@@ -1669,6 +1669,242 @@ export interface RevokeNhiCertResponse {
 	new_state: string;
 }
 
+// --- Approval Workflow Configuration Types ---
+
+export type ApproverType = 'manager' | 'entitlement_owner' | 'specific_users';
+export type GroupStatus = 'active' | 'disabled';
+export type EscalationAction = 'notify' | 'reassign' | 'auto_approve' | 'auto_reject';
+export type ExemptionStatus = 'active' | 'expired' | 'revoked';
+
+export interface ApprovalStep {
+	id: string;
+	step_order: number;
+	approver_type: ApproverType;
+	specific_approvers?: string[] | null;
+	created_at: string;
+}
+
+export interface ApprovalWorkflow {
+	id: string;
+	name: string;
+	description: string | null;
+	is_default: boolean;
+	is_active: boolean;
+	steps: ApprovalStep[];
+	created_at: string;
+	updated_at: string;
+}
+
+/** Summary returned in list views (no full steps, uses step_count). */
+export interface ApprovalWorkflowSummary {
+	id: string;
+	name: string;
+	description: string | null;
+	is_default: boolean;
+	is_active: boolean;
+	step_count: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ApprovalWorkflowListResponse {
+	items: ApprovalWorkflowSummary[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateApprovalWorkflowRequest {
+	name: string;
+	description?: string;
+	is_default?: boolean;
+	steps?: CreateApprovalStepRequest[];
+}
+
+export interface UpdateApprovalWorkflowRequest {
+	name?: string;
+	description?: string;
+	is_default?: boolean;
+	is_active?: boolean;
+	steps?: CreateApprovalStepRequest[];
+}
+
+export interface CreateApprovalStepRequest {
+	approver_type: ApproverType;
+	specific_approvers?: string[];
+}
+
+export interface ApprovalGroup {
+	id: string;
+	name: string;
+	description: string | null;
+	member_ids: string[];
+	member_count: number;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ApprovalGroupSummary {
+	id: string;
+	name: string;
+	description: string | null;
+	member_count: number;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ApprovalGroupListResponse {
+	items: ApprovalGroupSummary[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateApprovalGroupRequest {
+	name: string;
+	description?: string;
+	member_ids?: string[];
+}
+
+export interface UpdateApprovalGroupRequest {
+	name?: string;
+	description?: string;
+	is_active?: boolean;
+}
+
+export interface ModifyMembersRequest {
+	member_ids: string[];
+}
+
+export type EscalationTargetType =
+	| 'specific_user'
+	| 'approval_group'
+	| 'manager'
+	| 'manager_chain'
+	| 'tenant_admin';
+
+export type FinalFallbackAction =
+	| 'escalate_admin'
+	| 'auto_approve'
+	| 'auto_reject'
+	| 'remain_pending';
+
+export interface EscalationLevel {
+	id: string;
+	level_order: number;
+	level_name: string | null;
+	timeout_secs: number;
+	target_type: EscalationTargetType;
+	target_id: string | null;
+	manager_chain_depth: number | null;
+	created_at: string;
+}
+
+export interface EscalationPolicy {
+	id: string;
+	name: string;
+	description: string | null;
+	default_timeout_secs: number;
+	warning_threshold_secs: number | null;
+	final_fallback: FinalFallbackAction;
+	is_active: boolean;
+	is_default: boolean;
+	levels: EscalationLevel[];
+	created_at: string;
+	updated_at: string;
+}
+
+export interface EscalationPolicySummary {
+	id: string;
+	name: string;
+	description: string | null;
+	default_timeout_secs: number;
+	final_fallback: FinalFallbackAction;
+	is_active: boolean;
+	is_default: boolean;
+	level_count: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface EscalationPolicyListResponse {
+	items: EscalationPolicySummary[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateEscalationPolicyRequest {
+	name: string;
+	description?: string;
+	default_timeout_secs: number;
+	warning_threshold_secs?: number;
+	final_fallback: FinalFallbackAction;
+}
+
+export interface UpdateEscalationPolicyRequest {
+	name?: string;
+	description?: string;
+	default_timeout_secs?: number;
+	warning_threshold_secs?: number;
+	final_fallback?: FinalFallbackAction;
+	is_active?: boolean;
+}
+
+export interface AddEscalationLevelRequest {
+	level_order: number;
+	level_name?: string;
+	timeout_secs: number;
+	target_type: EscalationTargetType;
+	target_id?: string;
+	manager_chain_depth?: number;
+}
+
+export interface EscalationEvent {
+	id: string;
+	request_id: string;
+	event_type: string;
+	level: number | null;
+	action_taken: string | null;
+	details: Record<string, unknown> | null;
+	created_at: string;
+}
+
+export interface EscalationHistoryResponse {
+	events: EscalationEvent[];
+}
+
+export interface SodExemption {
+	id: string;
+	rule_id: string;
+	user_id: string;
+	approver_id: string;
+	justification: string;
+	status: ExemptionStatus;
+	created_at: string;
+	expires_at: string;
+	revoked_at: string | null;
+	revoked_by: string | null;
+	updated_at: string;
+	is_active: boolean;
+}
+
+export interface SodExemptionListResponse {
+	items: SodExemption[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateSodExemptionRequest {
+	rule_id: string;
+	user_id: string;
+	justification: string;
+	expires_at: string;
+}
+
 // --- Governance Reporting Types ---
 
 export type ReportTemplateType =

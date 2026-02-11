@@ -8,8 +8,14 @@ import {
 	approveAccessRequest,
 	rejectAccessRequest
 } from '$lib/api/access-requests';
+import {
+	getEscalationHistory,
+	cancelEscalation,
+	resetEscalation
+} from '$lib/api/approval-workflows';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import type { EscalationHistoryResponse } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -26,10 +32,22 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		throw e;
 	}
 
+	let escalationHistory: EscalationHistoryResponse = { events: [] };
+	try {
+		escalationHistory = await getEscalationHistory(
+			params.id,
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+	} catch {
+		// Non-fatal: escalation history may not be available
+	}
+
 	const approveForm = await superValidate(zod(approveRequestSchema));
 	const rejectForm = await superValidate(zod(rejectRequestSchema));
 
-	return { request, approveForm, rejectForm };
+	return { request, approveForm, rejectForm, escalationHistory };
 };
 
 export const actions: Actions = {
@@ -81,5 +99,29 @@ export const actions: Actions = {
 		}
 
 		redirect(302, '/governance');
+	},
+
+	cancelEscalation: async ({ params, locals, fetch }) => {
+		try {
+			await cancelEscalation(params.id, locals.accessToken!, locals.tenantId!, fetch);
+		} catch (e) {
+			if (e instanceof ApiError) {
+				return fail(e.status, { error: e.message });
+			}
+			return fail(500, { error: 'An unexpected error occurred' });
+		}
+		return { success: true };
+	},
+
+	resetEscalation: async ({ params, locals, fetch }) => {
+		try {
+			await resetEscalation(params.id, locals.accessToken!, locals.tenantId!, fetch);
+		} catch (e) {
+			if (e instanceof ApiError) {
+				return fail(e.status, { error: e.message });
+			}
+			return fail(500, { error: 'An unexpected error occurred' });
+		}
+		return { success: true };
 	}
 };

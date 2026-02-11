@@ -22,7 +22,9 @@
 		CertificationCampaignListResponse,
 		RiskScoreResponse,
 		RiskScoreListResponse,
-		RiskScoreSummary
+		RiskScoreSummary,
+		SodExemption,
+		SodExemptionListResponse
 	} from '$lib/api/types';
 	import EntitlementNameLink from './entitlement-name-link.svelte';
 	import AccessRequestLink from './access-request-link.svelte';
@@ -262,6 +264,34 @@
 		sodPagination = typeof updater === 'function' ? updater(sodPagination) : updater;
 	}
 
+	// SoD Exemptions sub-tab
+	let exemptions: SodExemption[] = $state([]);
+	let exemptionsLoading: boolean = $state(false);
+	let exemptionStatusFilter: string = $state('');
+
+	const exemptionStatusOptions = [
+		{ value: '', label: 'All statuses' },
+		{ value: 'active', label: 'Active' },
+		{ value: 'expired', label: 'Expired' },
+		{ value: 'revoked', label: 'Revoked' }
+	];
+
+	async function fetchExemptions() {
+		exemptionsLoading = true;
+		try {
+			const params = new URLSearchParams({ limit: '100' });
+			if (exemptionStatusFilter) params.set('status', exemptionStatusFilter);
+			const response = await fetch(`/api/governance/sod-exemptions?${params}`);
+			if (!response.ok) throw new Error('Failed to fetch');
+			const result: SodExemptionListResponse = await response.json();
+			exemptions = result.items;
+		} catch {
+			addToast('error', 'Failed to load SoD exemptions');
+		} finally {
+			exemptionsLoading = false;
+		}
+	}
+
 	// === Certifications tab ===
 	const campColumnHelper = createColumnHelper<CertificationCampaignResponse>();
 	const campColumns = [
@@ -433,6 +463,13 @@
 	});
 
 	$effect(() => {
+		if (activeTab === 'sod' && sodSubTab === 'exemptions') {
+			void exemptionStatusFilter;
+			fetchExemptions();
+		}
+	});
+
+	$effect(() => {
 		if (activeTab === 'certifications') {
 			void campPagination;
 			void campStatusFilter;
@@ -553,6 +590,12 @@
 				>
 					Violations
 				</button>
+				<button
+					class="rounded-md px-3 py-1.5 text-sm font-medium {sodSubTab === 'exemptions' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}"
+					onclick={() => (sodSubTab = 'exemptions')}
+				>
+					Exemptions
+				</button>
 				{#if sodSubTab === 'rules'}
 					<select
 						class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -580,8 +623,66 @@
 				<EmptyState title="No SoD rules yet" description="Create rules to define incompatible entitlement pairs." icon="⚖️" />
 			{/snippet}
 			<DataTable columns={sodColumns} data={sodData} pageCount={sodPageCount} pagination={sodPagination} onPaginationChange={handleSodPaginationChange} isLoading={sodLoading} emptyState={sodEmptyState} />
-		{:else}
+		{:else if sodSubTab === 'violations'}
 			<SodViolationList {violations} isLoading={violationsLoading} />
+		{:else if sodSubTab === 'exemptions'}
+			<div class="mb-4 flex items-center justify-between">
+				<select
+					class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+					bind:value={exemptionStatusFilter}
+				>
+					{#each exemptionStatusOptions as opt}
+						<option value={opt.value}>{opt.label}</option>
+					{/each}
+				</select>
+				<a
+					href="/governance/sod/exemptions/create"
+					class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+				>
+					Create Exemption
+				</a>
+			</div>
+			{#if exemptionsLoading}
+				<div class="space-y-2">
+					{#each Array(3) as _}
+						<div class="h-12 animate-pulse rounded-lg bg-muted"></div>
+					{/each}
+				</div>
+			{:else if exemptions.length === 0}
+				<EmptyState title="No SoD exemptions" description="Create exemptions to allow legitimate SoD rule violations." icon="🛡️" />
+			{:else}
+				<div class="overflow-x-auto rounded-lg border border-border">
+					<table class="w-full text-sm">
+						<thead>
+							<tr class="border-b border-border bg-muted/50">
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Rule ID</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">User ID</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Justification</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Expires</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each exemptions as exemption}
+								<tr class="border-b border-border last:border-0 hover:bg-muted/30">
+									<td class="px-4 py-3 font-mono text-xs">{exemption.rule_id.substring(0, 8)}...</td>
+									<td class="px-4 py-3 font-mono text-xs">{exemption.user_id.substring(0, 8)}...</td>
+									<td class="px-4 py-3">
+										<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
+											{exemption.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+											 exemption.status === 'revoked' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+											 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}">
+											{exemption.status}
+										</span>
+									</td>
+									<td class="max-w-[200px] truncate px-4 py-3 text-sm">{exemption.justification}</td>
+									<td class="px-4 py-3 text-sm">{exemption.expires_at ? new Date(exemption.expires_at).toLocaleDateString() : 'Never'}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
 		{/if}
 
 	{:else if activeTab === 'certifications'}

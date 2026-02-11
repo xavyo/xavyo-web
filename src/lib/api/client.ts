@@ -48,10 +48,18 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 	if (!response.ok) {
 		let errorMessage = 'An error occurred';
 		try {
-			const errorBody = await response.json();
-			errorMessage = errorBody.message || errorBody.detail || errorBody.error || errorMessage;
+			const text = await response.text();
+			try {
+				const errorBody = JSON.parse(text);
+				errorMessage = errorBody.message || errorBody.detail || errorBody.error || errorMessage;
+			} catch {
+				// Response body not JSON — use plain text if available
+				if (text) {
+					errorMessage = text;
+				}
+			}
 		} catch {
-			// Response body not JSON
+			// Could not read response body
 		}
 		throw new ApiError(errorMessage, response.status);
 	}

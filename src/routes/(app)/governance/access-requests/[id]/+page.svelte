@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
+	import { enhance as formEnhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import { Card, CardHeader, CardContent } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import { Separator } from '$lib/components/ui/separator';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
@@ -216,6 +219,77 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Escalation History -->
+{#if data.escalationHistory.events.length > 0}
+	<Separator class="my-6" />
+	<Card>
+		<CardHeader>
+			<div class="flex items-center justify-between">
+				<h2 class="text-xl font-semibold">Escalation History</h2>
+				{#if isPending}
+					<div class="flex gap-2">
+						<form method="POST" action="?/cancelEscalation" use:formEnhance={() => {
+							return async ({ result, update }) => {
+								if (result.type === 'success') {
+									addToast('success', 'Escalation cancelled');
+									await invalidateAll();
+								} else if (result.type === 'failure') {
+									addToast('error', 'Failed to cancel escalation');
+								}
+							};
+						}}>
+							<Button type="submit" variant="outline" size="sm">Cancel Escalation</Button>
+						</form>
+						<form method="POST" action="?/resetEscalation" use:formEnhance={() => {
+							return async ({ result, update }) => {
+								if (result.type === 'success') {
+									addToast('success', 'Escalation reset');
+									await invalidateAll();
+								} else if (result.type === 'failure') {
+									addToast('error', 'Failed to reset escalation');
+								}
+							};
+						}}>
+							<Button type="submit" variant="outline" size="sm">Reset Escalation</Button>
+						</form>
+					</div>
+				{/if}
+			</div>
+		</CardHeader>
+		<CardContent>
+			<div class="space-y-4">
+				{#each data.escalationHistory.events as entry}
+					<div class="flex gap-3 rounded-md border border-border p-3">
+						<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full
+							{entry.event_type === 'escalated' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+							 entry.event_type === 'auto_approved' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+							 entry.event_type === 'auto_rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+							 entry.event_type === 'reassigned' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
+							 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}">
+							<span class="text-xs font-bold">
+								{entry.event_type === 'escalated' ? 'E' :
+								 entry.event_type === 'auto_approved' ? 'A' :
+								 entry.event_type === 'auto_rejected' ? 'R' :
+								 entry.event_type === 'reassigned' ? 'M' :
+								 entry.event_type === 'notified' ? 'N' : '?'}
+							</span>
+						</div>
+						<div class="flex-1">
+							<div class="flex items-center gap-2">
+								<span class="text-sm font-medium capitalize">{entry.event_type.replace(/_/g, ' ')}</span>
+								<span class="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleString()}</span>
+							</div>
+							{#if entry.action_taken}
+								<p class="mt-1 text-sm text-muted-foreground">Action: {entry.action_taken}</p>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
+		</CardContent>
+	</Card>
+{/if}
 
 <!-- Approve Dialog -->
 <Dialog.Root bind:open={approveDialogOpen}>
