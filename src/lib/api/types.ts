@@ -894,3 +894,445 @@ export interface LinkAccountRequest {
 	code: string;
 	state: string;
 }
+
+// Governance Types (mirror Rust DTOs from xavyo-governance)
+
+export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
+export type EntitlementStatus = 'active' | 'inactive' | 'suspended';
+export type DataProtectionClassification = 'none' | 'personal' | 'sensitive' | 'special_category';
+export type LegalBasis =
+	| 'consent'
+	| 'contract'
+	| 'legal_obligation'
+	| 'vital_interest'
+	| 'public_task'
+	| 'legitimate_interest';
+
+export type AccessRequestStatus =
+	| 'pending'
+	| 'pending_approval'
+	| 'approved'
+	| 'provisioned'
+	| 'rejected'
+	| 'cancelled'
+	| 'expired'
+	| 'failed';
+
+export type SodRuleStatus = 'active' | 'inactive';
+
+export type CampaignStatus = 'draft' | 'active' | 'completed' | 'cancelled' | 'overdue';
+export type CampaignScopeType = 'all_users' | 'department' | 'application' | 'entitlement';
+export type CampaignReviewerType =
+	| 'user_manager'
+	| 'application_owner'
+	| 'entitlement_owner'
+	| 'specific_users';
+
+export type CertificationItemStatus = 'pending' | 'approved' | 'revoked' | 'skipped';
+export type CertificationDecision = 'approved' | 'revoked';
+
+export type RiskDirection = 'increasing' | 'stable' | 'decreasing';
+
+// Entitlement
+
+export interface EntitlementResponse {
+	id: string;
+	tenant_id: string;
+	application_id: string;
+	name: string;
+	description: string | null;
+	risk_level: RiskLevel;
+	status: EntitlementStatus;
+	owner_id: string | null;
+	external_id: string | null;
+	metadata: Record<string, unknown> | null;
+	is_delegable: boolean;
+	data_protection_classification: DataProtectionClassification;
+	legal_basis: LegalBasis | null;
+	retention_period_days: number | null;
+	data_controller: string | null;
+	data_processor: string | null;
+	purposes: string[] | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface EntitlementListResponse {
+	items: EntitlementResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateEntitlementRequest {
+	application_id: string;
+	name: string;
+	description?: string;
+	risk_level: RiskLevel;
+	owner_id?: string;
+	external_id?: string;
+	metadata?: Record<string, unknown>;
+	is_delegable?: boolean;
+	data_protection_classification: DataProtectionClassification;
+	legal_basis?: LegalBasis;
+	retention_period_days?: number;
+	data_controller?: string;
+	data_processor?: string;
+	purposes?: string[];
+}
+
+export interface UpdateEntitlementRequest {
+	application_id?: string;
+	name?: string;
+	description?: string;
+	risk_level?: RiskLevel;
+	status?: EntitlementStatus;
+	owner_id?: string;
+	external_id?: string;
+	metadata?: Record<string, unknown>;
+	is_delegable?: boolean;
+	data_protection_classification?: DataProtectionClassification;
+	legal_basis?: LegalBasis;
+	retention_period_days?: number;
+	data_controller?: string;
+	data_processor?: string;
+	purposes?: string[];
+}
+
+export interface SetEntitlementOwnerRequest {
+	owner_id: string;
+}
+
+// Access Requests
+
+export interface SodViolationInfo {
+	rule_id: string;
+	rule_name: string;
+	severity: RiskLevel;
+	first_entitlement_id: string;
+	second_entitlement_id: string;
+	user_already_has: string;
+}
+
+export interface AccessRequestResponse {
+	id: string;
+	requester_id: string;
+	entitlement_id: string;
+	workflow_id: string | null;
+	current_step: number;
+	status: AccessRequestStatus;
+	justification: string;
+	requested_expires_at: string | null;
+	has_sod_warning: boolean;
+	sod_violations: SodViolationInfo[];
+	provisioned_assignment_id: string | null;
+	created_at: string;
+	updated_at: string;
+	expires_at: string | null;
+}
+
+export interface AccessRequestListResponse {
+	items: AccessRequestResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateAccessRequestRequest {
+	entitlement_id: string;
+	justification: string;
+	requested_expires_at?: string;
+}
+
+export interface CreateAccessRequestResponse {
+	request: AccessRequestResponse;
+	sod_warning_message?: string;
+}
+
+export interface ApproveAccessRequestRequest {
+	notes?: string;
+}
+
+export interface RejectAccessRequestRequest {
+	reason: string;
+}
+
+// SoD Rules
+
+export interface SodRuleResponse {
+	id: string;
+	name: string;
+	description: string | null;
+	first_entitlement_id: string;
+	second_entitlement_id: string;
+	severity: RiskLevel;
+	status: SodRuleStatus;
+	business_rationale: string | null;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface SodRuleListResponse {
+	items: SodRuleResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateSodRuleRequest {
+	name: string;
+	description?: string;
+	first_entitlement_id: string;
+	second_entitlement_id: string;
+	severity: RiskLevel;
+	business_rationale?: string;
+}
+
+export interface UpdateSodRuleRequest {
+	name?: string;
+	description?: string;
+	first_entitlement_id?: string;
+	second_entitlement_id?: string;
+	severity?: RiskLevel;
+	business_rationale?: string;
+}
+
+export interface SodViolationResponse {
+	rule_id: string;
+	rule_name: string;
+	severity: RiskLevel;
+	first_entitlement_id: string;
+	second_entitlement_id: string;
+	user_id: string;
+	user_already_has: string;
+}
+
+export interface SodViolationListResponse {
+	items: SodViolationResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface SodCheckRequest {
+	entitlement_id: string;
+	user_id: string;
+}
+
+export interface SodCheckResponse {
+	has_violations: boolean;
+	violations: SodViolationInfo[];
+}
+
+// Certification Campaigns
+
+export interface CampaignScopeConfig {
+	application_id?: string;
+	entitlement_id?: string;
+	department?: string;
+}
+
+export interface CertificationCampaignResponse {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	scope_type: CampaignScopeType;
+	scope_config: CampaignScopeConfig;
+	reviewer_type: CampaignReviewerType;
+	status: CampaignStatus;
+	deadline: string;
+	launched_at: string | null;
+	completed_at: string | null;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CertificationCampaignListResponse {
+	items: CertificationCampaignResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateCampaignRequest {
+	name: string;
+	description?: string;
+	scope_type: CampaignScopeType;
+	scope_config?: CampaignScopeConfig;
+	reviewer_type: CampaignReviewerType;
+	specific_reviewers?: string[];
+	deadline: string;
+}
+
+export interface UpdateCampaignRequest {
+	name?: string;
+	description?: string;
+	scope_type?: CampaignScopeType;
+	scope_config?: CampaignScopeConfig;
+	reviewer_type?: CampaignReviewerType;
+	specific_reviewers?: string[];
+	deadline?: string;
+}
+
+export interface CampaignProgressResponse {
+	total_items: number;
+	pending_items: number;
+	approved_items: number;
+	revoked_items: number;
+	completion_percentage: number;
+}
+
+export interface CertificationItemResponse {
+	id: string;
+	campaign_id: string;
+	user_id: string;
+	entitlement_id: string;
+	reviewer_id: string;
+	status: CertificationItemStatus;
+	assignment_snapshot: Record<string, unknown> | null;
+	decided_at: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CertificationItemListResponse {
+	items: CertificationItemResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CertificationDecisionRequest {
+	decision: CertificationDecision;
+	notes?: string;
+}
+
+// Risk Scoring
+
+export interface FactorContribution {
+	factor_name: string;
+	score: number;
+	weight: number;
+	description: string | null;
+}
+
+export interface PeerComparison {
+	percentile: number;
+	peer_group_average: number;
+	peer_group_size: number;
+}
+
+export interface RiskScoreResponse {
+	id: string;
+	user_id: string;
+	total_score: number;
+	risk_level: RiskLevel;
+	static_score: number;
+	dynamic_score: number;
+	factor_breakdown: FactorContribution[];
+	peer_comparison: PeerComparison | null;
+	calculated_at: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface RiskScoreListResponse {
+	items: RiskScoreResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface RiskLevelCount {
+	level: RiskLevel;
+	count: number;
+}
+
+export interface RiskScoreSummary {
+	by_level: RiskLevelCount[];
+	total_users: number;
+	average_score: number;
+}
+
+export interface RiskHistoryEntry {
+	snapshot_date: string;
+	score: number;
+	risk_level: RiskLevel;
+}
+
+export interface RiskTrendResponse {
+	score_30d_ago?: number;
+	score_60d_ago?: number;
+	score_90d_ago?: number;
+	change_30d?: number;
+	change_60d?: number;
+	change_90d?: number;
+	direction: RiskDirection;
+}
+
+export interface RiskScoreHistoryResponse {
+	user_id: string;
+	current_score: number;
+	trend: RiskTrendResponse;
+	history: RiskHistoryEntry[];
+}
+
+export interface RiskAlertsSummary {
+	total_alerts: number;
+	unread_count: number;
+	by_severity: {
+		low: number;
+		medium: number;
+		high: number;
+		critical: number;
+	};
+}
+
+export interface RiskAlertResponse {
+	id: string;
+	user_id: string;
+	alert_type: string;
+	severity: RiskLevel;
+	title: string;
+	message: string;
+	metadata: Record<string, unknown>;
+	acknowledged_at: string | null;
+	created_at: string;
+}
+
+export interface RiskAlertListResponse {
+	items: RiskAlertResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Governance Applications ---
+
+export type AppType = 'internal' | 'external';
+export type AppStatus = 'active' | 'inactive';
+
+export interface ApplicationResponse {
+	id: string;
+	tenant_id: string;
+	name: string;
+	app_type: AppType;
+	status: AppStatus;
+	description: string | null;
+	owner_id: string | null;
+	external_id: string | null;
+	metadata: Record<string, unknown> | null;
+	is_delegable: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ApplicationListResponse {
+	items: ApplicationResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}

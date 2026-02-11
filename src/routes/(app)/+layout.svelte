@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, Settings, ClipboardList, Network } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, Settings, ClipboardList, Network, Shield, FileQuestion } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -24,11 +24,13 @@
 			{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
 			{ label: 'Users', href: '/users', icon: Users },
 			{ label: 'Personas', href: '/personas', icon: Drama },
-			{ label: 'NHI', href: '/nhi', icon: Bot }
+			{ label: 'NHI', href: '/nhi', icon: Bot },
+			{ label: 'My Requests', href: '/my-requests', icon: FileQuestion }
 		];
 		if (data.isAdmin) {
 			items.push({ label: 'Federation', href: '/federation', icon: Network });
 			items.push({ label: 'Audit', href: '/audit', icon: ClipboardList });
+			items.push({ label: 'Governance', href: '/governance', icon: Shield });
 		}
 		items.push({
 			label: 'Settings',
