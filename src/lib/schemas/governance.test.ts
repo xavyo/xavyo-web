@@ -604,35 +604,35 @@ describe('createAccessRequestSchema', () => {
 });
 
 describe('approveRequestSchema', () => {
-	it('accepts empty object (notes is optional)', () => {
+	it('accepts empty object (comments is optional)', () => {
 		const result = approveRequestSchema.safeParse({});
 		expect(result.success).toBe(true);
 	});
 
-	it('accepts valid notes', () => {
+	it('accepts valid comments', () => {
 		const result = approveRequestSchema.safeParse({
-			notes: 'Approved per manager request'
+			comments: 'Approved per manager request'
 		});
 		expect(result.success).toBe(true);
 	});
 });
 
 describe('rejectRequestSchema', () => {
-	it('accepts valid reason', () => {
+	it('accepts valid comments', () => {
 		const result = rejectRequestSchema.safeParse({
-			reason: 'Insufficient justification provided'
+			comments: 'Insufficient justification provided'
 		});
 		expect(result.success).toBe(true);
 	});
 
-	it('rejects missing reason', () => {
+	it('rejects missing comments', () => {
 		const result = rejectRequestSchema.safeParse({});
 		expect(result.success).toBe(false);
 	});
 
-	it('rejects empty reason', () => {
+	it('rejects empty comments', () => {
 		const result = rejectRequestSchema.safeParse({
-			reason: ''
+			comments: ''
 		});
 		expect(result.success).toBe(false);
 	});

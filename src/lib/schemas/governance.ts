@@ -88,11 +88,11 @@ export const createAccessRequestSchema = z.object({
 });
 
 export const approveRequestSchema = z.object({
-	notes: z.string().optional()
+	comments: z.string().optional()
 });
 
 export const rejectRequestSchema = z.object({
-	reason: z.string().min(1, 'Reason is required')
+	comments: z.string().min(1, 'Reason is required')
 });
 
 export const certificationDecisionSchema = z.object({

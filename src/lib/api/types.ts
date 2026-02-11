@@ -1050,11 +1050,11 @@ export interface CreateAccessRequestResponse {
 }
 
 export interface ApproveAccessRequestRequest {
-	notes?: string;
+	comments?: string;
 }
 
 export interface RejectAccessRequestRequest {
-	reason: string;
+	comments: string;
 }
 
 // SoD Rules

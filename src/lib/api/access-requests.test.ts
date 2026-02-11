@@ -215,7 +215,7 @@ describe('access-requests API functions', () => {
 
 	describe('approveAccessRequest', () => {
 		it('calls POST /governance/access-requests/:id/approve with body', async () => {
-			const approveData = { notes: 'Approved for project Alpha' };
+			const approveData = { comments: 'Approved for project Alpha' };
 			const approvedRequest = { ...mockAccessRequest, status: 'approved' };
 			mockApiClient.mockResolvedValue(approvedRequest);
 
@@ -231,7 +231,7 @@ describe('access-requests API functions', () => {
 			expect(result).toEqual(approvedRequest);
 		});
 
-		it('sends empty body when no notes provided', async () => {
+		it('sends empty body when no comments provided', async () => {
 			const approveData = {};
 			const approvedRequest = { ...mockAccessRequest, status: 'approved' };
 			mockApiClient.mockResolvedValue(approvedRequest);
@@ -250,7 +250,7 @@ describe('access-requests API functions', () => {
 
 	describe('rejectAccessRequest', () => {
 		it('calls POST /governance/access-requests/:id/reject with body', async () => {
-			const rejectData = { reason: 'Insufficient justification' };
+			const rejectData = { comments: 'Insufficient justification' };
 			const rejectedRequest = { ...mockAccessRequest, status: 'rejected' };
 			mockApiClient.mockResolvedValue(rejectedRequest);
 

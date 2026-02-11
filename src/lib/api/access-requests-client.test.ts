@@ -152,7 +152,7 @@ describe('access-requests-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(data));
 			const { approveAccessRequestClient } = await import('./access-requests-client');
 
-			const body = { notes: 'Approved by manager' };
+			const body = { comments: 'Approved by manager' };
 			const result = await approveAccessRequestClient('req-1', body, mockFetch);
 
 			expect(mockFetch).toHaveBeenCalledWith('/api/governance/access-requests/req-1/approve', {
@@ -168,7 +168,7 @@ describe('access-requests-client', () => {
 			const { approveAccessRequestClient } = await import('./access-requests-client');
 
 			await expect(
-				approveAccessRequestClient('req-1', { notes: 'ok' }, mockFetch)
+				approveAccessRequestClient('req-1', { comments: 'ok' }, mockFetch)
 			).rejects.toThrow('Failed to approve access request: 403');
 		});
 	});
@@ -181,7 +181,7 @@ describe('access-requests-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(data));
 			const { rejectAccessRequestClient } = await import('./access-requests-client');
 
-			const body = { reason: 'Not justified' };
+			const body = { comments: 'Not justified' };
 			const result = await rejectAccessRequestClient('req-1', body, mockFetch);
 
 			expect(mockFetch).toHaveBeenCalledWith('/api/governance/access-requests/req-1/reject', {
@@ -197,7 +197,7 @@ describe('access-requests-client', () => {
 			const { rejectAccessRequestClient } = await import('./access-requests-client');
 
 			await expect(
-				rejectAccessRequestClient('req-1', { reason: 'No' }, mockFetch)
+				rejectAccessRequestClient('req-1', { comments: 'No' }, mockFetch)
 			).rejects.toThrow('Failed to reject access request: 403');
 		});
 	});

@@ -235,16 +235,16 @@
 
 		<form method="POST" action="?/approve" use:approveEnhance class="space-y-4">
 			<div class="space-y-2">
-				<Label for="notes">Notes (optional)</Label>
+				<Label for="comments">Comments (optional)</Label>
 				<textarea
-					id="notes"
-					name="notes"
+					id="comments"
+					name="comments"
 					class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-					placeholder="Add any notes about this approval..."
-					value={String($approveFormData.notes ?? '')}
+					placeholder="Add any comments about this approval..."
+					value={String($approveFormData.comments ?? '')}
 				></textarea>
-				{#if $approveErrors.notes}
-					<p class="text-sm text-destructive">{$approveErrors.notes}</p>
+				{#if $approveErrors.comments}
+					<p class="text-sm text-destructive">{$approveErrors.comments}</p>
 				{/if}
 			</div>
 
@@ -282,16 +282,16 @@
 
 		<form method="POST" action="?/reject" use:rejectEnhance class="space-y-4">
 			<div class="space-y-2">
-				<Label for="reason">Reason</Label>
+				<Label for="reject-comments">Reason</Label>
 				<textarea
-					id="reason"
-					name="reason"
+					id="reject-comments"
+					name="comments"
 					class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 					placeholder="Explain why this request is being rejected..."
-					value={String($rejectFormData.reason ?? '')}
+					value={String($rejectFormData.comments ?? '')}
 				></textarea>
-				{#if $rejectErrors.reason}
-					<p class="text-sm text-destructive">{$rejectErrors.reason}</p>
+				{#if $rejectErrors.comments}
+					<p class="text-sm text-destructive">{$rejectErrors.comments}</p>
 				{/if}
 			</div>
 

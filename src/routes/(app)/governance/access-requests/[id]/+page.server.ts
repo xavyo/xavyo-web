@@ -43,7 +43,7 @@ export const actions: Actions = {
 		try {
 			await approveAccessRequest(
 				params.id,
-				{ notes: form.data.notes || undefined },
+				{ comments: form.data.comments || undefined },
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
@@ -68,7 +68,7 @@ export const actions: Actions = {
 		try {
 			await rejectAccessRequest(
 				params.id,
-				{ reason: form.data.reason },
+				{ comments: form.data.comments },
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
