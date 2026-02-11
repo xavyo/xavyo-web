@@ -25,6 +25,9 @@
 		RiskScoreSummary
 	} from '$lib/api/types';
 	import EntitlementNameLink from './entitlement-name-link.svelte';
+	import AccessRequestLink from './access-request-link.svelte';
+	import SodRuleLink from './sod-rule-link.svelte';
+	import CampaignLink from './campaign-link.svelte';
 	import RiskLevelBadge from './risk-level-badge.svelte';
 	import ClassificationBadge from './classification-badge.svelte';
 	import StatusBadge from './status-badge.svelte';
@@ -117,12 +120,10 @@
 	// === Access Requests tab ===
 	const arColumnHelper = createColumnHelper<AccessRequestResponse>();
 	const arColumns = [
-		arColumnHelper.accessor('requester_id', {
-			header: 'Requester',
-			cell: (info) => {
-				const val = info.getValue();
-				return val.substring(0, 8) + '...';
-			}
+		arColumnHelper.accessor('id', {
+			header: 'Request',
+			cell: (info) =>
+				renderComponent(AccessRequestLink, { id: info.getValue() })
 		}),
 		arColumnHelper.accessor('entitlement_id', {
 			header: 'Entitlement',
@@ -192,7 +193,8 @@
 	const sodColumns = [
 		sodColumnHelper.accessor('name', {
 			header: 'Name',
-			cell: (info) => info.getValue()
+			cell: (info) =>
+				renderComponent(SodRuleLink, { name: info.getValue(), id: info.row.original.id })
 		}),
 		sodColumnHelper.accessor('severity', {
 			header: 'Severity',
@@ -265,7 +267,8 @@
 	const campColumns = [
 		campColumnHelper.accessor('name', {
 			header: 'Name',
-			cell: (info) => info.getValue()
+			cell: (info) =>
+				renderComponent(CampaignLink, { name: info.getValue(), id: info.row.original.id })
 		}),
 		campColumnHelper.accessor('status', {
 			header: 'Status',
