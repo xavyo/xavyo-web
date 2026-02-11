@@ -20,10 +20,10 @@
 		enhance: editEnhance,
 		message: editMessage
 	} = superForm(data.editForm, {
+		invalidateAll: 'force',
 		onResult({ result }) {
 			if (result.type === 'success') {
 				addToast('success', 'Group updated');
-				invalidateAll();
 			}
 		}
 	});
@@ -34,11 +34,11 @@
 		enhance: memberEnhance,
 		message: memberMessage
 	} = superForm(data.memberForm, {
+		invalidateAll: 'force',
 		resetForm: true,
 		onResult({ result }) {
 			if (result.type === 'success') {
 				addToast('success', 'Member added');
-				invalidateAll();
 			}
 		}
 	});

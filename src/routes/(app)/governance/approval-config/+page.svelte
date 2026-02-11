@@ -290,7 +290,7 @@
 					<thead>
 						<tr class="border-b border-border bg-muted/50">
 							<th class="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
-							<th class="px-4 py-3 text-left font-medium text-muted-foreground">Default</th>
+							<th class="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
 							<th class="px-4 py-3 text-left font-medium text-muted-foreground">Fallback</th>
 							<th class="px-4 py-3 text-left font-medium text-muted-foreground">Levels</th>
 							<th class="px-4 py-3 text-left font-medium text-muted-foreground">Created</th>
@@ -308,13 +308,13 @@
 									</a>
 								</td>
 								<td class="px-4 py-3">
-									{#if policy.is_default}
-										<span
-											class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
-										>
-											Default
-										</span>
-									{/if}
+									<span
+										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {policy.is_active
+											? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+											: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'}"
+									>
+										{policy.is_active ? 'Active' : 'Inactive'}
+									</span>
 								</td>
 								<td class="px-4 py-3">
 									<span

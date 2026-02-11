@@ -21,11 +21,11 @@
 		enhance: editEnhance,
 		message: editMessage
 	} = superForm(data.editForm, {
+		invalidateAll: 'force',
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.type !== 'error') {
 				addToast('success', 'Workflow updated');
 				isEditing = false;
-				invalidateAll();
 			}
 		}
 	});
@@ -36,10 +36,11 @@
 		enhance: stepEnhance,
 		message: stepMessage
 	} = superForm(data.stepForm, {
+		invalidateAll: 'force',
+		resetForm: true,
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.type !== 'error') {
 				addToast('success', 'Step added');
-				invalidateAll();
 			}
 		}
 	});

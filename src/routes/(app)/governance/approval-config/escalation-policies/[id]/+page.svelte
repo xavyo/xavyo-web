@@ -20,10 +20,10 @@
 		enhance: editEnhance,
 		message: editMessage
 	} = superForm(data.editForm, {
+		invalidateAll: 'force',
 		onResult({ result }) {
 			if (result.type === 'success') {
 				addToast('success', 'Policy updated');
-				invalidateAll();
 			}
 		}
 	});
@@ -34,11 +34,11 @@
 		enhance: levelEnhance,
 		message: levelMessage
 	} = superForm(data.levelForm, {
+		invalidateAll: 'force',
 		resetForm: true,
 		onResult({ result }) {
 			if (result.type === 'success') {
 				addToast('success', 'Level added');
-				invalidateAll();
 			}
 		}
 	});

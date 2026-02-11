@@ -26,6 +26,7 @@
 		SodExemption,
 		SodExemptionListResponse
 	} from '$lib/api/types';
+	import { revokeSodExemptionClient } from '$lib/api/approval-workflows-client';
 	import EntitlementNameLink from './entitlement-name-link.svelte';
 	import AccessRequestLink from './access-request-link.svelte';
 	import SodRuleLink from './sod-rule-link.svelte';
@@ -289,6 +290,16 @@
 			addToast('error', 'Failed to load SoD exemptions');
 		} finally {
 			exemptionsLoading = false;
+		}
+	}
+
+	async function revokeExemption(id: string) {
+		try {
+			await revokeSodExemptionClient(id);
+			addToast('success', 'Exemption revoked');
+			fetchExemptions();
+		} catch {
+			addToast('error', 'Failed to revoke exemption');
 		}
 	}
 
@@ -660,6 +671,7 @@
 								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
 								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Justification</th>
 								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Expires</th>
+								<th class="px-4 py-3 text-left font-medium text-muted-foreground">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -677,6 +689,16 @@
 									</td>
 									<td class="max-w-[200px] truncate px-4 py-3 text-sm">{exemption.justification}</td>
 									<td class="px-4 py-3 text-sm">{exemption.expires_at ? new Date(exemption.expires_at).toLocaleDateString() : 'Never'}</td>
+									<td class="px-4 py-3">
+										{#if exemption.status === 'active'}
+											<button
+												class="rounded-md border border-input bg-background px-3 py-1 text-xs font-medium text-destructive ring-offset-background transition-colors hover:bg-destructive hover:text-destructive-foreground"
+												onclick={() => revokeExemption(exemption.id)}
+											>
+												Revoke
+											</button>
+										{/if}
+									</td>
 								</tr>
 							{/each}
 						</tbody>

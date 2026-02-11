@@ -1823,7 +1823,6 @@ export interface EscalationPolicySummary {
 	default_timeout_secs: number;
 	final_fallback: FinalFallbackAction;
 	is_active: boolean;
-	is_default: boolean;
 	level_count: number;
 	created_at: string;
 	updated_at: string;
