@@ -2,6 +2,9 @@ import { apiClient } from './client';
 import type {
 	NhiListResponse,
 	NhiDetailResponse,
+	NhiAgentExtension,
+	NhiToolExtension,
+	NhiServiceAccountExtension,
 	CreateToolRequest,
 	UpdateToolRequest,
 	CreateAgentRequest,
@@ -13,6 +16,46 @@ import type {
 	IssueCredentialRequest,
 	RotateCredentialRequest
 } from './types';
+
+// Backend entity-specific endpoints return flat structs (all fields at top level).
+// The frontend expects nested NhiDetailResponse with tool/agent/service_account sub-objects.
+// These helpers extract extension fields from the flat response and nest them.
+
+const AGENT_EXT_KEYS: (keyof NhiAgentExtension)[] = [
+	'agent_type', 'model_provider', 'model_name', 'model_version',
+	'max_token_lifetime_secs', 'requires_human_approval'
+];
+
+const TOOL_EXT_KEYS: (keyof NhiToolExtension)[] = [
+	'category', 'input_schema', 'output_schema', 'requires_approval',
+	'max_calls_per_hour', 'provider', 'provider_verified', 'checksum'
+];
+
+const SA_EXT_KEYS: (keyof NhiServiceAccountExtension)[] = ['purpose', 'environment'];
+
+function normalizeAgent(flat: Record<string, unknown>): NhiDetailResponse {
+	const agent: Record<string, unknown> = {};
+	for (const key of AGENT_EXT_KEYS) {
+		if (key in flat) agent[key] = flat[key];
+	}
+	return { ...flat, agent: agent as unknown as NhiAgentExtension } as unknown as NhiDetailResponse;
+}
+
+function normalizeTool(flat: Record<string, unknown>): NhiDetailResponse {
+	const tool: Record<string, unknown> = {};
+	for (const key of TOOL_EXT_KEYS) {
+		if (key in flat) tool[key] = flat[key];
+	}
+	return { ...flat, tool: tool as unknown as NhiToolExtension } as unknown as NhiDetailResponse;
+}
+
+function normalizeServiceAccount(flat: Record<string, unknown>): NhiDetailResponse {
+	const sa: Record<string, unknown> = {};
+	for (const key of SA_EXT_KEYS) {
+		if (key in flat) sa[key] = flat[key];
+	}
+	return { ...flat, service_account: sa as unknown as NhiServiceAccountExtension } as unknown as NhiDetailResponse;
+}
 
 // List params
 
@@ -56,13 +99,14 @@ export async function createTool(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>('/nhi/tools', {
+	const raw = await apiClient<Record<string, unknown>>('/nhi/tools', {
 		method: 'POST',
 		body: data,
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeTool(raw);
 }
 
 export async function getTool(
@@ -71,12 +115,13 @@ export async function getTool(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>(`/nhi/tools/${id}`, {
+	const raw = await apiClient<Record<string, unknown>>(`/nhi/tools/${id}`, {
 		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeTool(raw);
 }
 
 export async function updateTool(
@@ -86,13 +131,14 @@ export async function updateTool(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>(`/nhi/tools/${id}`, {
+	const raw = await apiClient<Record<string, unknown>>(`/nhi/tools/${id}`, {
 		method: 'PATCH',
 		body: data,
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeTool(raw);
 }
 
 export async function deleteTool(
@@ -117,13 +163,14 @@ export async function createAgent(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>('/nhi/agents', {
+	const raw = await apiClient<Record<string, unknown>>('/nhi/agents', {
 		method: 'POST',
 		body: data,
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeAgent(raw);
 }
 
 export async function getAgent(
@@ -132,12 +179,13 @@ export async function getAgent(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>(`/nhi/agents/${id}`, {
+	const raw = await apiClient<Record<string, unknown>>(`/nhi/agents/${id}`, {
 		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeAgent(raw);
 }
 
 export async function updateAgent(
@@ -147,13 +195,14 @@ export async function updateAgent(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>(`/nhi/agents/${id}`, {
+	const raw = await apiClient<Record<string, unknown>>(`/nhi/agents/${id}`, {
 		method: 'PATCH',
 		body: data,
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeAgent(raw);
 }
 
 export async function deleteAgent(
@@ -178,13 +227,14 @@ export async function createServiceAccount(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>('/nhi/service-accounts', {
+	const raw = await apiClient<Record<string, unknown>>('/nhi/service-accounts', {
 		method: 'POST',
 		body: data,
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeServiceAccount(raw);
 }
 
 export async function getServiceAccount(
@@ -193,12 +243,13 @@ export async function getServiceAccount(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>(`/nhi/service-accounts/${id}`, {
+	const raw = await apiClient<Record<string, unknown>>(`/nhi/service-accounts/${id}`, {
 		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeServiceAccount(raw);
 }
 
 export async function updateServiceAccount(
@@ -208,13 +259,14 @@ export async function updateServiceAccount(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiDetailResponse> {
-	return apiClient<NhiDetailResponse>(`/nhi/service-accounts/${id}`, {
+	const raw = await apiClient<Record<string, unknown>>(`/nhi/service-accounts/${id}`, {
 		method: 'PATCH',
 		body: data,
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return normalizeServiceAccount(raw);
 }
 
 export async function deleteServiceAccount(

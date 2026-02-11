@@ -1336,3 +1336,178 @@ export interface ApplicationListResponse {
 	limit: number;
 	offset: number;
 }
+
+// --- NHI Protocol Types (MCP, A2A, Permissions, Agent Card) ---
+
+// MCP Types
+
+export interface McpTool {
+	name: string;
+	description: string | null;
+	input_schema: Record<string, unknown>;
+	status: string;
+	deprecated: boolean | null;
+}
+
+export interface McpToolsResponse {
+	tools: McpTool[];
+}
+
+export interface McpContext {
+	conversation_id?: string;
+	session_id?: string;
+	user_instruction?: string;
+}
+
+export interface McpCallRequest {
+	parameters: Record<string, unknown>;
+	context?: McpContext;
+}
+
+export interface McpCallResponse {
+	call_id: string;
+	result: Record<string, unknown>;
+	latency_ms: number;
+}
+
+export type McpErrorCode =
+	| 'InvalidParameters'
+	| 'Unauthorized'
+	| 'NotFound'
+	| 'RateLimitExceeded'
+	| 'ExecutionFailed'
+	| 'Timeout'
+	| 'InternalError';
+
+export interface McpErrorResponse {
+	error_code: McpErrorCode;
+	message: string;
+	details: Record<string, unknown> | null;
+}
+
+// A2A Types
+
+export type A2aTaskState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+export interface A2aTaskResponse {
+	id: string;
+	source_agent_id: string | null;
+	target_agent_id: string | null;
+	task_type: string;
+	state: A2aTaskState;
+	result: Record<string, unknown> | null;
+	error_code: string | null;
+	error_message: string | null;
+	created_at: string;
+	started_at: string | null;
+	completed_at: string | null;
+}
+
+export interface A2aTaskListResponse {
+	tasks: A2aTaskResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateA2aTaskRequest {
+	target_agent_id: string;
+	task_type: string;
+	input: Record<string, unknown>;
+	callback_url?: string;
+	source_agent_id?: string;
+}
+
+export interface CreateA2aTaskResponse {
+	task_id: string;
+	status: string;
+	created_at: string;
+}
+
+export interface CancelA2aTaskResponse {
+	task_id: string;
+	state: string;
+	cancelled_at: string;
+}
+
+// NHI Permission Types
+
+export interface NhiToolPermission {
+	id: string;
+	agent_nhi_id: string;
+	tool_nhi_id: string;
+	expires_at: string | null;
+	granted_at: string;
+	granted_by: string;
+}
+
+export interface GrantToolPermissionRequest {
+	expires_at?: string;
+}
+
+export interface NhiNhiPermission {
+	id: string;
+	source_nhi_id: string;
+	target_nhi_id: string;
+	permission_type: string;
+	allowed_actions: Record<string, unknown> | null;
+	max_calls_per_hour: number | null;
+	expires_at: string | null;
+	granted_at: string;
+	granted_by: string | null;
+}
+
+export interface GrantNhiPermissionRequest {
+	permission_type: string;
+	allowed_actions?: Record<string, unknown>;
+	max_calls_per_hour?: number;
+	expires_at?: string;
+}
+
+export interface NhiUserPermission {
+	id: string;
+	nhi_id: string;
+	user_id: string;
+	permission_type: string;
+	granted_at: string;
+	granted_by: string | null;
+	expires_at: string | null;
+}
+
+export interface RevokeResponse {
+	revoked: boolean;
+}
+
+export interface PaginatedPermissionResponse<T> {
+	data: T[];
+	limit: number;
+	offset: number;
+}
+
+// Agent Card Types
+
+export interface AgentCapabilities {
+	streaming: boolean;
+	push_notifications: boolean;
+}
+
+export interface AgentAuthentication {
+	schemes: string[];
+}
+
+export interface AgentSkill {
+	id: string;
+	name: string;
+	description: string | null;
+}
+
+export interface AgentCard {
+	name: string;
+	description: string | null;
+	url: string;
+	version: string;
+	protocol_version: string;
+	capabilities: AgentCapabilities;
+	authentication: AgentAuthentication;
+	skills: AgentSkill[];
+}

@@ -8,6 +8,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { AGENT_TYPES } from '$lib/schemas/nhi';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -65,13 +66,17 @@
 
 			<div class="space-y-2">
 				<Label for="agent_type">Agent type</Label>
-				<Input
+				<select
 					id="agent_type"
 					name="agent_type"
-					type="text"
-					placeholder="e.g. autonomous, copilot"
+					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 					value={String($form.agent_type ?? '')}
-				/>
+				>
+					<option value="" disabled>Select agent type</option>
+					{#each AGENT_TYPES as type}
+						<option value={type}>{type}</option>
+					{/each}
+				</select>
 				{#if $errors.agent_type}
 					<p class="text-sm text-destructive">{$errors.agent_type}</p>
 				{/if}

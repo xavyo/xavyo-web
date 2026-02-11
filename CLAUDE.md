@@ -17,6 +17,10 @@ Auto-generated from all feature plans. Last updated: 2026-02-10
 - N/A (backend handles persistence via xavyo-idp REST API on localhost:8080) (009-security-self-service)
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (via `zod/v3`) (010-audit-compliance)
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte (011-identity-federation)
+- TypeScript 5.x / Svelte 5 (runes) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (`zod/v3`), TanStack Table (012-governance-core)
+- N/A (all data via xavyo-idp REST API through BFF) (012-governance-core)
+- TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte, TanStack Table (013-nhi-protocols-advanced)
+- N/A (backend handles all persistence via xavyo-idp API on localhost:8080) (013-nhi-protocols-advanced)
 
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit, Bits UI, Tailwind CSS v4 (@tailwindcss/vite), Superforms, Zod, TanStack Table (@tanstack/svelte-table), jose, clsx, tailwind-merge (001-project-foundations)
 
@@ -36,9 +40,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
+- 013-nhi-protocols-advanced: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte, TanStack Table
+- 012-governance-core: Added TypeScript 5.x / Svelte 5 (runes) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (`zod/v3`), TanStack Table
 - 011-identity-federation: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte
-- 010-audit-compliance: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (via `zod/v3`)
-- 009-security-self-service: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte, WebAuthn Browser API
 
 
 <!-- MANUAL ADDITIONS START -->

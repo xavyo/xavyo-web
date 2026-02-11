@@ -8,9 +8,11 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Separator } from '$lib/components/ui/separator';
+	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import NhiStateBadge from '../../nhi-state-badge.svelte';
 	import CredentialsSection from '../../credentials-section.svelte';
+	import PermissionsTab from '$lib/components/nhi/permissions-tab.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { PageData } from './$types';
@@ -47,6 +49,7 @@
 	}
 </script>
 
+<!-- Header section (outside tabs) -->
 <div class="flex items-center justify-between">
 	<div class="flex items-center gap-3">
 		<PageHeader title={data.nhi.name} description="Service account details" />
@@ -60,199 +63,215 @@
 	</a>
 </div>
 
-{#if isEditing}
-	<Card class="max-w-lg">
-		<CardHeader>
-			<h2 class="text-xl font-semibold">Edit service account</h2>
-		</CardHeader>
-		<CardContent>
-			{#if $message}
-				<Alert variant="destructive" class="mb-4">
-					<AlertDescription>{$message}</AlertDescription>
-				</Alert>
+<!-- Tabs -->
+<Tabs value="details" class="mt-4">
+	<TabsList>
+		<TabsTrigger value="details">Details</TabsTrigger>
+		<TabsTrigger value="permissions">Permissions</TabsTrigger>
+	</TabsList>
+
+	<TabsContent value="details">
+		{#if isEditing}
+			<Card class="max-w-lg">
+				<CardHeader>
+					<h2 class="text-xl font-semibold">Edit service account</h2>
+				</CardHeader>
+				<CardContent>
+					{#if $message}
+						<Alert variant="destructive" class="mb-4">
+							<AlertDescription>{$message}</AlertDescription>
+						</Alert>
+					{/if}
+
+					<form method="POST" action="?/update" use:enhance class="space-y-4">
+						<div class="space-y-2">
+							<Label for="name">Name</Label>
+							<Input id="name" name="name" type="text" value={String($form.name ?? '')} />
+							{#if $errors.name}
+								<p class="text-sm text-destructive">{$errors.name}</p>
+							{/if}
+						</div>
+
+						<div class="space-y-2">
+							<Label for="description">Description</Label>
+							<Input id="description" name="description" type="text" value={String($form.description ?? '')} />
+							{#if $errors.description}
+								<p class="text-sm text-destructive">{$errors.description}</p>
+							{/if}
+						</div>
+
+						<div class="space-y-2">
+							<Label for="purpose">Purpose</Label>
+							<Input id="purpose" name="purpose" type="text" value={String($form.purpose ?? '')} />
+							{#if $errors.purpose}
+								<p class="text-sm text-destructive">{$errors.purpose}</p>
+							{/if}
+						</div>
+
+						<div class="space-y-2">
+							<Label for="environment">Environment</Label>
+							<Input id="environment" name="environment" type="text" value={String($form.environment ?? '')} />
+							{#if $errors.environment}
+								<p class="text-sm text-destructive">{$errors.environment}</p>
+							{/if}
+						</div>
+
+						<div class="flex gap-2 pt-2">
+							<Button type="submit">Save changes</Button>
+							<Button type="button" variant="outline" onclick={cancelEdit}>Cancel</Button>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+		{:else}
+			<Card class="max-w-lg">
+				<CardHeader>
+					<div class="flex items-center justify-between">
+						<h2 class="text-xl font-semibold">Service account information</h2>
+						{#if !isArchived}
+							<Button variant="outline" size="sm" onclick={startEdit}>Edit</Button>
+						{/if}
+					</div>
+				</CardHeader>
+				<CardContent class="space-y-4">
+					<div class="grid gap-3">
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Name</span>
+							<span class="text-sm font-medium">{data.nhi.name}</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Description</span>
+							<span class="text-sm">{data.nhi.description ?? '—'}</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Lifecycle state</span>
+							<NhiStateBadge state={data.nhi.lifecycle_state} />
+						</div>
+						{#if data.nhi.suspension_reason}
+							<div class="flex justify-between">
+								<span class="text-sm text-muted-foreground">Suspension reason</span>
+								<span class="text-sm">{data.nhi.suspension_reason}</span>
+							</div>
+						{/if}
+
+						<Separator />
+
+						<h3 class="text-sm font-medium text-muted-foreground">Service account-specific</h3>
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Purpose</span>
+							<span class="text-sm">{data.nhi.service_account?.purpose ?? '—'}</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Environment</span>
+							<span class="text-sm">{data.nhi.service_account?.environment ?? '—'}</span>
+						</div>
+
+						<Separator />
+
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Created</span>
+							<span class="text-sm">{new Date(data.nhi.created_at).toLocaleString()}</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-sm text-muted-foreground">Updated</span>
+							<span class="text-sm">{new Date(data.nhi.updated_at).toLocaleString()}</span>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			<Separator class="my-6" />
+
+			{#if !isArchived}
+				<Card class="max-w-lg">
+					<CardHeader>
+						<h2 class="text-xl font-semibold">Actions</h2>
+					</CardHeader>
+					<CardContent class="flex flex-wrap gap-2">
+						{#if data.nhi.lifecycle_state === 'inactive' || data.nhi.lifecycle_state === 'suspended'}
+							<form
+								method="POST"
+								action="?/activate"
+								use:formEnhance={() => {
+									return async ({ result }) => {
+										if (result.type === 'success') {
+											addToast('success', 'Identity activated');
+											await invalidateAll();
+										} else if (result.type === 'failure') {
+											addToast('error', String(result.data?.error ?? 'Failed to activate'));
+										}
+									};
+								}}
+							>
+								<Button type="submit" variant="outline">Activate</Button>
+							</form>
+						{/if}
+
+						{#if data.nhi.lifecycle_state === 'active'}
+							<Button variant="outline" onclick={() => (showSuspendDialog = true)}>Suspend</Button>
+						{/if}
+
+						{#if data.nhi.lifecycle_state === 'suspended'}
+							<form
+								method="POST"
+								action="?/reactivate"
+								use:formEnhance={() => {
+									return async ({ result }) => {
+										if (result.type === 'success') {
+											addToast('success', 'Identity reactivated');
+											await invalidateAll();
+										} else if (result.type === 'failure') {
+											addToast('error', String(result.data?.error ?? 'Failed to reactivate'));
+										}
+									};
+								}}
+							>
+								<Button type="submit" variant="outline">Reactivate</Button>
+							</form>
+						{/if}
+
+						{#if data.nhi.lifecycle_state === 'active'}
+							<form
+								method="POST"
+								action="?/deprecate"
+								use:formEnhance={() => {
+									return async ({ result }) => {
+										if (result.type === 'success') {
+											addToast('success', 'Identity deprecated');
+											await invalidateAll();
+										} else if (result.type === 'failure') {
+											addToast('error', String(result.data?.error ?? 'Failed to deprecate'));
+										}
+									};
+								}}
+							>
+								<Button type="submit" variant="outline">Deprecate</Button>
+							</form>
+						{/if}
+
+						{#if data.nhi.lifecycle_state === 'deprecated'}
+							<Button variant="destructive" onclick={() => (showArchiveDialog = true)}>Archive</Button>
+						{/if}
+
+						{#if !isArchived}
+							<Button variant="destructive" onclick={() => (showDeleteDialog = true)}>Delete</Button>
+						{/if}
+					</CardContent>
+				</Card>
 			{/if}
 
-			<form method="POST" action="?/update" use:enhance class="space-y-4">
-				<div class="space-y-2">
-					<Label for="name">Name</Label>
-					<Input id="name" name="name" type="text" value={String($form.name ?? '')} />
-					{#if $errors.name}
-						<p class="text-sm text-destructive">{$errors.name}</p>
-					{/if}
-				</div>
+			<Separator class="my-6" />
 
-				<div class="space-y-2">
-					<Label for="description">Description</Label>
-					<Input id="description" name="description" type="text" value={String($form.description ?? '')} />
-					{#if $errors.description}
-						<p class="text-sm text-destructive">{$errors.description}</p>
-					{/if}
-				</div>
+			<CredentialsSection credentials={data.credentials} {isArchived} />
+		{/if}
+	</TabsContent>
 
-				<div class="space-y-2">
-					<Label for="purpose">Purpose</Label>
-					<Input id="purpose" name="purpose" type="text" value={String($form.purpose ?? '')} />
-					{#if $errors.purpose}
-						<p class="text-sm text-destructive">{$errors.purpose}</p>
-					{/if}
-				</div>
+	<TabsContent value="permissions">
+		<PermissionsTab nhiId={data.nhi.id} entityType="service_account" />
+	</TabsContent>
+</Tabs>
 
-				<div class="space-y-2">
-					<Label for="environment">Environment</Label>
-					<Input id="environment" name="environment" type="text" value={String($form.environment ?? '')} />
-					{#if $errors.environment}
-						<p class="text-sm text-destructive">{$errors.environment}</p>
-					{/if}
-				</div>
-
-				<div class="flex gap-2 pt-2">
-					<Button type="submit">Save changes</Button>
-					<Button type="button" variant="outline" onclick={cancelEdit}>Cancel</Button>
-				</div>
-			</form>
-		</CardContent>
-	</Card>
-{:else}
-	<Card class="max-w-lg">
-		<CardHeader>
-			<div class="flex items-center justify-between">
-				<h2 class="text-xl font-semibold">Service account information</h2>
-				{#if !isArchived}
-					<Button variant="outline" size="sm" onclick={startEdit}>Edit</Button>
-				{/if}
-			</div>
-		</CardHeader>
-		<CardContent class="space-y-4">
-			<div class="grid gap-3">
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Name</span>
-					<span class="text-sm font-medium">{data.nhi.name}</span>
-				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Description</span>
-					<span class="text-sm">{data.nhi.description ?? '—'}</span>
-				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Lifecycle state</span>
-					<NhiStateBadge state={data.nhi.lifecycle_state} />
-				</div>
-				{#if data.nhi.suspension_reason}
-					<div class="flex justify-between">
-						<span class="text-sm text-muted-foreground">Suspension reason</span>
-						<span class="text-sm">{data.nhi.suspension_reason}</span>
-					</div>
-				{/if}
-
-				<Separator />
-
-				<h3 class="text-sm font-medium text-muted-foreground">Service account-specific</h3>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Purpose</span>
-					<span class="text-sm">{data.nhi.service_account?.purpose ?? '—'}</span>
-				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Environment</span>
-					<span class="text-sm">{data.nhi.service_account?.environment ?? '—'}</span>
-				</div>
-
-				<Separator />
-
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Created</span>
-					<span class="text-sm">{new Date(data.nhi.created_at).toLocaleString()}</span>
-				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Updated</span>
-					<span class="text-sm">{new Date(data.nhi.updated_at).toLocaleString()}</span>
-				</div>
-			</div>
-		</CardContent>
-	</Card>
-
-	<Separator class="my-6" />
-
-	{#if !isArchived}
-		<Card class="max-w-lg">
-			<CardHeader>
-				<h2 class="text-xl font-semibold">Actions</h2>
-			</CardHeader>
-			<CardContent class="flex flex-wrap gap-2">
-				{#if data.nhi.lifecycle_state === 'inactive' || data.nhi.lifecycle_state === 'suspended'}
-					<form
-						method="POST"
-						action="?/activate"
-						use:formEnhance={() => {
-							return async ({ result }) => {
-								if (result.type === 'success') {
-									addToast('success', 'Identity activated');
-									await invalidateAll();
-								} else if (result.type === 'failure') {
-									addToast('error', String(result.data?.error ?? 'Failed to activate'));
-								}
-							};
-						}}
-					>
-						<Button type="submit" variant="outline">Activate</Button>
-					</form>
-				{/if}
-
-				{#if data.nhi.lifecycle_state === 'active'}
-					<Button variant="outline" onclick={() => (showSuspendDialog = true)}>Suspend</Button>
-				{/if}
-
-				{#if data.nhi.lifecycle_state === 'suspended'}
-					<form
-						method="POST"
-						action="?/reactivate"
-						use:formEnhance={() => {
-							return async ({ result }) => {
-								if (result.type === 'success') {
-									addToast('success', 'Identity reactivated');
-									await invalidateAll();
-								} else if (result.type === 'failure') {
-									addToast('error', String(result.data?.error ?? 'Failed to reactivate'));
-								}
-							};
-						}}
-					>
-						<Button type="submit" variant="outline">Reactivate</Button>
-					</form>
-				{/if}
-
-				{#if data.nhi.lifecycle_state === 'active'}
-					<form
-						method="POST"
-						action="?/deprecate"
-						use:formEnhance={() => {
-							return async ({ result }) => {
-								if (result.type === 'success') {
-									addToast('success', 'Identity deprecated');
-									await invalidateAll();
-								} else if (result.type === 'failure') {
-									addToast('error', String(result.data?.error ?? 'Failed to deprecate'));
-								}
-							};
-						}}
-					>
-						<Button type="submit" variant="outline">Deprecate</Button>
-					</form>
-				{/if}
-
-				{#if data.nhi.lifecycle_state === 'deprecated'}
-					<Button variant="destructive" onclick={() => (showArchiveDialog = true)}>Archive</Button>
-				{/if}
-
-				{#if !isArchived}
-					<Button variant="destructive" onclick={() => (showDeleteDialog = true)}>Delete</Button>
-				{/if}
-			</CardContent>
-		</Card>
-	{/if}
-
-	<Separator class="my-6" />
-
-	<CredentialsSection credentials={data.credentials} {isArchived} />
-{/if}
+<!-- Dialogs stay OUTSIDE tabs (they're modal overlays) -->
 
 <!-- Suspend dialog -->
 <Dialog.Root bind:open={showSuspendDialog}>
