@@ -7,45 +7,41 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const refreshToken = event.cookies.get('refresh_token');
 	const tenantId = event.cookies.get('tenant_id');
 
-	if (accessToken) {
-		if (isTokenExpired(accessToken)) {
-			// Token expired — try to refresh
-			if (refreshToken) {
-				try {
-					const tokens = await refresh(refreshToken, event.fetch);
-					setCookies(event.cookies, tokens);
+	if (accessToken && !isTokenExpired(accessToken)) {
+		// Token is still valid
+		const claims = decodeAccessToken(accessToken);
+		if (claims) {
+			event.locals.user = {
+				id: claims.sub,
+				email: claims.email ?? '',
+				roles: claims.roles ?? []
+			};
+			event.locals.accessToken = accessToken;
+			event.locals.tenantId = claims.tid ?? tenantId;
+		}
+	} else if (refreshToken) {
+		// Token missing or expired — try to refresh
+		try {
+			const tokens = await refresh(refreshToken, event.fetch);
+			setCookies(event.cookies, tokens);
 
-					const claims = decodeAccessToken(tokens.access_token);
-					if (claims) {
-						event.locals.user = {
-							id: claims.sub,
-							email: claims.email ?? '',
-							roles: claims.roles ?? []
-						};
-						event.locals.accessToken = tokens.access_token;
-						event.locals.tenantId = claims.tid ?? tenantId;
-					}
-				} catch {
-					// Refresh failed — clear everything
-					clearAuthCookies(event.cookies);
-				}
-			} else {
-				// No refresh token — clear expired access token
-				clearAuthCookies(event.cookies);
-			}
-		} else {
-			// Token is still valid
-			const claims = decodeAccessToken(accessToken);
+			const claims = decodeAccessToken(tokens.access_token);
 			if (claims) {
 				event.locals.user = {
 					id: claims.sub,
 					email: claims.email ?? '',
 					roles: claims.roles ?? []
 				};
-				event.locals.accessToken = accessToken;
+				event.locals.accessToken = tokens.access_token;
 				event.locals.tenantId = claims.tid ?? tenantId;
 			}
+		} catch {
+			// Refresh failed — clear everything
+			clearAuthCookies(event.cookies);
 		}
+	} else if (accessToken) {
+		// Expired token with no refresh token — clear
+		clearAuthCookies(event.cookies);
 	}
 
 	return resolve(event);
