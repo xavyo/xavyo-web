@@ -49,7 +49,7 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 		let errorMessage = 'An error occurred';
 		try {
 			const errorBody = await response.json();
-			errorMessage = errorBody.error || errorBody.message || errorBody.detail || errorMessage;
+			errorMessage = errorBody.message || errorBody.detail || errorBody.error || errorMessage;
 		} catch {
 			// Response body not JSON
 		}
