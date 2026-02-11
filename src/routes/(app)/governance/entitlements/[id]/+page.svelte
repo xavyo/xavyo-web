@@ -364,7 +364,7 @@
 						method="POST"
 						action="?/removeOwner"
 						use:formEnhance={() => {
-							return async ({ result }) => {
+							return async ({ result, update }) => {
 								if (result.type === 'success') {
 									addToast('success', 'Owner removed');
 									await invalidateAll();
@@ -387,7 +387,7 @@
 				method="POST"
 				action="?/setOwner"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							addToast('success', 'Owner set successfully');
 							ownerIdInput = '';
@@ -443,9 +443,10 @@
 				method="POST"
 				action="?/delete"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'Entitlement deleted');
+							await update();
 						} else if (result.type === 'failure') {
 							addToast('error', String(result.data?.error ?? 'Failed to delete'));
 							showDeleteDialog = false;

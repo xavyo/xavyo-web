@@ -272,7 +272,7 @@
 					method="POST"
 					action="?/enable"
 					use:formEnhance={() => {
-						return async ({ result }) => {
+						return async ({ result, update }) => {
 							if (result.type === 'success') {
 								addToast('success', 'SoD rule enabled');
 								await invalidateAll();
@@ -291,7 +291,7 @@
 					method="POST"
 					action="?/disable"
 					use:formEnhance={() => {
-						return async ({ result }) => {
+						return async ({ result, update }) => {
 							if (result.type === 'success') {
 								addToast('success', 'SoD rule disabled');
 								await invalidateAll();
@@ -326,9 +326,10 @@
 				method="POST"
 				action="?/delete"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'SoD rule deleted');
+							await update();
 						} else if (result.type === 'failure') {
 							addToast('error', String(result.data?.error ?? 'Failed to delete'));
 							showDeleteDialog = false;

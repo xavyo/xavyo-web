@@ -278,7 +278,7 @@
 								method="POST"
 								action="?/activate"
 								use:formEnhance={() => {
-									return async ({ result }) => {
+									return async ({ result, update }) => {
 										if (result.type === 'success') {
 											addToast('success', 'Identity activated');
 											await invalidateAll();
@@ -301,7 +301,7 @@
 								method="POST"
 								action="?/reactivate"
 								use:formEnhance={() => {
-									return async ({ result }) => {
+									return async ({ result, update }) => {
 										if (result.type === 'success') {
 											addToast('success', 'Identity reactivated');
 											await invalidateAll();
@@ -320,7 +320,7 @@
 								method="POST"
 								action="?/deprecate"
 								use:formEnhance={() => {
-									return async ({ result }) => {
+									return async ({ result, update }) => {
 										if (result.type === 'success') {
 											addToast('success', 'Identity deprecated');
 											await invalidateAll();
@@ -374,7 +374,7 @@
 			method="POST"
 			action="?/suspend"
 			use:formEnhance={() => {
-				return async ({ result }) => {
+				return async ({ result, update }) => {
 					if (result.type === 'success') {
 						addToast('success', 'Identity suspended');
 						showSuspendDialog = false;
@@ -411,7 +411,7 @@
 			method="POST"
 			action="?/archive"
 			use:formEnhance={() => {
-				return async ({ result }) => {
+				return async ({ result, update }) => {
 					if (result.type === 'success') {
 						addToast('success', 'Identity archived');
 						showArchiveDialog = false;
@@ -446,9 +446,10 @@
 				method="POST"
 				action="?/delete"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'Identity deleted');
+							await update();
 						} else if (result.type === 'failure') {
 							addToast('error', String(result.data?.error ?? 'Failed to delete'));
 							showDeleteDialog = false;

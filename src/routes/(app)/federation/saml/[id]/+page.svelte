@@ -178,9 +178,10 @@
 				method="POST"
 				action="?/delete"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'Service provider deleted');
+							await update();
 						} else if (result.type === 'failure') {
 							addToast('error', String(result.data?.error ?? 'Failed to delete'));
 							showDeleteDialog = false;

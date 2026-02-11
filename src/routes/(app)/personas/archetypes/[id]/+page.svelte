@@ -229,7 +229,7 @@
 					method="POST"
 					action="?/deactivate"
 					use:formEnhance={() => {
-						return async ({ result }) => {
+						return async ({ result, update }) => {
 							if (result.type === 'success') {
 								addToast('success', 'Archetype deactivated');
 								await invalidateAll();
@@ -246,7 +246,7 @@
 					method="POST"
 					action="?/activate"
 					use:formEnhance={() => {
-						return async ({ result }) => {
+						return async ({ result, update }) => {
 							if (result.type === 'success') {
 								addToast('success', 'Archetype activated');
 								await invalidateAll();
@@ -281,9 +281,10 @@
 					method="POST"
 					action="?/delete"
 					use:formEnhance={() => {
-						return async ({ result }) => {
+						return async ({ result, update }) => {
 							if (result.type === 'redirect') {
 								addToast('success', 'Archetype deleted');
+								await update();
 							} else if (result.type === 'failure') {
 								addToast('error', String(result.data?.error ?? 'Failed to delete archetype'));
 								showDeleteDialog = false;

@@ -169,7 +169,7 @@
 				action="?/validate"
 				use:formEnhance={() => {
 					isValidating = true;
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						isValidating = false;
 						if (result.type === 'success' && result.data?.validationResult) {
 							validationResult = result.data.validationResult as ValidationResultType;
@@ -198,7 +198,7 @@
 				method="POST"
 				action="?/toggle"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							const action = result.data?.action as string;
 							addToast('success', `Identity provider ${action}`);
@@ -250,9 +250,10 @@
 				method="POST"
 				action="?/delete"
 				use:formEnhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'Identity provider deleted');
+							await update();
 						} else if (result.type === 'failure') {
 							addToast('error', String(result.data?.error ?? 'Failed to delete'));
 							showDeleteDialog = false;
