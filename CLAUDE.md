@@ -16,6 +16,7 @@ Auto-generated from all feature plans. Last updated: 2026-02-10
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte, WebAuthn Browser API (009-security-self-service)
 - N/A (backend handles persistence via xavyo-idp REST API on localhost:8080) (009-security-self-service)
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (via `zod/v3`) (010-audit-compliance)
+- TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte (011-identity-federation)
 
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit, Bits UI, Tailwind CSS v4 (@tailwindcss/vite), Superforms, Zod, TanStack Table (@tanstack/svelte-table), jose, clsx, tailwind-merge (001-project-foundations)
 
@@ -35,9 +36,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
+- 011-identity-federation: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte
 - 010-audit-compliance: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (via `zod/v3`)
 - 009-security-self-service: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte, WebAuthn Browser API
-- 008-visual-redesign-dark-mode: Added TypeScript 5.9 / Svelte 5.50 (runes mode) + SvelteKit 2.50 + Bits UI 2.15, Tailwind CSS v4.1, lucide-svelte (new), clsx + tailwind-merge
 
 
 <!-- MANUAL ADDITIONS START -->

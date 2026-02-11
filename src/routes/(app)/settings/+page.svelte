@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { User, Shield, Monitor, Smartphone, Bell, Clock } from 'lucide-svelte';
+	import { User, Shield, Monitor, Smartphone, Bell, Clock, Link as LinkIcon } from 'lucide-svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { Badge } from '$lib/components/ui/badge';
@@ -11,6 +11,7 @@
 	import DevicesTab from './devices-tab.svelte';
 	import AlertsTab from './alerts-tab.svelte';
 	import LoginHistoryTab from './login-history-tab.svelte';
+	import SocialConnectionsTab from './social-connections-tab.svelte';
 
 	let { data } = $props();
 
@@ -43,6 +44,7 @@
 			{/if}
 		</TabsTrigger>
 		<TabsTrigger value="login-history"><Clock class="mr-2 h-4 w-4" />Login History</TabsTrigger>
+		<TabsTrigger value="social-connections"><LinkIcon class="mr-2 h-4 w-4" />Social Connections</TabsTrigger>
 	</TabsList>
 	<TabsContent value="profile">
 		<ProfileTab profile={data.profile} form={data.form} />
@@ -61,5 +63,8 @@
 	</TabsContent>
 	<TabsContent value="login-history">
 		<LoginHistoryTab />
+	</TabsContent>
+	<TabsContent value="social-connections">
+		<SocialConnectionsTab />
 	</TabsContent>
 </Tabs>

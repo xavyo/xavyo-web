@@ -682,3 +682,215 @@ export interface LoginAttemptStats {
 	new_device_logins: number;
 	new_location_logins: number;
 }
+
+// Identity Federation Types (mirror Rust DTOs from xavyo-api-oidc-federation, xavyo-api-saml, xavyo-api-social)
+
+// OIDC Identity Provider
+
+export interface ClaimMappingConfig {
+	[key: string]: string;
+}
+
+export interface IdentityProvider {
+	id: string;
+	name: string;
+	provider_type: string;
+	issuer_url: string;
+	client_id: string;
+	scopes: string;
+	claim_mapping: ClaimMappingConfig | null;
+	sync_on_login: boolean;
+	is_enabled: boolean;
+	validation_status: string | null;
+	last_validated_at: string | null;
+	linked_users_count?: number;
+	domains?: IdentityProviderDomain[];
+	created_at: string;
+	updated_at: string;
+}
+
+export interface IdentityProviderDomain {
+	id: string;
+	domain: string;
+	priority: number;
+	created_at: string;
+}
+
+export interface IdentityProviderListResponse {
+	items: IdentityProvider[];
+	total: number;
+	offset: number;
+	limit: number;
+}
+
+export interface DomainListResponse {
+	items: IdentityProviderDomain[];
+}
+
+export interface CreateIdentityProviderRequest {
+	name: string;
+	provider_type: string;
+	issuer_url: string;
+	client_id: string;
+	client_secret: string;
+	scopes?: string;
+	claim_mapping?: ClaimMappingConfig;
+	sync_on_login?: boolean;
+	domains?: string[];
+}
+
+export interface UpdateIdentityProviderRequest {
+	name?: string;
+	provider_type?: string;
+	issuer_url?: string;
+	client_id?: string;
+	client_secret?: string;
+	scopes?: string;
+	claim_mapping?: ClaimMappingConfig;
+	sync_on_login?: boolean;
+}
+
+export interface ToggleIdentityProviderRequest {
+	is_enabled: boolean;
+}
+
+export interface CreateDomainRequest {
+	domain: string;
+	priority?: number;
+}
+
+export interface DiscoveredEndpoints {
+	authorization_endpoint: string;
+	token_endpoint: string;
+	userinfo_endpoint: string;
+	jwks_uri: string;
+}
+
+export interface ValidationResult {
+	is_valid: boolean;
+	discovered_endpoints: DiscoveredEndpoints | null;
+	error: string | null;
+}
+
+// SAML Service Provider
+
+export interface ServiceProvider {
+	id: string;
+	name: string;
+	entity_id: string;
+	acs_urls: string[];
+	certificate: string | null;
+	attribute_mapping: Record<string, unknown> | null;
+	name_id_format: string | null;
+	sign_assertions: boolean;
+	validate_signatures: boolean;
+	assertion_validity_seconds: number;
+	enabled: boolean;
+	metadata_url: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ServiceProviderListResponse {
+	items: ServiceProvider[];
+	total: number;
+	offset: number;
+	limit: number;
+}
+
+export interface CreateServiceProviderRequest {
+	name: string;
+	entity_id: string;
+	acs_urls: string[];
+	certificate?: string;
+	attribute_mapping?: Record<string, unknown>;
+	name_id_format?: string;
+	sign_assertions?: boolean;
+	validate_signatures?: boolean;
+	assertion_validity_seconds?: number;
+	metadata_url?: string;
+}
+
+export interface UpdateServiceProviderRequest {
+	name?: string;
+	entity_id?: string;
+	acs_urls?: string[];
+	certificate?: string;
+	attribute_mapping?: Record<string, unknown>;
+	name_id_format?: string;
+	sign_assertions?: boolean;
+	validate_signatures?: boolean;
+	assertion_validity_seconds?: number;
+	enabled?: boolean;
+	metadata_url?: string;
+}
+
+// SAML Certificates
+
+export interface IdPCertificate {
+	id: string;
+	key_id: string;
+	subject_dn: string | null;
+	issuer_dn: string | null;
+	not_before: string | null;
+	not_after: string | null;
+	is_active: boolean;
+	created_at: string;
+}
+
+export interface CertificateListResponse {
+	items: IdPCertificate[];
+}
+
+export interface UploadCertificateRequest {
+	certificate: string;
+	private_key: string;
+	key_id: string;
+	subject_dn?: string;
+	issuer_dn?: string;
+	not_before?: string;
+	not_after?: string;
+}
+
+// Social Login
+
+export interface SocialProviderConfig {
+	provider: string;
+	enabled: boolean;
+	client_id: string | null;
+	has_client_secret: boolean;
+	scopes: string[];
+	additional_config: Record<string, unknown> | null;
+	created_at: string | null;
+	updated_at: string | null;
+}
+
+export interface SocialProviderListResponse {
+	providers: SocialProviderConfig[];
+}
+
+export interface UpdateSocialProviderRequest {
+	enabled?: boolean;
+	client_id?: string;
+	client_secret?: string;
+	scopes?: string[];
+	additional_config?: Record<string, unknown>;
+}
+
+export interface SocialConnection {
+	id: string;
+	provider: string;
+	email: string | null;
+	display_name: string | null;
+	is_private_email: boolean;
+	created_at: string;
+}
+
+export interface SocialConnectionsResponse {
+	connections: SocialConnection[];
+}
+
+export interface LinkAccountRequest {
+	code: string;
+	state: string;
+}
