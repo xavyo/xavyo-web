@@ -608,3 +608,77 @@ export interface SecurityOverview {
 	recent_security_alerts_count: number;
 	password_expires_at: string | null;
 }
+
+// Audit & Compliance Types (mirror Rust DTOs from xavyo-api-auth)
+
+export type AlertType =
+	| 'new_device'
+	| 'new_location'
+	| 'failed_attempts'
+	| 'password_change'
+	| 'mfa_disabled';
+
+export type AlertSeverity = 'info' | 'warning' | 'critical';
+
+export type AuthMethod = 'password' | 'social' | 'sso' | 'mfa' | 'refresh';
+
+export interface LoginAttempt {
+	id: string;
+	user_id: string | null;
+	email: string;
+	success: boolean;
+	failure_reason: string | null;
+	auth_method: string;
+	ip_address: string | null;
+	user_agent: string | null;
+	device_fingerprint: string | null;
+	geo_country: string | null;
+	geo_city: string | null;
+	is_new_device: boolean;
+	is_new_location: boolean;
+	created_at: string;
+}
+
+export interface SecurityAlert {
+	id: string;
+	user_id: string;
+	alert_type: AlertType;
+	severity: AlertSeverity;
+	title: string;
+	message: string;
+	metadata: Record<string, unknown>;
+	acknowledged_at: string | null;
+	created_at: string;
+}
+
+export interface CursorPaginatedResponse<T> {
+	items: T[];
+	total: number;
+	next_cursor: string | null;
+}
+
+export interface SecurityAlertsResponse extends CursorPaginatedResponse<SecurityAlert> {
+	unacknowledged_count: number;
+}
+
+export interface FailureReasonCount {
+	reason: string;
+	count: number;
+}
+
+export interface HourlyCount {
+	hour: number;
+	count: number;
+}
+
+export interface LoginAttemptStats {
+	total_attempts: number;
+	successful_attempts: number;
+	failed_attempts: number;
+	success_rate: number;
+	failure_reasons: FailureReasonCount[];
+	hourly_distribution: HourlyCount[];
+	unique_users: number;
+	new_device_logins: number;
+	new_location_logins: number;
+}

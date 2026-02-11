@@ -1,8 +1,10 @@
 <!--
   Sync Impact Report
-  Version change: 0.0.0 → 1.0.0 (initial constitution)
-  Added sections: Core Principles (7), Technology Stack, Development Workflow, Governance
-  Templates requiring updates: ✅ reviewed (no changes needed - templates are generic)
+  Version change: 1.0.0 → 1.1.0 (added Principle VIII)
+  Added sections: Principle VIII — Backend Fidelity
+  Modified sections: none
+  Removed sections: none
+  Templates requiring updates: ✅ reviewed (no changes needed)
   Follow-up TODOs: none
 -->
 
@@ -83,6 +85,20 @@
 - UI labels, user-facing text, and error messages MUST be in English
 - No i18n framework — all strings inline in English
 
+### VIII. Backend Fidelity (NON-NEGOTIABLE)
+
+- The frontend MUST NEVER mock, stub, or fake backend features that
+  do not exist in xavyo-idp
+- Every API endpoint called from the web UI MUST exist and be
+  functional in the backend — verify before implementing the frontend
+- If a backend endpoint is buggy or returns unexpected data, fix the
+  backend first (rebuild and redeploy via Docker) rather than working
+  around it in the frontend
+- E2E testing MUST use the real backend — never a mock server
+- If a planned feature depends on a backend endpoint that does not
+  exist yet, STOP and either implement it in xavyo-idp or remove
+  the feature from the current scope
+
 ## Technology Stack
 
 | Layer | Technology | Version/Notes |
@@ -124,4 +140,4 @@
 - Use CLAUDE.md for runtime development guidance that supplements
   but does not contradict this constitution
 
-**Version**: 1.0.0 | **Ratified**: 2026-02-10 | **Last Amended**: 2026-02-10
+**Version**: 1.1.0 | **Ratified**: 2026-02-10 | **Last Amended**: 2026-02-11

@@ -10,6 +10,7 @@
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Separator } from '$lib/components/ui/separator';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
+	import ActivityTimeline from '$lib/components/audit/activity-timeline.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { PageData, ActionData } from './$types';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -281,4 +282,15 @@
 			</Dialog.Footer>
 		</Dialog.Content>
 	</Dialog.Root>
+
+	<Separator class="my-6" />
+
+	<Card>
+		<CardHeader>
+			<h2 class="text-xl font-semibold">Recent Activity</h2>
+		</CardHeader>
+		<CardContent>
+			<ActivityTimeline userId={data.user.id} />
+		</CardContent>
+	</Card>
 {/if}

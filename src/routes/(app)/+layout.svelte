@@ -2,8 +2,9 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, Settings } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, Settings, ClipboardList } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
+	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
 	import ToastContainer from '$lib/components/layout/toast-container.svelte';
 	import { initThemeListener } from '$lib/stores/theme.svelte';
@@ -18,13 +19,24 @@
 
 	let sidebarOpen = $state(false);
 
-	const navItems = [
-		{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-		{ label: 'Users', href: '/users', icon: Users },
-		{ label: 'Personas', href: '/personas', icon: Drama },
-		{ label: 'NHI', href: '/nhi', icon: Bot },
-		{ label: 'Settings', href: '/settings', icon: Settings }
-	];
+	const navItems: NavItem[] = $derived.by(() => {
+		const items: NavItem[] = [
+			{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+			{ label: 'Users', href: '/users', icon: Users },
+			{ label: 'Personas', href: '/personas', icon: Drama },
+			{ label: 'NHI', href: '/nhi', icon: Bot }
+		];
+		if (data.isAdmin) {
+			items.push({ label: 'Audit', href: '/audit', icon: ClipboardList });
+		}
+		items.push({
+			label: 'Settings',
+			href: '/settings',
+			icon: Settings,
+			badge: data.unacknowledgedAlertCount ?? 0
+		});
+		return items;
+	});
 
 	function toggleSidebar() {
 		sidebarOpen = !sidebarOpen;

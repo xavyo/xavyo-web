@@ -47,3 +47,12 @@ export function clearAuthCookies(cookies: Cookies): void {
 	cookies.delete('refresh_token', { path: '/' });
 	cookies.delete('tenant_id', { path: '/' });
 }
+
+/**
+ * Check if a user has admin-level access.
+ * Mirrors backend role hierarchy: super_admin implies admin.
+ */
+export function hasAdminRole(roles: string[] | undefined): boolean {
+	if (!roles) return false;
+	return roles.includes('admin') || roles.includes('super_admin');
+}

@@ -3,10 +3,11 @@
 
 	type IconType = Component<any> | (new (...args: any[]) => SvelteComponent);
 
-	interface NavItem {
+	export interface NavItem {
 		label: string;
 		href: string;
 		icon: IconType;
+		badge?: number;
 	}
 
 	interface Props {
@@ -44,6 +45,11 @@
 			>
 				<Icon class="h-5 w-5 shrink-0" />
 				<span class="truncate">{item.label}</span>
+				{#if item.badge && item.badge > 0}
+					<span class="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground">
+						{item.badge}
+					</span>
+				{/if}
 			</a>
 		{/each}
 	</div>

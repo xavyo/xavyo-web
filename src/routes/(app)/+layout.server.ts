@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { SYSTEM_TENANT_ID } from '$lib/server/auth';
+import { SYSTEM_TENANT_ID, hasAdminRole } from '$lib/server/auth';
+import { fetchAlerts } from '$lib/api/alerts';
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -16,7 +17,21 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		redirect(302, '/onboarding');
 	}
 
+	let unacknowledgedAlertCount = 0;
+	try {
+		const alertsResult = await fetchAlerts(
+			{ limit: 1, acknowledged: false },
+			locals.accessToken!,
+			locals.tenantId!
+		);
+		unacknowledgedAlertCount = alertsResult.unacknowledged_count;
+	} catch {
+		// Non-critical; default to 0
+	}
+
 	return {
-		user: locals.user
+		user: locals.user,
+		unacknowledgedAlertCount,
+		isAdmin: hasAdminRole(locals.user.roles)
 	};
 };

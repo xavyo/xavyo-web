@@ -7,6 +7,7 @@ import { updateProfileSchema } from '$lib/schemas/settings';
 import { getProfile, updateProfile } from '$lib/api/me';
 import { getMfaStatus } from '$lib/api/mfa';
 import { getSecurityOverview } from '$lib/api/me';
+import { fetchAlerts } from '$lib/api/alerts';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
@@ -44,6 +45,19 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		// Security overview is non-critical; default to null
 	}
 
+	let unacknowledgedAlertCount = 0;
+	try {
+		const alertsResult = await fetchAlerts(
+			{ limit: 1, acknowledged: false },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+		unacknowledgedAlertCount = alertsResult.unacknowledged_count;
+	} catch {
+		// Non-critical; default to 0
+	}
+
 	const form = await superValidate(
 		{
 			display_name: profile?.display_name ?? '',
@@ -58,6 +72,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		profile,
 		mfaStatus,
 		securityOverview,
+		unacknowledgedAlertCount,
 		form
 	};
 };
