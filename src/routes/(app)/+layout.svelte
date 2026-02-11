@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -32,6 +32,7 @@
 			items.push({ label: 'Federation', href: '/federation', icon: Network });
 			items.push({ label: 'Audit', href: '/audit', icon: ClipboardList });
 			items.push({ label: 'Governance', href: '/governance', icon: Shield });
+			items.push({ label: 'Roles', href: '/governance/roles', icon: KeyRound });
 			items.push({ label: 'NHI Governance', href: '/nhi/governance', icon: ShieldCheck });
 			items.push({ label: 'Approval Config', href: '/governance/approval-config', icon: Workflow });
 			items.push({ label: 'Reports', href: '/governance/reports', icon: FileBarChart });

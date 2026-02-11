@@ -1904,6 +1904,162 @@ export interface CreateSodExemptionRequest {
 	expires_at: string;
 }
 
+// --- Governance Roles & RBAC Types ---
+
+export type ParameterType = 'string' | 'integer' | 'boolean' | 'date' | 'enum';
+
+export interface GovernanceRole {
+	id: string;
+	name: string;
+	description: string | null;
+	parent_role_id: string | null;
+	is_abstract: boolean;
+	hierarchy_depth: number;
+	version: number;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface GovernanceRoleListResponse {
+	items: GovernanceRole[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateGovernanceRoleRequest {
+	name: string;
+	description?: string;
+	parent_role_id?: string;
+}
+
+export interface UpdateGovernanceRoleRequest {
+	name?: string;
+	description?: string;
+	is_abstract?: boolean;
+	version: number;
+}
+
+export interface RoleTreeNode {
+	id: string;
+	name: string;
+	depth: number;
+	is_abstract: boolean;
+	direct_entitlement_count: number;
+	effective_entitlement_count: number;
+	assigned_user_count: number;
+	children: RoleTreeNode[];
+}
+
+export interface RoleTreeResponse {
+	roots: RoleTreeNode[];
+}
+
+export interface MoveRoleRequest {
+	new_parent_id: string | null;
+	version: number;
+}
+
+export interface MoveRoleResponse {
+	role: GovernanceRole;
+	affected_roles_count: number;
+	recomputed: boolean;
+}
+
+export interface ImpactAnalysisResponse {
+	role_id: string;
+	role_name: string;
+	descendant_count: number;
+	total_affected_users: number;
+	descendants: GovernanceRole[];
+}
+
+export interface RoleEntitlement {
+	id: string;
+	tenant_id: string;
+	entitlement_id: string;
+	role_name: string;
+	created_at: string;
+	created_by: string;
+}
+
+export interface AddRoleEntitlementRequest {
+	entitlement_id: string;
+	role_name: string;
+}
+
+export interface EffectiveEntitlementsResponse {
+	items: Record<string, unknown>[];
+	direct_count: number;
+	inherited_count: number;
+	total: number;
+}
+
+export interface RoleParameter {
+	id: string;
+	tenant_id: string;
+	role_id: string;
+	name: string;
+	description: string | null;
+	parameter_type: ParameterType;
+	is_required: boolean;
+	default_value: unknown;
+	constraints: Record<string, unknown> | null;
+	display_name: string | null;
+	display_order: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface RoleParameterListResponse {
+	items: RoleParameter[];
+	total: number;
+}
+
+export interface CreateRoleParameterRequest {
+	name: string;
+	parameter_type: ParameterType;
+	description?: string;
+	is_required?: boolean;
+	default_value?: unknown;
+	constraints?: Record<string, unknown>;
+	display_name?: string;
+	display_order?: number;
+}
+
+export interface UpdateRoleParameterRequest {
+	description?: string;
+	is_required?: boolean;
+	default_value?: unknown;
+	constraints?: Record<string, unknown>;
+	display_name?: string;
+	display_order?: number;
+}
+
+export interface ValidateParametersRequest {
+	parameters: { name: string; value: unknown }[];
+}
+
+export interface ValidateParametersResponse {
+	is_valid: boolean;
+	results: Record<string, unknown>[];
+	errors: string[];
+}
+
+export interface InheritanceBlock {
+	id: string;
+	entitlement_id: string;
+	entitlement_name: string;
+	application_name: string | null;
+	created_by: string;
+	created_at: string;
+}
+
+export interface AddInheritanceBlockRequest {
+	entitlement_id: string;
+}
+
 // --- Governance Reporting Types ---
 
 export type ReportTemplateType =

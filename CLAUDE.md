@@ -40,9 +40,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
+- 017-governance-roles-rbac: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
+- 016-approval-workflow-config: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 - 015-governance-reporting: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte
-- 013-nhi-protocols-advanced: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte, TanStack Table
-- 012-governance-core: Added TypeScript 5.x / Svelte 5 (runes) + SvelteKit + Bits UI, Tailwind CSS v4, lucide-svelte, Superforms + Zod (`zod/v3`), TanStack Table
 
 
 <!-- MANUAL ADDITIONS START -->

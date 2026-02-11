@@ -64,5 +64,11 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 		throw new ApiError(errorMessage, response.status);
 	}
 
-	return response.json() as Promise<T>;
+	// Handle empty 200 responses (e.g. DELETE returning 200 with no body)
+	const text = await response.text();
+	if (!text) {
+		return null as T;
+	}
+
+	return JSON.parse(text) as T;
 }
