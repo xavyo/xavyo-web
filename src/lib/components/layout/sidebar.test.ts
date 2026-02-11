@@ -1,10 +1,11 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/svelte';
+import { LayoutDashboard, Users } from 'lucide-svelte';
 import Sidebar from './sidebar.svelte';
 
 const testItems = [
-	{ label: 'Dashboard', href: '/dashboard', icon: '📊' },
-	{ label: 'Users', href: '/users', icon: '👥' }
+	{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+	{ label: 'Users', href: '/users', icon: Users }
 ];
 
 describe('Sidebar', () => {
@@ -26,7 +27,7 @@ describe('Sidebar', () => {
 	it('highlights active item', () => {
 		render(Sidebar, { props: { items: testItems, currentPath: '/dashboard' } });
 		const dashboardLink = screen.getByText('Dashboard').closest('a');
-		expect(dashboardLink?.className).toContain('bg-accent');
+		expect(dashboardLink?.className).toContain('bg-primary');
 	});
 
 	it('does not highlight inactive item', () => {
@@ -48,7 +49,12 @@ describe('Sidebar', () => {
 	it('does not error when onNavigate is not provided', async () => {
 		render(Sidebar, { props: { items: testItems, currentPath: '/dashboard' } });
 		const usersLink = screen.getByText('Users').closest('a');
-		// Should not throw
 		await fireEvent.click(usersLink!);
+	});
+
+	it('renders SVG icons instead of emoji', () => {
+		const { container } = render(Sidebar, { props: { items: testItems, currentPath: '/dashboard' } });
+		const svgs = container.querySelectorAll('svg');
+		expect(svgs.length).toBeGreaterThanOrEqual(2);
 	});
 });

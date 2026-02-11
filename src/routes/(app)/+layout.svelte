@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
+	import { LayoutDashboard, Users, Drama, Bot } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
 	import ToastContainer from '$lib/components/layout/toast-container.svelte';
+	import { initThemeListener } from '$lib/stores/theme.svelte';
 	import type { LayoutData } from './$types';
 
 	interface Props {
@@ -16,10 +19,10 @@
 	let sidebarOpen = $state(false);
 
 	const navItems = [
-		{ label: 'Dashboard', href: '/dashboard', icon: '📊' },
-		{ label: 'Users', href: '/users', icon: '👥' },
-		{ label: 'Personas', href: '/personas', icon: '🎭' },
-		{ label: 'NHI', href: '/nhi', icon: '🤖' }
+		{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+		{ label: 'Users', href: '/users', icon: Users },
+		{ label: 'Personas', href: '/personas', icon: Drama },
+		{ label: 'NHI', href: '/nhi', icon: Bot }
 	];
 
 	function toggleSidebar() {
@@ -29,6 +32,11 @@
 	function closeSidebar() {
 		sidebarOpen = false;
 	}
+
+	onMount(() => {
+		const cleanup = initThemeListener();
+		return cleanup;
+	});
 </script>
 
 <div class="flex h-screen overflow-hidden bg-background">

@@ -1,8 +1,12 @@
 <script lang="ts">
+	import type { Component, SvelteComponent } from 'svelte';
+
+	type IconType = Component<any> | (new (...args: any[]) => SvelteComponent);
+
 	interface NavItem {
 		label: string;
 		href: string;
-		icon: string;
+		icon: IconType;
 	}
 
 	interface Props {
@@ -23,22 +27,23 @@
 	}
 </script>
 
-<nav class="flex h-full w-64 flex-col border-r bg-card {className}">
+<nav class="flex h-full w-64 flex-col border-r bg-card text-card-foreground {className}">
 	<div class="flex h-14 items-center border-b px-4">
-		<span class="text-lg font-semibold">xavyo</span>
+		<span class="text-lg font-bold tracking-tight text-foreground">xavyo</span>
 	</div>
 	<div class="flex-1 space-y-1 p-2">
 		{#each items as item}
+			{@const Icon = item.icon}
 			<a
 				href={item.href}
 				onclick={handleClick}
-				class="flex min-h-[44px] items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors
+				class="flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150
 					{isActive(item.href)
-					? 'bg-accent text-accent-foreground'
+					? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary'
 					: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}"
 			>
-				<span class="text-base">{item.icon}</span>
-				<span>{item.label}</span>
+				<Icon class="h-5 w-5 shrink-0" />
+				<span class="truncate">{item.label}</span>
 			</a>
 		{/each}
 	</div>
