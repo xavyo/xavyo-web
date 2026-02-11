@@ -19,12 +19,18 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
+		const expiresAt = form.data.requested_expires_at
+			? form.data.requested_expires_at.includes('T')
+				? form.data.requested_expires_at
+				: `${form.data.requested_expires_at}T00:00:00Z`
+			: undefined;
+
 		try {
 			await createAccessRequest(
 				{
 					entitlement_id: form.data.entitlement_id,
 					justification: form.data.justification,
-					requested_expires_at: form.data.requested_expires_at || undefined
+					requested_expires_at: expiresAt
 				},
 				locals.accessToken!,
 				locals.tenantId!,

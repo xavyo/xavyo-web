@@ -33,13 +33,17 @@ export const actions: Actions = {
 		if (form.data.scope_config_entitlement_id)
 			scopeConfig.entitlement_id = form.data.scope_config_entitlement_id;
 
+		const deadline = form.data.deadline.includes('T')
+			? form.data.deadline
+			: `${form.data.deadline}T00:00:00Z`;
+
 		const body: CreateCampaignRequest = {
 			name: form.data.name,
 			description: form.data.description || undefined,
 			scope_type: form.data.scope_type as any,
 			scope_config: Object.keys(scopeConfig).length > 0 ? scopeConfig : undefined,
 			reviewer_type: form.data.reviewer_type as any,
-			deadline: form.data.deadline
+			deadline
 		};
 
 		try {
