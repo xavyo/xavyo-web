@@ -128,10 +128,13 @@ export async function fetchCallees(
 export async function grantUserPermissionClient(
 	id: string,
 	userId: string,
+	body: { permission_type?: string; expires_at?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<NhiUserPermission> {
 	const res = await fetchFn(`/api/nhi/permissions/${id}/users/${userId}/grant`, {
-		method: 'POST'
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ permission_type: body.permission_type || 'use', expires_at: body.expires_at })
 	});
 	if (!res.ok) throw new Error(`Failed to grant user permission: ${res.status}`);
 	return res.json();
@@ -140,10 +143,13 @@ export async function grantUserPermissionClient(
 export async function revokeUserPermissionClient(
 	id: string,
 	userId: string,
+	body: { permission_type?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<RevokeResponse> {
 	const res = await fetchFn(`/api/nhi/permissions/${id}/users/${userId}/revoke`, {
-		method: 'POST'
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ permission_type: body.permission_type || 'use' })
 	});
 	if (!res.ok) throw new Error(`Failed to revoke user permission: ${res.status}`);
 	return res.json();

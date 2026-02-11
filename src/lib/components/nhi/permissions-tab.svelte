@@ -60,6 +60,7 @@
 		type: 'tool' | 'nhi' | 'user';
 		id: string;
 		label: string;
+		permissionType?: string;
 	} | null>(null);
 	let isRevoking = $state(false);
 
@@ -163,14 +164,14 @@
 	}
 
 	async function handleGrantUser(userId: string) {
-		await grantUserPermissionClient(nhiId, userId);
+		await grantUserPermissionClient(nhiId, userId, { permission_type: 'use' });
 		await loadUsers();
 	}
 
 	// --- Revoke Handlers ---
 
-	function confirmRevoke(type: 'tool' | 'nhi' | 'user', id: string, label: string) {
-		revokeTarget = { type, id, label };
+	function confirmRevoke(type: 'tool' | 'nhi' | 'user', id: string, label: string, permissionType?: string) {
+		revokeTarget = { type, id, label, permissionType };
 		revokeDialogOpen = true;
 	}
 
@@ -191,7 +192,7 @@
 				await loadCallees();
 				await loadCallers();
 			} else if (revokeTarget.type === 'user') {
-				await revokeUserPermissionClient(nhiId, revokeTarget.id);
+				await revokeUserPermissionClient(nhiId, revokeTarget.id, { permission_type: revokeTarget.permissionType || 'use' });
 				await loadUsers();
 			}
 			revokeDialogOpen = false;
@@ -409,7 +410,7 @@
 								variant="ghost"
 								size="sm"
 								class="text-destructive hover:text-destructive"
-								onclick={() => confirmRevoke('user', perm.user_id, perm.user_id)}
+								onclick={() => confirmRevoke('user', perm.user_id, perm.user_id, perm.permission_type)}
 							>
 								Revoke
 							</Button>

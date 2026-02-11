@@ -168,12 +168,14 @@ export async function listCallees(
 export async function grantUserPermission(
 	id: string,
 	userId: string,
+	body: { permission_type: string; expires_at?: string },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiUserPermission> {
 	return apiClient<NhiUserPermission>(`/nhi/${id}/users/${userId}/grant`, {
 		method: 'POST',
+		body,
 		token,
 		tenantId,
 		fetch: fetchFn
@@ -183,12 +185,14 @@ export async function grantUserPermission(
 export async function revokeUserPermission(
 	id: string,
 	userId: string,
+	body: { permission_type: string },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<RevokeResponse> {
 	return apiClient<RevokeResponse>(`/nhi/${id}/users/${userId}/revoke`, {
 		method: 'POST',
+		body,
 		token,
 		tenantId,
 		fetch: fetchFn

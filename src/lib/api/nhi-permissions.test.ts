@@ -192,14 +192,15 @@ describe('NHI Permissions API', () => {
 	// --- NHI-User Permissions ---
 
 	describe('grantUserPermission', () => {
-		it('calls POST /nhi/:id/users/:user_id/grant', async () => {
+		it('calls POST /nhi/:id/users/:user_id/grant with body', async () => {
 			const mockResponse = { nhi_id: 'nhi-1', user_id: 'user-1', created_at: '2026-01-01' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await grantUserPermission('nhi-1', 'user-1', token, tenantId, mockFetch);
+			const result = await grantUserPermission('nhi-1', 'user-1', { permission_type: 'use' }, token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/nhi/nhi-1/users/user-1/grant', {
 				method: 'POST',
+				body: { permission_type: 'use' },
 				token,
 				tenantId,
 				fetch: mockFetch
@@ -209,13 +210,14 @@ describe('NHI Permissions API', () => {
 	});
 
 	describe('revokeUserPermission', () => {
-		it('calls POST /nhi/:id/users/:user_id/revoke', async () => {
+		it('calls POST /nhi/:id/users/:user_id/revoke with body', async () => {
 			mockApiClient.mockResolvedValue({ revoked: true });
 
-			const result = await revokeUserPermission('nhi-1', 'user-1', token, tenantId, mockFetch);
+			const result = await revokeUserPermission('nhi-1', 'user-1', { permission_type: 'use' }, token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/nhi/nhi-1/users/user-1/revoke', {
 				method: 'POST',
+				body: { permission_type: 'use' },
 				token,
 				tenantId,
 				fetch: mockFetch
