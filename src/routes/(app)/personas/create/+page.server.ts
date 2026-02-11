@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createPersonaSchema } from '$lib/schemas/persona';
 import { createPersona, listArchetypes } from '$lib/api/personas';
 import { listUsers } from '$lib/api/users';
@@ -10,10 +10,19 @@ import { ApiError } from '$lib/api/client';
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	const form = await superValidate(zod(createPersonaSchema));
 
-	const [archetypesResult, usersResult] = await Promise.all([
-		listArchetypes({ is_active: true, limit: 100 }, locals.accessToken!, locals.tenantId!, fetch),
-		listUsers({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch)
-	]);
+	let archetypesResult;
+	let usersResult;
+	try {
+		[archetypesResult, usersResult] = await Promise.all([
+			listArchetypes({ is_active: true, limit: 100 }, locals.accessToken!, locals.tenantId!, fetch),
+			listUsers({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch)
+		]);
+	} catch (e) {
+		if (e instanceof ApiError) {
+			error(e.status, e.message);
+		}
+		error(500, 'Failed to load form data');
+	}
 
 	return {
 		form,

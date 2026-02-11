@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { updateAgentSchema, issueCredentialSchema, suspendNhiSchema } from '$lib/schemas/nhi';
 import {
 	getAgent,
@@ -21,8 +21,17 @@ import { ApiError } from '$lib/api/client';
 import type { UpdateAgentRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	const nhi = await getAgent(params.id, locals.accessToken!, locals.tenantId!, fetch);
-	const credentials = await listCredentials(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	let nhi;
+	let credentials;
+	try {
+		nhi = await getAgent(params.id, locals.accessToken!, locals.tenantId!, fetch);
+		credentials = await listCredentials(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	} catch (e) {
+		if (e instanceof ApiError) {
+			error(e.status, e.message);
+		}
+		error(500, 'Failed to load agent');
+	}
 
 	const form = await superValidate(
 		{

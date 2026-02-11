@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { updatePersonaSchema, reasonSchema } from '$lib/schemas/persona';
 import {
 	getPersona,
@@ -13,7 +13,15 @@ import {
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	const persona = await getPersona(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	let persona;
+	try {
+		persona = await getPersona(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	} catch (e) {
+		if (e instanceof ApiError) {
+			error(e.status, e.message);
+		}
+		error(500, 'Failed to load persona');
+	}
 
 	const form = await superValidate(
 		{

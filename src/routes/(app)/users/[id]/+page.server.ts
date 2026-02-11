@@ -1,13 +1,21 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { updateUserSchema } from '$lib/schemas/user';
 import { getUser, updateUser, deleteUser } from '$lib/api/users';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	const user = await getUser(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	let user;
+	try {
+		user = await getUser(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	} catch (e) {
+		if (e instanceof ApiError) {
+			error(e.status, e.message);
+		}
+		error(500, 'Failed to load user');
+	}
 
 	const form = await superValidate(
 		{

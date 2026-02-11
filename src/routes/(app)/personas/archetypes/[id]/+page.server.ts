@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { updateArchetypeSchema } from '$lib/schemas/persona';
 import {
 	getArchetype,
@@ -14,7 +14,15 @@ import { ApiError } from '$lib/api/client';
 import type { UpdateArchetypeRequest, LifecyclePolicyRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	const archetype = await getArchetype(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	let archetype;
+	try {
+		archetype = await getArchetype(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	} catch (e) {
+		if (e instanceof ApiError) {
+			error(e.status, e.message);
+		}
+		error(500, 'Failed to load archetype');
+	}
 
 	const form = await superValidate(
 		{

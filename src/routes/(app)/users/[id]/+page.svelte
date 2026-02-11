@@ -122,8 +122,8 @@
 							</label>
 						{/each}
 					</div>
-					{#if $errors.roles}
-						<p class="text-sm text-destructive">{$errors.roles}</p>
+					{#if $errors.roles?._errors}
+						<p class="text-sm text-destructive">{$errors.roles._errors}</p>
 					{/if}
 				</div>
 
