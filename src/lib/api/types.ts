@@ -1668,3 +1668,178 @@ export interface RevokeNhiCertResponse {
 	revoked: boolean;
 	new_state: string;
 }
+
+// --- Governance Reporting Types ---
+
+export type ReportTemplateType =
+	| 'access_review'
+	| 'sod_violations'
+	| 'certification_status'
+	| 'user_access'
+	| 'audit_trail';
+
+export type ComplianceStandard = 'sox' | 'gdpr' | 'hipaa' | 'custom';
+
+export type ReportStatus = 'pending' | 'generating' | 'completed' | 'failed';
+
+export type ScheduleFrequency = 'daily' | 'weekly' | 'monthly';
+
+export type ScheduleStatus = 'active' | 'paused' | 'disabled';
+
+export type OutputFormat = 'json' | 'csv';
+
+export type TemplateStatus = 'active' | 'archived';
+
+export interface TemplateFilter {
+	field: string;
+	type: string;
+	required: boolean;
+	options: Record<string, unknown> | null;
+	default: unknown;
+}
+
+export interface TemplateColumn {
+	field: string;
+	label: string;
+	sortable: boolean;
+}
+
+export interface TemplateDefinition {
+	data_sources: string[];
+	filters: TemplateFilter[];
+	columns: TemplateColumn[];
+	grouping: string[];
+	default_sort: { field: string; direction: string } | null;
+}
+
+export interface ReportTemplate {
+	id: string;
+	tenant_id: string | null;
+	name: string;
+	description: string | null;
+	template_type: ReportTemplateType;
+	compliance_standard: ComplianceStandard | null;
+	definition: TemplateDefinition;
+	is_system: boolean;
+	cloned_from: string | null;
+	status: TemplateStatus;
+	created_by: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ReportTemplateListResponse {
+	items: ReportTemplate[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface CreateReportTemplateRequest {
+	name: string;
+	description?: string;
+	template_type: ReportTemplateType;
+	compliance_standard?: ComplianceStandard;
+	definition: TemplateDefinition;
+}
+
+export interface UpdateReportTemplateRequest {
+	name?: string;
+	description?: string;
+	definition?: TemplateDefinition;
+}
+
+export interface CloneReportTemplateRequest {
+	name: string;
+	description?: string;
+}
+
+export interface GeneratedReport {
+	id: string;
+	tenant_id: string;
+	template_id: string;
+	name: string;
+	status: ReportStatus;
+	parameters: Record<string, unknown>;
+	output_format: OutputFormat;
+	record_count: number | null;
+	file_size_bytes: number | null;
+	error_message: string | null;
+	progress_percent: number;
+	started_at: string | null;
+	completed_at: string | null;
+	generated_by: string;
+	schedule_id: string | null;
+	retention_until: string;
+	created_at: string;
+}
+
+export interface GeneratedReportListResponse {
+	items: GeneratedReport[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface GenerateReportRequest {
+	template_id: string;
+	name?: string;
+	parameters?: Record<string, unknown>;
+	output_format: OutputFormat;
+}
+
+export interface CleanupReportsResponse {
+	deleted_count: number;
+}
+
+export interface ReportSchedule {
+	id: string;
+	tenant_id: string;
+	template_id: string;
+	name: string;
+	frequency: ScheduleFrequency;
+	schedule_hour: number;
+	schedule_day_of_week: number | null;
+	schedule_day_of_month: number | null;
+	parameters: Record<string, unknown>;
+	recipients: string[];
+	output_format: OutputFormat;
+	status: ScheduleStatus;
+	last_run_at: string | null;
+	next_run_at: string;
+	consecutive_failures: number;
+	last_error: string | null;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ReportScheduleListResponse {
+	items: ReportSchedule[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface CreateReportScheduleRequest {
+	template_id: string;
+	name: string;
+	frequency: ScheduleFrequency;
+	schedule_hour: number;
+	schedule_day_of_week?: number;
+	schedule_day_of_month?: number;
+	parameters?: Record<string, unknown>;
+	recipients: string[];
+	output_format: OutputFormat;
+}
+
+export interface UpdateReportScheduleRequest {
+	name?: string;
+	frequency?: ScheduleFrequency;
+	schedule_hour?: number;
+	schedule_day_of_week?: number | null;
+	schedule_day_of_month?: number | null;
+	parameters?: Record<string, unknown>;
+	recipients?: string[];
+	output_format?: OutputFormat;
+}
