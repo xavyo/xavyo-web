@@ -47,13 +47,13 @@
 					</DropdownMenu.Label>
 				</DropdownMenu.Group>
 				<DropdownMenu.Separator />
-				<a href="/dashboard" class="block">
+				<a href="/settings?tab=profile" class="block">
 					<DropdownMenu.Item>
 						<UserCircle class="mr-2 h-4 w-4" />
 						Profile
 					</DropdownMenu.Item>
 				</a>
-				<a href="/dashboard" class="block">
+				<a href="/settings" class="block">
 					<DropdownMenu.Item>
 						<Settings class="mr-2 h-4 w-4" />
 						Settings

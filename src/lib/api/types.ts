@@ -417,3 +417,194 @@ export interface JwtClaims {
 	purpose?: string;
 	email?: string;
 }
+
+// Security & Self-Service Types (mirror Rust DTOs from xavyo-api-auth)
+
+export type MfaMethod = 'totp' | 'webauthn' | 'recovery';
+
+export interface UserProfile {
+	id: string;
+	email: string;
+	display_name: string | null;
+	first_name: string | null;
+	last_name: string | null;
+	avatar_url: string | null;
+	email_verified: boolean;
+	created_at: string;
+}
+
+export interface UpdateProfileRequest {
+	display_name?: string;
+	first_name?: string;
+	last_name?: string;
+	avatar_url?: string;
+}
+
+export interface PasswordChangeRequest {
+	current_password: string;
+	new_password: string;
+	revoke_other_sessions: boolean;
+}
+
+export interface PasswordChangeResponse {
+	message: string;
+	sessions_revoked: number;
+}
+
+export interface MfaStatus {
+	totp_enabled: boolean;
+	webauthn_enabled: boolean;
+	recovery_codes_remaining: number;
+	available_methods: MfaMethod[];
+	setup_at: string | null;
+	last_used_at: string | null;
+}
+
+export interface TotpSetupResponse {
+	secret: string;
+	otpauth_uri: string;
+	qr_code: string;
+}
+
+export interface TotpVerifySetupRequest {
+	code: string;
+}
+
+export interface TotpVerifySetupResponse {
+	recovery_codes: string[];
+	message: string;
+}
+
+export interface TotpDisableRequest {
+	password: string;
+	code: string;
+}
+
+export interface MfaDisableResponse {
+	message: string;
+}
+
+export interface RecoveryRegenerateRequest {
+	password: string;
+}
+
+export interface RecoveryCodesResponse {
+	recovery_codes: string[];
+	message: string;
+}
+
+export interface WebAuthnCredential {
+	id: string;
+	name: string;
+	created_at: string;
+}
+
+export interface WebAuthnCredentialList {
+	credentials: WebAuthnCredential[];
+	count: number;
+}
+
+export interface StartRegistrationRequest {
+	name?: string;
+}
+
+export interface RegistrationResponse {
+	credential: WebAuthnCredential;
+	message: string;
+}
+
+export interface UpdateCredentialRequest {
+	name: string;
+}
+
+export interface SessionInfo {
+	id: string;
+	device_name: string | null;
+	device_type: string | null;
+	browser: string | null;
+	os: string | null;
+	ip_address: string | null;
+	is_current: boolean;
+	created_at: string;
+	last_activity_at: string;
+}
+
+export interface SessionList {
+	sessions: SessionInfo[];
+	total: number;
+}
+
+export interface RevokeAllSessionsResponse {
+	revoked_count: number;
+	message: string;
+}
+
+export interface DeviceInfo {
+	id: string;
+	device_fingerprint: string;
+	device_name: string | null;
+	device_type: string | null;
+	browser: string | null;
+	browser_version: string | null;
+	os: string | null;
+	os_version: string | null;
+	is_trusted: boolean;
+	trust_expires_at: string | null;
+	first_seen_at: string;
+	last_seen_at: string;
+	login_count: number;
+	is_current: boolean | null;
+}
+
+export interface DeviceList {
+	items: DeviceInfo[];
+	total: number;
+}
+
+export interface TrustDeviceRequest {
+	trust_duration_days?: number;
+}
+
+export interface TrustDeviceResponse {
+	id: string;
+	is_trusted: boolean;
+	trust_expires_at: string | null;
+}
+
+export interface RenameDeviceRequest {
+	device_name: string;
+}
+
+export interface RenameDeviceResponse {
+	id: string;
+	device_name: string;
+}
+
+export interface EmailChangeRequest {
+	new_email: string;
+	current_password: string;
+}
+
+export interface EmailChangeInitiatedResponse {
+	message: string;
+	expires_at: string;
+}
+
+export interface EmailVerifyChangeRequest {
+	token: string;
+}
+
+export interface EmailChangeCompletedResponse {
+	message: string;
+	new_email: string;
+}
+
+export interface SecurityOverview {
+	mfa_enabled: boolean;
+	mfa_methods: string[];
+	trusted_devices_count: number;
+	active_sessions_count: number;
+	last_password_change: string | null;
+	recent_security_alerts_count: number;
+	password_expires_at: string | null;
+}

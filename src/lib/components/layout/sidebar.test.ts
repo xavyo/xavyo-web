@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/svelte';
-import { LayoutDashboard, Users } from 'lucide-svelte';
+import { LayoutDashboard, Users, Settings } from 'lucide-svelte';
 import Sidebar from './sidebar.svelte';
 
 const testItems = [
@@ -56,5 +56,16 @@ describe('Sidebar', () => {
 		const { container } = render(Sidebar, { props: { items: testItems, currentPath: '/dashboard' } });
 		const svgs = container.querySelectorAll('svg');
 		expect(svgs.length).toBeGreaterThanOrEqual(2);
+	});
+
+	it('renders Settings navigation link', () => {
+		const itemsWithSettings = [
+			...testItems,
+			{ label: 'Settings', href: '/settings', icon: Settings }
+		];
+		render(Sidebar, { props: { items: itemsWithSettings, currentPath: '/dashboard' } });
+		const settingsLink = screen.getByText('Settings').closest('a');
+		expect(settingsLink).toBeTruthy();
+		expect(settingsLink?.getAttribute('href')).toBe('/settings');
 	});
 });
