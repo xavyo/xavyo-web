@@ -275,6 +275,11 @@ export interface NhiIdentityResponse {
 	lifecycle_state: NhiLifecycleState;
 	suspension_reason: string | null;
 	expires_at: string | null;
+	last_activity_at: string | null;
+	risk_score: number;
+	last_certified_at: string | null;
+	last_certified_by: string | null;
+	next_certification_at: string | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -1510,4 +1515,156 @@ export interface AgentCard {
 	capabilities: AgentCapabilities;
 	authentication: AgentAuthentication;
 	skills: AgentSkill[];
+}
+
+// --- NHI Governance Types (Risk, Inactivity, Orphans, SoD, Certifications) ---
+
+// NHI Risk Scoring
+
+export interface NhiRiskFactor {
+	name: string;
+	score: number;
+	weight: number;
+	description: string;
+}
+
+export interface NhiRiskBreakdown {
+	nhi_id: string;
+	total_score: number;
+	risk_level: string;
+	common_factors: NhiRiskFactor[];
+	type_specific_factors: NhiRiskFactor[];
+}
+
+export interface TypeRiskSummary {
+	nhi_type: string;
+	count: number;
+	avg_score: number;
+}
+
+export interface LevelRiskSummary {
+	level: string;
+	count: number;
+}
+
+export interface NhiRiskSummary {
+	total_entities: number;
+	by_type: TypeRiskSummary[];
+	by_level: LevelRiskSummary[];
+}
+
+// NHI Inactivity Detection
+
+export interface InactiveNhiEntity {
+	id: string;
+	name: string;
+	nhi_type: string;
+	days_inactive: number;
+	threshold_days: number;
+	last_activity_at: string | null;
+	grace_period_ends_at: string | null;
+}
+
+export interface AutoSuspendFailure {
+	id: string;
+	error: string;
+}
+
+export interface AutoSuspendResult {
+	suspended: string[];
+	failed: AutoSuspendFailure[];
+}
+
+// NHI Orphan Detection
+
+export interface OrphanNhiEntity {
+	id: string;
+	name: string;
+	nhi_type: string;
+	owner_id: string | null;
+	reason: string;
+}
+
+// NHI SoD Rules
+
+export type NhiSodEnforcement = 'prevent' | 'warn';
+
+export interface NhiSodRule {
+	id: string;
+	tenant_id: string;
+	tool_id_a: string;
+	tool_id_b: string;
+	enforcement: NhiSodEnforcement;
+	description: string | null;
+	created_at: string;
+	created_by: string | null;
+}
+
+export interface NhiSodRuleListResponse {
+	data: NhiSodRule[];
+	limit: number;
+	offset: number;
+}
+
+export interface CreateNhiSodRuleRequest {
+	tool_id_a: string;
+	tool_id_b: string;
+	enforcement: NhiSodEnforcement;
+	description?: string;
+}
+
+export interface NhiSodViolation {
+	rule_id: string;
+	conflicting_tool_id: string;
+	enforcement: NhiSodEnforcement;
+	description: string | null;
+}
+
+export interface NhiSodCheckResult {
+	violations: NhiSodViolation[];
+	is_allowed: boolean;
+}
+
+export interface NhiSodCheckRequest {
+	agent_id: string;
+	tool_id: string;
+}
+
+// NHI Certifications
+
+export interface NhiCertificationCampaign {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	scope: string;
+	nhi_type_filter: string | null;
+	specific_nhi_ids: string[] | null;
+	status: string;
+	due_date: string | null;
+	created_by: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateNhiCertCampaignRequest {
+	name: string;
+	description?: string;
+	scope?: string;
+	nhi_type_filter?: string;
+	specific_nhi_ids?: string[];
+	due_date?: string;
+}
+
+export interface CertifyNhiResponse {
+	nhi_id: string;
+	certified_by: string;
+	certified_at: string;
+	next_certification_at: string | null;
+}
+
+export interface RevokeNhiCertResponse {
+	nhi_id: string;
+	revoked: boolean;
+	new_state: string;
 }

@@ -14,6 +14,9 @@
 	import CredentialsSection from '../../credentials-section.svelte';
 	import McpToolsTab from '$lib/components/nhi/mcp-tools-tab.svelte';
 	import PermissionsTab from '$lib/components/nhi/permissions-tab.svelte';
+	import RiskBreakdown from '$lib/components/nhi/risk-breakdown.svelte';
+	import type { NhiRiskBreakdown } from '$lib/api/types';
+	import { fetchNhiRisk } from '$lib/api/nhi-governance-client';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { PageData } from './$types';
@@ -34,6 +37,17 @@
 	let showDeleteDialog: boolean = $state(false);
 	let showSuspendDialog: boolean = $state(false);
 	let showArchiveDialog: boolean = $state(false);
+
+	let riskData = $state<NhiRiskBreakdown | null>(null);
+	let riskLoading = $state(true);
+	let riskError = $state<string | null>(null);
+
+	$effect(() => {
+		fetchNhiRisk(data.nhi.id)
+			.then((r) => { riskData = r; })
+			.catch((err: unknown) => { riskError = err instanceof Error ? err.message : 'Failed to load risk data'; })
+			.finally(() => { riskLoading = false; });
+	});
 
 	const isArchived = $derived(data.nhi.lifecycle_state === 'archived');
 
@@ -83,6 +97,7 @@
 		<TabsTrigger value="details">Details</TabsTrigger>
 		<TabsTrigger value="mcp-tools">MCP Tools</TabsTrigger>
 		<TabsTrigger value="permissions">Permissions</TabsTrigger>
+		<TabsTrigger value="risk">Risk</TabsTrigger>
 	</TabsList>
 
 	<TabsContent value="details">
@@ -358,6 +373,21 @@
 
 	<TabsContent value="permissions">
 		<PermissionsTab nhiId={data.nhi.id} entityType="tool" />
+	</TabsContent>
+
+	<TabsContent value="risk">
+		{#if riskLoading}
+			<div class="animate-pulse space-y-3">
+				<div class="h-8 rounded bg-muted"></div>
+				<div class="h-48 rounded bg-muted"></div>
+			</div>
+		{:else if riskError}
+			<p class="text-sm text-destructive">{riskError}</p>
+		{:else if riskData}
+			<RiskBreakdown breakdown={riskData} />
+		{:else}
+			<p class="text-sm text-muted-foreground">Click the Risk tab to load risk data.</p>
+		{/if}
 	</TabsContent>
 </Tabs>
 
