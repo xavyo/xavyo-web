@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -48,6 +48,7 @@
 			items.push({ label: 'Peer Groups', href: '/governance/peer-groups', icon: UsersRound });
 			items.push({ label: 'Authorization', href: '/governance/authorization', icon: LockKeyhole });
 			items.push({ label: 'Deduplication', href: '/governance/dedup', icon: GitMerge });
+			items.push({ label: 'Correlation', href: '/governance/correlation', icon: Link });
 			items.push({ label: 'Licenses', href: '/governance/licenses', icon: Scale });
 			items.push({ label: 'Webhooks', href: '/settings/webhooks', icon: Webhook });
 			items.push({ label: 'Imports', href: '/settings/imports', icon: Upload });

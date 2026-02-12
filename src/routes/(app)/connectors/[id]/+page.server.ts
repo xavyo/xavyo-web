@@ -8,6 +8,10 @@ import {
 	deactivateConnector,
 	deleteConnector
 } from '$lib/api/connectors';
+import {
+	listCorrelationRules,
+	getCorrelationThresholds
+} from '$lib/api/correlation';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
@@ -31,7 +35,13 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		error(500, 'Failed to load connector');
 	}
 
-	return { connector, health };
+	// Load correlation data in parallel — catch errors gracefully
+	const [correlationRules, correlationThresholds] = await Promise.all([
+		listCorrelationRules(params.id, { limit: 100, offset: 0 }, locals.accessToken!, locals.tenantId!, fetch).catch(() => ({ items: [], total: 0 })),
+		getCorrelationThresholds(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(() => null)
+	]);
+
+	return { connector, health, correlationRules: correlationRules.items ?? [], correlationThresholds };
 };
 
 export const actions: Actions = {

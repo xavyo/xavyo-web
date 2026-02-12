@@ -4328,3 +4328,285 @@ export interface ComplianceSummary {
 	total_allocated: number;
 	overall_utilization: number;
 }
+
+// Correlation Engine Types
+
+export type CorrelationMatchType = 'exact' | 'fuzzy' | 'expression';
+export type CorrelationAlgorithm = 'levenshtein' | 'jaro_winkler';
+export type CorrelationJobStatus = 'running' | 'completed' | 'failed';
+export type CorrelationCaseStatus = 'pending' | 'confirmed' | 'rejected' | 'identity_created';
+export type CorrelationTriggerType = 'import' | 'reconciliation' | 'manual';
+export type CorrelationEventType = 'auto_confirm' | 'manual_confirm' | 'reject' | 'create_identity' | 'reassign';
+export type CorrelationOutcome = 'success' | 'failure';
+export type CorrelationActorType = 'user' | 'system';
+
+export interface CorrelationRule {
+	id: string;
+	tenant_id: string;
+	connector_id: string;
+	name: string;
+	source_attribute: string;
+	target_attribute: string;
+	match_type: CorrelationMatchType;
+	algorithm: CorrelationAlgorithm | null;
+	threshold: number;
+	weight: number;
+	expression: string | null;
+	tier: number;
+	is_definitive: boolean;
+	normalize: boolean;
+	is_active: boolean;
+	priority: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateCorrelationRuleRequest {
+	name: string;
+	source_attribute: string;
+	target_attribute: string;
+	match_type: CorrelationMatchType;
+	algorithm?: CorrelationAlgorithm;
+	threshold: number;
+	weight: number;
+	expression?: string;
+	tier: number;
+	is_definitive: boolean;
+	normalize: boolean;
+	priority: number;
+}
+
+export interface UpdateCorrelationRuleRequest {
+	name?: string;
+	source_attribute?: string;
+	target_attribute?: string;
+	match_type?: CorrelationMatchType;
+	algorithm?: CorrelationAlgorithm | null;
+	threshold?: number;
+	weight?: number;
+	expression?: string | null;
+	tier?: number;
+	is_definitive?: boolean;
+	normalize?: boolean;
+	is_active?: boolean;
+	priority?: number;
+}
+
+export interface CorrelationRuleListResponse {
+	items: CorrelationRule[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ValidateExpressionRequest {
+	expression: string;
+	test_input?: {
+		source: Record<string, unknown>;
+		target: Record<string, unknown>;
+	};
+}
+
+export interface ValidateExpressionResponse {
+	valid: boolean;
+	result: string | null;
+	error: string | null;
+}
+
+export interface IdentityCorrelationRule {
+	id: string;
+	name: string;
+	attribute: string;
+	match_type: CorrelationMatchType;
+	algorithm: CorrelationAlgorithm | null;
+	threshold: number;
+	weight: number;
+	is_active: boolean;
+	priority: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateIdentityCorrelationRuleRequest {
+	name: string;
+	attribute: string;
+	match_type: CorrelationMatchType;
+	algorithm?: CorrelationAlgorithm;
+	threshold: number;
+	weight: number;
+	priority: number;
+}
+
+export interface UpdateIdentityCorrelationRuleRequest {
+	name?: string;
+	attribute?: string;
+	match_type?: CorrelationMatchType;
+	algorithm?: CorrelationAlgorithm | null;
+	threshold?: number;
+	weight?: number;
+	is_active?: boolean;
+	priority?: number;
+}
+
+export interface IdentityCorrelationRuleListResponse {
+	items: IdentityCorrelationRule[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CorrelationThreshold {
+	id: string;
+	connector_id: string;
+	auto_confirm_threshold: number;
+	manual_review_threshold: number;
+	tuning_mode: boolean;
+	include_deactivated: boolean;
+	batch_size: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface UpsertCorrelationThresholdRequest {
+	auto_confirm_threshold?: number;
+	manual_review_threshold?: number;
+	tuning_mode?: boolean;
+	include_deactivated?: boolean;
+	batch_size?: number;
+}
+
+export interface CorrelationJob {
+	job_id: string;
+	status: CorrelationJobStatus;
+	total_accounts: number;
+	processed_accounts: number;
+	auto_confirmed: number;
+	queued_for_review: number;
+	no_match: number;
+	errors: number;
+	started_at: string;
+	completed_at: string | null;
+}
+
+export interface TriggerCorrelationRequest {
+	account_ids?: string[];
+}
+
+export interface CorrelationCase {
+	id: string;
+	connector_id: string;
+	connector_name: string;
+	account_identifier: string;
+	account_id: string | null;
+	status: CorrelationCaseStatus;
+	trigger_type: CorrelationTriggerType;
+	highest_confidence: number;
+	candidate_count: number;
+	assigned_to: string | null;
+	created_at: string;
+}
+
+export interface CorrelationCaseListResponse {
+	items: CorrelationCase[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CorrelationCandidate {
+	id: string;
+	identity_id: string;
+	identity_display_name: string;
+	identity_attributes: Record<string, unknown>;
+	aggregate_confidence: number;
+	per_attribute_scores: Record<string, number>;
+	is_deactivated: boolean;
+	is_definitive_match: boolean;
+}
+
+export interface CorrelationCaseDetail extends CorrelationCase {
+	account_attributes: Record<string, unknown>;
+	candidates: CorrelationCandidate[];
+	resolved_by: string | null;
+	resolved_at: string | null;
+	resolution_reason: string | null;
+	rules_snapshot: Record<string, unknown>;
+	updated_at: string;
+}
+
+export interface ConfirmCaseRequest {
+	candidate_id: string;
+	reason?: string;
+}
+
+export interface RejectCaseRequest {
+	reason: string;
+}
+
+export interface CreateIdentityFromCaseRequest {
+	reason?: string;
+}
+
+export interface ReassignCaseRequest {
+	assigned_to: string;
+	reason?: string;
+}
+
+export interface CorrelationStatistics {
+	connector_id: string;
+	period_start: string;
+	period_end: string;
+	total_evaluated: number;
+	auto_confirmed_count: number;
+	auto_confirmed_percentage: number;
+	manual_review_count: number;
+	manual_review_percentage: number;
+	no_match_count: number;
+	no_match_percentage: number;
+	average_confidence: number;
+	review_queue_depth: number;
+	suggestions: string[];
+}
+
+export interface DailyTrend {
+	date: string;
+	total_evaluated: number;
+	auto_confirmed: number;
+	manual_review: number;
+	no_match: number;
+	average_confidence: number;
+}
+
+export interface CorrelationTrends {
+	connector_id: string;
+	period_start: string;
+	period_end: string;
+	daily_trends: DailyTrend[];
+	suggestions: string[];
+}
+
+export interface CorrelationAuditEvent {
+	id: string;
+	connector_id: string;
+	account_id: string;
+	case_id: string;
+	identity_id: string;
+	event_type: CorrelationEventType;
+	outcome: CorrelationOutcome;
+	confidence_score: number;
+	candidate_count: number;
+	candidates_summary: Record<string, unknown>;
+	rules_snapshot: Record<string, unknown>;
+	thresholds_snapshot: Record<string, unknown>;
+	actor_type: CorrelationActorType;
+	actor_id: string | null;
+	reason: string | null;
+	created_at: string;
+}
+
+export interface CorrelationAuditListResponse {
+	items: CorrelationAuditEvent[];
+	total: number;
+	limit: number;
+	offset: number;
+}

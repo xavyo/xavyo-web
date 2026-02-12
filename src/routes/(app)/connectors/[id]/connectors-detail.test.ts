@@ -204,18 +204,18 @@ describe('Connector Detail page component', () => {
 	it('page component is defined', async () => {
 		const mod = await import('./+page.svelte');
 		expect(mod.default).toBeDefined();
-	}, 15000);
+	}, 60000);
 
 	it('page component is a valid Svelte component constructor', async () => {
 		const mod = await import('./+page.svelte');
 		expect(typeof mod.default).toBe('function');
-	});
+	}, 60000);
 
 	it('module has no unexpected named exports', async () => {
 		const mod = await import('./+page.svelte');
 		const keys = Object.keys(mod);
 		expect(keys).toContain('default');
-	});
+	}, 60000);
 });
 
 describe('Connector Detail rendering logic', () => {

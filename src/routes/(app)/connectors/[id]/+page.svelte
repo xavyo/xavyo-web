@@ -6,14 +6,24 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
+	import RulesTable from '$lib/components/correlation/rules-table.svelte';
+	import ThresholdForm from '$lib/components/correlation/threshold-form.svelte';
+	import JobStatus from '$lib/components/correlation/job-status.svelte';
+	import StatisticsCards from '$lib/components/correlation/statistics-cards.svelte';
+	import TrendsTable from '$lib/components/correlation/trends-table.svelte';
 	import { enhance as formEnhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import { testConnectionClient } from '$lib/api/connectors-client';
-	import type { ConnectorTestResult } from '$lib/api/types';
+	import { fetchCorrelationStatistics, fetchCorrelationTrends } from '$lib/api/correlation-client';
+	import type { ConnectorTestResult, CorrelationStatistics, CorrelationTrends } from '$lib/api/types';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	let correlationStats = $state<CorrelationStatistics | null>(null);
+	let correlationTrends = $state<CorrelationTrends | null>(null);
+	let statsLoading = $state(false);
 
 	let isTesting = $state(false);
 	let testResult = $state<ConnectorTestResult | null>(null);
@@ -100,6 +110,29 @@
 	function healthDotColor(isOnline: boolean): string {
 		return isOnline ? 'bg-green-500' : 'bg-red-500';
 	}
+
+	async function loadStatistics() {
+		if (correlationStats) return; // already loaded
+		statsLoading = true;
+		try {
+			const endDate = new Date().toISOString().split('T')[0];
+			const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+			const [stats, trends] = await Promise.all([
+				fetchCorrelationStatistics(data.connector.id),
+				fetchCorrelationTrends(data.connector.id, { start_date: startDate, end_date: endDate })
+			]);
+			correlationStats = stats;
+			correlationTrends = trends;
+		} catch {
+			// Stats may not be available yet
+		} finally {
+			statsLoading = false;
+		}
+	}
+
+	async function handleCorrelationDataChanged() {
+		await invalidateAll();
+	}
 </script>
 
 <!-- Header -->
@@ -185,11 +218,15 @@
 {/if}
 
 <!-- Tabs -->
-<Tabs value="overview" class="mt-4">
+<Tabs value="overview" class="mt-4" onValueChange={(v) => { if (v === 'statistics') loadStatistics(); }}>
 	<TabsList>
 		<TabsTrigger value="overview">Overview</TabsTrigger>
 		<TabsTrigger value="configuration">Configuration</TabsTrigger>
 		<TabsTrigger value="health">Health</TabsTrigger>
+		<TabsTrigger value="correlation-rules">Correlation Rules</TabsTrigger>
+		<TabsTrigger value="thresholds">Thresholds</TabsTrigger>
+		<TabsTrigger value="correlation-jobs">Jobs</TabsTrigger>
+		<TabsTrigger value="statistics">Statistics</TabsTrigger>
 	</TabsList>
 
 	<!-- Overview Tab -->
@@ -322,6 +359,44 @@
 				{/if}
 			</CardContent>
 		</Card>
+	</TabsContent>
+
+	<!-- Correlation Rules Tab -->
+	<TabsContent value="correlation-rules">
+		<RulesTable
+			rules={data.correlationRules ?? []}
+			connectorId={data.connector.id}
+			onRuleCreated={handleCorrelationDataChanged}
+			onRuleUpdated={handleCorrelationDataChanged}
+			onRuleDeleted={handleCorrelationDataChanged}
+		/>
+	</TabsContent>
+
+	<!-- Thresholds Tab -->
+	<TabsContent value="thresholds">
+		<div class="max-w-lg">
+			<ThresholdForm
+				connectorId={data.connector.id}
+				threshold={data.correlationThresholds ?? undefined}
+				onSuccess={handleCorrelationDataChanged}
+			/>
+		</div>
+	</TabsContent>
+
+	<!-- Correlation Jobs Tab -->
+	<TabsContent value="correlation-jobs">
+		<JobStatus
+			connectorId={data.connector.id}
+			onJobComplete={handleCorrelationDataChanged}
+		/>
+	</TabsContent>
+
+	<!-- Statistics Tab -->
+	<TabsContent value="statistics">
+		<div class="space-y-6">
+			<StatisticsCards statistics={correlationStats} isLoading={statsLoading} />
+			<TrendsTable trends={correlationTrends} isLoading={statsLoading} />
+		</div>
 	</TabsContent>
 </Tabs>
 
