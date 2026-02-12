@@ -72,8 +72,8 @@ describe('dedup hub page server', () => {
 				fetch: vi.fn()
 			} as any);
 
-			expect(result.duplicates.items).toHaveLength(1);
-			expect(result.duplicates.total).toBe(1);
+			expect((result as any).duplicates.items).toHaveLength(1);
+			expect((result as any).duplicates.total).toBe(1);
 		});
 
 		it('filters by status and min_confidence', async () => {

@@ -81,7 +81,7 @@ describe('dedup detail page server', () => {
 				fetch: vi.fn()
 			} as any);
 
-			expect(result.duplicate).toEqual(mockDuplicate);
+			expect((result as any).duplicate).toEqual(mockDuplicate);
 		});
 	});
 

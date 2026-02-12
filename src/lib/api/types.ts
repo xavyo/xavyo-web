@@ -2721,7 +2721,8 @@ export interface QueueStatistics {
 	failed: number;
 	dead_letter: number;
 	awaiting_system: number;
-	avg_processing_time_secs: number;
+	avg_processing_time_secs: number | null;
+	success_rate: number | null;
 }
 
 // DLQ Response (no total field)
@@ -3935,6 +3936,8 @@ export interface MergeAuditDetailResponse {
 		target_entitlements: MergeEntitlementSummary[];
 		merged_entitlements: MergeEntitlementSummary[];
 		excluded_entitlements: MergeEntitlementSummary[];
+		added_count?: number;
+		removed_count?: number;
 	};
 	sod_violations: MergeSodViolationResponse[] | null;
 	created_at: string;

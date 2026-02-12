@@ -95,8 +95,8 @@ describe('merge page server', () => {
 				fetch: vi.fn()
 			} as any);
 
-			expect(result.preview).toEqual(mockPreview);
-			expect(result.duplicate).toEqual(mockDuplicate);
+			expect((result as any).preview).toEqual(mockPreview);
+			expect((result as any).duplicate).toEqual(mockDuplicate);
 		});
 	});
 

@@ -75,8 +75,8 @@ describe('audit detail page server', () => {
 				fetch: vi.fn()
 			} as any);
 
-			expect(result.audit).toEqual(mockAudit);
-			expect(result.audit.source_snapshot.email).toBe('john@example.com');
+			expect((result as any).audit).toEqual(mockAudit);
+			expect((result as any).audit.source_snapshot.email).toBe('john@example.com');
 		});
 
 		it('throws 404 on not found', async () => {

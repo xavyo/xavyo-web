@@ -62,7 +62,7 @@ describe('batch merge page server', () => {
 				fetch: vi.fn()
 			} as any);
 
-			expect(result.pendingDuplicates.items).toHaveLength(1);
+			expect((result as any).pendingDuplicates.items).toHaveLength(1);
 		});
 	});
 

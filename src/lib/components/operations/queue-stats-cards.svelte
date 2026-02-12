@@ -1,23 +1,15 @@
 <script lang="ts">
-	interface QueueStats {
-		pending: number;
-		in_progress: number;
-		completed: number;
-		failed: number;
-		dead_letter: number;
-		awaiting_system: number;
-		avg_processing_time_secs: number;
-	}
+	import type { QueueStatistics } from '$lib/api/types';
 
 	interface Props {
-		stats: QueueStats;
+		stats: QueueStatistics;
 	}
 
 	let { stats }: Props = $props();
 
 	interface CardConfig {
 		label: string;
-		key: keyof QueueStats | null;
+		key: keyof QueueStatistics | null;
 		dotColor: string;
 	}
 
@@ -31,8 +23,8 @@
 		{ label: 'Avg Time', key: null, dotColor: 'bg-cyan-500' }
 	];
 
-	function formatAvgTime(secs: number): string {
-		if (secs === 0) return 'N/A';
+	function formatAvgTime(secs: number | null | undefined): string {
+		if (secs == null || secs === 0) return 'N/A';
 		return `${secs.toFixed(1)}s`;
 	}
 </script>
@@ -46,7 +38,7 @@
 			</div>
 			<p class="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-100">
 				{#if card.key !== null}
-					{stats[card.key]}
+					{stats[card.key] ?? 0}
 				{:else}
 					{formatAvgTime(stats.avg_processing_time_secs)}
 				{/if}

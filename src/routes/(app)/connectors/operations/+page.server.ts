@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 		]);
 
 		return { operations, stats, connectors: connectors.items };
-	} catch {
+	} catch (e) {
 		return {
 			operations: { operations: [], total: 0, limit, offset },
 			stats: null,
