@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ReportSchedule } from '$lib/api/types';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 	import { pauseScheduleClient, resumeScheduleClient, deleteScheduleClient } from '$lib/api/governance-reporting-client';
 	import { addToast } from '$lib/stores/toast.svelte';
 
@@ -62,14 +63,24 @@
 		}
 	}
 
-	async function handleDelete(id: string) {
-		if (!confirm('Delete this schedule?')) return;
+	let confirmDeleteId: string | null = $state(null);
+	let showDeleteConfirm = $state(false);
+
+	function requestDelete(id: string) {
+		confirmDeleteId = id;
+		showDeleteConfirm = true;
+	}
+
+	async function handleDelete() {
+		if (!confirmDeleteId) return;
 		try {
-			await deleteScheduleClient(id);
+			await deleteScheduleClient(confirmDeleteId);
 			addToast('success', 'Schedule deleted');
 			onRefresh?.();
 		} catch {
 			addToast('error', 'Failed to delete schedule');
+		} finally {
+			confirmDeleteId = null;
 		}
 	}
 </script>
@@ -158,7 +169,7 @@
 									<button
 										type="button"
 										class="text-sm font-medium text-destructive hover:underline"
-										onclick={() => handleDelete(schedule.id)}
+										onclick={() => requestDelete(schedule.id)}
 									>
 										Delete
 									</button>
@@ -171,3 +182,11 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete schedule"
+	description="Are you sure you want to delete this schedule? This action cannot be undone."
+	confirmLabel="Delete"
+	onconfirm={handleDelete}
+/>

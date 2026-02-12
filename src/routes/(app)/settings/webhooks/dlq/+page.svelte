@@ -6,6 +6,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -31,6 +32,9 @@
 		if (text.length <= maxLen) return text;
 		return text.slice(0, maxLen) + '...';
 	}
+
+	let showDeleteConfirm = $state(false);
+	let deleteEntryId: string | null = $state(null);
 
 	function formatDate(dateStr: string): string {
 		return new Date(dateStr).toLocaleDateString();
@@ -121,6 +125,7 @@
 									<Button variant="outline" size="sm" type="submit">Replay</Button>
 								</form>
 								<form
+									id="dlq-delete-form-{entry.id}"
 									method="POST"
 									action="?/delete"
 									use:enhance={() => {
@@ -140,14 +145,9 @@
 											}
 										};
 									}}
-									onsubmit={(e) => {
-										if (!confirm('Are you sure you want to delete this DLQ entry? This action cannot be undone.')) {
-											e.preventDefault();
-										}
-									}}
 								>
 									<input type="hidden" name="id" value={entry.id} />
-									<Button variant="destructive" size="sm" type="submit">Delete</Button>
+									<Button variant="destructive" size="sm" type="button" onclick={() => { deleteEntryId = entry.id; showDeleteConfirm = true; }}>Delete</Button>
 								</form>
 							</div>
 						</td>
@@ -183,3 +183,17 @@
 		</div>
 	{/if}
 {/if}
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete DLQ entry"
+	description="Are you sure you want to delete this DLQ entry? This action cannot be undone."
+	confirmLabel="Delete"
+	variant="destructive"
+	onconfirm={() => {
+		if (deleteEntryId) {
+			const form = document.getElementById('dlq-delete-form-' + deleteEntryId);
+			if (form instanceof HTMLFormElement) form.requestSubmit();
+		}
+	}}
+/>

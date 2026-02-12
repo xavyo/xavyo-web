@@ -5,6 +5,7 @@
 	import { updateTemplateSchema, cloneTemplateSchema } from '$lib/schemas/governance-reporting';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 
 	let { data } = $props();
 	let template = $derived(data.template);
@@ -30,6 +31,8 @@
 	});
 
 	let showClone: boolean = $state(false);
+	let showArchiveConfirm = $state(false);
+	let archiveFormRef: HTMLFormElement | undefined = $state(undefined);
 </script>
 
 <div class="mx-auto max-w-3xl space-y-6 p-6">
@@ -77,7 +80,7 @@
 			Clone
 		</button>
 		{#if !template.is_system}
-			<form method="POST" action="?/archive" use:svelteEnhance={() => {
+			<form bind:this={archiveFormRef} method="POST" action="?/archive" use:svelteEnhance={() => {
 				return async ({ result, update }) => {
 					if (result.type === 'redirect') {
 						addToast('success', 'Template archived');
@@ -88,9 +91,9 @@
 				};
 			}}>
 				<button
-					type="submit"
+					type="button"
 					class="inline-flex h-9 items-center rounded-md border border-destructive px-4 text-sm font-medium text-destructive hover:bg-destructive/10"
-					onclick={(e) => { if (!confirm('Archive this template?')) e.preventDefault(); }}
+					onclick={() => (showArchiveConfirm = true)}
 				>
 					Archive
 				</button>
@@ -155,3 +158,12 @@
 		&larr; Back to Reports
 	</a>
 </div>
+
+<ConfirmDialog
+	bind:open={showArchiveConfirm}
+	title="Archive template"
+	description="Are you sure you want to archive this template?"
+	confirmLabel="Archive"
+	variant="destructive"
+	onconfirm={() => archiveFormRef?.requestSubmit()}
+/>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { GeneratedReport } from '$lib/api/types';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 	import { deleteReportClient, cleanupReportsClient } from '$lib/api/governance-reporting-client';
 	import { addToast } from '$lib/stores/toast.svelte';
 
@@ -17,6 +18,9 @@
 	let viewingReportId: string | null = $state(null);
 	let reportData: unknown = $state(null);
 	let dataLoading: boolean = $state(false);
+	let confirmDeleteId: string | null = $state(null);
+	let showDeleteConfirm = $state(false);
+	let showCleanupConfirm = $state(false);
 
 	function statusClass(status: string): string {
 		switch (status) {
@@ -59,19 +63,25 @@
 		}
 	}
 
-	async function handleDelete(id: string) {
-		if (!confirm('Delete this report?')) return;
+	function requestDelete(id: string) {
+		confirmDeleteId = id;
+		showDeleteConfirm = true;
+	}
+
+	async function handleDelete() {
+		if (!confirmDeleteId) return;
 		try {
-			await deleteReportClient(id);
+			await deleteReportClient(confirmDeleteId);
 			addToast('success', 'Report deleted');
 			onRefresh?.();
 		} catch {
 			addToast('error', 'Failed to delete report');
+		} finally {
+			confirmDeleteId = null;
 		}
 	}
 
 	async function handleCleanup() {
-		if (!confirm('Delete all expired reports?')) return;
 		try {
 			const result = await cleanupReportsClient();
 			addToast('success', `Cleaned up ${result.deleted_count} expired ${result.deleted_count === 1 ? 'report' : 'reports'}`);
@@ -103,7 +113,7 @@
 		<button
 			type="button"
 			class="inline-flex h-8 items-center rounded-md border border-border px-3 text-sm hover:bg-muted"
-			onclick={handleCleanup}
+			onclick={() => (showCleanupConfirm = true)}
 		>
 			Cleanup Expired
 		</button>
@@ -160,7 +170,7 @@
 										<button
 											type="button"
 											class="text-sm font-medium text-destructive hover:underline"
-											onclick={() => handleDelete(report.id)}
+											onclick={() => requestDelete(report.id)}
 										>
 											Delete
 										</button>
@@ -219,3 +229,19 @@
 		</div>
 	{/if}
 </div>
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete report"
+	description="Are you sure you want to delete this report? This action cannot be undone."
+	confirmLabel="Delete"
+	onconfirm={handleDelete}
+/>
+
+<ConfirmDialog
+	bind:open={showCleanupConfirm}
+	title="Cleanup expired reports"
+	description="Are you sure you want to delete all expired reports? This action cannot be undone."
+	confirmLabel="Delete All Expired"
+	onconfirm={handleCleanup}
+/>

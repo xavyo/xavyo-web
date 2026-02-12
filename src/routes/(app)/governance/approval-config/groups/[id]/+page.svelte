@@ -10,9 +10,13 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	let showDeleteConfirm = $state(false);
+	let deleteGroupFormRef: HTMLFormElement | undefined = $state(undefined);
 
 	const {
 		form: editForm,
@@ -148,15 +152,10 @@
 			<Separator />
 
 			<form
+				bind:this={deleteGroupFormRef}
 				method="POST"
 				action="?/delete"
-				use:formEnhance={({ cancel }) => {
-					if (
-						!confirm(
-							'Are you sure you want to delete this group? This will fail if the group is referenced by workflow steps.'
-						)
-					)
-						cancel();
+				use:formEnhance={() => {
 					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'Group deleted');
@@ -167,7 +166,7 @@
 					};
 				}}
 			>
-				<Button type="submit" variant="destructive" class="w-full">Delete Group</Button>
+				<Button type="button" variant="destructive" class="w-full" onclick={() => (showDeleteConfirm = true)}>Delete Group</Button>
 			</form>
 		</CardContent>
 	</Card>
@@ -253,3 +252,12 @@
 		</form>
 	</CardContent>
 </Card>
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete group"
+	description="Are you sure you want to delete this group? This will fail if the group is referenced by workflow steps."
+	confirmLabel="Delete"
+	variant="destructive"
+	onconfirm={() => deleteGroupFormRef?.requestSubmit()}
+/>

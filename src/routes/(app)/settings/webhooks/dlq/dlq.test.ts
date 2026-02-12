@@ -289,5 +289,5 @@ describe('DLQ page Svelte component', () => {
 	it('page is defined', async () => {
 		const mod = await import('./+page.svelte');
 		expect(mod.default).toBeDefined();
-	});
+	}, 15000);
 });

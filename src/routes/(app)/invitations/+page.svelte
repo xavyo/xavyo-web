@@ -6,6 +6,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -77,6 +78,9 @@
 	function goToPage(page: number) {
 		goto(buildUrl({ offset: page * limit }));
 	}
+
+	let showCancelConfirm = $state(false);
+	let cancelInvitationId: string | null = $state(null);
 
 	function canActOn(invitation: { status: string; expires_at: string }): boolean {
 		return invitation.status === 'sent' && !isExpired(invitation);
@@ -197,6 +201,7 @@
 										<Button variant="outline" size="sm" type="submit">Resend</Button>
 									</form>
 									<form
+										id="cancel-form-{invitation.id}"
 										method="POST"
 										action="?/cancel"
 										use:enhance={() => {
@@ -216,14 +221,9 @@
 												}
 											};
 										}}
-										onsubmit={(e) => {
-											if (!confirm('Are you sure you want to cancel this invitation?')) {
-												e.preventDefault();
-											}
-										}}
 									>
 										<input type="hidden" name="id" value={invitation.id} />
-										<Button variant="outline" size="sm" type="submit">Cancel</Button>
+										<Button variant="outline" size="sm" type="button" onclick={() => { cancelInvitationId = invitation.id; showCancelConfirm = true; }}>Cancel</Button>
 									</form>
 								</div>
 							{:else}
@@ -262,3 +262,17 @@
 		</div>
 	{/if}
 {/if}
+
+<ConfirmDialog
+	bind:open={showCancelConfirm}
+	title="Cancel invitation"
+	description="Are you sure you want to cancel this invitation?"
+	confirmLabel="Cancel Invitation"
+	variant="destructive"
+	onconfirm={() => {
+		if (cancelInvitationId) {
+			const form = document.getElementById('cancel-form-' + cancelInvitationId);
+			if (form instanceof HTMLFormElement) form.requestSubmit();
+		}
+	}}
+/>

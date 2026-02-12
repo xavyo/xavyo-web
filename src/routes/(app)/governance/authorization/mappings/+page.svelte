@@ -6,6 +6,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -31,6 +32,8 @@
 		if (id.length <= 12) return id;
 		return id.slice(0, 8) + '...';
 	}
+	let showDeleteConfirm = $state(false);
+	let deleteMappingId: string | null = $state(null);
 </script>
 
 <div class="flex items-center justify-between">
@@ -110,6 +113,7 @@
 						</td>
 						<td class="px-4 py-3">
 							<form
+								id="mapping-delete-form-{mapping.id}"
 								method="POST"
 								action="?/delete"
 								use:enhance={() => {
@@ -132,18 +136,9 @@
 										}
 									};
 								}}
-								onsubmit={(e) => {
-									if (
-										!confirm(
-											'Are you sure you want to delete this mapping?'
-										)
-									) {
-										e.preventDefault();
-									}
-								}}
 							>
 								<input type="hidden" name="id" value={mapping.id} />
-								<Button variant="outline" size="sm" type="submit">Delete</Button>
+								<Button variant="outline" size="sm" type="button" onclick={() => { deleteMappingId = mapping.id; showDeleteConfirm = true; }}>Delete</Button>
 							</form>
 						</td>
 					</tr>
@@ -179,3 +174,17 @@
 		</div>
 	{/if}
 {/if}
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete mapping"
+	description="Are you sure you want to delete this mapping?"
+	confirmLabel="Delete"
+	variant="destructive"
+	onconfirm={() => {
+		if (deleteMappingId) {
+			const form = document.getElementById('mapping-delete-form-' + deleteMappingId);
+			if (form instanceof HTMLFormElement) form.requestSubmit();
+		}
+	}}
+/>

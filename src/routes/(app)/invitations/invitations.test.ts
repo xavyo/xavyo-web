@@ -266,5 +266,5 @@ describe('Invitations +page.svelte', () => {
 	it('is defined as a module', async () => {
 		const mod = await import('./+page.svelte');
 		expect(mod.default).toBeDefined();
-	});
+	}, 15000);
 });

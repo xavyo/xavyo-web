@@ -10,9 +10,13 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	let showDeleteConfirm = $state(false);
+	let deletePolicyFormRef: HTMLFormElement | undefined = $state(undefined);
 
 	const {
 		form: editForm,
@@ -238,10 +242,10 @@
 				<Separator />
 			{/if}
 			<form
+				bind:this={deletePolicyFormRef}
 				method="POST"
 				action="?/delete"
-				use:formEnhance={({ cancel }) => {
-					if (!confirm('Are you sure you want to delete this escalation policy?')) cancel();
+				use:formEnhance={() => {
 					return async ({ result, update }) => {
 						if (result.type === 'redirect') {
 							addToast('success', 'Policy deleted');
@@ -252,7 +256,7 @@
 					};
 				}}
 			>
-				<Button type="submit" variant="destructive" class="w-full">Delete Policy</Button>
+				<Button type="button" variant="destructive" class="w-full" onclick={() => (showDeleteConfirm = true)}>Delete Policy</Button>
 			</form>
 		</CardContent>
 	</Card>
@@ -446,3 +450,12 @@
 		</form>
 	</CardContent>
 </Card>
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete escalation policy"
+	description="Are you sure you want to delete this escalation policy?"
+	confirmLabel="Delete"
+	variant="destructive"
+	onconfirm={() => deletePolicyFormRef?.requestSubmit()}
+/>

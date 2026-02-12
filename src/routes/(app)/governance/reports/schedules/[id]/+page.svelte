@@ -9,6 +9,7 @@
 	} from '$lib/schemas/governance-reporting';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
 
 	let { data } = $props();
 	let schedule = $derived(data.schedule);
@@ -22,6 +23,9 @@
 			if (f.message) addToast('error', f.message);
 		}
 	});
+
+	let showDeleteConfirm = $state(false);
+	let deleteFormRef: HTMLFormElement | undefined = $state(undefined);
 
 	const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -126,16 +130,16 @@
 				</button>
 			</form>
 		{/if}
-		<form method="POST" action="?/delete" use:svelteEnhance={() => {
+		<form bind:this={deleteFormRef} method="POST" action="?/delete" use:svelteEnhance={() => {
 			return async ({ result, update }) => {
 				if (result.type === 'redirect') { addToast('success', 'Schedule deleted'); await update(); }
 				else if (result.type === 'error') addToast('error', result.error?.message ?? 'Delete failed');
 			};
 		}}>
 			<button
-				type="submit"
+				type="button"
 				class="inline-flex h-9 items-center rounded-md border border-destructive px-4 text-sm font-medium text-destructive hover:bg-destructive/10"
-				onclick={(e) => { if (!confirm('Delete this schedule?')) e.preventDefault(); }}
+				onclick={() => (showDeleteConfirm = true)}
 			>
 				Delete
 			</button>
@@ -261,3 +265,12 @@
 		&larr; Back to Reports
 	</a>
 </div>
+
+<ConfirmDialog
+	bind:open={showDeleteConfirm}
+	title="Delete schedule"
+	description="Are you sure you want to delete this schedule?"
+	confirmLabel="Delete"
+	variant="destructive"
+	onconfirm={() => deleteFormRef?.requestSubmit()}
+/>
