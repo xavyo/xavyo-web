@@ -28,7 +28,7 @@ export const actions: Actions = {
 		const body: CreateApprovalWorkflowRequest = {
 			name: form.data.name,
 			description: form.data.description || undefined,
-			steps: []
+			steps: [{ approver_type: 'manager' }]
 		};
 
 		let workflowId: string;

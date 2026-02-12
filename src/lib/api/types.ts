@@ -3982,3 +3982,349 @@ export interface MergeAuditDetailResponse {
 	sod_violations: MergeSodViolationResponse[] | null;
 	created_at: string;
 }
+
+// =====================================================
+// License Management Types
+// =====================================================
+
+// License Enums
+
+export type LicenseType = 'named' | 'concurrent';
+export type LicenseBillingPeriod = 'monthly' | 'annual' | 'perpetual';
+export type LicenseExpirationPolicy = 'block_new' | 'revoke_all' | 'warn_only';
+export type LicensePoolStatus = 'active' | 'expired' | 'archived';
+export type LicenseAssignmentStatus = 'active' | 'reclaimed' | 'expired' | 'released';
+export type LicenseAssignmentSource = 'manual' | 'automatic' | 'entitlement';
+export type LicenseReclamationTrigger = 'inactivity' | 'lifecycle_state';
+export type LicenseRecommendationType = 'underutilized' | 'high_utilization' | 'expiring_soon' | 'reclaim_opportunity';
+
+// License Pool
+
+export interface LicensePool {
+	id: string;
+	name: string;
+	vendor: string;
+	description: string | null;
+	total_capacity: number;
+	allocated_count: number;
+	available_count: number;
+	utilization_percent: number;
+	cost_per_license: number | null;
+	currency: string;
+	billing_period: LicenseBillingPeriod;
+	license_type: LicenseType;
+	expiration_date: string | null;
+	expiration_policy: LicenseExpirationPolicy;
+	warning_days: number;
+	status: LicensePoolStatus;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+}
+
+export interface CreateLicensePoolRequest {
+	name: string;
+	vendor: string;
+	description?: string;
+	total_capacity: number;
+	cost_per_license?: number;
+	currency?: string;
+	billing_period: LicenseBillingPeriod;
+	license_type?: LicenseType;
+	expiration_date?: string;
+	expiration_policy?: LicenseExpirationPolicy;
+	warning_days?: number;
+}
+
+export interface UpdateLicensePoolRequest {
+	name?: string;
+	vendor?: string;
+	description?: string;
+	total_capacity?: number;
+	cost_per_license?: number;
+	currency?: string;
+	billing_period?: LicenseBillingPeriod;
+	expiration_date?: string;
+	expiration_policy?: LicenseExpirationPolicy;
+	warning_days?: number;
+}
+
+export interface LicensePoolListResponse {
+	items: LicensePool[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// License Assignment
+
+export interface LicenseAssignment {
+	id: string;
+	license_pool_id: string;
+	pool_name: string | null;
+	user_id: string;
+	user_email: string | null;
+	assigned_at: string;
+	assigned_by: string;
+	source: LicenseAssignmentSource;
+	status: LicenseAssignmentStatus;
+	reclaimed_at: string | null;
+	reclaim_reason: string | null;
+	notes: string | null;
+	created_at: string;
+}
+
+export interface AssignLicenseRequest {
+	license_pool_id: string;
+	user_id: string;
+	source?: LicenseAssignmentSource;
+	notes?: string;
+}
+
+export interface BulkAssignLicenseRequest {
+	license_pool_id: string;
+	user_ids: string[];
+	source?: LicenseAssignmentSource;
+}
+
+export interface BulkReclaimLicenseRequest {
+	license_pool_id: string;
+	assignment_ids: string[];
+	reason: string;
+}
+
+export interface BulkOperationResult {
+	success_count: number;
+	failure_count: number;
+	failures: BulkOperationFailure[];
+}
+
+export interface BulkOperationFailure {
+	item_id: string;
+	error: string;
+}
+
+export interface LicenseAssignmentListResponse {
+	items: LicenseAssignment[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// Reclamation Rule
+
+export interface ReclamationRule {
+	id: string;
+	license_pool_id: string;
+	pool_name: string | null;
+	pool_vendor: string | null;
+	trigger_type: LicenseReclamationTrigger;
+	threshold_days: number | null;
+	lifecycle_state: string | null;
+	notification_days_before: number;
+	enabled: boolean;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+}
+
+export interface CreateReclamationRuleRequest {
+	license_pool_id: string;
+	trigger_type: LicenseReclamationTrigger;
+	threshold_days?: number;
+	lifecycle_state?: string;
+	notification_days_before?: number;
+}
+
+export interface UpdateReclamationRuleRequest {
+	threshold_days?: number;
+	lifecycle_state?: string;
+	notification_days_before?: number;
+	enabled?: boolean;
+}
+
+export interface ReclamationRuleListResponse {
+	items: ReclamationRule[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// License Incompatibility
+
+export interface LicenseIncompatibility {
+	id: string;
+	pool_a_id: string;
+	pool_a_name: string | null;
+	pool_a_vendor: string | null;
+	pool_b_id: string;
+	pool_b_name: string | null;
+	pool_b_vendor: string | null;
+	reason: string;
+	created_at: string;
+	created_by: string;
+}
+
+export interface CreateLicenseIncompatibilityRequest {
+	pool_a_id: string;
+	pool_b_id: string;
+	reason: string;
+}
+
+export interface LicenseIncompatibilityListResponse {
+	items: LicenseIncompatibility[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// License-Entitlement Link
+
+export interface LicenseEntitlementLink {
+	id: string;
+	license_pool_id: string;
+	pool_name: string | null;
+	pool_vendor: string | null;
+	entitlement_id: string;
+	entitlement_name: string | null;
+	priority: number;
+	enabled: boolean;
+	created_at: string;
+	created_by: string;
+}
+
+export interface CreateLicenseEntitlementLinkRequest {
+	license_pool_id: string;
+	entitlement_id: string;
+	priority?: number;
+}
+
+export interface LicenseEntitlementLinkListResponse {
+	items: LicenseEntitlementLink[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// License Analytics
+
+export interface LicenseDashboardResponse {
+	summary: LicenseSummary;
+	pools: LicensePoolStats[];
+	cost_by_vendor: VendorCost[];
+	recent_events: LicenseAuditEntry[];
+}
+
+export interface LicenseSummary {
+	total_pools: number;
+	total_capacity: number;
+	total_allocated: number;
+	total_available: number;
+	overall_utilization: number;
+	total_monthly_cost: number;
+	expiring_soon_count: number;
+}
+
+export interface LicensePoolStats {
+	id: string;
+	name: string;
+	vendor: string;
+	total_capacity: number;
+	allocated_count: number;
+	utilization_percent: number;
+	monthly_cost: number | null;
+	status: LicensePoolStatus;
+	expiration_date: string | null;
+}
+
+export interface VendorCost {
+	vendor: string;
+	pool_count: number;
+	total_capacity: number;
+	allocated_count: number;
+	monthly_cost: number;
+	currency: string;
+}
+
+export interface LicenseRecommendation {
+	recommendation_type: LicenseRecommendationType;
+	pool_id: string;
+	pool_name: string;
+	description: string;
+	potential_savings: number | null;
+	currency: string | null;
+}
+
+export interface ExpiringLicensesResponse {
+	pools: ExpiringPoolInfo[];
+	total_expiring: number;
+}
+
+export interface ExpiringPoolInfo {
+	id: string;
+	name: string;
+	vendor: string;
+	expiration_date: string;
+	days_until_expiration: number;
+	allocated_count: number;
+	total_capacity: number;
+	expiration_policy: LicenseExpirationPolicy;
+}
+
+// License Audit / Reports
+
+export interface LicenseAuditEntry {
+	id: string;
+	pool_id: string | null;
+	pool_name: string | null;
+	assignment_id: string | null;
+	user_id: string | null;
+	user_email: string | null;
+	action: string;
+	actor_id: string;
+	actor_email: string | null;
+	details: Record<string, unknown>;
+	created_at: string;
+}
+
+export interface LicenseAuditTrailResponse {
+	items: LicenseAuditEntry[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ComplianceReportRequest {
+	pool_ids?: string[];
+	vendor?: string;
+	from_date?: string;
+	to_date?: string;
+}
+
+export interface ComplianceReport {
+	generated_at: string;
+	pools: CompliancePoolEntry[];
+	summary: ComplianceSummary;
+}
+
+export interface CompliancePoolEntry {
+	pool_id: string;
+	pool_name: string;
+	vendor: string;
+	total_capacity: number;
+	allocated_count: number;
+	utilization_percent: number;
+	status: LicensePoolStatus;
+	expiration_date: string | null;
+	is_compliant: boolean;
+	issues: string[];
+}
+
+export interface ComplianceSummary {
+	total_pools_reviewed: number;
+	compliant_pools: number;
+	non_compliant_pools: number;
+	total_capacity: number;
+	total_allocated: number;
+	overall_utilization: number;
+}

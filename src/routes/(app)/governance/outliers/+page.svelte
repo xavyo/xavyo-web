@@ -59,16 +59,7 @@
 	const analysisColumns = [
 		analysisColumnHelper.accessor('status', {
 			header: 'Status',
-			cell: (info) => {
-				const status = info.getValue();
-				const colors: Record<string, string> = {
-					pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-					running: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-					completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-					failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-				};
-				return `<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${colors[status] ?? ''}">${status}</span>`;
-			}
+			cell: (info) => info.getValue()
 		}),
 		analysisColumnHelper.accessor('triggered_by', {
 			header: 'Trigger',
@@ -158,23 +149,11 @@
 		}),
 		resultColumnHelper.accessor('overall_score', {
 			header: 'Score',
-			cell: (info) => {
-				const score = info.getValue();
-				const color = score >= 80 ? 'text-red-600 dark:text-red-400' : score >= 60 ? 'text-orange-600 dark:text-orange-400' : score >= 40 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400';
-				return `<span class="font-semibold ${color}">${score.toFixed(1)}</span>`;
-			}
+			cell: (info) => info.getValue().toFixed(1)
 		}),
 		resultColumnHelper.accessor('classification', {
 			header: 'Classification',
-			cell: (info) => {
-				const c = info.getValue();
-				const colors: Record<string, string> = {
-					outlier: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-					normal: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-					unclassifiable: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
-				};
-				return `<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${colors[c] ?? ''}">${c}</span>`;
-			}
+			cell: (info) => info.getValue()
 		}),
 		resultColumnHelper.accessor('peer_scores', {
 			header: 'Peer Groups',
@@ -186,8 +165,7 @@
 				const change = info.getValue();
 				if (change === null) return '\u2014';
 				const sign = change > 0 ? '+' : '';
-				const color = change > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
-				return `<span class="${color}">${sign}${change.toFixed(1)}</span>`;
+				return `${sign}${change.toFixed(1)}`;
 			}
 		}),
 		resultColumnHelper.accessor('created_at', {
@@ -240,16 +218,7 @@
 	const alertColumns = [
 		alertColumnHelper.accessor('severity', {
 			header: 'Severity',
-			cell: (info) => {
-				const sev = info.getValue();
-				const colors: Record<string, string> = {
-					critical: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-					high: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',
-					medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-					low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-				};
-				return `<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${colors[sev] ?? ''}">${sev}</span>`;
-			}
+			cell: (info) => info.getValue()
 		}),
 		alertColumnHelper.accessor('alert_type', {
 			header: 'Type',
@@ -332,14 +301,7 @@
 					under_investigation: 'Under Investigation',
 					remediated: 'Remediated'
 				};
-				const colors: Record<string, string> = {
-					new: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-					legitimate: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-					requires_remediation: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-					under_investigation: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-					remediated: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
-				};
-				return `<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${colors[s] ?? ''}">${labels[s] ?? s}</span>`;
+				return labels[s] ?? s;
 			}
 		}),
 		dispColumnHelper.accessor('user_id', {
