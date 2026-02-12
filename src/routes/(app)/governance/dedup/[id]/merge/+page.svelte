@@ -39,6 +39,21 @@
 	let selectedStrategy: EntitlementStrategy = $state('union');
 	let sodOverrideReason = $state('');
 
+	// Compute reactive merged preview based on attribute selections
+	const mergedResult = $derived.by(() => {
+		const base = { ...preview.merged_preview };
+		for (const [attr, source] of Object.entries(attributeSelections)) {
+			const comp = duplicate.attribute_comparison.find(c => c.attribute === attr);
+			if (!comp) continue;
+			const value = source === 'source' ? comp.value_a : comp.value_b;
+			if (attr === 'email') base.email = value as string | null;
+			else if (attr === 'display_name') base.display_name = value as string | null;
+			else if (attr === 'department') base.department = value as string | null;
+			else base.attributes = { ...base.attributes, [attr]: value };
+		}
+		return base;
+	});
+
 	// Build hidden input JSON
 	const attributeSelectionsJson = $derived(
 		JSON.stringify(
@@ -67,7 +82,7 @@
 	<div class="grid gap-4 md:grid-cols-3">
 		<MergePreviewCard identity={preview.source_identity} title="Source (will be removed)" />
 		<MergePreviewCard identity={preview.target_identity} title="Target (will be kept)" />
-		<MergePreviewCard identity={preview.merged_preview} title="Merged Result" />
+		<MergePreviewCard identity={mergedResult} title="Merged Result" />
 	</div>
 
 	<!-- Attribute Selection for Differing Attributes -->
