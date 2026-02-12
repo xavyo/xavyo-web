@@ -21,6 +21,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-10
 - N/A (all data via xavyo-idp REST API through BFF) (012-governance-core)
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte, TanStack Table (013-nhi-protocols-advanced)
 - N/A (backend handles all persistence via xavyo-idp API on localhost:8080) (013-nhi-protocols-advanced)
+- N/A (all data via xavyo-idp REST API through BFF proxy) (020-connector-management)
+- TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), TanStack Table (@tanstack/svelte-table), lucide-svelte (021-provisioning-reconciliation)
 
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit, Bits UI, Tailwind CSS v4 (@tailwindcss/vite), Superforms, Zod, TanStack Table (@tanstack/svelte-table), jose, clsx, tailwind-merge (001-project-foundations)
 
@@ -40,9 +42,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
-- 017-governance-roles-rbac: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
-- 016-approval-workflow-config: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
-- 015-governance-reporting: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), lucide-svelte
+- 021-provisioning-reconciliation: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), TanStack Table (@tanstack/svelte-table), lucide-svelte
+- 020-connector-management: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
+- 019-user-invitations: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 
 
 <!-- MANUAL ADDITIONS START -->
