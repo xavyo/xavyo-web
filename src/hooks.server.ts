@@ -22,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	} else if (refreshToken) {
 		// Token missing or expired — try to refresh
 		try {
-			const tokens = await refresh(refreshToken, event.fetch);
+			const tokens = await refresh(refreshToken, tenantId, event.fetch);
 			setCookies(event.cookies, tokens);
 
 			const claims = decodeAccessToken(tokens.access_token);

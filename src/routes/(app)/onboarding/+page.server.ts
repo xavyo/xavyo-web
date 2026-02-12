@@ -32,10 +32,9 @@ export const actions: Actions = {
 				fetch
 			);
 
-			// Save new JWT tokens scoped to the provisioned tenant (super_admin role)
-			setCookies(cookies, result.tokens);
-
 			const secure = !dev;
+
+			// Set the tenant_id cookie for the new tenant
 			cookies.set('tenant_id', result.tenant.id, {
 				httpOnly: true,
 				secure,
@@ -44,12 +43,22 @@ export const actions: Actions = {
 				maxAge: 60 * 60 * 24 * 30 // 30 days
 			});
 
-			return { form, result };
+			// If the provision response includes tokens, use them directly
+			if (result.tokens) {
+				setCookies(cookies, result.tokens);
+			} else {
+				// Backend doesn't return tokens — clear old system tenant token
+				// The user will need to log in to the new tenant
+				cookies.delete('access_token', { path: '/' });
+				cookies.delete('refresh_token', { path: '/' });
+			}
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
 			}
 			return message(form, 'An unexpected error occurred', { status: 500 });
 		}
+
+		redirect(302, '/dashboard');
 	}
 };

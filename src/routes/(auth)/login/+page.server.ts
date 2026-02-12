@@ -3,8 +3,9 @@ import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
+import { dev } from '$app/environment';
 import { login } from '$lib/api/auth';
-import { setCookies } from '$lib/server/auth';
+import { setCookies, SYSTEM_TENANT_ID, decodeAccessToken } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -24,7 +25,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const tenantId = cookies.get('tenant_id') ?? '';
+		const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
 
 		try {
 			const tokens = await login(
@@ -37,6 +38,18 @@ export const actions: Actions = {
 			);
 
 			setCookies(cookies, tokens);
+
+			// Ensure tenant_id cookie is set from JWT claims
+			const claims = decodeAccessToken(tokens.access_token);
+			if (claims?.tid) {
+				cookies.set('tenant_id', claims.tid, {
+					httpOnly: true,
+					secure: !dev,
+					sameSite: 'lax',
+					path: '/',
+					maxAge: 60 * 60 * 24 * 30
+				});
+			}
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
