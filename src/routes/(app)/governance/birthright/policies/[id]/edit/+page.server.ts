@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect, isRedirect } from '@sveltejs/kit';
-import { birthrightPolicyFormSchema, updateBirthrightPolicySchema } from '$lib/schemas/birthright';
+import { createBirthrightPolicySchema, updateBirthrightPolicySchema } from '$lib/schemas/birthright';
 import { getBirthrightPolicy, updateBirthrightPolicy } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			evaluation_mode: policy.evaluation_mode,
 			grace_period_days: policy.grace_period_days
 		},
-		zod(birthrightPolicyFormSchema)
+		zod(createBirthrightPolicySchema)
 	);
 
 	const entitlements = entitlementResult.items.map((e: any) => ({ id: e.id, name: e.name }));
@@ -70,7 +70,7 @@ export const actions: Actions = {
 			name: form.data.name,
 			description: form.data.description || undefined,
 			priority: form.data.priority,
-			conditions: form.data.conditions,
+			conditions: form.data.conditions as UpdateBirthrightPolicyRequest['conditions'],
 			entitlement_ids: form.data.entitlement_ids,
 			evaluation_mode: form.data.evaluation_mode,
 			grace_period_days: form.data.grace_period_days

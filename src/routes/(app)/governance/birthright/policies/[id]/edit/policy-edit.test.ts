@@ -257,13 +257,15 @@ describe('Policy Edit rendering logic', () => {
 		});
 
 		it('falls back to empty condition when conditions is null-like', () => {
-			const conditions = null ?? [{ attribute: '', operator: 'equals', value: '' }];
+			const nullValue: unknown[] | null = null;
+			const conditions = nullValue ?? [{ attribute: '', operator: 'equals', value: '' }];
 			expect(conditions).toHaveLength(1);
-			expect(conditions[0].attribute).toBe('');
+			expect((conditions[0] as Record<string, string>).attribute).toBe('');
 		});
 
 		it('falls back to empty array when entitlement_ids is null-like', () => {
-			const ids = null ?? [];
+			const nullValue: string[] | null = null;
+			const ids = nullValue ?? [];
 			expect(ids).toEqual([]);
 		});
 	});

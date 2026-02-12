@@ -4813,3 +4813,277 @@ export interface LifecycleEventListResponse {
 	limit: number;
 	offset: number;
 }
+
+// ─── Power of Attorney & Identity Delegation ────────────────────────
+
+export type PoaStatus = 'pending' | 'active' | 'expired' | 'revoked';
+
+export type PoaEventType = 'granted' | 'activated' | 'assumed' | 'dropped' | 'extended' | 'revoked' | 'expired';
+
+export interface PoaScope {
+	application_ids: string[];
+	workflow_types: string[];
+}
+
+export interface PoaGrant {
+	id: string;
+	donor_id: string;
+	attorney_id: string;
+	starts_at: string;
+	ends_at: string;
+	status: PoaStatus;
+	is_currently_active: boolean;
+	scope_id: string | null;
+	reason: string | null;
+	created_at: string;
+	revoked_at: string | null;
+	revoked_by: string | null;
+}
+
+export interface GrantPoaRequest {
+	attorney_id: string;
+	starts_at: string;
+	ends_at: string;
+	scope?: PoaScope;
+	reason?: string;
+}
+
+export interface RevokePoaRequest {
+	reason?: string;
+}
+
+export interface ExtendPoaRequest {
+	new_ends_at: string;
+}
+
+export interface AssumeIdentityResponse {
+	access_token: string;
+	session_id: string;
+	donor_id: string;
+	donor_name: string | null;
+	donor_email: string | null;
+	scope: PoaScope | null;
+}
+
+export interface CurrentAssumptionStatus {
+	is_assuming: boolean;
+	poa_id?: string | null;
+	donor_id?: string | null;
+	donor_name?: string | null;
+	session_id?: string | null;
+	assumed_at?: string | null;
+	scope?: PoaScope | null;
+}
+
+export interface PoaAuditEvent {
+	id: string;
+	event_type: PoaEventType;
+	actor_id: string;
+	actor_name: string | null;
+	affected_user_id: string | null;
+	affected_user_name: string | null;
+	details: Record<string, unknown> | null;
+	created_at: string;
+}
+
+export interface PoaListResponse {
+	items: PoaGrant[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface PoaAuditListResponse {
+	items: PoaAuditEvent[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// ===================== Catalog & Birthright Types =====================
+
+// --- Catalog Category ---
+
+export interface CatalogCategory {
+	id: string;
+	name: string;
+	description: string | null;
+	parent_id: string | null;
+	icon: string | null;
+	display_order: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CatalogCategoryListResponse {
+	items: CatalogCategory[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Catalog Item ---
+
+export type CatalogItemType = 'role' | 'entitlement' | 'resource';
+
+export interface RequestabilityRules {
+	self_request?: boolean;
+	manager_request?: boolean;
+	department_restriction?: string[];
+	archetype_restriction?: string[];
+	prerequisite_roles?: string[];
+	prerequisite_entitlements?: string[];
+}
+
+export interface FormField {
+	name: string;
+	label: string;
+	field_type: string;
+	required: boolean;
+	options?: string[];
+	placeholder?: string;
+}
+
+export interface CatalogItem {
+	id: string;
+	category_id: string | null;
+	item_type: CatalogItemType;
+	name: string;
+	description: string | null;
+	reference_id: string | null;
+	requestability_rules: RequestabilityRules | null;
+	form_fields: FormField[];
+	tags: string[];
+	icon: string | null;
+	is_enabled: boolean;
+	can_request: boolean;
+	cannot_request_reason: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CatalogItemListResponse {
+	items: CatalogItem[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Shopping Cart ---
+
+export interface CartItem {
+	id: string;
+	catalog_item_id: string;
+	catalog_item_name: string;
+	catalog_item_type: CatalogItemType;
+	parameters: Record<string, unknown>;
+	form_values: Record<string, unknown>;
+	added_at: string;
+}
+
+export interface CartResponse {
+	requester_id: string;
+	beneficiary_id: string | null;
+	items: CartItem[];
+	item_count: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CartItemResponse {
+	id: string;
+	catalog_item_id: string;
+	catalog_item_name: string;
+	catalog_item_type: CatalogItemType;
+	parameters: Record<string, unknown>;
+	form_values: Record<string, unknown>;
+	added_at: string;
+}
+
+export interface ValidationIssue {
+	cart_item_id: string | null;
+	code: string;
+	message: string;
+}
+
+export interface CartSodViolation {
+	rule_id: string;
+	rule_name: string;
+	conflicting_item_ids: string[];
+	description: string;
+}
+
+export interface CartValidationResponse {
+	valid: boolean;
+	issues: ValidationIssue[];
+	sod_violations: CartSodViolation[];
+}
+
+export interface SubmissionItem {
+	cart_item_id: string;
+	access_request_id: string;
+}
+
+export interface CartSubmissionResponse {
+	submission_id: string;
+	items: SubmissionItem[];
+	request_count: number;
+}
+
+export interface AddToCartRequest {
+	catalog_item_id: string;
+	beneficiary_id?: string;
+	parameters?: Record<string, unknown>;
+	form_values?: Record<string, unknown>;
+}
+
+export interface UpdateCartItemRequest {
+	parameters?: Record<string, unknown>;
+	form_values?: Record<string, unknown>;
+}
+
+export interface SubmitCartRequest {
+	beneficiary_id?: string;
+	global_justification?: string;
+}
+
+// --- Catalog Admin ---
+
+export interface CreateCategoryRequest {
+	name: string;
+	description?: string;
+	parent_id?: string;
+	icon?: string;
+	display_order?: number;
+}
+
+export interface UpdateCategoryRequest {
+	name?: string;
+	description?: string;
+	parent_id?: string | null;
+	icon?: string | null;
+	display_order?: number;
+}
+
+export interface CreateCatalogItemRequest {
+	category_id?: string;
+	item_type: CatalogItemType;
+	name: string;
+	description?: string;
+	reference_id?: string;
+	requestability_rules?: RequestabilityRules;
+	form_fields?: FormField[];
+	tags?: string[];
+}
+
+export interface UpdateCatalogItemRequest {
+	category_id?: string | null;
+	item_type?: CatalogItemType;
+	name?: string;
+	description?: string | null;
+	reference_id?: string | null;
+	requestability_rules?: RequestabilityRules | null;
+	form_fields?: FormField[];
+	tags?: string[];
+}
+

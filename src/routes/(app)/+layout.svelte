@@ -2,12 +2,13 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
 	import ToastContainer from '$lib/components/layout/toast-container.svelte';
 	import { initThemeListener } from '$lib/stores/theme.svelte';
+	import AssumedIdentityIndicator from '$lib/components/poa/assumed-identity-indicator.svelte';
 	import type { LayoutData } from './$types';
 
 	interface Props {
@@ -26,6 +27,7 @@
 			{ label: 'Personas', href: '/personas', icon: Drama },
 			{ label: 'NHI', href: '/nhi', icon: Bot },
 			{ label: 'A2A Tasks', href: '/nhi/a2a', icon: ArrowRightLeft },
+			{ label: 'Request Catalog', href: '/governance/catalog', icon: ShoppingBag },
 			{ label: 'My Requests', href: '/my-requests', icon: FileQuestion },
 			{ label: 'My Approvals', href: '/my-approvals', icon: CheckCircle },
 			{ label: 'My Certifications', href: '/my-certifications', icon: Award }
@@ -50,7 +52,8 @@
 			items.push({ label: 'Deduplication', href: '/governance/dedup', icon: GitMerge });
 			items.push({ label: 'Correlation', href: '/governance/correlation', icon: Link });
 			items.push({ label: 'Licenses', href: '/governance/licenses', icon: Scale });
-			items.push({ label: 'Birthright & JML', href: '/governance/birthright', icon: Milestone });
+			items.push({ label: 'Birthright Policies', href: '/governance/birthright-policies', icon: Milestone });
+			items.push({ label: 'Power of Attorney', href: '/governance/power-of-attorney', icon: Stamp });
 			items.push({ label: 'Webhooks', href: '/settings/webhooks', icon: Webhook });
 			items.push({ label: 'Imports', href: '/settings/imports', icon: Upload });
 			items.push({ label: 'SCIM', href: '/settings/scim', icon: Key });
@@ -101,6 +104,15 @@
 	<!-- Main content -->
 	<div class="flex flex-1 flex-col overflow-hidden">
 		<Header email={data.user?.email ?? ''} onToggleSidebar={toggleSidebar} />
+		{#if data.currentAssumption?.is_assuming && data.currentAssumption.donor_id}
+			<div class="px-4 pt-2 sm:px-6">
+				<AssumedIdentityIndicator
+					donorName={data.currentAssumption.donor_name ?? ''}
+					donorId={data.currentAssumption.donor_id}
+					poaId={data.currentAssumption.poa_id ?? ''}
+				/>
+			</div>
+		{/if}
 		<main class="flex-1 overflow-y-auto p-4 sm:p-6">
 			{@render children()}
 		</main>

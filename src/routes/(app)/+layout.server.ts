@@ -2,6 +2,8 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 import { SYSTEM_TENANT_ID, hasAdminRole } from '$lib/server/auth';
 import { fetchAlerts } from '$lib/api/alerts';
+import { getCurrentAssumption } from '$lib/api/power-of-attorney';
+import type { CurrentAssumptionStatus } from '$lib/api/types';
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -29,9 +31,17 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		// Non-critical; default to 0
 	}
 
+	let currentAssumption: CurrentAssumptionStatus = { is_assuming: false, poa_id: null, donor_id: null, donor_name: null };
+	try {
+		currentAssumption = await getCurrentAssumption(locals.accessToken!, locals.tenantId!, fetch);
+	} catch {
+		// Non-critical; default to not assuming
+	}
+
 	return {
 		user: locals.user,
 		unacknowledgedAlertCount,
-		isAdmin: hasAdminRole(locals.user.roles)
+		isAdmin: hasAdminRole(locals.user.roles),
+		currentAssumption
 	};
 };

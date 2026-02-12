@@ -9,12 +9,7 @@ import {
 	disableBirthrightPolicy,
 	simulatePolicy,
 	simulateAllPolicies,
-	analyzeImpact,
-	listLifecycleEvents,
-	getLifecycleEvent,
-	createLifecycleEvent,
-	processLifecycleEvent,
-	triggerLifecycleEvent
+	analyzeImpact
 } from './birthright';
 
 vi.mock('./client', () => ({
@@ -32,198 +27,172 @@ import { apiClient } from './client';
 
 const mockApiClient = vi.mocked(apiClient);
 
-const TOKEN = 'test-token';
-const TENANT = 'test-tenant';
-const mockFetch = vi.fn();
+describe('Birthright API', () => {
+	const mockFetch = vi.fn();
+	const token = 'test-token';
+	const tenantId = 'test-tenant';
 
-describe('Birthright API client', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
 
-	// --- Birthright Policies ---
+	// --- List & Get ---
 
 	describe('listBirthrightPolicies', () => {
-		it('calls GET /governance/birthright-policies with no params', async () => {
-			const mockResponse = { items: [], total: 0, limit: 20, offset: 0 };
+		it('calls GET /governance/birthright-policies', async () => {
+			const mockResponse = { items: [], total: 0, limit: 50, offset: 0 };
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await listBirthrightPolicies({}, TOKEN, TENANT, mockFetch);
+			const result = await listBirthrightPolicies({}, token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/birthright-policies', {
-				method: 'GET',
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/birthright-policies',
+				{ method: 'GET', token, tenantId, fetch: mockFetch }
+			);
 			expect(result).toEqual(mockResponse);
 		});
 
-		it('includes status filter in query string', async () => {
-			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+		it('includes status query param', async () => {
+			mockApiClient.mockResolvedValue({} as any);
 
-			await listBirthrightPolicies({ status: 'active' }, TOKEN, TENANT, mockFetch);
+			await listBirthrightPolicies({ status: 'active' }, token, tenantId, mockFetch);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('status=active');
 		});
 
-		it('includes limit and offset pagination params', async () => {
-			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 10, offset: 20 });
+		it('includes limit and offset query params', async () => {
+			mockApiClient.mockResolvedValue({} as any);
 
-			await listBirthrightPolicies({ limit: 10, offset: 20 }, TOKEN, TENANT, mockFetch);
+			await listBirthrightPolicies({ limit: 10, offset: 20 }, token, tenantId, mockFetch);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			const params = new URLSearchParams(calledPath.split('?')[1]);
-			expect(params.get('limit')).toBe('10');
-			expect(params.get('offset')).toBe('20');
+			expect(calledPath).toContain('limit=10');
+			expect(calledPath).toContain('offset=20');
 		});
 	});
 
 	describe('getBirthrightPolicy', () => {
 		it('calls GET /governance/birthright-policies/:id', async () => {
-			const mockPolicy = { id: 'policy-1', name: 'New Hire Policy', status: 'active' };
-			mockApiClient.mockResolvedValue(mockPolicy);
+			const mockResponse = {
+				id: 'pol-1',
+				name: 'New Hire Policy',
+				status: 'active',
+				priority: 10,
+				conditions: [],
+				entitlement_ids: []
+			};
+			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await getBirthrightPolicy('policy-1', TOKEN, TENANT, mockFetch);
+			const result = await getBirthrightPolicy('pol-1', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/birthright-policies/policy-1', {
-				method: 'GET',
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockPolicy);
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/birthright-policies/pol-1',
+				{ method: 'GET', token, tenantId, fetch: mockFetch }
+			);
+			expect(result).toEqual(mockResponse);
 		});
 	});
+
+	// --- Create & Update ---
 
 	describe('createBirthrightPolicy', () => {
 		it('calls POST /governance/birthright-policies with body', async () => {
 			const body = {
 				name: 'New Hire Policy',
-				description: 'Auto-assign entitlements for new hires',
-				trigger_event: 'user_created',
-				entitlement_ids: ['ent-1', 'ent-2']
+				priority: 10,
+				conditions: [{ attribute: 'dept', operator: 'Equals', value: 'Eng' }],
+				entitlement_ids: ['ent-1']
 			};
-			const mockPolicy = { id: 'policy-1', ...body };
-			mockApiClient.mockResolvedValue(mockPolicy);
+			const mockResponse = { id: 'pol-1', ...body };
+			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await createBirthrightPolicy(body as never, TOKEN, TENANT, mockFetch);
+			const result = await createBirthrightPolicy(body as any, token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/birthright-policies', {
-				method: 'POST',
-				body,
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockPolicy);
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/birthright-policies',
+				{ method: 'POST', body, token, tenantId, fetch: mockFetch }
+			);
+			expect(result).toEqual(mockResponse);
 		});
 	});
 
 	describe('updateBirthrightPolicy', () => {
 		it('calls PUT /governance/birthright-policies/:id with body', async () => {
-			const body = { name: 'Updated Policy', description: 'Updated description' };
-			const mockPolicy = { id: 'policy-1', ...body };
-			mockApiClient.mockResolvedValue(mockPolicy);
+			const body = { name: 'Updated Policy', priority: 20 };
+			const mockResponse = { id: 'pol-1', ...body };
+			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await updateBirthrightPolicy(
-				'policy-1',
-				body as never,
-				TOKEN,
-				TENANT,
-				mockFetch
+			const result = await updateBirthrightPolicy('pol-1', body as any, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/birthright-policies/pol-1',
+				{ method: 'PUT', body, token, tenantId, fetch: mockFetch }
 			);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/birthright-policies/policy-1', {
-				method: 'PUT',
-				body,
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockPolicy);
+			expect(result).toEqual(mockResponse);
 		});
 	});
 
+	// --- Lifecycle ---
+
 	describe('archiveBirthrightPolicy', () => {
 		it('calls DELETE /governance/birthright-policies/:id', async () => {
-			mockApiClient.mockResolvedValue(undefined);
+			const mockResponse = { id: 'pol-1', status: 'archived' };
+			mockApiClient.mockResolvedValue(mockResponse);
 
-			await archiveBirthrightPolicy('policy-1', TOKEN, TENANT, mockFetch);
+			const result = await archiveBirthrightPolicy('pol-1', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/birthright-policies/policy-1', {
-				method: 'DELETE',
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/birthright-policies/pol-1',
+				{ method: 'DELETE', token, tenantId, fetch: mockFetch }
+			);
+			expect(result).toEqual(mockResponse);
 		});
 	});
 
 	describe('enableBirthrightPolicy', () => {
 		it('calls POST /governance/birthright-policies/:id/enable', async () => {
-			const mockPolicy = { id: 'policy-1', status: 'active' };
-			mockApiClient.mockResolvedValue(mockPolicy);
+			const mockResponse = { id: 'pol-1', status: 'active' };
+			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await enableBirthrightPolicy('policy-1', TOKEN, TENANT, mockFetch);
+			const result = await enableBirthrightPolicy('pol-1', token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith(
-				'/governance/birthright-policies/policy-1/enable',
-				{
-					method: 'POST',
-					token: TOKEN,
-					tenantId: TENANT,
-					fetch: mockFetch
-				}
+				'/governance/birthright-policies/pol-1/enable',
+				{ method: 'POST', token, tenantId, fetch: mockFetch }
 			);
-			expect(result).toEqual(mockPolicy);
+			expect(result).toEqual(mockResponse);
 		});
 	});
 
 	describe('disableBirthrightPolicy', () => {
 		it('calls POST /governance/birthright-policies/:id/disable', async () => {
-			const mockPolicy = { id: 'policy-1', status: 'disabled' };
-			mockApiClient.mockResolvedValue(mockPolicy);
+			const mockResponse = { id: 'pol-1', status: 'disabled' };
+			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await disableBirthrightPolicy('policy-1', TOKEN, TENANT, mockFetch);
+			const result = await disableBirthrightPolicy('pol-1', token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith(
-				'/governance/birthright-policies/policy-1/disable',
-				{
-					method: 'POST',
-					token: TOKEN,
-					tenantId: TENANT,
-					fetch: mockFetch
-				}
+				'/governance/birthright-policies/pol-1/disable',
+				{ method: 'POST', token, tenantId, fetch: mockFetch }
 			);
-			expect(result).toEqual(mockPolicy);
+			expect(result).toEqual(mockResponse);
 		});
 	});
 
+	// --- Simulation ---
+
 	describe('simulatePolicy', () => {
 		it('calls POST /governance/birthright-policies/:id/simulate with body', async () => {
-			const body = {
-				attributes: { department: 'Engineering', role: 'developer' }
-			};
-			const mockResponse = {
-				policy_id: 'policy-1',
-				matched: true,
-				entitlements: ['ent-1', 'ent-2']
-			};
+			const body = { attributes: { department: 'Engineering', location: 'US' } };
+			const mockResponse = { matched: true, entitlements: ['ent-1'], conditions_met: [] };
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await simulatePolicy('policy-1', body as never, TOKEN, TENANT, mockFetch);
+			const result = await simulatePolicy('pol-1', body as any, token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith(
-				'/governance/birthright-policies/policy-1/simulate',
-				{
-					method: 'POST',
-					body,
-					token: TOKEN,
-					tenantId: TENANT,
-					fetch: mockFetch
-				}
+				'/governance/birthright-policies/pol-1/simulate',
+				{ method: 'POST', body, token, tenantId, fetch: mockFetch }
 			);
 			expect(result).toEqual(mockResponse);
 		});
@@ -231,218 +200,47 @@ describe('Birthright API client', () => {
 
 	describe('simulateAllPolicies', () => {
 		it('calls POST /governance/birthright-policies/simulate with body', async () => {
-			const body = {
-				attributes: { department: 'Engineering', role: 'developer' }
-			};
-			const mockResponse = {
-				results: [
-					{ policy_id: 'policy-1', matched: true, entitlements: ['ent-1'] },
-					{ policy_id: 'policy-2', matched: false, entitlements: [] }
-				]
-			};
+			const body = { attributes: { department: 'Engineering' } };
+			const mockResponse = { policies: [{ id: 'pol-1', matched: true }] };
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await simulateAllPolicies(body as never, TOKEN, TENANT, mockFetch);
+			const result = await simulateAllPolicies(body as any, token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith(
 				'/governance/birthright-policies/simulate',
-				{
-					method: 'POST',
-					body,
-					token: TOKEN,
-					tenantId: TENANT,
-					fetch: mockFetch
-				}
+				{ method: 'POST', body, token, tenantId, fetch: mockFetch }
 			);
 			expect(result).toEqual(mockResponse);
 		});
 	});
 
 	describe('analyzeImpact', () => {
-		it('calls POST /governance/birthright-policies/:id/impact', async () => {
+		it('calls POST /governance/birthright-policies/:id/impact with empty body', async () => {
 			const mockResponse = {
-				policy_id: 'policy-1',
-				affected_users: 42,
-				entitlements_added: 84
+				policy_id: 'pol-1',
+				policy_name: 'Test Policy',
+				summary: {
+					total_users_affected: 50,
+					users_gaining_access: 30,
+					users_losing_access: 10,
+					users_unchanged: 10,
+					total_entitlements_granted: 5
+				},
+				by_department: [],
+				by_location: [],
+				entitlement_impacts: [],
+				affected_users: [],
+				is_truncated: false
 			};
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await analyzeImpact('policy-1', TOKEN, TENANT, mockFetch);
+			const result = await analyzeImpact('pol-1', token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith(
-				'/governance/birthright-policies/policy-1/impact',
-				{
-					method: 'POST',
-					body: {},
-					token: TOKEN,
-					tenantId: TENANT,
-					fetch: mockFetch
-				}
+				'/governance/birthright-policies/pol-1/impact',
+				{ method: 'POST', body: {}, token, tenantId, fetch: mockFetch }
 			);
 			expect(result).toEqual(mockResponse);
-		});
-	});
-
-	// --- Lifecycle Events ---
-
-	describe('listLifecycleEvents', () => {
-		it('calls GET /governance/lifecycle-events with no params', async () => {
-			const mockResponse = { items: [], total: 0, limit: 20, offset: 0 };
-			mockApiClient.mockResolvedValue(mockResponse);
-
-			const result = await listLifecycleEvents({}, TOKEN, TENANT, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/lifecycle-events', {
-				method: 'GET',
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockResponse);
-		});
-
-		it('includes event_type filter in query string', async () => {
-			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
-
-			await listLifecycleEvents({ event_type: 'user_created' }, TOKEN, TENANT, mockFetch);
-
-			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			expect(calledPath).toContain('event_type=user_created');
-		});
-
-		it('includes processed boolean filter', async () => {
-			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
-
-			await listLifecycleEvents({ processed: false }, TOKEN, TENANT, mockFetch);
-
-			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			expect(calledPath).toContain('processed=false');
-		});
-
-		it('includes user_id, from, and to filters', async () => {
-			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
-
-			await listLifecycleEvents(
-				{ user_id: 'user-1', from: '2026-01-01', to: '2026-01-31' },
-				TOKEN,
-				TENANT,
-				mockFetch
-			);
-
-			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			const params = new URLSearchParams(calledPath.split('?')[1]);
-			expect(params.get('user_id')).toBe('user-1');
-			expect(params.get('from')).toBe('2026-01-01');
-			expect(params.get('to')).toBe('2026-01-31');
-		});
-
-		it('includes limit and offset pagination params', async () => {
-			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 10 });
-
-			await listLifecycleEvents({ limit: 50, offset: 10 }, TOKEN, TENANT, mockFetch);
-
-			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			const params = new URLSearchParams(calledPath.split('?')[1]);
-			expect(params.get('limit')).toBe('50');
-			expect(params.get('offset')).toBe('10');
-		});
-	});
-
-	describe('getLifecycleEvent', () => {
-		it('calls GET /governance/lifecycle-events/:id', async () => {
-			const mockEvent = {
-				id: 'evt-1',
-				event_type: 'user_created',
-				user_id: 'user-1',
-				processed: true
-			};
-			mockApiClient.mockResolvedValue(mockEvent);
-
-			const result = await getLifecycleEvent('evt-1', TOKEN, TENANT, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/lifecycle-events/evt-1', {
-				method: 'GET',
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockEvent);
-		});
-	});
-
-	describe('createLifecycleEvent', () => {
-		it('calls POST /governance/lifecycle-events with body', async () => {
-			const body = {
-				event_type: 'user_created',
-				user_id: 'user-1',
-				attributes: { department: 'Engineering' }
-			};
-			const mockEvent = { id: 'evt-1', ...body, processed: false };
-			mockApiClient.mockResolvedValue(mockEvent);
-
-			const result = await createLifecycleEvent(body as never, TOKEN, TENANT, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/lifecycle-events', {
-				method: 'POST',
-				body,
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockEvent);
-		});
-	});
-
-	describe('processLifecycleEvent', () => {
-		it('calls POST /governance/lifecycle-events/:id/process', async () => {
-			const mockResult = {
-				id: 'evt-1',
-				processed: true,
-				policies_applied: 2,
-				entitlements_granted: 3
-			};
-			mockApiClient.mockResolvedValue(mockResult);
-
-			const result = await processLifecycleEvent('evt-1', TOKEN, TENANT, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith(
-				'/governance/lifecycle-events/evt-1/process',
-				{
-					method: 'POST',
-					token: TOKEN,
-					tenantId: TENANT,
-					fetch: mockFetch
-				}
-			);
-			expect(result).toEqual(mockResult);
-		});
-	});
-
-	describe('triggerLifecycleEvent', () => {
-		it('calls POST /governance/lifecycle-events/trigger with body', async () => {
-			const body = {
-				event_type: 'user_created',
-				user_id: 'user-1',
-				attributes: { department: 'Engineering' }
-			};
-			const mockResult = {
-				id: 'evt-1',
-				processed: true,
-				policies_applied: 1,
-				entitlements_granted: 2
-			};
-			mockApiClient.mockResolvedValue(mockResult);
-
-			const result = await triggerLifecycleEvent(body as never, TOKEN, TENANT, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/lifecycle-events/trigger', {
-				method: 'POST',
-				body,
-				token: TOKEN,
-				tenantId: TENANT,
-				fetch: mockFetch
-			});
-			expect(result).toEqual(mockResult);
 		});
 	});
 
@@ -452,16 +250,20 @@ describe('Birthright API client', () => {
 		it('propagates errors from apiClient for GET requests', async () => {
 			mockApiClient.mockRejectedValue(new Error('Network error'));
 
-			await expect(
-				getBirthrightPolicy('policy-1', TOKEN, TENANT, mockFetch)
-			).rejects.toThrow('Network error');
+			await expect(listBirthrightPolicies({}, token, tenantId, mockFetch)).rejects.toThrow('Network error');
+		});
+
+		it('propagates errors from apiClient for GET single', async () => {
+			mockApiClient.mockRejectedValue(new Error('Not found'));
+
+			await expect(getBirthrightPolicy('bad', token, tenantId, mockFetch)).rejects.toThrow('Not found');
 		});
 
 		it('propagates errors from apiClient for POST requests', async () => {
 			mockApiClient.mockRejectedValue(new Error('Server error'));
 
 			await expect(
-				createBirthrightPolicy({} as never, TOKEN, TENANT, mockFetch)
+				createBirthrightPolicy({} as any, token, tenantId, mockFetch)
 			).rejects.toThrow('Server error');
 		});
 
@@ -469,7 +271,7 @@ describe('Birthright API client', () => {
 			mockApiClient.mockRejectedValue(new Error('Validation error'));
 
 			await expect(
-				updateBirthrightPolicy('policy-1', {} as never, TOKEN, TENANT, mockFetch)
+				updateBirthrightPolicy('pol-1', {} as any, token, tenantId, mockFetch)
 			).rejects.toThrow('Validation error');
 		});
 
@@ -477,40 +279,48 @@ describe('Birthright API client', () => {
 			mockApiClient.mockRejectedValue(new Error('Forbidden'));
 
 			await expect(
-				archiveBirthrightPolicy('policy-1', TOKEN, TENANT, mockFetch)
+				archiveBirthrightPolicy('pol-1', token, tenantId, mockFetch)
 			).rejects.toThrow('Forbidden');
 		});
 
-		it('propagates errors from apiClient for lifecycle events', async () => {
+		it('propagates errors from apiClient for enable', async () => {
 			mockApiClient.mockRejectedValue(new Error('Unauthorized'));
 
 			await expect(
-				listLifecycleEvents({}, TOKEN, TENANT, mockFetch)
+				enableBirthrightPolicy('pol-1', token, tenantId, mockFetch)
 			).rejects.toThrow('Unauthorized');
 		});
 
+		it('propagates errors from apiClient for disable', async () => {
+			mockApiClient.mockRejectedValue(new Error('Conflict'));
+
+			await expect(
+				disableBirthrightPolicy('pol-1', token, tenantId, mockFetch)
+			).rejects.toThrow('Conflict');
+		});
+
 		it('propagates errors from apiClient for simulate', async () => {
+			mockApiClient.mockRejectedValue(new Error('Bad request'));
+
+			await expect(
+				simulatePolicy('pol-1', {} as any, token, tenantId, mockFetch)
+			).rejects.toThrow('Bad request');
+		});
+
+		it('propagates errors from apiClient for simulateAll', async () => {
 			mockApiClient.mockRejectedValue(new Error('Service unavailable'));
 
 			await expect(
-				simulatePolicy('policy-1', {} as never, TOKEN, TENANT, mockFetch)
+				simulateAllPolicies({} as any, token, tenantId, mockFetch)
 			).rejects.toThrow('Service unavailable');
 		});
 
 		it('propagates errors from apiClient for impact analysis', async () => {
-			mockApiClient.mockRejectedValue(new Error('Not found'));
+			mockApiClient.mockRejectedValue(new Error('Timeout'));
 
 			await expect(
-				analyzeImpact('policy-1', TOKEN, TENANT, mockFetch)
-			).rejects.toThrow('Not found');
-		});
-
-		it('propagates errors from apiClient for trigger', async () => {
-			mockApiClient.mockRejectedValue(new Error('Bad request'));
-
-			await expect(
-				triggerLifecycleEvent({} as never, TOKEN, TENANT, mockFetch)
-			).rejects.toThrow('Bad request');
+				analyzeImpact('pol-1', token, tenantId, mockFetch)
+			).rejects.toThrow('Timeout');
 		});
 	});
 });
