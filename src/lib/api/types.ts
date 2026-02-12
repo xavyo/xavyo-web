@@ -3698,3 +3698,244 @@ export interface MappingRequest {
 	transform: string | null;
 	required: boolean;
 }
+
+// ================================
+// Identity Deduplication & Merging
+// ================================
+
+// Enums
+
+export type DuplicateStatus = 'pending' | 'merged' | 'dismissed';
+export type MergeOperationStatus = 'in_progress' | 'completed' | 'failed' | 'cancelled';
+export type EntitlementStrategy = 'union' | 'intersection' | 'manual';
+export type AttributeResolutionRule = 'newest_wins' | 'oldest_wins' | 'prefer_non_null';
+export type BatchMergeStatus = 'queued' | 'running' | 'completed' | 'failed';
+
+// Duplicate Candidates
+
+export interface DuplicateCandidateResponse {
+	id: string;
+	identity_a_id: string;
+	identity_b_id: string;
+	confidence_score: number;
+	status: DuplicateStatus;
+	detected_at: string;
+}
+
+export interface IdentitySummary {
+	id: string;
+	email: string | null;
+	display_name: string | null;
+	department: string | null;
+	attributes: Record<string, unknown>;
+}
+
+export interface AttributeComparison {
+	attribute: string;
+	value_a: unknown;
+	value_b: unknown;
+	is_different: boolean;
+}
+
+export interface RuleMatchResponse {
+	rule_id: string;
+	rule_name: string;
+	attribute: string;
+	similarity: number;
+	weighted_score: number;
+}
+
+export interface DuplicateDetailResponse {
+	id: string;
+	identity_a_id: string;
+	identity_b_id: string;
+	confidence_score: number;
+	identity_a: IdentitySummary;
+	identity_b: IdentitySummary;
+	attribute_comparison: AttributeComparison[];
+	rule_matches: RuleMatchResponse[];
+}
+
+export interface ListDuplicatesQuery {
+	status?: DuplicateStatus;
+	min_confidence?: number;
+	max_confidence?: number;
+	identity_id?: string;
+	limit?: number;
+	offset?: number;
+}
+
+export interface DismissDuplicateRequest {
+	reason: string;
+}
+
+export interface RunDetectionScanRequest {
+	min_confidence?: number;
+}
+
+export interface DetectionScanResponse {
+	scan_id: string;
+	users_processed: number;
+	duplicates_found: number;
+	new_duplicates: number;
+	duration_ms: number;
+}
+
+// Merge Operations
+
+export interface MergePreviewRequest {
+	source_identity_id: string;
+	target_identity_id: string;
+	entitlement_strategy: EntitlementStrategy;
+	attribute_selections?: Record<string, { source: 'source' | 'target' }>;
+}
+
+export interface MergeEntitlementSummary {
+	id: string;
+	name: string;
+	application: string | null;
+}
+
+export interface EntitlementsPreview {
+	source_only: MergeEntitlementSummary[];
+	target_only: MergeEntitlementSummary[];
+	common: MergeEntitlementSummary[];
+	merged: MergeEntitlementSummary[];
+}
+
+export interface MergeSodViolationResponse {
+	rule_id: string;
+	rule_name: string;
+	severity: string;
+	entitlement_being_added: string;
+	conflicting_entitlement_id: string;
+	has_exemption: boolean;
+}
+
+export interface MergeSodCheckResponse {
+	has_violations: boolean;
+	can_override: boolean;
+	violations: MergeSodViolationResponse[];
+}
+
+export interface MergePreviewResponse {
+	source_identity: IdentitySummary;
+	target_identity: IdentitySummary;
+	merged_preview: IdentitySummary;
+	entitlements_preview: EntitlementsPreview;
+	sod_check: MergeSodCheckResponse;
+}
+
+export interface MergeExecuteRequest {
+	source_identity_id: string;
+	target_identity_id: string;
+	entitlement_strategy: EntitlementStrategy;
+	attribute_selections?: Record<string, { source: 'source' | 'target' }>;
+	entitlement_selections?: string[] | null;
+	sod_override_reason?: string | null;
+}
+
+export interface MergeOperationResponse {
+	id: string;
+	source_identity_id: string;
+	target_identity_id: string;
+	status: MergeOperationStatus;
+	entitlement_strategy: EntitlementStrategy;
+	operator_id: string;
+	started_at: string;
+	completed_at: string | null;
+}
+
+export interface MergeErrorResponse {
+	error: string;
+	message: string;
+	pending_operation_id?: string;
+	violations?: MergeSodViolationResponse[];
+}
+
+// Batch Merge
+
+export interface BatchMergeRequest {
+	candidate_ids: string[];
+	entitlement_strategy: EntitlementStrategy;
+	attribute_rule: AttributeResolutionRule;
+	min_confidence?: number | null;
+	skip_sod_violations: boolean;
+}
+
+export interface BatchMergePreviewRequest {
+	candidate_ids: string[];
+	min_confidence?: number | null;
+	entitlement_strategy: EntitlementStrategy;
+	attribute_rule: AttributeResolutionRule;
+	limit?: number;
+	offset?: number;
+}
+
+export interface BatchMergeCandidatePreviewResponse {
+	candidate_id: string;
+	source_identity_id: string;
+	target_identity_id: string;
+	confidence_score: number;
+}
+
+export interface BatchMergePreviewResponse {
+	total_candidates: number;
+	candidates: BatchMergeCandidatePreviewResponse[];
+	entitlement_strategy: EntitlementStrategy;
+	attribute_rule: AttributeResolutionRule;
+}
+
+export interface BatchMergeResponse {
+	job_id: string;
+	status: BatchMergeStatus;
+	total_pairs: number;
+	processed: number;
+	successful: number;
+	failed: number;
+	skipped: number;
+}
+
+// Merge Audit
+
+export interface ListMergeAuditsQuery {
+	identity_id?: string;
+	operator_id?: string;
+	from_date?: string;
+	to_date?: string;
+	limit?: number;
+	offset?: number;
+}
+
+export interface MergeAuditSummaryResponse {
+	id: string;
+	operation_id: string;
+	source_identity_id: string;
+	target_identity_id: string;
+	operator_id: string;
+	created_at: string;
+}
+
+export interface MergeAuditDetailResponse {
+	id: string;
+	operation_id: string;
+	source_snapshot: IdentitySummary & { entitlements: MergeEntitlementSummary[] };
+	target_snapshot: IdentitySummary & { entitlements: MergeEntitlementSummary[] };
+	merged_snapshot: IdentitySummary & { entitlements: MergeEntitlementSummary[] };
+	attribute_decisions: {
+		attribute: string;
+		source: 'source' | 'target';
+		selected_value: unknown;
+		source_value: unknown;
+		target_value: unknown;
+	}[];
+	entitlement_decisions: {
+		strategy: EntitlementStrategy;
+		source_entitlements: MergeEntitlementSummary[];
+		target_entitlements: MergeEntitlementSummary[];
+		merged_entitlements: MergeEntitlementSummary[];
+		excluded_entitlements: MergeEntitlementSummary[];
+	};
+	sod_violations: MergeSodViolationResponse[] | null;
+	created_at: string;
+}
