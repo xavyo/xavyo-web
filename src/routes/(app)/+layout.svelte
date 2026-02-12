@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -29,10 +29,15 @@
 			{ label: 'My Requests', href: '/my-requests', icon: FileQuestion }
 		];
 		if (data.isAdmin) {
+			items.push({ label: 'Connectors', href: '/connectors', icon: Plug });
+			items.push({ label: 'Operations', href: '/connectors/operations', icon: Activity });
+			items.push({ label: 'Reconciliation', href: '/connectors/reconciliation', icon: RefreshCw });
+			items.push({ label: 'Invitations', href: '/invitations', icon: Mail });
 			items.push({ label: 'Federation', href: '/federation', icon: Network });
 			items.push({ label: 'Audit', href: '/audit', icon: ClipboardList });
 			items.push({ label: 'Governance', href: '/governance', icon: Shield });
 			items.push({ label: 'Roles', href: '/governance/roles', icon: KeyRound });
+			items.push({ label: 'Meta-Roles', href: '/governance/meta-roles', icon: Layers });
 			items.push({ label: 'NHI Governance', href: '/nhi/governance', icon: ShieldCheck });
 			items.push({ label: 'Approval Config', href: '/governance/approval-config', icon: Workflow });
 			items.push({ label: 'Reports', href: '/governance/reports', icon: FileBarChart });

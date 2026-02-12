@@ -2234,3 +2234,720 @@ export interface UpdateReportScheduleRequest {
 	recipients?: string[];
 	output_format?: OutputFormat;
 }
+
+// --- Governance Meta-Roles Types ---
+
+export type MetaRoleStatus = 'active' | 'disabled';
+export type CriteriaLogic = 'and' | 'or';
+export type MetaRolePermissionType = 'grant' | 'deny';
+export type MetaRoleInheritanceStatus = 'active' | 'suspended' | 'removed';
+export type MetaRoleResolutionStatus = 'unresolved' | 'resolved_priority' | 'resolved_manual' | 'ignored';
+export type MetaRoleConflictType = 'entitlement_conflict' | 'constraint_conflict' | 'policy_conflict';
+export type CriteriaOperator = 'eq' | 'neq' | 'in' | 'not_in' | 'gt' | 'gte' | 'lt' | 'lte' | 'contains' | 'starts_with';
+export type MetaRoleSimulationType = 'create' | 'update' | 'delete' | 'criteria_change' | 'enable' | 'disable';
+export type MetaRoleEventType = 'created' | 'updated' | 'deleted' | 'disabled' | 'enabled' | 'inheritance_applied' | 'inheritance_removed' | 'conflict_detected' | 'conflict_resolved' | 'cascade_started' | 'cascade_completed' | 'cascade_failed';
+export type MetaRoleConstraintType = 'max_session_duration' | 'require_mfa' | 'ip_whitelist' | 'approval_required';
+
+export interface MetaRole {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	priority: number;
+	status: MetaRoleStatus;
+	criteria_logic: CriteriaLogic;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface MetaRoleCriteria {
+	id: string;
+	meta_role_id: string;
+	field: string;
+	operator: CriteriaOperator;
+	value: unknown;
+	created_at: string;
+}
+
+export interface MetaRoleEntitlementInfo {
+	id: string;
+	name: string;
+	application_id: string;
+	application_name: string | null;
+	risk_level: string | null;
+}
+
+export interface MetaRoleEntitlement {
+	id: string;
+	meta_role_id: string;
+	entitlement_id: string;
+	permission_type: MetaRolePermissionType;
+	created_at: string;
+	entitlement: MetaRoleEntitlementInfo | null;
+}
+
+export interface MetaRoleConstraint {
+	id: string;
+	meta_role_id: string;
+	constraint_type: MetaRoleConstraintType;
+	constraint_value: Record<string, unknown>;
+	created_at: string;
+}
+
+export interface MetaRoleStats {
+	active_inheritances: number;
+	unresolved_conflicts: number;
+	criteria_count: number;
+	entitlements_count: number;
+	constraints_count: number;
+}
+
+export interface MetaRoleWithDetails extends MetaRole {
+	criteria: MetaRoleCriteria[];
+	entitlements: MetaRoleEntitlement[];
+	constraints: MetaRoleConstraint[];
+	stats: MetaRoleStats | null;
+}
+
+export interface MetaRoleListResponse {
+	items: MetaRole[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface MetaRoleInheritanceMetaRole {
+	id: string;
+	name: string;
+	priority: number;
+	status: MetaRoleStatus;
+}
+
+export interface MetaRoleInheritanceChildRole {
+	id: string;
+	name: string;
+	application_id: string | null;
+	application_name: string | null;
+}
+
+export interface MetaRoleInheritance {
+	id: string;
+	tenant_id: string;
+	meta_role_id: string;
+	child_role_id: string;
+	match_reason: unknown;
+	status: MetaRoleInheritanceStatus;
+	matched_at: string;
+	updated_at: string;
+	meta_role: MetaRoleInheritanceMetaRole | null;
+	child_role: MetaRoleInheritanceChildRole | null;
+}
+
+export interface MetaRoleInheritanceListResponse {
+	items: MetaRoleInheritance[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface MetaRoleConflictMetaRole {
+	id: string;
+	name: string;
+	priority: number;
+	status: MetaRoleStatus;
+}
+
+export interface MetaRoleConflictAffectedRole {
+	id: string;
+	name: string;
+	application_id: string | null;
+	application_name: string | null;
+}
+
+export interface MetaRoleConflict {
+	id: string;
+	tenant_id: string;
+	meta_role_a_id: string;
+	meta_role_b_id: string;
+	affected_role_id: string;
+	conflict_type: MetaRoleConflictType;
+	conflicting_items: unknown;
+	resolution_status: MetaRoleResolutionStatus;
+	resolved_by: string | null;
+	resolution_choice: unknown;
+	detected_at: string;
+	resolved_at: string | null;
+	meta_role_a: MetaRoleConflictMetaRole | null;
+	meta_role_b: MetaRoleConflictMetaRole | null;
+	affected_role: MetaRoleConflictAffectedRole | null;
+}
+
+export interface MetaRoleConflictListResponse {
+	items: MetaRoleConflict[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface MetaRoleEvent {
+	id: string;
+	tenant_id: string;
+	meta_role_id: string | null;
+	event_type: MetaRoleEventType;
+	actor_id: string | null;
+	changes: unknown;
+	affected_roles: unknown;
+	metadata: unknown;
+	created_at: string;
+}
+
+export interface MetaRoleEventListResponse {
+	items: MetaRoleEvent[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface MetaRoleEventStats {
+	total: number;
+	created: number;
+	updated: number;
+	deleted: number;
+	disabled: number;
+	enabled: number;
+	inheritance_applied: number;
+	inheritance_removed: number;
+	conflict_detected: number;
+	conflict_resolved: number;
+	cascade_started: number;
+	cascade_completed: number;
+	cascade_failed: number;
+}
+
+export interface SimulationAffectedRole {
+	role_id: string;
+	role_name: string;
+	application_id: string | null;
+	reason: unknown;
+	entitlements_affected: string[];
+	constraints_affected: string[];
+}
+
+export interface SimulationPotentialConflict {
+	meta_role_a_id: string;
+	meta_role_a_name: string;
+	meta_role_b_id: string;
+	meta_role_b_name: string;
+	affected_role_id: string;
+	affected_role_name: string;
+	conflict_type: MetaRoleConflictType;
+	conflicting_items: unknown;
+}
+
+export interface SimulationSummary {
+	total_roles_affected: number;
+	roles_gaining_inheritance: number;
+	roles_losing_inheritance: number;
+	new_conflicts: number;
+	resolved_conflicts: number;
+	is_safe: boolean;
+	warnings: string[];
+}
+
+export interface MetaRoleSimulationResult {
+	simulation_type: MetaRoleSimulationType;
+	roles_to_add: SimulationAffectedRole[];
+	roles_to_remove: SimulationAffectedRole[];
+	potential_conflicts: SimulationPotentialConflict[];
+	conflicts_to_resolve: SimulationPotentialConflict[];
+	summary: SimulationSummary;
+}
+
+export interface CascadeFailure {
+	role_id: string;
+	error: string;
+	failed_at: string;
+}
+
+export interface MetaRoleCascadeStatus {
+	meta_role_id: string;
+	in_progress: boolean;
+	processed_count: number;
+	remaining_count: number;
+	success_count: number;
+	failure_count: number;
+	started_at: string | null;
+	completed_at: string | null;
+	failures: CascadeFailure[] | null;
+}
+
+// Meta-Role Request Types
+
+export interface CreateMetaRoleRequest {
+	name: string;
+	description?: string;
+	priority: number;
+	criteria_logic?: CriteriaLogic;
+	criteria?: { field: string; operator: CriteriaOperator; value: unknown }[];
+	entitlements?: { entitlement_id: string; permission_type?: MetaRolePermissionType }[];
+	constraints?: { constraint_type: MetaRoleConstraintType; constraint_value: Record<string, unknown> }[];
+}
+
+export interface UpdateMetaRoleRequest {
+	name?: string;
+	description?: string;
+	priority?: number;
+	criteria_logic?: CriteriaLogic;
+}
+
+export interface AddMetaRoleCriterionRequest {
+	field: string;
+	operator: CriteriaOperator;
+	value: unknown;
+}
+
+export interface AddMetaRoleEntitlementRequest {
+	entitlement_id: string;
+	permission_type?: MetaRolePermissionType;
+}
+
+export interface AddMetaRoleConstraintRequest {
+	constraint_type: MetaRoleConstraintType;
+	constraint_value: Record<string, unknown>;
+}
+
+export interface ResolveMetaRoleConflictRequest {
+	resolution_status: 'resolved_priority' | 'resolved_manual' | 'ignored';
+	resolution_choice?: unknown;
+	comment?: string;
+}
+
+export interface SimulateMetaRoleRequest {
+	simulation_type: MetaRoleSimulationType;
+	meta_role_id?: string;
+	meta_role_data?: CreateMetaRoleRequest;
+	criteria_changes?: { field: string; operator: CriteriaOperator; value: unknown }[];
+	limit?: number;
+}
+
+export interface CascadeMetaRoleRequest {
+	meta_role_id: string;
+	dry_run?: boolean;
+}
+
+// --- User Invitations ---
+
+export interface Invitation {
+	id: string;
+	email: string;
+	status: 'sent' | 'cancelled' | 'accepted';
+	role_template_id: string | null;
+	invited_by_user_id: string;
+	expires_at: string;
+	created_at: string;
+	accepted_at: string | null;
+}
+
+export interface InvitationListResponse {
+	invitations: Invitation[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateInvitationRequest {
+	email: string;
+	roles?: string[];
+}
+
+// --- Connector Management Types ---
+
+export type ConnectorType = 'ldap' | 'database' | 'rest';
+export type ConnectorStatus = 'active' | 'inactive' | 'error';
+
+export interface Connector {
+	id: string;
+	name: string;
+	connector_type: ConnectorType;
+	description: string | null;
+	config: Record<string, unknown>;
+	status: ConnectorStatus;
+	last_connection_test?: string | null;
+	last_error?: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ConnectorListResponse {
+	items: Connector[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateConnectorRequest {
+	name: string;
+	description?: string;
+	connector_type: ConnectorType;
+	config: Record<string, unknown>;
+	credentials: Record<string, unknown>;
+}
+
+export interface UpdateConnectorRequest {
+	name?: string;
+	description?: string;
+	config?: Record<string, unknown>;
+	credentials?: Record<string, unknown>;
+}
+
+export interface ConnectorHealthStatus {
+	connector_id: string;
+	is_online: boolean;
+	consecutive_failures: number;
+	offline_since?: string | null;
+	last_success_at?: string | null;
+	last_error?: string | null;
+	last_check_at: string;
+}
+
+export interface ConnectorTestResult {
+	success: boolean;
+	error?: string;
+	tested_at: string;
+}
+
+// --- Provisioning Operations & Reconciliation Types ---
+
+// Operations Enums
+export type OperationType = 'create' | 'update' | 'delete';
+export type OperationStatus =
+	| 'pending'
+	| 'in_progress'
+	| 'completed'
+	| 'failed'
+	| 'dead_letter'
+	| 'awaiting_system'
+	| 'resolved'
+	| 'cancelled';
+
+export type DiscrepancyType = 'missing' | 'orphan' | 'mismatch' | 'collision' | 'unlinked' | 'deleted';
+export type RemediationAction = 'create' | 'update' | 'delete' | 'link' | 'unlink' | 'inactivate_identity';
+export type RemediationDirection = 'xavyo_to_target' | 'target_to_xavyo';
+export type ResolutionStatus = 'pending' | 'resolved' | 'ignored';
+export type ConflictOutcome = 'applied' | 'superseded' | 'merged' | 'rejected';
+export type ReconciliationScheduleFrequency = 'hourly' | 'daily' | 'weekly' | 'monthly' | 'cron';
+export type ReconciliationMode = 'full' | 'delta';
+export type ReconciliationRunStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'paused';
+
+// Provisioning Operation
+export interface ProvisioningOperation {
+	id: string;
+	tenant_id: string;
+	connector_id: string;
+	connector_name: string;
+	user_id: string;
+	operation_type: OperationType;
+	object_class: string;
+	target_uid: string | null;
+	status: OperationStatus;
+	priority: number;
+	retry_count: number;
+	max_retries: number;
+	error_message: string | null;
+	payload: Record<string, unknown>;
+	created_at: string;
+	updated_at: string;
+	completed_at: string | null;
+	resolution_notes: string | null;
+}
+
+export interface OperationListResponse {
+	operations: ProvisioningOperation[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface TriggerOperationRequest {
+	connector_id: string;
+	user_id: string;
+	operation_type: OperationType;
+	object_class: string;
+	target_uid?: string;
+	payload: Record<string, unknown>;
+	priority?: number;
+}
+
+export interface ResolveOperationRequest {
+	resolution_notes?: string;
+}
+
+// Execution Attempts
+export interface ExecutionAttempt {
+	attempt_number: number;
+	started_at: string;
+	completed_at: string | null;
+	success: boolean;
+	error_code: string | null;
+	error_message: string | null;
+	duration_ms: number;
+}
+
+export interface ExecutionAttemptsResponse {
+	attempts: ExecutionAttempt[];
+	operation_id: string;
+}
+
+// Operation Logs
+export interface OperationLog {
+	id: string;
+	operation_id: string;
+	timestamp: string;
+	level: string;
+	message: string;
+}
+
+export interface OperationLogsResponse {
+	logs: OperationLog[];
+	operation_id: string;
+}
+
+// Queue Statistics
+export interface QueueStatistics {
+	pending: number;
+	in_progress: number;
+	completed: number;
+	failed: number;
+	dead_letter: number;
+	awaiting_system: number;
+	avg_processing_time_secs: number;
+}
+
+// DLQ Response (no total field)
+export interface DlqResponse {
+	operations: ProvisioningOperation[];
+	offset: number;
+	limit: number;
+}
+
+// Provisioning Conflicts
+export interface ProvisioningConflict {
+	id: string;
+	tenant_id: string;
+	operation_id_a: string;
+	operation_id_b: string;
+	conflict_type: string;
+	affected_attributes: string[];
+	status: string;
+	outcome: ConflictOutcome | null;
+	notes: string | null;
+	created_at: string;
+	resolved_at: string | null;
+	resolved_by: string | null;
+}
+
+export interface ConflictListResponse {
+	conflicts: ProvisioningConflict[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ResolveConflictRequest {
+	outcome: ConflictOutcome;
+	notes?: string;
+}
+
+// Reconciliation Run
+export interface ReconciliationRun {
+	id: string;
+	connector_id: string;
+	mode: ReconciliationMode;
+	dry_run: boolean;
+	status: ReconciliationRunStatus;
+	started_at: string;
+	completed_at: string | null;
+	accounts_processed: number;
+	discrepancies_found: number;
+	duration_seconds: number | null;
+	created_by: string;
+}
+
+export interface ReconciliationRunListResponse {
+	runs: ReconciliationRun[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface TriggerRunRequest {
+	mode: ReconciliationMode;
+	dry_run: boolean;
+}
+
+// Reconciliation Report
+export interface DiscrepancySummary {
+	total: number;
+	by_type: Record<string, number>;
+}
+
+export interface ActionSummary {
+	total: number;
+	by_action: Record<string, number>;
+}
+
+export interface MismatchedAttribute {
+	attribute_name: string;
+	count: number;
+}
+
+export interface PerformanceMetrics {
+	total_duration_ms: number;
+	accounts_per_second: number;
+	api_calls_made: number;
+}
+
+export interface ReconciliationReport {
+	run_id: string;
+	discrepancy_summary: DiscrepancySummary;
+	action_summary: ActionSummary;
+	top_mismatched_attributes: MismatchedAttribute[];
+	performance_metrics: PerformanceMetrics;
+}
+
+// Discrepancies
+export interface Discrepancy {
+	id: string;
+	connector_id: string;
+	run_id: string;
+	discrepancy_type: DiscrepancyType;
+	identity_id: string | null;
+	external_uid: string | null;
+	attribute_name: string | null;
+	expected_value: string | null;
+	actual_value: string | null;
+	resolution_status: ResolutionStatus;
+	resolved_at: string | null;
+	resolved_by: string | null;
+	created_at: string;
+}
+
+export interface DiscrepancyListResponse {
+	discrepancies: Discrepancy[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface RemediateDiscrepancyRequest {
+	action: RemediationAction;
+	direction: RemediationDirection;
+	identity_id?: string;
+	dry_run: boolean;
+}
+
+export interface RemediationResult {
+	discrepancy_id: string;
+	action: RemediationAction;
+	direction: RemediationDirection;
+	success: boolean;
+	error: string | null;
+	changes: Record<string, unknown> | null;
+}
+
+export interface BulkRemediateRequest {
+	items: {
+		discrepancy_id: string;
+		action: RemediationAction;
+		direction: RemediationDirection;
+	}[];
+	dry_run: boolean;
+}
+
+export interface BulkRemediateResponse {
+	results: RemediationResult[];
+	total: number;
+	succeeded: number;
+	failed: number;
+}
+
+export interface PreviewRemediationRequest {
+	discrepancy_ids: string[];
+}
+
+export interface RemediationPreview {
+	discrepancy_id: string;
+	suggested_action: RemediationAction;
+	suggested_direction: RemediationDirection;
+	changes: Record<string, unknown>;
+}
+
+export interface PreviewRemediationResponse {
+	previews: RemediationPreview[];
+}
+
+// Reconciliation Actions (Audit Log)
+export interface ReconciliationActionEntry {
+	id: string;
+	connector_id: string;
+	discrepancy_id: string | null;
+	action_type: string;
+	result: string;
+	dry_run: boolean;
+	performed_by: string;
+	performed_at: string;
+	details: Record<string, unknown> | null;
+}
+
+export interface ReconciliationActionListResponse {
+	actions: ReconciliationActionEntry[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// Reconciliation Schedule
+export interface ReconciliationSchedule {
+	id: string;
+	connector_id: string;
+	connector_name: string | null;
+	mode: ReconciliationMode;
+	frequency: ReconciliationScheduleFrequency;
+	day_of_week: number | null;
+	day_of_month: number | null;
+	hour_of_day: number;
+	cron_expression: string | null;
+	enabled: boolean;
+	last_run_at: string | null;
+	next_run_at: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ReconciliationScheduleListResponse {
+	schedules: ReconciliationSchedule[];
+}
+
+export interface UpsertScheduleRequest {
+	mode: ReconciliationMode;
+	frequency: ReconciliationScheduleFrequency;
+	day_of_week?: number;
+	day_of_month?: number;
+	hour_of_day: number;
+	enabled: boolean;
+}
+
+// Discrepancy Trend
+export interface DiscrepancyTrendPoint {
+	date: string;
+	total: number;
+	by_type: Record<string, number> | null;
+}
+
+export interface DiscrepancyTrendResponse {
+	data_points: DiscrepancyTrendPoint[];
+	connector_id: string | null;
+	from: string;
+	to: string;
+}
