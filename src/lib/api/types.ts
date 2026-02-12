@@ -2951,3 +2951,252 @@ export interface DiscrepancyTrendResponse {
 	from: string;
 	to: string;
 }
+
+// Outlier Detection Types
+
+export type OutlierAnalysisStatus = 'pending' | 'running' | 'completed' | 'failed';
+export type OutlierTriggerType = 'scheduled' | 'manual' | 'api';
+export type OutlierClassification = 'normal' | 'outlier' | 'unclassifiable';
+export type OutlierDispositionStatus = 'new' | 'legitimate' | 'requires_remediation' | 'under_investigation' | 'remediated';
+export type OutlierAlertType = 'new_outlier' | 'score_increase' | 'repeated_outlier';
+export type OutlierAlertSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type PeerGroupType = 'department' | 'role' | 'location' | 'custom';
+
+export interface ScoringWeights {
+	role_frequency: number;
+	entitlement_count: number;
+	assignment_pattern: number;
+	peer_group_coverage: number;
+	historical_deviation: number;
+}
+
+export interface OutlierConfig {
+	id: string;
+	tenant_id: string;
+	confidence_threshold: number;
+	frequency_threshold: number;
+	min_peer_group_size: number;
+	scoring_weights: ScoringWeights;
+	schedule_cron: string;
+	retention_days: number;
+	is_enabled: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface UpdateOutlierConfigRequest {
+	confidence_threshold?: number;
+	frequency_threshold?: number;
+	min_peer_group_size?: number;
+	scoring_weights?: ScoringWeights;
+	schedule_cron?: string;
+	retention_days?: number;
+	is_enabled?: boolean;
+}
+
+export interface OutlierAnalysis {
+	id: string;
+	tenant_id: string;
+	status: OutlierAnalysisStatus;
+	triggered_by: OutlierTriggerType;
+	started_at: string | null;
+	completed_at: string | null;
+	users_analyzed: number;
+	outliers_detected: number;
+	progress_percent: number;
+	error_message: string | null;
+	created_at: string;
+}
+
+export interface TriggerAnalysisRequest {
+	triggered_by: OutlierTriggerType;
+}
+
+export interface PeerScoreItem {
+	peer_group_id: string;
+	peer_group_name: string;
+	z_score: number;
+	deviation_factor: number;
+	is_outlier: boolean;
+}
+
+export interface FactorDetail {
+	raw_value: number;
+	weight: number;
+	contribution: number;
+	details: string;
+}
+
+export interface FactorBreakdown {
+	role_frequency?: FactorDetail;
+	entitlement_count?: FactorDetail;
+	assignment_pattern?: FactorDetail;
+	peer_group_coverage?: FactorDetail;
+	historical_deviation?: FactorDetail;
+}
+
+export interface OutlierResult {
+	id: string;
+	analysis_id: string;
+	user_id: string;
+	overall_score: number;
+	classification: OutlierClassification;
+	peer_scores: PeerScoreItem[];
+	factor_breakdown: FactorBreakdown;
+	previous_score: number | null;
+	score_change: number | null;
+	created_at: string;
+}
+
+export interface OutlierSummary {
+	total_users: number;
+	outlier_count: number;
+	normal_count: number;
+	unclassifiable_count: number;
+	avg_score: number;
+	max_score: number;
+	analysis_id: string | null;
+	analysis_completed_at: string | null;
+}
+
+export interface OutlierDisposition {
+	id: string;
+	result_id: string;
+	user_id: string;
+	status: OutlierDispositionStatus;
+	justification: string | null;
+	reviewed_by: string | null;
+	reviewed_at: string | null;
+	expires_at: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateDispositionRequest {
+	status: OutlierDispositionStatus;
+	justification?: string;
+	expires_at?: string;
+}
+
+export interface DispositionSummary {
+	new_count: number;
+	legitimate_count: number;
+	requires_remediation_count: number;
+	under_investigation_count: number;
+	remediated_count: number;
+}
+
+export interface OutlierAlert {
+	id: string;
+	analysis_id: string;
+	user_id: string;
+	alert_type: OutlierAlertType;
+	severity: OutlierAlertSeverity;
+	score: number;
+	classification: OutlierClassification;
+	is_read: boolean;
+	is_dismissed: boolean;
+	created_at: string;
+}
+
+export interface AlertSummary {
+	total_count: number;
+	unread_count: number;
+	critical_count: number;
+	high_count: number;
+	medium_count: number;
+	low_count: number;
+}
+
+export interface GenerateReportRequest {
+	start_date: string;
+	end_date: string;
+	include_trends?: boolean;
+	include_peer_breakdown?: boolean;
+}
+
+export interface OutlierTrendItem {
+	date: string;
+	analysis_id: string;
+	outlier_count: number;
+	total_users: number;
+	avg_score: number;
+}
+
+export interface PeerGroupBreakdownItem {
+	peer_group_id: string;
+	peer_group_name: string;
+	outlier_count: number;
+	member_count: number;
+	avg_deviation: number;
+}
+
+export interface OutlierReport {
+	start_date: string;
+	end_date: string;
+	total_analyses: number;
+	total_users_analyzed: number;
+	total_outliers_detected: number;
+	average_outlier_rate: number;
+	trends: OutlierTrendItem[];
+	peer_group_breakdown: PeerGroupBreakdownItem[];
+	generated_at: string;
+}
+
+export interface UserOutlierHistory {
+	user_id: string;
+	results: OutlierResult[];
+	current_disposition: OutlierDisposition | null;
+}
+
+// Peer Group Types
+
+export interface PeerGroup {
+	id: string;
+	name: string;
+	group_type: PeerGroupType;
+	attribute_key: string;
+	attribute_value: string;
+	user_count: number;
+	avg_entitlements: number | null;
+	stddev_entitlements: number | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreatePeerGroupRequest {
+	name: string;
+	group_type: PeerGroupType;
+	attribute_key: string;
+	attribute_value: string;
+}
+
+export interface PeerGroupRefreshResult {
+	group: PeerGroup;
+	member_count: number;
+}
+
+export interface RefreshAllPeerGroupsResult {
+	groups_refreshed: number;
+	groups_created: number;
+	users_processed: number;
+	duration_ms: number;
+}
+
+export interface PeerComparisonItem {
+	group_id: string;
+	group_name: string;
+	group_type: PeerGroupType;
+	group_average: number;
+	group_stddev: number;
+	deviation_from_mean: number;
+	is_outlier: boolean;
+	outlier_severity: 'moderate' | 'severe' | null;
+}
+
+export interface UserPeerComparison {
+	user_id: string;
+	user_entitlement_count: number;
+	comparisons: PeerComparisonItem[];
+	is_outlier: boolean;
+}
