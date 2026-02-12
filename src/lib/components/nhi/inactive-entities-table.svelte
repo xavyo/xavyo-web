@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { InactiveNhiEntity } from '$lib/api/types';
+	import type { StalenessReportResponse } from '$lib/api/types';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Dialog } from 'bits-ui';
@@ -7,15 +7,15 @@
 	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
 	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
 	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
-	import { nhiTypeClass, formatNhiDate, nhiEntityPath } from './nhi-utils';
+	import { formatNhiDate } from './nhi-utils';
 
 	interface Props {
-		entities: InactiveNhiEntity[];
+		report: StalenessReportResponse;
 		onGrantGracePeriod: (id: string, days: number) => Promise<void>;
 		onAutoSuspend: () => Promise<void>;
 	}
 
-	let { entities, onGrantGracePeriod, onAutoSuspend }: Props = $props();
+	let { report, onGrantGracePeriod, onAutoSuspend }: Props = $props();
 
 	let showGraceDialog = $state(false);
 	let selectedEntityId = $state<string | null>(null);
@@ -52,50 +52,62 @@
 
 <div class="space-y-4">
 	<div class="flex items-center justify-between">
-		<p class="text-sm text-muted-foreground">{entities.length} inactive entities detected</p>
-		{#if entities.length > 0}
+		<div class="space-y-1">
+			<p class="text-sm text-muted-foreground">
+				{report.total_stale} stale entities detected
+				{#if report.critical_count > 0}
+					<Badge class="ml-2 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+						{report.critical_count} critical
+					</Badge>
+				{/if}
+				{#if report.warning_count > 0}
+					<Badge class="ml-2 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+						{report.warning_count} warning
+					</Badge>
+				{/if}
+			</p>
+		</div>
+		{#if report.stale_nhis.length > 0}
 			<Button variant="destructive" size="sm" onclick={handleAutoSuspend} disabled={suspending}>
 				{suspending ? 'Suspending...' : 'Auto-Suspend All Expired'}
 			</Button>
 		{/if}
 	</div>
 
-	{#if entities.length === 0}
-		<p class="py-8 text-center text-sm text-muted-foreground">No inactive NHI entities detected.</p>
+	{#if report.stale_nhis.length === 0}
+		<p class="py-8 text-center text-sm text-muted-foreground">No stale NHI entities detected.</p>
 	{:else}
 		<div class="overflow-x-auto">
 			<table class="w-full text-sm">
 				<thead>
 					<tr class="border-b border-border text-left">
 						<th class="px-3 py-2 font-medium text-muted-foreground">Name</th>
-						<th class="px-3 py-2 font-medium text-muted-foreground">Type</th>
 						<th class="px-3 py-2 font-medium text-muted-foreground">Days Inactive</th>
 						<th class="px-3 py-2 font-medium text-muted-foreground">Threshold</th>
-						<th class="px-3 py-2 font-medium text-muted-foreground">Last Activity</th>
+						<th class="px-3 py-2 font-medium text-muted-foreground">Last Used</th>
 						<th class="px-3 py-2 font-medium text-muted-foreground">Grace Period</th>
 						<th class="px-3 py-2 font-medium text-muted-foreground">Actions</th>
 					</tr>
 				</thead>
 				<tbody>
-					{#each entities as entity}
+					{#each report.stale_nhis as entity}
 						<tr class="border-b border-border">
-							<td class="px-3 py-2">
-								<a href={nhiEntityPath(entity.nhi_type, entity.id)} class="font-medium text-primary hover:underline">
-									{entity.name}
-								</a>
-							</td>
-							<td class="px-3 py-2">
-								<Badge class={nhiTypeClass(entity.nhi_type)}>{entity.nhi_type}</Badge>
+							<td class="px-3 py-2 font-medium text-foreground">
+								{entity.name}
 							</td>
 							<td class="px-3 py-2 font-mono">{entity.days_inactive}</td>
-							<td class="px-3 py-2 font-mono">{entity.threshold_days}</td>
-							<td class="px-3 py-2 text-muted-foreground">{formatNhiDate(entity.last_activity_at)}</td>
+							<td class="px-3 py-2 font-mono">{entity.inactivity_threshold_days}</td>
+							<td class="px-3 py-2 text-muted-foreground">{formatNhiDate(entity.last_used_at)}</td>
 							<td class="px-3 py-2 text-muted-foreground">
-								{entity.grace_period_ends_at ? `Until ${formatNhiDate(entity.grace_period_ends_at)}` : '—'}
+								{#if entity.in_grace_period && entity.grace_period_ends_at}
+									Until {formatNhiDate(entity.grace_period_ends_at)}
+								{:else}
+									—
+								{/if}
 							</td>
 							<td class="px-3 py-2">
-								{#if !entity.grace_period_ends_at}
-									<Button variant="outline" size="sm" onclick={() => openGraceDialog(entity.id)}>
+								{#if !entity.in_grace_period}
+									<Button variant="outline" size="sm" onclick={() => openGraceDialog(entity.nhi_id)}>
 										Grant Grace
 									</Button>
 								{:else}

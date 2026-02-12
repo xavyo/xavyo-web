@@ -1,11 +1,10 @@
 import type {
 	NhiRiskBreakdown,
 	NhiRiskSummary,
-	InactiveNhiEntity,
+	StalenessReportResponse,
 	AutoSuspendResult,
-	OrphanNhiEntity,
+	OrphanDetectionListResponse,
 	NhiSodRuleListResponse,
-	NhiSodRule,
 	NhiSodCheckResult,
 	NhiCertificationCampaign,
 	CertifyNhiResponse,
@@ -42,15 +41,20 @@ export async function fetchNhiRiskSummary(
 	return res.json();
 }
 
-// --- Inactivity ---
+// --- Staleness / Inactivity ---
 
-export async function fetchInactiveNhis(
-	fetchFn: typeof fetch = fetch
-): Promise<InactiveNhiEntity[]> {
-	const res = await fetchFn('/api/nhi/governance/inactivity');
-	if (!res.ok) throw new Error(`Failed to detect inactive NHIs: ${res.status}`);
+export async function fetchStalenessReport(
+	fetchFn: typeof fetch = fetch,
+	minInactiveDays?: number
+): Promise<StalenessReportResponse> {
+	const qs = minInactiveDays !== undefined ? `?min_inactive_days=${minInactiveDays}` : '';
+	const res = await fetchFn(`/api/nhi/governance/inactivity${qs}`);
+	if (!res.ok) throw new Error(`Failed to fetch staleness report: ${res.status}`);
 	return res.json();
 }
+
+// Legacy alias
+export const fetchInactiveNhis = fetchStalenessReport;
 
 export async function grantGracePeriodClient(
 	id: string,
@@ -75,15 +79,20 @@ export async function triggerAutoSuspend(
 	return res.json();
 }
 
-// --- Orphans ---
+// --- Orphan Detections ---
 
-export async function fetchOrphanNhis(
-	fetchFn: typeof fetch = fetch
-): Promise<OrphanNhiEntity[]> {
-	const res = await fetchFn('/api/nhi/governance/orphans');
-	if (!res.ok) throw new Error(`Failed to detect orphan NHIs: ${res.status}`);
+export async function fetchOrphanDetections(
+	fetchFn: typeof fetch = fetch,
+	params?: { limit?: number; offset?: number; status?: string }
+): Promise<OrphanDetectionListResponse> {
+	const qs = params ? buildSearchParams(params) : '';
+	const res = await fetchFn(`/api/nhi/governance/orphans${qs}`);
+	if (!res.ok) throw new Error(`Failed to fetch orphan detections: ${res.status}`);
 	return res.json();
 }
+
+// Legacy alias
+export const fetchOrphanNhis = fetchOrphanDetections;
 
 // --- SoD Rules ---
 

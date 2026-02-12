@@ -1536,54 +1536,79 @@ export interface NhiRiskBreakdown {
 	type_specific_factors: NhiRiskFactor[];
 }
 
-export interface TypeRiskSummary {
-	nhi_type: string;
-	count: number;
-	avg_score: number;
+export interface NhiRiskByType {
+	service_account: number;
+	ai_agent: number;
 }
 
-export interface LevelRiskSummary {
-	level: string;
-	count: number;
+export interface NhiRiskByLevel {
+	critical: number;
+	high: number;
+	medium: number;
+	low: number;
 }
 
 export interface NhiRiskSummary {
-	total_entities: number;
-	by_type: TypeRiskSummary[];
-	by_level: LevelRiskSummary[];
+	total_count: number;
+	by_type: NhiRiskByType;
+	by_risk_level: NhiRiskByLevel;
+	pending_certification: number;
+	inactive_30_days: number;
+	expiring_7_days: number;
 }
 
-// NHI Inactivity Detection
+// NHI Staleness Report (inactivity detection)
 
-export interface InactiveNhiEntity {
-	id: string;
+export interface StaleNhiInfo {
+	nhi_id: string;
 	name: string;
-	nhi_type: string;
+	owner_id: string;
 	days_inactive: number;
-	threshold_days: number;
-	last_activity_at: string | null;
+	last_used_at: string | null;
+	inactivity_threshold_days: number;
+	in_grace_period: boolean;
 	grace_period_ends_at: string | null;
 }
 
-export interface AutoSuspendFailure {
-	id: string;
-	error: string;
+export interface StalenessReportResponse {
+	generated_at: string;
+	min_inactive_days: number;
+	total_stale: number;
+	critical_count: number;
+	warning_count: number;
+	stale_nhis: StaleNhiInfo[];
 }
+
+// Legacy aliases for backward compatibility
+export type InactiveNhiEntity = StaleNhiInfo;
 
 export interface AutoSuspendResult {
 	suspended: string[];
-	failed: AutoSuspendFailure[];
+	failed: { id: string; error: string }[];
 }
 
-// NHI Orphan Detection
+// NHI Orphan Detection (via governance/orphan-detections)
 
-export interface OrphanNhiEntity {
+export interface OrphanDetectionItem {
 	id: string;
-	name: string;
-	nhi_type: string;
-	owner_id: string | null;
-	reason: string;
+	user_id: string;
+	run_id: string;
+	detection_reason: string;
+	status: string;
+	detected_at: string;
+	last_activity_at: string | null;
+	days_inactive: number | null;
 }
+
+export interface OrphanDetectionListResponse {
+	items: OrphanDetectionItem[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// Legacy alias
+export type OrphanNhiEntity = OrphanDetectionItem;
 
 // NHI SoD Rules
 
@@ -1601,7 +1626,8 @@ export interface NhiSodRule {
 }
 
 export interface NhiSodRuleListResponse {
-	data: NhiSodRule[];
+	items: NhiSodRule[];
+	total: number;
 	limit: number;
 	offset: number;
 }
@@ -1654,6 +1680,20 @@ export interface CreateNhiCertCampaignRequest {
 	nhi_type_filter?: string;
 	specific_nhi_ids?: string[];
 	due_date?: string;
+}
+
+export interface NhiCertificationItem {
+	id: string;
+	campaign_id: string;
+	nhi_id: string;
+	nhi_name: string | null;
+	nhi_type: string | null;
+	reviewer_id: string | null;
+	decision: string | null;
+	decided_at: string | null;
+	decided_by: string | null;
+	comment: string | null;
+	created_at: string;
 }
 
 export interface CertifyNhiResponse {

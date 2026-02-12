@@ -36,7 +36,9 @@
 		mfa_disabled: 'MFA Disabled'
 	};
 
-	const isAcknowledged = $derived(alert.acknowledged_at !== null);
+	const isAcknowledged = $derived(
+		!!alert.acknowledged_at && !isNaN(new Date(alert.acknowledged_at).getTime())
+	);
 	const SeverityIcon = $derived(severityConfig.icon);
 </script>
 

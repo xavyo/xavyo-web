@@ -76,7 +76,7 @@ describe('nhi-governance-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 500));
 			const { fetchInactiveNhis } = await import('./nhi-governance-client');
 
-			await expect(fetchInactiveNhis(mockFetch)).rejects.toThrow('Failed to detect inactive NHIs: 500');
+			await expect(fetchInactiveNhis(mockFetch)).rejects.toThrow('Failed to fetch staleness report: 500');
 		});
 	});
 
@@ -140,7 +140,7 @@ describe('nhi-governance-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 500));
 			const { fetchOrphanNhis } = await import('./nhi-governance-client');
 
-			await expect(fetchOrphanNhis(mockFetch)).rejects.toThrow('Failed to detect orphan NHIs: 500');
+			await expect(fetchOrphanNhis(mockFetch)).rejects.toThrow('Failed to fetch orphan detections: 500');
 		});
 	});
 

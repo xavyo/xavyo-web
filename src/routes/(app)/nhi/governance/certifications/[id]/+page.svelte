@@ -1,51 +1,45 @@
 <script lang="ts">
-	import type { NhiIdentityResponse } from '$lib/api/types';
-	import { certifyNhiClient, revokeNhiCertClient } from '$lib/api/nhi-governance-client';
+	import type { NhiCertificationItem } from '$lib/api/types';
 	import { Card, CardHeader, CardContent } from '$lib/components/ui/card';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
-	import { campaignStatusClass, nhiTypeClass, formatNhiDate } from '$lib/components/nhi/nhi-utils';
+	import { campaignStatusClass, formatNhiDate } from '$lib/components/nhi/nhi-utils';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	let nhiEntities: NhiIdentityResponse[] = $state(data.nhiEntities);
-	// Initialize certification status from entity data (last_certified_at)
-	let certifiedIds = $state<Set<string>>(
-		new Set(data.nhiEntities.filter((e) => e.last_certified_at).map((e) => e.id))
-	);
-	let revokedIds = $state<Set<string>>(new Set());
+	let items: NhiCertificationItem[] = $state(data.campaignItems ?? []);
 	let processing = $state<string | null>(null);
 
-	async function handleCertify(nhiId: string) {
-		processing = nhiId;
+	async function handleDecide(itemId: string, decision: 'certify' | 'revoke') {
+		processing = itemId;
 		try {
-			await certifyNhiClient(data.campaign.id, nhiId);
-			certifiedIds = new Set([...certifiedIds, nhiId]);
-			revokedIds.delete(nhiId);
-			revokedIds = new Set(revokedIds);
-			addToast('success', 'NHI entity certified');
+			const res = await fetch(`/api/nhi/governance/certifications/items/${itemId}/decide`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ decision })
+			});
+			if (!res.ok) throw new Error(`Failed: ${res.status}`);
+			const updated: NhiCertificationItem = await res.json();
+			items = items.map((it) => (it.id === itemId ? updated : it));
+			addToast('success', decision === 'certify' ? 'NHI entity certified' : 'NHI certification revoked');
 		} catch {
-			addToast('error', 'Failed to certify NHI entity');
+			addToast('error', `Failed to ${decision} NHI entity`);
 		} finally {
 			processing = null;
 		}
 	}
 
-	async function handleRevoke(nhiId: string) {
-		processing = nhiId;
-		try {
-			await revokeNhiCertClient(data.campaign.id, nhiId);
-			revokedIds = new Set([...revokedIds, nhiId]);
-			certifiedIds.delete(nhiId);
-			certifiedIds = new Set(certifiedIds);
-			addToast('success', 'NHI entity certification revoked');
-		} catch {
-			addToast('error', 'Failed to revoke NHI certification');
-		} finally {
-			processing = null;
+	function decisionBadgeClass(decision: string | null): string {
+		switch (decision) {
+			case 'certify':
+				return 'bg-green-600 text-white hover:bg-green-600/80';
+			case 'revoke':
+				return 'bg-red-500 text-white hover:bg-red-500/80';
+			default:
+				return '';
 		}
 	}
 </script>
@@ -75,72 +69,66 @@
 		</CardContent>
 	</Card>
 	<Card>
-		<CardHeader><p class="text-sm text-muted-foreground">Entities in Scope</p></CardHeader>
+		<CardHeader><p class="text-sm text-muted-foreground">Items</p></CardHeader>
 		<CardContent>
-			<p class="text-lg font-semibold text-foreground">{nhiEntities.length}</p>
+			<p class="text-lg font-semibold text-foreground">{items.length}</p>
 		</CardContent>
 	</Card>
 </div>
 
 <Card>
 	<CardHeader>
-		<h3 class="text-lg font-semibold text-foreground">NHI Entities</h3>
+		<h3 class="text-lg font-semibold text-foreground">Certification Items</h3>
 	</CardHeader>
 	<CardContent>
-		{#if nhiEntities.length === 0}
-			<p class="py-8 text-center text-sm text-muted-foreground">No NHI entities in scope.</p>
+		{#if items.length === 0}
+			<p class="py-8 text-center text-sm text-muted-foreground">No certification items in this campaign.</p>
 		{:else}
 			<div class="overflow-x-auto">
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b border-border text-left">
-							<th class="px-3 py-2 font-medium text-muted-foreground">Name</th>
+							<th class="px-3 py-2 font-medium text-muted-foreground">NHI Name</th>
 							<th class="px-3 py-2 font-medium text-muted-foreground">Type</th>
-							<th class="px-3 py-2 font-medium text-muted-foreground">State</th>
-							<th class="px-3 py-2 font-medium text-muted-foreground">Status</th>
+							<th class="px-3 py-2 font-medium text-muted-foreground">Decision</th>
+							<th class="px-3 py-2 font-medium text-muted-foreground">Decided At</th>
 							<th class="px-3 py-2 font-medium text-muted-foreground">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
-						{#each nhiEntities as entity}
+						{#each items as item}
 							<tr class="border-b border-border">
-								<td class="px-3 py-2 font-medium text-foreground">{entity.name}</td>
+								<td class="px-3 py-2 font-medium text-foreground">{item.nhi_name ?? item.nhi_id}</td>
+								<td class="px-3 py-2 text-muted-foreground">{item.nhi_type ?? '—'}</td>
 								<td class="px-3 py-2">
-									<Badge class={nhiTypeClass(entity.nhi_type)}>{entity.nhi_type}</Badge>
-								</td>
-								<td class="px-3 py-2 text-muted-foreground">{entity.lifecycle_state}</td>
-								<td class="px-3 py-2">
-									{#if certifiedIds.has(entity.id)}
-										<Badge class="bg-green-600 text-white hover:bg-green-600/80">Certified</Badge>
-									{:else if revokedIds.has(entity.id)}
-										<Badge class="bg-red-500 text-white hover:bg-red-500/80">Revoked</Badge>
+									{#if item.decision}
+										<Badge class={decisionBadgeClass(item.decision)}>{item.decision}</Badge>
 									{:else}
 										<span class="text-muted-foreground">Pending</span>
 									{/if}
 								</td>
+								<td class="px-3 py-2 text-muted-foreground">{formatNhiDate(item.decided_at)}</td>
 								<td class="px-3 py-2">
-									{#if data.campaign.status === 'active'}
+									{#if data.campaign.status === 'active' && !item.decision}
 										<div class="flex gap-2">
-											{#if !certifiedIds.has(entity.id)}
-												<Button
-													size="sm"
-													onclick={() => handleCertify(entity.id)}
-													disabled={processing === entity.id}
-												>
-													{processing === entity.id ? '...' : 'Certify'}
-												</Button>
-											{/if}
-											{#if !revokedIds.has(entity.id)}
-												<Button
-													variant="destructive"
-													size="sm"
-													onclick={() => handleRevoke(entity.id)}
-													disabled={processing === entity.id}
-												>
-													{processing === entity.id ? '...' : 'Revoke'}
-												</Button>
-											{/if}
+											<Button
+												size="sm"
+												onclick={() => handleDecide(item.id, 'certify')}
+												disabled={processing === item.id}
+											>
+												{processing === item.id ? '...' : 'Certify'}
+											</Button>
+											<Button
+												variant="destructive"
+												size="sm"
+												onclick={() => handleDecide(item.id, 'revoke')}
+												disabled={processing === item.id}
+											>
+												{processing === item.id ? '...' : 'Revoke'}
+											</Button>
 										</div>
+									{:else if item.decision}
+										<span class="text-xs text-muted-foreground">Decided</span>
 									{:else}
 										<span class="text-xs text-muted-foreground">Campaign not active</span>
 									{/if}

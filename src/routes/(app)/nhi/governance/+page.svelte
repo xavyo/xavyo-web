@@ -37,8 +37,8 @@
 
 	// Server-loaded data — use $derived so navigation/invalidation updates reactively
 	let riskSummary = $derived(data.riskSummary);
-	let inactiveEntities = $derived(data.inactiveEntities);
-	let orphanEntities = $derived(data.orphanEntities);
+	let stalenessReport = $derived(data.stalenessReport);
+	let orphanDetections = $derived(data.orphanDetections);
 	let nhiNameMap = $derived(data.nhiNameMap);
 
 	// Client-loaded data (SoD + Certifications)
@@ -65,7 +65,7 @@
 		sodLoading = true;
 		try {
 			const result = await fetchNhiSodRules();
-			sodRules = result.data;
+			sodRules = result.items;
 			sodLoaded = true;
 		} catch {
 			addToast('error', 'Failed to load SoD rules');
@@ -147,12 +147,12 @@
 		<RiskSummaryCards summary={riskSummary} />
 	{:else if activeTab === 'inactive'}
 		<InactiveEntitiesTable
-			entities={inactiveEntities}
+			report={stalenessReport}
 			onGrantGracePeriod={handleGrantGracePeriod}
 			onAutoSuspend={handleAutoSuspend}
 		/>
 	{:else if activeTab === 'orphans'}
-		<OrphanEntitiesTable entities={orphanEntities} />
+		<OrphanEntitiesTable detections={orphanDetections} />
 	{:else if activeTab === 'sod'}
 		{#if sodLoading}
 			<div class="animate-pulse space-y-3">

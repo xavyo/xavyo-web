@@ -2,15 +2,16 @@ import { apiClient } from './client';
 import type {
 	NhiRiskBreakdown,
 	NhiRiskSummary,
-	InactiveNhiEntity,
+	StalenessReportResponse,
 	AutoSuspendResult,
-	OrphanNhiEntity,
+	OrphanDetectionListResponse,
 	NhiSodRule,
 	NhiSodRuleListResponse,
 	CreateNhiSodRuleRequest,
 	NhiSodCheckResult,
 	NhiSodCheckRequest,
 	NhiCertificationCampaign,
+	NhiCertificationItem,
 	CreateNhiCertCampaignRequest,
 	CertifyNhiResponse,
 	RevokeNhiCertResponse
@@ -67,20 +68,29 @@ export async function getNhiRiskSummary(
 	});
 }
 
-// --- Inactivity Detection ---
+// --- Staleness Report (Inactivity Detection) ---
 
-export async function detectInactiveNhis(
+export async function getStalenessReport(
 	token: string,
 	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
-): Promise<InactiveNhiEntity[]> {
-	return apiClient<InactiveNhiEntity[]>('/nhi/inactivity/detect', {
+	fetchFn?: typeof globalThis.fetch,
+	minInactiveDays?: number
+): Promise<StalenessReportResponse> {
+	const qs = minInactiveDays !== undefined
+		? `?min_inactive_days=${minInactiveDays}`
+		: '';
+	return apiClient<StalenessReportResponse>(`/nhi/staleness-report${qs}`, {
 		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
 }
+
+// Legacy alias
+export const detectInactiveNhis = getStalenessReport;
+
+// --- Grace Period & Suspend (via governance NHI endpoints) ---
 
 export async function grantGracePeriod(
 	id: string,
@@ -89,7 +99,8 @@ export async function grantGracePeriod(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<void> {
-	await apiClient<void>(`/nhi/inactivity/grace-period/${id}`, {
+	// Backend manages grace periods via governance NHI suspend flow
+	await apiClient<void>(`/governance/nhis/${id}/grace-period`, {
 		method: 'POST',
 		token,
 		tenantId,
@@ -103,7 +114,7 @@ export async function autoSuspendExpired(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<AutoSuspendResult> {
-	return apiClient<AutoSuspendResult>('/nhi/inactivity/auto-suspend', {
+	return apiClient<AutoSuspendResult>('/governance/nhis/auto-suspend', {
 		method: 'POST',
 		token,
 		tenantId,
@@ -111,14 +122,20 @@ export async function autoSuspendExpired(
 	});
 }
 
-// --- Orphan Detection ---
+// --- Orphan Detection (via governance API) ---
 
-export async function detectOrphanNhis(
+export async function listOrphanDetections(
 	token: string,
 	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
-): Promise<OrphanNhiEntity[]> {
-	return apiClient<OrphanNhiEntity[]>('/nhi/orphans/detect', {
+	fetchFn?: typeof globalThis.fetch,
+	params?: { limit?: number; offset?: number; status?: string }
+): Promise<OrphanDetectionListResponse> {
+	const qs = buildSearchParams({
+		limit: params?.limit ?? 50,
+		offset: params?.offset ?? 0,
+		status: params?.status
+	});
+	return apiClient<OrphanDetectionListResponse>(`/governance/orphan-detections${qs}`, {
 		method: 'GET',
 		token,
 		tenantId,
@@ -126,7 +143,12 @@ export async function detectOrphanNhis(
 	});
 }
 
+// Legacy alias
+export const detectOrphanNhis = listOrphanDetections;
+
 // --- NHI SoD Rules ---
+
+// NHI SoD uses the governance SoD rules at /governance/sod-rules
 
 export async function createNhiSodRule(
 	body: CreateNhiSodRuleRequest,
@@ -134,7 +156,7 @@ export async function createNhiSodRule(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiSodRule> {
-	return apiClient<NhiSodRule>('/nhi/sod/rules', {
+	return apiClient<NhiSodRule>('/governance/sod-rules', {
 		method: 'POST',
 		token,
 		tenantId,
@@ -153,7 +175,7 @@ export async function listNhiSodRules(
 		limit: params.limit,
 		offset: params.offset
 	});
-	return apiClient<NhiSodRuleListResponse>(`/nhi/sod/rules${qs}`, {
+	return apiClient<NhiSodRuleListResponse>(`/governance/sod-rules${qs}`, {
 		method: 'GET',
 		token,
 		tenantId,
@@ -167,7 +189,7 @@ export async function deleteNhiSodRule(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<void> {
-	await apiClient<void>(`/nhi/sod/rules/${id}`, {
+	await apiClient<void>(`/governance/sod-rules/${id}`, {
 		method: 'DELETE',
 		token,
 		tenantId,
@@ -181,7 +203,7 @@ export async function checkNhiSod(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiSodCheckResult> {
-	return apiClient<NhiSodCheckResult>('/nhi/sod/check', {
+	return apiClient<NhiSodCheckResult>('/governance/sod-check', {
 		method: 'POST',
 		token,
 		tenantId,
@@ -198,7 +220,7 @@ export async function createNhiCertCampaign(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiCertificationCampaign> {
-	return apiClient<NhiCertificationCampaign>('/nhi/certifications', {
+	return apiClient<NhiCertificationCampaign>('/nhi/certifications/campaigns', {
 		method: 'POST',
 		token,
 		tenantId,
@@ -218,7 +240,7 @@ export async function listNhiCertCampaigns(
 		limit: params.limit,
 		offset: params.offset
 	});
-	return apiClient<NhiCertificationCampaign[]>(`/nhi/certifications${qs}`, {
+	return apiClient<NhiCertificationCampaign[]>(`/nhi/certifications/campaigns${qs}`, {
 		method: 'GET',
 		token,
 		tenantId,
@@ -226,14 +248,27 @@ export async function listNhiCertCampaigns(
 	});
 }
 
-export async function certifyNhi(
+export async function getNhiCertCampaign(
 	campaignId: string,
-	nhiId: string,
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
-): Promise<CertifyNhiResponse> {
-	return apiClient<CertifyNhiResponse>(`/nhi/certifications/${campaignId}/certify/${nhiId}`, {
+): Promise<NhiCertificationCampaign> {
+	return apiClient<NhiCertificationCampaign>(`/nhi/certifications/campaigns/${campaignId}`, {
+		method: 'GET',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+export async function launchNhiCertCampaign(
+	campaignId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<NhiCertificationCampaign> {
+	return apiClient<NhiCertificationCampaign>(`/nhi/certifications/campaigns/${campaignId}/launch`, {
 		method: 'POST',
 		token,
 		tenantId,
@@ -241,17 +276,52 @@ export async function certifyNhi(
 	});
 }
 
-export async function revokeNhiCert(
+export async function cancelNhiCertCampaign(
 	campaignId: string,
-	nhiId: string,
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
-): Promise<RevokeNhiCertResponse> {
-	return apiClient<RevokeNhiCertResponse>(`/nhi/certifications/${campaignId}/revoke/${nhiId}`, {
+): Promise<NhiCertificationCampaign> {
+	return apiClient<NhiCertificationCampaign>(`/nhi/certifications/campaigns/${campaignId}/cancel`, {
 		method: 'POST',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
 }
+
+export async function listNhiCertCampaignItems(
+	campaignId: string,
+	params: { limit?: number; offset?: number },
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<{ items: NhiCertificationItem[]; total: number }> {
+	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	return apiClient<{ items: NhiCertificationItem[]; total: number }>(
+		`/nhi/certifications/campaigns/${campaignId}/items${qs}`,
+		{ method: 'GET', token, tenantId, fetch: fetchFn }
+	);
+}
+
+export async function decideNhiCertItem(
+	itemId: string,
+	decision: 'certify' | 'revoke',
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<NhiCertificationItem> {
+	return apiClient<NhiCertificationItem>(`/nhi/certifications/items/${itemId}/decide`, {
+		method: 'POST',
+		token,
+		tenantId,
+		body: { decision },
+		fetch: fetchFn
+	});
+}
+
+// Legacy aliases
+export const certifyNhi = (campaignId: string, nhiId: string, token: string, tenantId: string, fetchFn?: typeof globalThis.fetch) =>
+	decideNhiCertItem(nhiId, 'certify', token, tenantId, fetchFn) as unknown as Promise<CertifyNhiResponse>;
+export const revokeNhiCert = (campaignId: string, nhiId: string, token: string, tenantId: string, fetchFn?: typeof globalThis.fetch) =>
+	decideNhiCertItem(nhiId, 'revoke', token, tenantId, fetchFn) as unknown as Promise<RevokeNhiCertResponse>;

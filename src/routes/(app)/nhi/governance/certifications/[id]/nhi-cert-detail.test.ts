@@ -1,10 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('$lib/api/nhi-governance', () => ({
-	listNhiCertCampaigns: vi.fn()
-}));
-vi.mock('$lib/api/nhi', () => ({
-	listNhi: vi.fn()
+	getNhiCertCampaign: vi.fn(),
+	listNhiCertCampaignItems: vi.fn()
 }));
 vi.mock('$lib/api/client', () => ({
 	ApiError: class extends Error {
@@ -20,8 +18,7 @@ vi.mock('$lib/server/auth', () => ({
 }));
 
 import { load } from './+page.server';
-import { listNhiCertCampaigns } from '$lib/api/nhi-governance';
-import { listNhi } from '$lib/api/nhi';
+import { getNhiCertCampaign, listNhiCertCampaignItems } from '$lib/api/nhi-governance';
 import { hasAdminRole } from '$lib/server/auth';
 
 const mockLocals = (admin: boolean) => ({
@@ -45,7 +42,7 @@ describe('NHI Certification Campaign detail +page.server', () => {
 		}
 	});
 
-	it('returns campaign and nhiEntities when found', async () => {
+	it('returns campaign and campaignItems when found', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		const campaign = {
 			id: 'camp-1',
@@ -54,13 +51,11 @@ describe('NHI Certification Campaign detail +page.server', () => {
 			scope: 'all',
 			nhi_type_filter: null
 		};
-		vi.mocked(listNhiCertCampaigns).mockResolvedValue([campaign] as any);
-		vi.mocked(listNhi).mockResolvedValue({
-			data: [{ id: 'e1', name: 'Tool A', nhi_type: 'tool' }],
-			total: 1,
-			limit: 100,
-			offset: 0
-		} as any);
+		const items = [
+			{ id: 'item-1', campaign_id: 'camp-1', nhi_id: 'nhi-1', nhi_name: 'Tool A', nhi_type: 'tool', decision: null }
+		];
+		vi.mocked(getNhiCertCampaign).mockResolvedValue(campaign as any);
+		vi.mocked(listNhiCertCampaignItems).mockResolvedValue({ items, total: 1 } as any);
 
 		const result: any = await load({
 			params: { id: 'camp-1' },
@@ -69,12 +64,12 @@ describe('NHI Certification Campaign detail +page.server', () => {
 		} as any);
 
 		expect(result.campaign).toEqual(campaign);
-		expect(result.nhiEntities).toHaveLength(1);
+		expect(result.campaignItems).toHaveLength(1);
 	});
 
-	it('throws 404 when campaign not found', async () => {
+	it('throws error when campaign not found', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
-		vi.mocked(listNhiCertCampaigns).mockResolvedValue([]);
+		vi.mocked(getNhiCertCampaign).mockRejectedValue(new Error('Not found'));
 
 		try {
 			await load({
@@ -82,13 +77,13 @@ describe('NHI Certification Campaign detail +page.server', () => {
 				locals: mockLocals(true),
 				fetch: vi.fn()
 			} as any);
-			expect.fail('should throw 404');
+			expect.fail('should throw');
 		} catch (e: any) {
-			expect(e.status).toBe(404);
+			expect(e.status).toBe(500);
 		}
 	});
 
-	it('filters NHI entities by campaign nhi_type_filter', async () => {
+	it('handles items fetch failure gracefully', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		const campaign = {
 			id: 'camp-2',
@@ -97,13 +92,8 @@ describe('NHI Certification Campaign detail +page.server', () => {
 			scope: 'by_type',
 			nhi_type_filter: 'agent'
 		};
-		vi.mocked(listNhiCertCampaigns).mockResolvedValue([campaign] as any);
-		vi.mocked(listNhi).mockResolvedValue({
-			data: [{ id: 'a1', name: 'Agent A', nhi_type: 'agent' }],
-			total: 1,
-			limit: 100,
-			offset: 0
-		} as any);
+		vi.mocked(getNhiCertCampaign).mockResolvedValue(campaign as any);
+		vi.mocked(listNhiCertCampaignItems).mockRejectedValue(new Error('Items fetch failed'));
 
 		const result: any = await load({
 			params: { id: 'camp-2' },
@@ -111,13 +101,7 @@ describe('NHI Certification Campaign detail +page.server', () => {
 			fetch: vi.fn()
 		} as any);
 
-		// Verify listNhi was called with nhi_type filter
-		expect(listNhi).toHaveBeenCalledWith(
-			expect.objectContaining({ nhi_type: 'agent' }),
-			'tok',
-			'tid',
-			expect.any(Function)
-		);
-		expect(result.nhiEntities).toHaveLength(1);
+		expect(result.campaign).toEqual(campaign);
+		expect(result.campaignItems).toEqual([]);
 	});
 });
