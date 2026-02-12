@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -26,9 +26,12 @@
 			{ label: 'Personas', href: '/personas', icon: Drama },
 			{ label: 'NHI', href: '/nhi', icon: Bot },
 			{ label: 'A2A Tasks', href: '/nhi/a2a', icon: ArrowRightLeft },
-			{ label: 'My Requests', href: '/my-requests', icon: FileQuestion }
+			{ label: 'My Requests', href: '/my-requests', icon: FileQuestion },
+			{ label: 'My Approvals', href: '/my-approvals', icon: CheckCircle },
+			{ label: 'My Certifications', href: '/my-certifications', icon: Award }
 		];
 		if (data.isAdmin) {
+			items.push({ label: 'Groups', href: '/groups', icon: UsersRound });
 			items.push({ label: 'Connectors', href: '/connectors', icon: Plug });
 			items.push({ label: 'Operations', href: '/connectors/operations', icon: Activity });
 			items.push({ label: 'Reconciliation', href: '/connectors/reconciliation', icon: RefreshCw });
@@ -43,6 +46,10 @@
 			items.push({ label: 'Reports', href: '/governance/reports', icon: FileBarChart });
 			items.push({ label: 'Outlier Detection', href: '/governance/outliers', icon: ScanSearch });
 			items.push({ label: 'Peer Groups', href: '/governance/peer-groups', icon: UsersRound });
+			items.push({ label: 'Authorization', href: '/governance/authorization', icon: LockKeyhole });
+			items.push({ label: 'Webhooks', href: '/settings/webhooks', icon: Webhook });
+			items.push({ label: 'Imports', href: '/settings/imports', icon: Upload });
+			items.push({ label: 'SCIM', href: '/settings/scim', icon: Key });
 		}
 		items.push({
 			label: 'Settings',

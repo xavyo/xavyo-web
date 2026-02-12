@@ -3200,3 +3200,501 @@ export interface UserPeerComparison {
 	comparisons: PeerComparisonItem[];
 	is_outlier: boolean;
 }
+
+// --- Tenant Branding Types ---
+
+export interface BrandingConfig {
+	logo_url: string | null;
+	logo_dark_url: string | null;
+	favicon_url: string | null;
+	email_logo_url: string | null;
+	primary_color: string | null;
+	secondary_color: string | null;
+	accent_color: string | null;
+	background_color: string | null;
+	text_color: string | null;
+	font_family: string | null;
+	custom_css: string | null;
+	login_page_title: string | null;
+	login_page_subtitle: string | null;
+	login_page_background_url: string | null;
+	footer_text: string | null;
+	privacy_policy_url: string | null;
+	terms_of_service_url: string | null;
+	support_url: string | null;
+	updated_at: string;
+}
+
+// --- OAuth Client Types ---
+
+export type OAuthClientType = 'confidential' | 'public';
+
+export interface OAuthClient {
+	id: string;
+	client_id: string;
+	name: string;
+	client_type: OAuthClientType;
+	redirect_uris: string[];
+	grant_types: string[];
+	scopes: string[];
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface OAuthClientWithSecret extends OAuthClient {
+	client_secret: string;
+}
+
+export interface OAuthClientListResponse {
+	clients: OAuthClient[];
+	total: number;
+}
+
+export interface CreateOAuthClientRequest {
+	name: string;
+	client_type: OAuthClientType;
+	redirect_uris: string[];
+	grant_types: string[];
+	scopes: string[];
+}
+
+export interface UpdateOAuthClientRequest {
+	name?: string;
+	redirect_uris?: string[];
+	grant_types?: string[];
+	scopes?: string[];
+	is_active?: boolean;
+}
+
+// --- User Group Types ---
+
+export interface GroupMember {
+	user_id: string;
+	email: string;
+	display_name: string | null;
+}
+
+export interface UserGroup {
+	id: string;
+	tenant_id: string;
+	display_name: string;
+	description: string | null;
+	parent_id: string | null;
+	group_type: string;
+	path: string[];
+	created_at: string;
+	updated_at: string;
+}
+
+export interface UserGroupListResponse {
+	groups: UserGroup[];
+	pagination: {
+		limit: number;
+		offset: number;
+		has_more: boolean;
+	};
+}
+
+export interface GroupMembersResponse {
+	group_id: string;
+	members: GroupMember[];
+	pagination: {
+		total_count: number;
+		limit: number;
+		offset: number;
+		has_more: boolean;
+	};
+}
+
+export interface CreateUserGroupRequest {
+	display_name: string;
+	description?: string;
+	group_type?: string;
+	parent_id?: string;
+}
+
+export interface UpdateUserGroupRequest {
+	display_name?: string;
+	description?: string;
+}
+
+export interface AddGroupMembersRequest {
+	member_ids: string[];
+}
+
+// --- My Approvals Types ---
+
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected';
+
+export interface ApprovalItem {
+	id: string;
+	request_id: string;
+	requester_id: string;
+	requester_email: string;
+	resource_type: string;
+	resource_name: string;
+	reason: string | null;
+	status: ApprovalStatus;
+	decision_comment: string | null;
+	submitted_at: string;
+	decided_at: string | null;
+}
+
+export interface ApprovalItemListResponse {
+	items: ApprovalItem[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ApproveApprovalRequest {
+	comment?: string;
+}
+
+export interface RejectApprovalRequest {
+	comment: string;
+}
+
+// --- My Certifications Types ---
+
+export type MyCertificationStatus = 'pending' | 'certified' | 'revoked';
+
+export interface MyCertificationItem {
+	id: string;
+	campaign_id: string;
+	campaign_name: string;
+	user_id: string;
+	user_email: string;
+	entitlements: string[];
+	status: MyCertificationStatus;
+	due_date: string | null;
+	decided_at: string | null;
+}
+
+export interface MyCertificationListResponse {
+	items: MyCertificationItem[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+// ─── Webhook Types ───────────────────────────────────────────────────────────
+
+export interface WebhookEventType {
+	event_type: string;
+	category: string;
+	description: string;
+}
+
+export interface WebhookEventTypeListResponse {
+	event_types: WebhookEventType[];
+}
+
+export interface WebhookSubscription {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	url: string;
+	event_types: string[];
+	enabled: boolean;
+	consecutive_failures: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface WebhookSubscriptionListResponse {
+	items: WebhookSubscription[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateWebhookSubscriptionRequest {
+	name: string;
+	description?: string;
+	url: string;
+	secret?: string;
+	event_types: string[];
+}
+
+export interface UpdateWebhookSubscriptionRequest {
+	name?: string;
+	description?: string;
+	url?: string;
+	secret?: string;
+	event_types?: string[];
+	enabled?: boolean;
+}
+
+export interface WebhookDelivery {
+	id: string;
+	subscription_id: string;
+	event_id: string;
+	event_type: string;
+	status: string;
+	attempt_number: number;
+	response_code: number | null;
+	latency_ms: number | null;
+	error_message: string | null;
+	created_at: string;
+	completed_at: string | null;
+}
+
+export interface WebhookDeliveryListResponse {
+	items: WebhookDelivery[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface WebhookDlqEntry {
+	id: string;
+	subscription_id: string;
+	event_id: string;
+	event_type: string;
+	payload: Record<string, unknown>;
+	error_message: string;
+	original_failure_at: string;
+	retry_count: number;
+	created_at: string;
+}
+
+export interface WebhookDlqListResponse {
+	entries: WebhookDlqEntry[];
+	total: number;
+	has_more: boolean;
+}
+
+// ─── Authorization Policy Types ──────────────────────────────────────────────
+
+export type PolicyEffect = 'allow' | 'deny';
+export type PolicyStatus = 'active' | 'inactive';
+export type ConditionType = 'time_window' | 'user_attribute' | 'entitlement_check';
+export type ConditionOperator = 'equals' | 'not_equals' | 'contains' | 'in_list';
+export type AuthorizationSource = 'policy' | 'entitlement' | 'default_deny';
+
+export interface PolicyCondition {
+	id: string;
+	condition_type: ConditionType;
+	attribute_path: string | null;
+	operator: ConditionOperator | null;
+	value: unknown;
+}
+
+export interface CreateConditionRequest {
+	condition_type: ConditionType;
+	attribute_path?: string;
+	operator?: ConditionOperator;
+	value: unknown;
+}
+
+export interface AuthorizationPolicy {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	effect: PolicyEffect;
+	priority: number;
+	status: PolicyStatus;
+	resource_type: string | null;
+	action: string | null;
+	conditions: PolicyCondition[];
+	created_by: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface PolicyListResponse {
+	items: AuthorizationPolicy[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreatePolicyRequest {
+	name: string;
+	description?: string;
+	effect: PolicyEffect;
+	priority?: number;
+	resource_type?: string;
+	action?: string;
+	conditions?: CreateConditionRequest[];
+}
+
+export interface UpdatePolicyRequest {
+	name?: string;
+	description?: string;
+	effect?: PolicyEffect;
+	priority?: number;
+	status?: PolicyStatus;
+	resource_type?: string;
+	action?: string;
+}
+
+export interface EntitlementActionMapping {
+	id: string;
+	tenant_id: string;
+	entitlement_id: string;
+	action: string;
+	resource_type: string;
+	created_by: string | null;
+	created_at: string;
+}
+
+export interface MappingListResponse {
+	items: EntitlementActionMapping[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateMappingRequest {
+	entitlement_id: string;
+	action: string;
+	resource_type: string;
+}
+
+export interface AuthorizationDecision {
+	allowed: boolean;
+	reason: string;
+	source: AuthorizationSource;
+	policy_id: string | null;
+	decision_id: string;
+}
+
+// =============================================================================
+// Bulk Import Types
+// =============================================================================
+
+export type ImportJobStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+export type ImportErrorType = 'validation' | 'duplicate_in_file' | 'duplicate_in_tenant' | 'role_not_found' | 'group_error' | 'attribute_error' | 'system';
+
+export interface ImportJobSummary {
+	id: string;
+	status: ImportJobStatus;
+	file_name: string;
+	total_rows: number;
+	success_count: number;
+	error_count: number;
+	skip_count: number;
+	send_invitations: boolean;
+	created_at: string;
+}
+
+export interface ImportJobDetail extends ImportJobSummary {
+	tenant_id: string;
+	file_hash: string;
+	file_size_bytes: number;
+	processed_rows: number;
+	created_by: string | null;
+	started_at: string | null;
+	completed_at: string | null;
+	error_message: string | null;
+	updated_at: string;
+}
+
+export interface ImportError {
+	id: string;
+	line_number: number;
+	email: string | null;
+	column_name: string | null;
+	error_type: ImportErrorType;
+	error_message: string;
+	created_at: string;
+}
+
+export interface ImportJobCreatedResponse {
+	job_id: string;
+	status: string;
+	file_name: string;
+	total_rows: number;
+	message: string | null;
+}
+
+export interface ImportJobListResponse {
+	items: ImportJobSummary[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ImportErrorListResponse {
+	items: ImportError[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface BulkResendResponse {
+	resent_count: number;
+	skipped_count: number;
+	message: string | null;
+}
+
+// =============================================================================
+// Invitation Types
+// =============================================================================
+
+export interface InvitationValidationResponse {
+	valid: boolean;
+	email: string | null;
+	tenant_name: string | null;
+	reason: string | null;
+	message: string | null;
+}
+
+export interface AcceptInvitationRequest {
+	password: string;
+}
+
+export interface AcceptInvitationResponse {
+	success: boolean;
+	message: string | null;
+	redirect_url: string | null;
+}
+
+// =============================================================================
+// SCIM Types
+// =============================================================================
+
+export interface ScimTokenInfo {
+	id: string;
+	name: string;
+	token_prefix: string;
+	created_at: string;
+	last_used_at: string | null;
+	revoked_at: string | null;
+	created_by: string;
+}
+
+export interface ScimTokenCreated {
+	id: string;
+	name: string;
+	token: string;
+	created_at: string;
+	warning: string;
+}
+
+export interface ScimAttributeMapping {
+	id: string;
+	tenant_id: string;
+	scim_path: string;
+	xavyo_field: string;
+	transform: string | null;
+	required: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface UpdateMappingsRequest {
+	mappings: MappingRequest[];
+}
+
+export interface MappingRequest {
+	scim_path: string;
+	xavyo_field: string;
+	transform: string | null;
+	required: boolean;
+}

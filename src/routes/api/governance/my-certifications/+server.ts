@@ -1,17 +1,21 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { listMyCertifications } from '$lib/api/governance';
+import { listMyCertifications } from '$lib/api/my-certifications';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
+	const campaign_id = url.searchParams.get('campaign_id') ?? undefined;
+	const status = url.searchParams.get('status') ?? undefined;
+	const page = url.searchParams.get('page') ? Number(url.searchParams.get('page')) : undefined;
+	const page_size = url.searchParams.get('page_size')
+		? Number(url.searchParams.get('page_size'))
+		: undefined;
 
 	const result = await listMyCertifications(
-		{ limit, offset },
+		{ campaign_id, status, page, page_size },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
