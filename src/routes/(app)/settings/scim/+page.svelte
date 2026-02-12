@@ -2,6 +2,12 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { enhance as svelteEnhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogDescription from '$lib/components/ui/dialog/dialog-description.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
@@ -340,46 +346,36 @@
 </div>
 
 <!-- Revoke Confirmation Dialog -->
-{#if showRevokeConfirm}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="w-full max-w-md rounded-lg bg-background p-6 shadow-xl">
-			<h3 class="text-lg font-semibold text-foreground">Revoke Token</h3>
-			<p class="mt-1 text-sm text-muted-foreground">
+<Dialog.Root bind:open={showRevokeConfirm}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>Revoke Token</DialogTitle>
+			<DialogDescription>
 				Are you sure you want to revoke the token <strong>{revokeTargetName}</strong>? This action
 				cannot be undone. Any integrations using this token will stop working.
-			</p>
-			<div class="mt-4 flex justify-end gap-2">
-				<button
-					onclick={closeRevokeConfirm}
-					class="rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-				>
-					Cancel
-				</button>
-				<form
-					method="POST"
-					action="?/revokeToken"
-					use:svelteEnhance={() => {
-						return async ({ result, update }) => {
-							if (result.type === 'success') {
-								addToast('success', 'SCIM token revoked');
-								closeRevokeConfirm();
-							} else if (result.type === 'failure') {
-								addToast('error', 'Failed to revoke token');
-								closeRevokeConfirm();
-							}
-							await update();
-						};
-					}}
-				>
-					<input type="hidden" name="id" value={revokeTargetId} />
-					<button
-						type="submit"
-						class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
-					>
-						Revoke
-					</button>
-				</form>
-			</div>
-		</div>
-	</div>
-{/if}
+			</DialogDescription>
+		</DialogHeader>
+		<DialogFooter>
+			<Button variant="outline" onclick={closeRevokeConfirm}>Cancel</Button>
+			<form
+				method="POST"
+				action="?/revokeToken"
+				use:svelteEnhance={() => {
+					return async ({ result, update }) => {
+						if (result.type === 'success') {
+							addToast('success', 'SCIM token revoked');
+							closeRevokeConfirm();
+						} else if (result.type === 'failure') {
+							addToast('error', 'Failed to revoke token');
+							closeRevokeConfirm();
+						}
+						await update();
+					};
+				}}
+			>
+				<input type="hidden" name="id" value={revokeTargetId} />
+				<Button type="submit" variant="destructive">Revoke</Button>
+			</form>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

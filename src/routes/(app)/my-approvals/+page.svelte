@@ -1,5 +1,12 @@
 <script lang="ts">
 	import type { PaginationState, Updater } from '@tanstack/svelte-table';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogDescription from '$lib/components/ui/dialog/dialog-description.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
@@ -281,67 +288,45 @@
 {/if}
 
 <!-- Approve Dialog -->
-{#if showApproveDialog}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="w-full max-w-md rounded-lg bg-background p-6 shadow-xl">
-			<h3 class="text-lg font-semibold text-foreground">Approve Request</h3>
-			<p class="mt-1 text-sm text-muted-foreground">
-				Add an optional comment for this approval.
-			</p>
-			<textarea
-				class="mt-3 w-full rounded-md border border-input bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-				placeholder="Optional comment..."
-				bind:value={actionComment}
-				rows={3}
-			></textarea>
-			<div class="mt-4 flex justify-end gap-2">
-				<button
-					onclick={closeApproveDialog}
-					disabled={isSubmitting}
-					class="rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-				>
-					Cancel
-				</button>
-				<button
-					onclick={handleApprove}
-					disabled={isSubmitting}
-					class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50 dark:bg-green-700 dark:hover:bg-green-600"
-				>
-					{isSubmitting ? 'Approving...' : 'Approve'}
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
+<Dialog.Root bind:open={showApproveDialog}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>Approve Request</DialogTitle>
+			<DialogDescription>Add an optional comment for this approval.</DialogDescription>
+		</DialogHeader>
+		<textarea
+			class="w-full rounded-md border border-input bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+			placeholder="Optional comment..."
+			bind:value={actionComment}
+			rows={3}
+		></textarea>
+		<DialogFooter>
+			<Button variant="outline" onclick={closeApproveDialog} disabled={isSubmitting}>Cancel</Button>
+			<Button onclick={handleApprove} disabled={isSubmitting} class="bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+				{isSubmitting ? 'Approving...' : 'Approve'}
+			</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>
 
 <!-- Reject Dialog -->
-{#if showRejectDialog}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="w-full max-w-md rounded-lg bg-background p-6 shadow-xl">
-			<h3 class="text-lg font-semibold text-foreground">Reject Request</h3>
-			<p class="mt-1 text-sm text-muted-foreground">A justification is required for rejection.</p>
-			<textarea
-				class="mt-3 w-full rounded-md border border-input bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-				placeholder="Justification..."
-				bind:value={actionComment}
-				rows={3}
-			></textarea>
-			<div class="mt-4 flex justify-end gap-2">
-				<button
-					onclick={closeRejectDialog}
-					disabled={isSubmitting}
-					class="rounded-md border border-input bg-background px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-				>
-					Cancel
-				</button>
-				<button
-					onclick={handleReject}
-					disabled={!actionComment || isSubmitting}
-					class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50 dark:bg-red-700 dark:hover:bg-red-600"
-				>
-					{isSubmitting ? 'Rejecting...' : 'Reject'}
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
+<Dialog.Root bind:open={showRejectDialog}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>Reject Request</DialogTitle>
+			<DialogDescription>A justification is required for rejection.</DialogDescription>
+		</DialogHeader>
+		<textarea
+			class="w-full rounded-md border border-input bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+			placeholder="Justification..."
+			bind:value={actionComment}
+			rows={3}
+		></textarea>
+		<DialogFooter>
+			<Button variant="outline" onclick={closeRejectDialog} disabled={isSubmitting}>Cancel</Button>
+			<Button variant="destructive" onclick={handleReject} disabled={!actionComment || isSubmitting}>
+				{isSubmitting ? 'Rejecting...' : 'Reject'}
+			</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

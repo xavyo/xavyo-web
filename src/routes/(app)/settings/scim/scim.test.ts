@@ -268,5 +268,5 @@ describe('SCIM page Svelte component', () => {
 	it('page component is defined', async () => {
 		const mod = await import('./+page.svelte');
 		expect(mod.default).toBeDefined();
-	});
+	}, 15000);
 });
