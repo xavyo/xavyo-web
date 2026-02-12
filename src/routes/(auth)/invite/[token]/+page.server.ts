@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, isRedirect, redirect } from '@sveltejs/kit';
 import { acceptInvitationSchema } from '$lib/schemas/imports';
 import { validateInvitation, acceptInvitation } from '$lib/api/imports';
 import { ApiError } from '$lib/api/client';
@@ -46,6 +46,7 @@ export const actions: Actions = {
 				status: 400 as ErrorStatus
 			});
 		} catch (e) {
+			if (isRedirect(e)) throw e;
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
 			}

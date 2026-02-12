@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types';
-import { redirect, error } from '@sveltejs/kit';
+import { redirect, error, isHttpError, isRedirect } from '@sveltejs/kit';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { updateScheduleSchema } from '$lib/schemas/governance-reporting';
@@ -76,6 +76,8 @@ export const actions: Actions = {
 			);
 			redirect(303, `/governance/reports/schedules/${params.id}`);
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) return message(form, e.message, { status: e.status as ErrorStatus });
 			throw e;
 		}
@@ -87,6 +89,8 @@ export const actions: Actions = {
 			await pauseSchedule(params.id, locals.accessToken, locals.tenantId, fetch);
 			redirect(303, `/governance/reports/schedules/${params.id}`);
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) error(e.status, e.message);
 			throw e;
 		}
@@ -98,6 +102,8 @@ export const actions: Actions = {
 			await resumeSchedule(params.id, locals.accessToken, locals.tenantId, fetch);
 			redirect(303, `/governance/reports/schedules/${params.id}`);
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) error(e.status, e.message);
 			throw e;
 		}
@@ -109,6 +115,8 @@ export const actions: Actions = {
 			await deleteSchedule(params.id, locals.accessToken, locals.tenantId, fetch);
 			redirect(303, '/governance/reports');
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) error(e.status, e.message);
 			throw e;
 		}

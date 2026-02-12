@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail, isHttpError, isRedirect, redirect } from '@sveltejs/kit';
 import { updateWebhookSubscriptionSchema } from '$lib/schemas/webhooks';
 import {
 	getWebhookSubscription,
@@ -85,6 +85,8 @@ export const actions: Actions = {
 			);
 			redirect(303, `/settings/webhooks/${params.id}`);
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
 			}

@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, isHttpError, isRedirect, redirect } from '@sveltejs/kit';
 import { createPolicySchema } from '$lib/schemas/authorization';
 import { createPolicy } from '$lib/api/authorization';
 import { ApiError } from '$lib/api/client';
@@ -63,6 +63,8 @@ export const actions: Actions = {
 			const policy = await createPolicy(body, locals.accessToken!, locals.tenantId!, fetch);
 			redirect(302, `/governance/authorization/${policy.id}`);
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
 			}

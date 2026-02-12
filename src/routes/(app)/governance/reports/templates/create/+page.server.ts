@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions } from './$types';
-import { redirect, error } from '@sveltejs/kit';
+import { redirect, error, isHttpError, isRedirect } from '@sveltejs/kit';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createTemplateSchema } from '$lib/schemas/governance-reporting';
@@ -29,6 +29,8 @@ export const actions: Actions = {
 			await createTemplate(form.data as Parameters<typeof createTemplate>[0], locals.accessToken, locals.tenantId, fetch);
 			redirect(303, '/governance/reports');
 		} catch (e) {
+			if (isRedirect(e)) throw e;
+			if (isHttpError(e)) throw e;
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
 			}
