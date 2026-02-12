@@ -3108,7 +3108,7 @@ export interface AlertSummary {
 	low_count: number;
 }
 
-export interface GenerateReportRequest {
+export interface OutlierGenerateReportRequest {
 	start_date: string;
 	end_date: string;
 	include_trends?: boolean;

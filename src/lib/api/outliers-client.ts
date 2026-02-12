@@ -10,7 +10,7 @@ import type {
 	DispositionSummary,
 	OutlierAlert,
 	AlertSummary,
-	GenerateReportRequest,
+	OutlierGenerateReportRequest,
 	OutlierReport,
 	UserOutlierHistory
 } from './types';
@@ -200,7 +200,7 @@ export async function dismissAlertClient(id: string, fetchFn: typeof fetch = fet
 }
 
 // Reports
-export async function generateOutlierReportClient(body: GenerateReportRequest, fetchFn: typeof fetch = fetch): Promise<OutlierReport> {
+export async function generateOutlierReportClient(body: OutlierGenerateReportRequest, fetchFn: typeof fetch = fetch): Promise<OutlierReport> {
 	const res = await fetchFn('/api/governance/outliers/reports', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },

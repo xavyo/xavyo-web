@@ -11,7 +11,7 @@ import type {
 	DispositionSummary,
 	OutlierAlert,
 	AlertSummary,
-	GenerateReportRequest,
+	OutlierGenerateReportRequest,
 	OutlierReport,
 	UserOutlierHistory
 } from './types';
@@ -211,7 +211,7 @@ export async function dismissAlert(
 
 // Reports
 export async function generateOutlierReport(
-	body: GenerateReportRequest, token: string, tenantId: string, fetchFn?: typeof globalThis.fetch
+	body: OutlierGenerateReportRequest, token: string, tenantId: string, fetchFn?: typeof globalThis.fetch
 ): Promise<OutlierReport> {
 	return apiClient<OutlierReport>('/governance/outliers/reports', { method: 'POST', token, tenantId, body, fetch: fetchFn });
 }
