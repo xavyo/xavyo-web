@@ -4610,3 +4610,206 @@ export interface CorrelationAuditListResponse {
 	limit: number;
 	offset: number;
 }
+
+// ─── Birthright Policies & Lifecycle Workflows ───
+
+export type BirthrightPolicyStatus = 'active' | 'inactive' | 'archived';
+export type EvaluationMode = 'first_match' | 'all_match';
+export type BirthrightOperator = 'equals' | 'not_equals' | 'in' | 'not_in' | 'starts_with' | 'contains';
+export type LifecycleEventType = 'joiner' | 'mover' | 'leaver';
+export type LifecycleActionType = 'provision' | 'revoke' | 'schedule_revoke' | 'cancel_revoke' | 'skip';
+
+export interface BirthrightCondition {
+	attribute: string;
+	operator: BirthrightOperator;
+	value: string | string[];
+}
+
+export interface BirthrightPolicy {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	priority: number;
+	conditions: BirthrightCondition[];
+	entitlement_ids: string[];
+	status: BirthrightPolicyStatus;
+	evaluation_mode: EvaluationMode;
+	grace_period_days: number;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateBirthrightPolicyRequest {
+	name: string;
+	description?: string;
+	priority: number;
+	conditions: BirthrightCondition[];
+	entitlement_ids: string[];
+	evaluation_mode?: EvaluationMode;
+	grace_period_days?: number;
+}
+
+export interface UpdateBirthrightPolicyRequest {
+	name?: string;
+	description?: string;
+	priority?: number;
+	conditions?: BirthrightCondition[];
+	entitlement_ids?: string[];
+	evaluation_mode?: EvaluationMode;
+	grace_period_days?: number;
+}
+
+export interface BirthrightPolicyListResponse {
+	items: BirthrightPolicy[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface SimulatePolicyRequest {
+	attributes: Record<string, unknown>;
+}
+
+export interface ConditionEvaluationResult {
+	attribute: string;
+	operator: string;
+	expected: unknown;
+	actual: unknown | null;
+	matched: boolean;
+}
+
+export interface SimulatePolicyResponse {
+	matches: boolean;
+	condition_results: ConditionEvaluationResult[];
+}
+
+export interface SimulateAllPoliciesResponse {
+	attributes: Record<string, unknown>;
+	matching_policies: {
+		policy_id: string;
+		policy_name: string;
+		priority: number;
+		entitlements: string[];
+	}[];
+	total_entitlements: string[];
+}
+
+export interface ImpactSummary {
+	total_users_affected: number;
+	users_gaining_access: number;
+	users_losing_access: number;
+	users_unchanged: number;
+	total_entitlements_granted: number;
+}
+
+export interface DepartmentImpact {
+	department: string;
+	user_count: number;
+	percentage: number;
+}
+
+export interface LocationImpact {
+	location: string;
+	user_count: number;
+	percentage: number;
+}
+
+export interface EntitlementImpact {
+	entitlement_id: string;
+	entitlement_name: string | null;
+	users_gaining: number;
+	users_already_have: number;
+}
+
+export interface AffectedUser {
+	user_id: string;
+	email: string | null;
+	department: string | null;
+	location: string | null;
+	impact_type: 'gaining' | 'losing' | 'unchanged' | 'mixed';
+	entitlements_gaining: string[];
+	entitlements_losing: string[];
+}
+
+export interface ImpactAnalysisResponse {
+	policy_id: string;
+	policy_name: string;
+	summary: ImpactSummary;
+	by_department: DepartmentImpact[];
+	by_location: LocationImpact[];
+	entitlement_impacts: EntitlementImpact[];
+	affected_users: AffectedUser[];
+	is_truncated: boolean;
+}
+
+export interface LifecycleEvent {
+	id: string;
+	tenant_id: string;
+	user_id: string;
+	event_type: LifecycleEventType;
+	attributes_before: Record<string, unknown> | null;
+	attributes_after: Record<string, unknown> | null;
+	source: string;
+	processed_at: string | null;
+	created_at: string;
+}
+
+export interface CreateLifecycleEventRequest {
+	user_id: string;
+	event_type: LifecycleEventType;
+	attributes_before?: Record<string, unknown>;
+	attributes_after?: Record<string, unknown>;
+	source?: string;
+}
+
+export interface LifecycleAction {
+	id: string;
+	tenant_id?: string;
+	event_id: string;
+	action_type: LifecycleActionType;
+	assignment_id: string | null;
+	policy_id: string | null;
+	entitlement_id: string;
+	scheduled_at: string | null;
+	executed_at: string | null;
+	cancelled_at: string | null;
+	error_message: string | null;
+	created_at: string;
+	is_pending?: boolean;
+	is_executed?: boolean;
+	is_cancelled?: boolean;
+}
+
+export interface AccessSnapshotSummary {
+	id: string;
+	snapshot_type: string;
+	assignment_count: number;
+	created_at: string;
+}
+
+/** GET /governance/lifecycle-events/{id} — backend flattens event fields to top level */
+export interface LifecycleEventDetail extends LifecycleEvent {
+	actions: LifecycleAction[];
+	snapshot: AccessSnapshotSummary | null;
+}
+
+export interface ProcessEventResult {
+	event: LifecycleEvent;
+	actions: LifecycleAction[];
+	snapshot: AccessSnapshotSummary | null;
+	summary: {
+		provisioned: number;
+		revoked: number;
+		skipped: number;
+		scheduled: number;
+	};
+}
+
+export interface LifecycleEventListResponse {
+	items: LifecycleEvent[];
+	total: number;
+	limit: number;
+	offset: number;
+}

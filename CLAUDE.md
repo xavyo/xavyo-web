@@ -25,6 +25,7 @@ Auto-generated from all feature plans. Last updated: 2026-02-10
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via zod/v3), TanStack Table (@tanstack/svelte-table), lucide-svelte (021-provisioning-reconciliation)
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte, TanStack Table (023-tenant-admin-selfservice)
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), TanStack Table (`@tanstack/svelte-table`), lucide-svelte (024-webhooks-authz-policies)
+- TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4 (@tailwindcss/vite), Superforms + Zod (via `zod/v3`), lucide-svelte (029-birthright-lifecycle)
 
 - TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit, Bits UI, Tailwind CSS v4 (@tailwindcss/vite), Superforms, Zod, TanStack Table (@tanstack/svelte-table), jose, clsx, tailwind-merge (001-project-foundations)
 
@@ -44,9 +45,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
+- 029-birthright-lifecycle: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4 (@tailwindcss/vite), Superforms + Zod (via `zod/v3`), lucide-svelte
 - 028-correlation-engine: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 - 027-license-management: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), TanStack Table (`@tanstack/svelte-table`), lucide-svelte
-- 026-identity-dedup-merging: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 
 
 <!-- MANUAL ADDITIONS START -->

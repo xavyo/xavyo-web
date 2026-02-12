@@ -17,7 +17,8 @@ import type {
 	CertificationItemListResponse,
 	CertificationItemResponse,
 	CertificationDecisionRequest,
-	ApplicationListResponse
+	ApplicationListResponse,
+	ApplicationResponse
 } from './types';
 
 // --- Param interfaces ---
@@ -498,6 +499,21 @@ export async function listMyCertifications(
 }
 
 // --- Applications ---
+
+export async function createApplication(
+	body: { name: string; description?: string; app_type?: string },
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<ApplicationResponse> {
+	return apiClient<ApplicationResponse>('/governance/applications', {
+		method: 'POST',
+		token,
+		tenantId,
+		body,
+		fetch: fetchFn
+	});
+}
 
 export async function listApplications(
 	params: ListApplicationsParams,
