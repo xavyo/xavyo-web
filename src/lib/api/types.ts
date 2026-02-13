@@ -5468,3 +5468,166 @@ export interface CalculateMetricsResponse {
 	calculated_at: string;
 }
 
+// --- Micro Certifications ---
+
+export type MicroCertificationStatus = 'pending' | 'approved' | 'revoked' | 'auto_revoked' | 'flagged_for_review' | 'expired' | 'skipped';
+export type TriggerType = 'high_risk_assignment' | 'sod_violation' | 'manager_change' | 'periodic_recert' | 'manual';
+export type ScopeType = 'tenant' | 'application' | 'entitlement';
+export type ReviewerType = 'user_manager' | 'entitlement_owner' | 'application_owner' | 'specific_user';
+export type CertDecision = 'approve' | 'revoke' | 'reduce' | 'delegate';
+export type CertEventType = 'created' | 'reminder_sent' | 'escalated' | 'approved' | 'rejected' | 'flagged_for_review' | 'delegated' | 'auto_revoked' | 'expired' | 'skipped' | 'assignment_revoked';
+
+export interface MicroCertification {
+	id: string;
+	tenant_id: string;
+	user_id: string;
+	assignment_id: string | null;
+	entitlement_id: string;
+	trigger_rule_id: string | null;
+	reviewer_id: string;
+	status: MicroCertificationStatus;
+	decision: CertDecision | null;
+	comment: string | null;
+	decided_at: string | null;
+	delegated_to: string | null;
+	escalated: boolean;
+	past_deadline: boolean;
+	from_date: string | null;
+	to_date: string | null;
+	created_at: string;
+}
+
+export interface MicroCertificationListResponse {
+	items: MicroCertification[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface TriggerRule {
+	id: string;
+	tenant_id: string;
+	name: string;
+	trigger_type: TriggerType;
+	scope_type: ScopeType;
+	scope_id: string | null;
+	reviewer_type: ReviewerType;
+	specific_reviewer_id: string | null;
+	fallback_reviewer_id: string | null;
+	timeout_secs: number | null;
+	reminder_threshold_percent: number | null;
+	auto_revoke: boolean;
+	revoke_triggering_assignment: boolean;
+	is_active: boolean;
+	is_default: boolean;
+	priority: number | null;
+	metadata: Record<string, unknown> | null;
+	created_at: string;
+}
+
+export interface TriggerRuleListResponse {
+	items: TriggerRule[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CertificationEvent {
+	id: string;
+	certification_id: string;
+	event_type: CertEventType;
+	actor_id: string | null;
+	details: Record<string, unknown> | null;
+	created_at: string;
+}
+
+export interface CertificationEventListResponse {
+	items: CertificationEvent[];
+	total: number;
+	limit?: number;
+	offset?: number;
+}
+
+export interface MicroCertificationStats {
+	total: number;
+	pending: number;
+	approved: number;
+	revoked: number;
+	auto_revoked: number;
+	flagged_for_review: number;
+	expired: number;
+	skipped: number;
+	escalated: number;
+	past_deadline: number;
+	by_trigger_type?: Array<{ trigger_type: string; count: number }>;
+}
+
+export interface DecideMicroCertificationRequest {
+	decision: CertDecision;
+	comment?: string;
+}
+
+export interface DelegateMicroCertificationRequest {
+	delegate_to: string;
+	comment?: string;
+}
+
+export interface SkipMicroCertificationRequest {
+	reason: string;
+}
+
+export interface BulkDecisionRequest {
+	certification_ids: string[];
+	decision: CertDecision;
+	comment?: string;
+}
+
+export interface BulkDecisionResponse {
+	success_count: number;
+	failure_count: number;
+	succeeded: string[];
+	failures: Array<{ certification_id: string; error: string }>;
+}
+
+export interface ManualTriggerRequest {
+	user_id: string;
+	entitlement_id: string;
+	trigger_rule_id?: string;
+	reviewer_id?: string;
+	reason: string;
+}
+
+export interface CreateTriggerRuleRequest {
+	name: string;
+	trigger_type: TriggerType;
+	scope_type: ScopeType;
+	scope_id?: string;
+	reviewer_type: ReviewerType;
+	specific_reviewer_id?: string;
+	fallback_reviewer_id?: string;
+	timeout_secs?: number;
+	reminder_threshold_percent?: number;
+	auto_revoke?: boolean;
+	revoke_triggering_assignment?: boolean;
+	is_default?: boolean;
+	priority?: number;
+	metadata?: Record<string, unknown>;
+}
+
+export interface UpdateTriggerRuleRequest {
+	name?: string;
+	trigger_type?: TriggerType;
+	scope_type?: ScopeType;
+	scope_id?: string;
+	reviewer_type?: ReviewerType;
+	specific_reviewer_id?: string;
+	fallback_reviewer_id?: string;
+	timeout_secs?: number;
+	reminder_threshold_percent?: number;
+	auto_revoke?: boolean;
+	revoke_triggering_assignment?: boolean;
+	is_default?: boolean;
+	priority?: number;
+	metadata?: Record<string, unknown>;
+}
+
