@@ -6545,3 +6545,178 @@ export interface PropagateAttributesResponse {
 	persona_id: string;
 	attributes_updated: number;
 }
+
+// === Policy Simulations & What-If Analysis (Phase 039) ===
+
+export type PolicySimulationType = 'sod_rule' | 'birthright_policy';
+export type BatchSimulationType = 'role_add' | 'role_remove' | 'entitlement_add' | 'entitlement_remove';
+export type ImpactType = 'violation' | 'entitlement_gain' | 'entitlement_loss' | 'no_change' | 'warning';
+export type Severity = 'critical' | 'high' | 'medium' | 'low';
+export type ComparisonType = 'simulation_vs_simulation' | 'simulation_vs_current';
+export type SelectionMode = 'user_list' | 'filter';
+
+export interface SeverityBreakdown {
+	critical: number;
+	high: number;
+	medium: number;
+	low: number;
+}
+
+export interface ImpactTypeBreakdown {
+	violation: number;
+	entitlement_gain: number;
+	entitlement_loss: number;
+	no_change: number;
+	warning: number;
+}
+
+export interface PolicyImpactSummary {
+	total_users_analyzed: number;
+	affected_users: number;
+	by_severity: SeverityBreakdown;
+	by_impact_type: ImpactTypeBreakdown;
+}
+
+export interface PolicySimulation {
+	id: string;
+	tenant_id: string;
+	name: string;
+	simulation_type: PolicySimulationType;
+	policy_id: string | null;
+	policy_config: Record<string, unknown>;
+	status: SimulationStatus;
+	affected_user_count: number | null;
+	impact_summary: PolicyImpactSummary | null;
+	data_snapshot_at: string | null;
+	is_stale: boolean;
+	is_archived: boolean;
+	notes: string | null;
+	created_by: string;
+	created_at: string;
+	executed_at: string | null;
+}
+
+export interface PolicySimulationResult {
+	id: string;
+	simulation_id: string;
+	user_id: string;
+	impact_type: ImpactType;
+	details: Record<string, unknown>;
+	severity: Severity;
+	created_at: string;
+}
+
+export interface AccessItem {
+	type: string;
+	id: string;
+	name: string;
+}
+
+export interface FilterCriteria {
+	department?: string | null;
+	status?: string | null;
+	role_ids?: string[] | null;
+	entitlement_ids?: string[] | null;
+	title?: string | null;
+	metadata?: Record<string, string> | null;
+}
+
+export interface ChangeSpec {
+	operation: BatchSimulationType;
+	role_id?: string | null;
+	entitlement_id?: string | null;
+	justification?: string | null;
+}
+
+export interface BatchImpactSummary {
+	total_users: number;
+	affected_users: number;
+	entitlements_gained: number;
+	entitlements_lost: number;
+	sod_violations_introduced: number;
+	warnings: string[];
+}
+
+export interface BatchSimulation {
+	id: string;
+	tenant_id: string;
+	name: string;
+	batch_type: BatchSimulationType;
+	selection_mode: SelectionMode;
+	user_ids: string[] | null;
+	filter_criteria: FilterCriteria | null;
+	change_spec: ChangeSpec;
+	total_users: number | null;
+	processed_users: number | null;
+	status: SimulationStatus;
+	impact_summary: BatchImpactSummary | null;
+	has_scope_warning: boolean;
+	data_snapshot_at: string | null;
+	is_archived: boolean;
+	notes: string | null;
+	created_by: string;
+	created_at: string;
+	executed_at: string | null;
+	applied_at: string | null;
+	applied_by: string | null;
+}
+
+export interface BatchSimulationResult {
+	id: string;
+	simulation_id: string;
+	user_id: string;
+	access_gained: AccessItem[];
+	access_lost: AccessItem[];
+	warnings: string[];
+	created_at: string;
+}
+
+export interface DeltaEntry {
+	user_id: string;
+	impact_type: string;
+	severity: string | null;
+	details: Record<string, unknown> | null;
+}
+
+export interface ModifiedEntry {
+	user_id: string;
+	impact_a: Record<string, unknown>;
+	impact_b: Record<string, unknown>;
+}
+
+export interface DeltaResults {
+	added: DeltaEntry[];
+	removed: DeltaEntry[];
+	modified: ModifiedEntry[];
+}
+
+export interface ComparisonSummary {
+	users_in_both: number;
+	users_only_in_a: number;
+	users_only_in_b: number;
+	different_impacts: number;
+	total_additions: number;
+	total_removals: number;
+}
+
+export interface SimulationComparison {
+	id: string;
+	tenant_id: string;
+	name: string;
+	comparison_type: ComparisonType;
+	simulation_a_id: string;
+	simulation_a_type: string;
+	simulation_b_id: string | null;
+	simulation_b_type: string | null;
+	summary_stats: ComparisonSummary | null;
+	delta_results: DeltaResults | null;
+	is_stale: boolean;
+	created_by: string;
+	created_at: string;
+}
+
+export interface StalenessCheck {
+	is_stale: boolean;
+	data_snapshot_at: string;
+	last_data_change_at: string;
+}
