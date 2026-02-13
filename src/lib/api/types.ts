@@ -5218,7 +5218,7 @@ export interface EvaluateConditionsRequest {
 	context: Record<string, unknown>;
 }
 
-export interface ConditionEvaluationResult {
+export interface LifecycleConditionResult {
 	condition_type: string;
 	passed: boolean;
 	message?: string;
@@ -5226,7 +5226,7 @@ export interface ConditionEvaluationResult {
 
 export interface EvaluateConditionsResponse {
 	is_allowed: boolean;
-	results: ConditionEvaluationResult[];
+	results: LifecycleConditionResult[];
 }
 
 export interface StateActionsResponse {
@@ -6719,4 +6719,88 @@ export interface StalenessCheck {
 	is_stale: boolean;
 	data_snapshot_at: string;
 	last_data_change_at: string;
+}
+
+// --- Object Templates ---
+
+export interface ObjectTemplate {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	object_type: 'user' | 'role' | 'entitlement' | 'application';
+	status: 'draft' | 'active' | 'disabled';
+	priority: number;
+	parent_template_id: string | null;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ObjectTemplateDetail extends ObjectTemplate {
+	rules: TemplateRule[];
+	scopes: TemplateScope[];
+	merge_policies: TemplateMergePolicy[];
+	current_version: number | null;
+	parent: ObjectTemplate | null;
+}
+
+export interface TemplateRule {
+	id: string;
+	template_id: string;
+	rule_type: 'default' | 'computed' | 'validation' | 'normalization';
+	target_attribute: string;
+	expression: string;
+	strength: 'strong' | 'normal' | 'weak';
+	authoritative: boolean;
+	priority: number;
+	condition: string | null;
+	error_message: string | null;
+	exclusive: boolean;
+	time_from: string | null;
+	time_to: string | null;
+	time_reference: 'absolute' | 'relative_to_creation' | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface TemplateScope {
+	id: string;
+	template_id: string;
+	scope_type: 'global' | 'organization' | 'category' | 'condition';
+	scope_value: string | null;
+	condition: string | null;
+	created_at: string;
+}
+
+export interface TemplateMergePolicy {
+	id: string;
+	template_id: string;
+	attribute: string;
+	strategy: 'source_precedence' | 'timestamp_wins' | 'concatenate_unique' | 'first_wins' | 'manual_only';
+	source_precedence: unknown | null;
+	null_handling: 'merge' | 'preserve_empty';
+	created_at: string;
+	updated_at: string;
+}
+
+export interface TemplateSimulationResult {
+	template_id: string;
+	rules_applied: Array<{
+		rule_id: string;
+		target_attribute: string;
+		rule_type: string;
+		before_value: unknown | null;
+		after_value: unknown;
+		applied: boolean;
+		skip_reason: string | null;
+	}>;
+	validation_errors: Array<{
+		rule_id: string;
+		target_attribute: string;
+		message: string;
+		expression: string;
+	}>;
+	computed_values: Record<string, unknown>;
+	affected_count: number;
 }

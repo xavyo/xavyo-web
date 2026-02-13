@@ -97,7 +97,7 @@
 						class={selectClass}
 						value={String($form.destination_type ?? '')}
 						onchange={(e) => {
-							$form.destination_type = (e.target as HTMLSelectElement).value;
+							$form.destination_type = (e.target as HTMLSelectElement).value as typeof $form.destination_type;
 						}}
 					>
 						<option value="" disabled>Select destination type</option>
@@ -150,7 +150,7 @@
 						class={selectClass}
 						value={String($form.export_format ?? '')}
 						onchange={(e) => {
-							$form.export_format = (e.target as HTMLSelectElement).value;
+							$form.export_format = (e.target as HTMLSelectElement).value as typeof $form.export_format;
 						}}
 					>
 						<option value="" disabled>Select format</option>

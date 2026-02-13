@@ -395,13 +395,13 @@ describe('Correlation rules rendering logic', () => {
 		});
 
 		it('plural when 0 rules', () => {
-			const count = 0;
+			const count: number = 0;
 			const text = `${count} correlation ${count === 1 ? 'rule' : 'rules'}`;
 			expect(text).toBe('0 correlation rules');
 		});
 
 		it('plural when multiple rules', () => {
-			const count = 5;
+			const count: number = 5;
 			const text = `${count} correlation ${count === 1 ? 'rule' : 'rules'}`;
 			expect(text).toBe('5 correlation rules');
 		});
@@ -609,13 +609,13 @@ describe('Job status rendering logic', () => {
 		});
 
 		it('failed is terminal', () => {
-			const status = 'failed';
+			const status: string = 'failed';
 			const isTerminal = status === 'completed' || status === 'failed';
 			expect(isTerminal).toBe(true);
 		});
 
 		it('running is not terminal', () => {
-			const status = 'running';
+			const status: string = 'running';
 			const isTerminal = status === 'completed' || status === 'failed';
 			expect(isTerminal).toBe(false);
 		});

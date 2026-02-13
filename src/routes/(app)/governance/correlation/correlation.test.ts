@@ -621,13 +621,13 @@ describe('Correlation hub rendering logic', () => {
 		});
 
 		it('plural when 0 rules', () => {
-			const total = 0;
+			const total: number = 0;
 			const text = `${total} rule${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('0 rules');
 		});
 
 		it('plural when multiple rules', () => {
-			const total = 5;
+			const total: number = 5;
 			const text = `${total} rule${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('5 rules');
 		});
@@ -641,7 +641,7 @@ describe('Correlation hub rendering logic', () => {
 		});
 
 		it('plural when multiple events', () => {
-			const total = 42;
+			const total: number = 42;
 			const text = `${total} event${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('42 events');
 		});

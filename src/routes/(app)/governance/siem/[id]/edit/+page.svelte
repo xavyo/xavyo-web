@@ -167,7 +167,7 @@
 					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 					value={$form.export_format ?? ''}
 					onchange={(e) => {
-						$form.export_format = (e.target as HTMLSelectElement).value;
+						$form.export_format = (e.target as HTMLSelectElement).value as typeof $form.export_format;
 					}}
 				>
 					{#each formatOptions as opt}

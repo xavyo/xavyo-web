@@ -196,7 +196,7 @@ describe('Comparison create form logic', () => {
 		});
 
 		it('hides simulation B fields for simulation_vs_current type', () => {
-			const comparisonType = 'simulation_vs_current';
+			const comparisonType: string = 'simulation_vs_current';
 			const showSimB = comparisonType === 'simulation_vs_simulation';
 			expect(showSimB).toBe(false);
 		});

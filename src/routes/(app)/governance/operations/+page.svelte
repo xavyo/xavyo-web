@@ -559,7 +559,7 @@
 										</td>
 										<td class="px-4 py-3 text-sm">{formatDate(op.created_at)}</td>
 										<td class="px-4 py-3 text-sm">
-											{#if op.status === 'queued' || op.status === 'processing'}
+											{#if op.status === 'pending' || op.status === 'processing'}
 												<button
 													type="button"
 													class="text-sm font-medium text-destructive hover:underline"

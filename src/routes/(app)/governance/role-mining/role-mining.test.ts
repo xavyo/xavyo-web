@@ -299,13 +299,13 @@ describe('Role Mining hub rendering logic', () => {
 		});
 
 		it('plural when 0 jobs', () => {
-			const total = 0;
+			const total: number = 0;
 			const text = `${total} job${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('0 jobs');
 		});
 
 		it('plural when multiple jobs', () => {
-			const total = 5;
+			const total: number = 5;
 			const text = `${total} job${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('5 jobs');
 		});

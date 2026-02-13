@@ -360,7 +360,7 @@ describe('Correlation case detail rendering logic', () => {
 		});
 
 		it('plural when multiple candidates', () => {
-			const count = 3;
+			const count: number = 3;
 			const text = `${count} candidate${count !== 1 ? 's' : ''}`;
 			expect(text).toBe('3 candidates');
 		});

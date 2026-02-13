@@ -13,6 +13,12 @@
 	import SimulationStatusBadge from '$lib/components/simulations/simulation-status-badge.svelte';
 	import ImpactSummaryCards from '$lib/components/simulations/impact-summary-cards.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -27,6 +33,26 @@
 	let showApplyDialog = $state(false);
 	let applyJustification = $state('');
 	let applyAcknowledgeScope = $state(false);
+
+	let confirmOpen = $state(false);
+	let confirmTitle = $state('');
+	let confirmMessage = $state('');
+	let confirmAction = $state<(() => Promise<void>) | null>(null);
+
+	function openConfirm(title: string, message: string, action: () => Promise<void>) {
+		confirmTitle = title;
+		confirmMessage = message;
+		confirmAction = action;
+		confirmOpen = true;
+	}
+
+	async function executeConfirm() {
+		if (confirmAction) {
+			await confirmAction();
+		}
+		confirmOpen = false;
+		confirmAction = null;
+	}
 
 	let currentResults: BatchSimulationResult[] = $state([]);
 	let currentResultsTotal = $state(0);
@@ -59,18 +85,23 @@
 		return bt.replace(/_/g, ' ');
 	}
 
-	async function handleExecute() {
-		if (!confirm('Execute this batch simulation? This will analyze all selected users.')) return;
-		actionLoading = true;
-		try {
-			await executeBatchSimulationClient(simulation.id);
-			addToast('success', 'Batch simulation executed successfully');
-			await invalidateAll();
-		} catch {
-			addToast('error', 'Failed to execute batch simulation');
-		} finally {
-			actionLoading = false;
-		}
+	function handleExecute() {
+		openConfirm(
+			'Execute Batch Simulation',
+			'Execute this batch simulation? This will analyze all selected users.',
+			async () => {
+				actionLoading = true;
+				try {
+					await executeBatchSimulationClient(simulation.id);
+					addToast('success', 'Batch simulation executed successfully');
+					await invalidateAll();
+				} catch {
+					addToast('error', 'Failed to execute batch simulation');
+				} finally {
+					actionLoading = false;
+				}
+			}
+		);
 	}
 
 	async function handleApply() {
@@ -97,18 +128,19 @@
 		}
 	}
 
-	async function handleArchive() {
-		if (!confirm('Archive this simulation?')) return;
-		actionLoading = true;
-		try {
-			await archiveBatchSimulationClient(simulation.id);
-			addToast('success', 'Simulation archived');
-			await invalidateAll();
-		} catch {
-			addToast('error', 'Failed to archive simulation');
-		} finally {
-			actionLoading = false;
-		}
+	function handleArchive() {
+		openConfirm('Archive Simulation', 'Archive this simulation?', async () => {
+			actionLoading = true;
+			try {
+				await archiveBatchSimulationClient(simulation.id);
+				addToast('success', 'Simulation archived');
+				await invalidateAll();
+			} catch {
+				addToast('error', 'Failed to archive simulation');
+			} finally {
+				actionLoading = false;
+			}
+		});
 	}
 
 	async function handleRestore() {
@@ -124,17 +156,22 @@
 		}
 	}
 
-	async function handleDelete() {
-		if (!confirm('Permanently delete this simulation? This cannot be undone.')) return;
-		actionLoading = true;
-		try {
-			await deleteBatchSimulationClient(simulation.id);
-			addToast('success', 'Simulation deleted');
-			goto('/governance/simulations');
-		} catch {
-			addToast('error', 'Failed to delete simulation');
-			actionLoading = false;
-		}
+	function handleDelete() {
+		openConfirm(
+			'Delete Simulation',
+			'Permanently delete this simulation? This cannot be undone.',
+			async () => {
+				actionLoading = true;
+				try {
+					await deleteBatchSimulationClient(simulation.id);
+					addToast('success', 'Simulation deleted');
+					goto('/governance/simulations');
+				} catch {
+					addToast('error', 'Failed to delete simulation');
+					actionLoading = false;
+				}
+			}
+		);
 	}
 
 	async function handleSaveNotes() {
@@ -450,3 +487,19 @@
 		</button>
 	</div>
 </section>
+
+<!-- Confirm Dialog -->
+<Dialog.Root bind:open={confirmOpen}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>{confirmTitle}</DialogTitle>
+		</DialogHeader>
+		<div class="py-4">
+			<p class="text-sm text-muted-foreground">{confirmMessage}</p>
+		</div>
+		<DialogFooter>
+			<Button variant="outline" onclick={() => (confirmOpen = false)}>Cancel</Button>
+			<Button variant="destructive" onclick={executeConfirm}>Confirm</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

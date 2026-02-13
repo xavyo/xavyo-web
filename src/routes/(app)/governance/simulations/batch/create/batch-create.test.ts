@@ -207,19 +207,19 @@ describe('Batch simulation create form logic', () => {
 		});
 
 		it('hides filter fields when selection_mode is user_list', () => {
-			const selectionMode = 'user_list';
+			const selectionMode: string = 'user_list';
 			const showFilterFields = selectionMode === 'filter';
 			expect(showFilterFields).toBe(false);
 		});
 
 		it('shows user_ids field when selection_mode is user_list', () => {
-			const selectionMode = 'user_list';
+			const selectionMode: string = 'user_list';
 			const showUserIds = selectionMode === 'user_list';
 			expect(showUserIds).toBe(true);
 		});
 
 		it('hides user_ids field when selection_mode is filter', () => {
-			const selectionMode = 'filter';
+			const selectionMode: string = 'filter';
 			const showUserIds = selectionMode === 'user_list';
 			expect(showUserIds).toBe(false);
 		});
@@ -233,33 +233,33 @@ describe('Batch simulation create form logic', () => {
 		});
 
 		it('shows role_id field for role_remove batch_type', () => {
-			const batchType = 'role_remove';
+			const batchType: string = 'role_remove';
 			const isRoleOperation = batchType === 'role_add' || batchType === 'role_remove';
 			expect(isRoleOperation).toBe(true);
 		});
 
 		it('shows entitlement_id field for entitlement_add batch_type', () => {
-			const batchType = 'entitlement_add';
+			const batchType: string = 'entitlement_add';
 			const isEntitlementOperation =
 				batchType === 'entitlement_add' || batchType === 'entitlement_remove';
 			expect(isEntitlementOperation).toBe(true);
 		});
 
 		it('shows entitlement_id field for entitlement_remove batch_type', () => {
-			const batchType = 'entitlement_remove';
+			const batchType: string = 'entitlement_remove';
 			const isEntitlementOperation =
 				batchType === 'entitlement_add' || batchType === 'entitlement_remove';
 			expect(isEntitlementOperation).toBe(true);
 		});
 
 		it('hides role_id for entitlement operations', () => {
-			const batchType = 'entitlement_add';
+			const batchType: string = 'entitlement_add';
 			const isRoleOperation = batchType === 'role_add' || batchType === 'role_remove';
 			expect(isRoleOperation).toBe(false);
 		});
 
 		it('hides entitlement_id for role operations', () => {
-			const batchType = 'role_add';
+			const batchType: string = 'role_add';
 			const isEntitlementOperation =
 				batchType === 'entitlement_add' || batchType === 'entitlement_remove';
 			expect(isEntitlementOperation).toBe(false);

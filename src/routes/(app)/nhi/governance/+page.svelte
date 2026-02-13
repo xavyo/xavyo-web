@@ -78,7 +78,7 @@
 		certLoading = true;
 		try {
 			const result = await fetchNhiCertCampaigns();
-			certCampaigns = Array.isArray(result) ? result : Array.isArray(result?.items) ? result.items : [];
+			certCampaigns = Array.isArray(result) ? result : Array.isArray((result as any)?.items) ? (result as any).items : [];
 		} catch {
 			addToast('error', 'Failed to load certification campaigns');
 		} finally {

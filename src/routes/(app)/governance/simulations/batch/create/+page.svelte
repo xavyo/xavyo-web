@@ -66,7 +66,7 @@
 					name="batch_type"
 					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 					value={String($form.batch_type ?? '')}
-					onchange={(e) => { $form.batch_type = e.currentTarget.value; }}
+					onchange={(e) => { $form.batch_type = e.currentTarget.value as typeof $form.batch_type; }}
 				>
 					<option value="">Select type</option>
 					<option value="role_add">Role Add</option>
@@ -86,7 +86,7 @@
 					name="selection_mode"
 					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 					value={String($form.selection_mode ?? '')}
-					onchange={(e) => { $form.selection_mode = e.currentTarget.value; }}
+					onchange={(e) => { $form.selection_mode = e.currentTarget.value as typeof $form.selection_mode; }}
 				>
 					<option value="">Select mode</option>
 					<option value="user_list">User List</option>

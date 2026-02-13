@@ -115,7 +115,7 @@
 					class={selectClass}
 					value={String($form.output_format ?? '')}
 					onchange={(e) => {
-						$form.output_format = (e.target as HTMLSelectElement).value;
+						$form.output_format = (e.target as HTMLSelectElement).value as typeof $form.output_format;
 					}}
 				>
 					<option value="" disabled>Select format</option>

@@ -11,6 +11,11 @@
 	import ValidationResult from '$lib/components/provisioning-scripts/validation-result.svelte';
 	import DryRunPanel from '$lib/components/provisioning-scripts/dry-run-panel.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
 	import type { PageData } from './$types';
 	import type { VersionCompareResponse, ScriptValidationResult } from '$lib/api/types';
 
@@ -23,6 +28,27 @@
 
 	let activeTab = $state('details');
 	let loading = $state(false);
+
+	// Confirm dialog state
+	let confirmOpen = $state(false);
+	let confirmTitle = $state('');
+	let confirmMessage = $state('');
+	let confirmAction = $state<(() => Promise<void>) | null>(null);
+
+	function openConfirm(title: string, message: string, action: () => Promise<void>) {
+		confirmTitle = title;
+		confirmMessage = message;
+		confirmAction = action;
+		confirmOpen = true;
+	}
+
+	async function executeConfirm() {
+		if (confirmAction) {
+			await confirmAction();
+		}
+		confirmOpen = false;
+		confirmAction = null;
+	}
 
 	// Version creation
 	let showCreateVersion = $state(false);
@@ -89,22 +115,23 @@
 		loading = false;
 	}
 
-	async function handleDelete() {
-		if (!confirm('Are you sure you want to delete this script?')) return;
-		loading = true;
-		try {
-			const res = await fetch(`/api/provisioning-scripts/${script.id}`, { method: 'DELETE' });
-			if (res.ok) {
-				addToast('success', 'Script deleted');
-				goto('/governance/provisioning-scripts');
-			} else {
-				const body = await res.json().catch(() => ({ error: 'Delete failed' }));
-				addToast('error', body.error || 'Failed to delete script');
+	function handleDelete() {
+		openConfirm('Delete Script', 'Are you sure you want to delete this script?', async () => {
+			loading = true;
+			try {
+				const res = await fetch(`/api/provisioning-scripts/${script.id}`, { method: 'DELETE' });
+				if (res.ok) {
+					addToast('success', 'Script deleted');
+					goto('/governance/provisioning-scripts');
+				} else {
+					const body = await res.json().catch(() => ({ error: 'Delete failed' }));
+					addToast('error', body.error || 'Failed to delete script');
+				}
+			} catch {
+				addToast('error', 'Failed to delete script');
 			}
-		} catch {
-			addToast('error', 'Failed to delete script');
-		}
-		loading = false;
+			loading = false;
+		});
 	}
 
 	async function handleCreateVersion() {
@@ -148,26 +175,27 @@
 		loading = false;
 	}
 
-	async function handleRollback(targetVersion: number) {
-		if (!confirm(`Roll back to version ${targetVersion}?`)) return;
-		loading = true;
-		try {
-			const res = await fetch(`/api/provisioning-scripts/${script.id}/rollback`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ target_version: targetVersion })
-			});
-			if (res.ok) {
-				addToast('success', `Rolled back to version ${targetVersion}`);
-				await invalidateAll();
-			} else {
-				const body = await res.json().catch(() => ({ error: 'Failed' }));
-				addToast('error', body.error || 'Failed to rollback');
+	function handleRollback(targetVersion: number) {
+		openConfirm('Rollback Version', `Roll back to version ${targetVersion}?`, async () => {
+			loading = true;
+			try {
+				const res = await fetch(`/api/provisioning-scripts/${script.id}/rollback`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ target_version: targetVersion })
+				});
+				if (res.ok) {
+					addToast('success', `Rolled back to version ${targetVersion}`);
+					await invalidateAll();
+				} else {
+					const body = await res.json().catch(() => ({ error: 'Failed' }));
+					addToast('error', body.error || 'Failed to rollback');
+				}
+			} catch {
+				addToast('error', 'Failed to rollback');
 			}
-		} catch {
-			addToast('error', 'Failed to rollback');
-		}
-		loading = false;
+			loading = false;
+		});
 	}
 
 	async function handleValidate() {
@@ -571,3 +599,19 @@
 		</div>
 	{/if}
 </div>
+
+<!-- Confirm Dialog -->
+<Dialog.Root bind:open={confirmOpen}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>{confirmTitle}</DialogTitle>
+		</DialogHeader>
+		<div class="py-4">
+			<p class="text-sm text-muted-foreground">{confirmMessage}</p>
+		</div>
+		<DialogFooter>
+			<Button variant="outline" onclick={() => (confirmOpen = false)}>Cancel</Button>
+			<Button variant="destructive" onclick={executeConfirm}>Confirm</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

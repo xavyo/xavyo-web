@@ -4,6 +4,12 @@
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import SimulationStatusBadge from '$lib/components/simulations/simulation-status-badge.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -22,6 +28,26 @@
 
 	let comparisonItems: SimulationComparison[] = $state([]);
 	let comparisonItemsInitialized = $state(false);
+
+	let confirmOpen = $state(false);
+	let confirmTitle = $state('');
+	let confirmMessage = $state('');
+	let confirmAction = $state<(() => Promise<void>) | null>(null);
+
+	function openConfirm(title: string, message: string, action: () => Promise<void>) {
+		confirmTitle = title;
+		confirmMessage = message;
+		confirmAction = action;
+		confirmOpen = true;
+	}
+
+	async function executeConfirm() {
+		if (confirmAction) {
+			await confirmAction();
+		}
+		confirmOpen = false;
+		confirmAction = null;
+	}
 
 	$effect(() => {
 		if (!comparisonItemsInitialized && comparisons.items.length > 0) {
@@ -46,15 +72,16 @@
 		return type.replace(/_/g, ' ');
 	}
 
-	async function handleDeleteComparison(id: string) {
-		if (!confirm('Are you sure you want to delete this comparison?')) return;
-		try {
-			await deleteSimulationComparisonClient(id);
-			comparisonItems = comparisonItems.filter((c) => c.id !== id);
-			addToast('success', 'Comparison deleted');
-		} catch {
-			addToast('error', 'Failed to delete comparison');
-		}
+	function handleDeleteComparison(id: string) {
+		openConfirm('Delete Comparison', 'Are you sure you want to delete this comparison?', async () => {
+			try {
+				await deleteSimulationComparisonClient(id);
+				comparisonItems = comparisonItems.filter((c) => c.id !== id);
+				addToast('success', 'Comparison deleted');
+			} catch {
+				addToast('error', 'Failed to delete comparison');
+			}
+		});
 	}
 </script>
 
@@ -237,3 +264,19 @@
 		{/if}
 	{/if}
 </div>
+
+<!-- Confirm Dialog -->
+<Dialog.Root bind:open={confirmOpen}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>{confirmTitle}</DialogTitle>
+		</DialogHeader>
+		<div class="py-4">
+			<p class="text-sm text-muted-foreground">{confirmMessage}</p>
+		</div>
+		<DialogFooter>
+			<Button variant="outline" onclick={() => (confirmOpen = false)}>Cancel</Button>
+			<Button variant="destructive" onclick={executeConfirm}>Confirm</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

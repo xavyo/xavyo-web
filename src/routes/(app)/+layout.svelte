@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass, UserCheck, AlertTriangle, FlaskConical } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass, UserCheck, AlertTriangle, FlaskConical, Blocks } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -61,6 +61,7 @@
 			items.push({ label: 'Birthright Policies', href: '/governance/birthright-policies', icon: Milestone });
 			items.push({ label: 'Power of Attorney', href: '/governance/power-of-attorney', icon: Stamp });
 			items.push({ label: 'Lifecycle', href: '/governance/lifecycle', icon: RotateCw });
+			items.push({ label: 'Object Templates', href: '/governance/object-templates', icon: Blocks });
 			items.push({ label: 'Role Mining', href: '/governance/role-mining', icon: Pickaxe });
 			items.push({ label: 'Micro Certs', href: '/governance/micro-certifications', icon: ClipboardCheck });
 			items.push({ label: 'SIEM', href: '/governance/siem', icon: Radio });

@@ -792,29 +792,29 @@ describe('Script Detail rendering logic', () => {
 
 	describe('compare versions validation', () => {
 		it('disables compare when from is 0', () => {
-			const compareFrom = 0;
-			const compareTo = 2;
+			const compareFrom: number = 0;
+			const compareTo: number = 2;
 			const disabled = compareFrom <= 0 || compareTo <= 0 || compareFrom === compareTo;
 			expect(disabled).toBe(true);
 		});
 
 		it('disables compare when to is 0', () => {
-			const compareFrom = 1;
-			const compareTo = 0;
+			const compareFrom: number = 1;
+			const compareTo: number = 0;
 			const disabled = compareFrom <= 0 || compareTo <= 0 || compareFrom === compareTo;
 			expect(disabled).toBe(true);
 		});
 
 		it('disables compare when from equals to', () => {
-			const compareFrom = 2;
-			const compareTo = 2;
+			const compareFrom: number = 2;
+			const compareTo: number = 2;
 			const disabled = compareFrom <= 0 || compareTo <= 0 || compareFrom === compareTo;
 			expect(disabled).toBe(true);
 		});
 
 		it('enables compare when from and to are different positive numbers', () => {
-			const compareFrom = 1;
-			const compareTo = 3;
+			const compareFrom: number = 1;
+			const compareTo: number = 3;
 			const disabled = compareFrom <= 0 || compareTo <= 0 || compareFrom === compareTo;
 			expect(disabled).toBe(false);
 		});

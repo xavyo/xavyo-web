@@ -9,6 +9,12 @@
 		updatePolicyNotesClient
 	} from '$lib/api/simulations-client';
 	import { invalidateAll, goto } from '$app/navigation';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import SimulationStatusBadge from '$lib/components/simulations/simulation-status-badge.svelte';
 	import ImpactSummaryCards from '$lib/components/simulations/impact-summary-cards.svelte';
@@ -25,6 +31,26 @@
 	let notesValue = $state(data.simulation.notes ?? '');
 	let notesSaving = $state(false);
 	let actionLoading = $state(false);
+
+	let confirmOpen = $state(false);
+	let confirmTitle = $state('');
+	let confirmMessage = $state('');
+	let confirmAction = $state<(() => Promise<void>) | null>(null);
+
+	function openConfirm(title: string, message: string, action: () => Promise<void>) {
+		confirmTitle = title;
+		confirmMessage = message;
+		confirmAction = action;
+		confirmOpen = true;
+	}
+
+	async function executeConfirm() {
+		if (confirmAction) {
+			await confirmAction();
+		}
+		confirmOpen = false;
+		confirmAction = null;
+	}
 
 	let currentResults: PolicySimulationResult[] = $state([]);
 	let currentResultsTotal = $state(0);
@@ -53,46 +79,49 @@
 		});
 	}
 
-	async function handleExecute() {
-		if (!confirm('Execute this simulation? This will analyze all affected users.')) return;
-		actionLoading = true;
-		try {
-			await executePolicySimulationClient(simulation.id);
-			addToast('success', 'Simulation executed successfully');
-			await invalidateAll();
-		} catch {
-			addToast('error', 'Failed to execute simulation');
-		} finally {
-			actionLoading = false;
-		}
+	function handleExecute() {
+		openConfirm('Execute Simulation', 'Execute this simulation? This will analyze all affected users.', async () => {
+			actionLoading = true;
+			try {
+				await executePolicySimulationClient(simulation.id);
+				addToast('success', 'Simulation executed successfully');
+				await invalidateAll();
+			} catch {
+				addToast('error', 'Failed to execute simulation');
+			} finally {
+				actionLoading = false;
+			}
+		});
 	}
 
-	async function handleCancel() {
-		if (!confirm('Cancel this simulation?')) return;
-		actionLoading = true;
-		try {
-			await cancelPolicySimulationClient(simulation.id);
-			addToast('success', 'Simulation cancelled');
-			await invalidateAll();
-		} catch {
-			addToast('error', 'Failed to cancel simulation');
-		} finally {
-			actionLoading = false;
-		}
+	function handleCancel() {
+		openConfirm('Cancel Simulation', 'Cancel this simulation?', async () => {
+			actionLoading = true;
+			try {
+				await cancelPolicySimulationClient(simulation.id);
+				addToast('success', 'Simulation cancelled');
+				await invalidateAll();
+			} catch {
+				addToast('error', 'Failed to cancel simulation');
+			} finally {
+				actionLoading = false;
+			}
+		});
 	}
 
-	async function handleArchive() {
-		if (!confirm('Archive this simulation?')) return;
-		actionLoading = true;
-		try {
-			await archivePolicySimulationClient(simulation.id);
-			addToast('success', 'Simulation archived');
-			await invalidateAll();
-		} catch {
-			addToast('error', 'Failed to archive simulation');
-		} finally {
-			actionLoading = false;
-		}
+	function handleArchive() {
+		openConfirm('Archive Simulation', 'Archive this simulation?', async () => {
+			actionLoading = true;
+			try {
+				await archivePolicySimulationClient(simulation.id);
+				addToast('success', 'Simulation archived');
+				await invalidateAll();
+			} catch {
+				addToast('error', 'Failed to archive simulation');
+			} finally {
+				actionLoading = false;
+			}
+		});
 	}
 
 	async function handleRestore() {
@@ -108,17 +137,18 @@
 		}
 	}
 
-	async function handleDelete() {
-		if (!confirm('Permanently delete this simulation? This cannot be undone.')) return;
-		actionLoading = true;
-		try {
-			await deletePolicySimulationClient(simulation.id);
-			addToast('success', 'Simulation deleted');
-			goto('/governance/simulations');
-		} catch {
-			addToast('error', 'Failed to delete simulation');
-			actionLoading = false;
-		}
+	function handleDelete() {
+		openConfirm('Delete Simulation', 'Permanently delete this simulation? This cannot be undone.', async () => {
+			actionLoading = true;
+			try {
+				await deletePolicySimulationClient(simulation.id);
+				addToast('success', 'Simulation deleted');
+				goto('/governance/simulations');
+			} catch {
+				addToast('error', 'Failed to delete simulation');
+				actionLoading = false;
+			}
+		});
 	}
 
 	async function handleSaveNotes() {
@@ -297,3 +327,19 @@
 		</button>
 	</div>
 </section>
+
+<!-- Confirm Dialog -->
+<Dialog.Root bind:open={confirmOpen}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>{confirmTitle}</DialogTitle>
+		</DialogHeader>
+		<div class="py-4">
+			<p class="text-sm text-muted-foreground">{confirmMessage}</p>
+		</div>
+		<DialogFooter>
+			<Button variant="outline" onclick={() => (confirmOpen = false)}>Cancel</Button>
+			<Button variant="destructive" onclick={executeConfirm}>Confirm</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

@@ -81,7 +81,7 @@
 					name="comparison_type"
 					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 					value={String($form.comparison_type ?? '')}
-					onchange={(e) => { $form.comparison_type = e.currentTarget.value; }}
+					onchange={(e) => { $form.comparison_type = e.currentTarget.value as typeof $form.comparison_type; }}
 				>
 					<option value="">Select type</option>
 					<option value="simulation_vs_simulation">Simulation vs Simulation</option>
@@ -103,7 +103,7 @@
 					name="simulation_a_type"
 					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 					value={String($form.simulation_a_type ?? '')}
-					onchange={(e) => { $form.simulation_a_type = e.currentTarget.value; }}
+					onchange={(e) => { $form.simulation_a_type = e.currentTarget.value as typeof $form.simulation_a_type; }}
 				>
 					<option value="">Select type</option>
 					<option value="policy">Policy</option>
@@ -145,7 +145,7 @@
 						name="simulation_b_type"
 						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 						value={String($form.simulation_b_type ?? '')}
-						onchange={(e) => { $form.simulation_b_type = e.currentTarget.value; }}
+						onchange={(e) => { $form.simulation_b_type = e.currentTarget.value as typeof $form.simulation_b_type; }}
 					>
 						<option value="">Select type</option>
 						<option value="policy">Policy</option>

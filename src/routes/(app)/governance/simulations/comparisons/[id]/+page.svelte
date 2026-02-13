@@ -5,12 +5,37 @@
 	import SimulationStatusBadge from '$lib/components/simulations/simulation-status-badge.svelte';
 	import DeltaView from '$lib/components/simulations/delta-view.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { Dialog } from 'bits-ui';
+	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
+	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
+	import DialogTitle from '$lib/components/ui/dialog/dialog-title.svelte';
+	import DialogFooter from '$lib/components/ui/dialog/dialog-footer.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	let comparison = $derived(data.comparison);
 	let actionLoading = $state(false);
+	let confirmOpen = $state(false);
+	let confirmTitle = $state('');
+	let confirmMessage = $state('');
+	let confirmAction = $state<(() => Promise<void>) | null>(null);
+
+	function openConfirm(title: string, message: string, action: () => Promise<void>) {
+		confirmTitle = title;
+		confirmMessage = message;
+		confirmAction = action;
+		confirmOpen = true;
+	}
+
+	async function executeConfirm() {
+		if (confirmAction) {
+			await confirmAction();
+		}
+		confirmOpen = false;
+		confirmAction = null;
+	}
 
 	function formatDate(dateStr: string | null): string {
 		if (!dateStr) return '-';
@@ -40,17 +65,18 @@
 		}
 	}
 
-	async function handleDelete() {
-		if (!confirm('Permanently delete this comparison? This cannot be undone.')) return;
-		actionLoading = true;
-		try {
-			await deleteSimulationComparisonClient(comparison.id);
-			addToast('success', 'Comparison deleted');
-			goto('/governance/simulations');
-		} catch {
-			addToast('error', 'Failed to delete comparison');
-			actionLoading = false;
-		}
+	function handleDelete() {
+		openConfirm('Delete Comparison', 'Permanently delete this comparison? This cannot be undone.', async () => {
+			actionLoading = true;
+			try {
+				await deleteSimulationComparisonClient(comparison.id);
+				addToast('success', 'Comparison deleted');
+				goto('/governance/simulations');
+			} catch {
+				addToast('error', 'Failed to delete comparison');
+				actionLoading = false;
+			}
+		});
 	}
 </script>
 
@@ -125,3 +151,19 @@
 	<h2 class="mb-4 text-lg font-semibold">Comparison Results</h2>
 	<DeltaView summary={comparison.summary_stats} delta={comparison.delta_results} />
 </section>
+
+<!-- Confirm Dialog -->
+<Dialog.Root bind:open={confirmOpen}>
+	<DialogContent>
+		<DialogHeader>
+			<DialogTitle>{confirmTitle}</DialogTitle>
+		</DialogHeader>
+		<div class="py-4">
+			<p class="text-sm text-muted-foreground">{confirmMessage}</p>
+		</div>
+		<DialogFooter>
+			<Button variant="outline" onclick={() => (confirmOpen = false)}>Cancel</Button>
+			<Button variant="destructive" onclick={executeConfirm}>Confirm</Button>
+		</DialogFooter>
+	</DialogContent>
+</Dialog.Root>

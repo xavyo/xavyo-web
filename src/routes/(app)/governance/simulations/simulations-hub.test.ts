@@ -310,13 +310,13 @@ describe('Simulations hub rendering logic', () => {
 		});
 
 		it('plural when 0 simulations', () => {
-			const total = 0;
+			const total: number = 0;
 			const text = `${total} policy simulation${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('0 policy simulations');
 		});
 
 		it('plural when multiple simulations', () => {
-			const total = 5;
+			const total: number = 5;
 			const text = `${total} policy simulation${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('5 policy simulations');
 		});
@@ -330,7 +330,7 @@ describe('Simulations hub rendering logic', () => {
 		});
 
 		it('plural when multiple comparisons', () => {
-			const total = 3;
+			const total: number = 3;
 			const text = `${total} comparison${total !== 1 ? 's' : ''}`;
 			expect(text).toBe('3 comparisons');
 		});
