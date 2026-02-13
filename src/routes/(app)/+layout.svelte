@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -35,7 +35,7 @@
 		if (data.isAdmin) {
 			items.push({ label: 'Groups', href: '/groups', icon: UsersRound });
 			items.push({ label: 'Connectors', href: '/connectors', icon: Plug });
-			items.push({ label: 'Operations', href: '/connectors/operations', icon: Activity });
+			items.push({ label: 'Provisioning Ops', href: '/connectors/operations', icon: Activity });
 			items.push({ label: 'Reconciliation', href: '/connectors/reconciliation', icon: RefreshCw });
 			items.push({ label: 'Invitations', href: '/invitations', icon: Mail });
 			items.push({ label: 'Federation', href: '/federation', icon: Network });
@@ -59,6 +59,7 @@
 			items.push({ label: 'Micro Certs', href: '/governance/micro-certifications', icon: ClipboardCheck });
 			items.push({ label: 'SIEM', href: '/governance/siem', icon: Radio });
 			items.push({ label: 'Provisioning Scripts', href: '/governance/provisioning-scripts', icon: ScrollText });
+			items.push({ label: 'Operations', href: '/governance/operations', icon: Clock });
 			items.push({ label: 'Webhooks', href: '/settings/webhooks', icon: Webhook });
 			items.push({ label: 'Imports', href: '/settings/imports', icon: Upload });
 			items.push({ label: 'SCIM', href: '/settings/scim', icon: Key });

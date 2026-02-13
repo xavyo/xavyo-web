@@ -6064,3 +6064,268 @@ export interface ScriptAuditEventListResponse {
 	total: number;
 }
 
+// ============================================================================
+// Governance Operations & SLA Management (Phase 037)
+// ============================================================================
+
+// --- SLA Policy ---
+
+export interface CreateSlaPolicyRequest {
+	name: string;
+	description?: string;
+	target_duration_seconds: number;
+	warning_threshold_percent: number;
+	breach_notification_enabled: boolean;
+	escalation_contacts?: unknown;
+}
+
+export interface SlaPolicyResponse {
+	id: string;
+	name: string;
+	description?: string;
+	target_duration_seconds: number;
+	target_duration_human: string;
+	warning_threshold_percent: number;
+	breach_notification_enabled: boolean;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface UpdateSlaPolicyRequest {
+	name?: string;
+	description?: string;
+	target_duration_seconds?: number;
+	warning_threshold_percent?: number;
+	breach_notification_enabled?: boolean;
+	escalation_contacts?: unknown;
+}
+
+export interface SlaPolicyListResponse {
+	items: SlaPolicyResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Ticketing Configuration ---
+
+export type TicketingSystemType = 'service_now' | 'jira' | 'webhook';
+
+export interface CreateTicketingConfigurationRequest {
+	name: string;
+	ticketing_type: TicketingSystemType;
+	endpoint_url: string;
+	credentials: string;
+	field_mappings?: unknown;
+	default_assignee?: string;
+	default_assignment_group?: string;
+	project_key?: string;
+	issue_type?: string;
+	polling_interval_seconds: number;
+}
+
+export interface TicketingConfigurationResponse {
+	id: string;
+	name: string;
+	ticketing_type: TicketingSystemType;
+	endpoint_url: string;
+	polling_interval_seconds: number;
+	default_assignee?: string;
+	default_assignment_group?: string;
+	project_key?: string;
+	issue_type?: string;
+	is_active: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface UpdateTicketingConfigurationRequest {
+	name?: string;
+	ticketing_type?: TicketingSystemType;
+	endpoint_url?: string;
+	credentials?: string;
+	field_mappings?: unknown;
+	default_assignee?: string;
+	default_assignment_group?: string;
+	project_key?: string;
+	issue_type?: string;
+	polling_interval_seconds?: number;
+}
+
+export interface TicketingConfigurationListResponse {
+	items: TicketingConfigurationResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Bulk Actions ---
+
+export type BulkActionType = 'assign_role' | 'revoke_role' | 'enable' | 'disable' | 'modify_attribute';
+export type BulkActionStatus = 'pending' | 'previewing' | 'approved' | 'executing' | 'completed' | 'failed' | 'cancelled';
+
+export interface CreateBulkActionRequest {
+	filter_expression: string;
+	action_type: BulkActionType;
+	action_params: unknown;
+	justification: string;
+}
+
+export interface BulkActionResponse {
+	id: string;
+	tenant_id: string;
+	filter_expression: string;
+	action_type: BulkActionType;
+	action_params: unknown;
+	status: BulkActionStatus;
+	justification: string;
+	total_matched: number;
+	processed_count: number;
+	success_count: number;
+	failure_count: number;
+	skipped_count: number;
+	created_by: string;
+	created_at: string;
+	started_at?: string;
+	completed_at?: string;
+}
+
+export interface BulkActionListResponse {
+	items: BulkActionResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface PreviewUser {
+	id: string;
+	display_name?: string;
+	email: string;
+	current_state?: string;
+	would_change: boolean;
+	change_description?: string;
+}
+
+export interface BulkActionPreviewResponse {
+	total_matched: number;
+	would_change_count: number;
+	no_change_count: number;
+	users: PreviewUser[];
+	limit: number;
+	offset: number;
+}
+
+export interface ExpressionValidationResponse {
+	valid: boolean;
+	error?: string;
+	parsed_attributes?: string[];
+}
+
+// --- Failed Operations ---
+
+export interface FailedOperationResponse {
+	id: string;
+	operation_type: string;
+	related_request_id?: string;
+	object_id: string;
+	object_type: string;
+	error_message: string;
+	retry_count: number;
+	max_retries: number;
+	status: string;
+	next_retry_at: string;
+	last_attempted_at?: string;
+	created_at: string;
+	resolved_at?: string;
+}
+
+export interface FailedOperationListResponse {
+	items: FailedOperationResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface RetryStatsResponse {
+	tenants_processed: number;
+	total_processed: number;
+	total_succeeded: number;
+	total_rescheduled: number;
+	total_dead_letter: number;
+}
+
+// --- Scheduled Transitions ---
+
+export type ScheduledTransitionStatus = 'pending' | 'executed' | 'cancelled' | 'failed';
+
+export interface ScheduledTransitionResponse {
+	id: string;
+	transition_request_id: string;
+	object_id: string;
+	object_type: string;
+	transition_name: string;
+	from_state: string;
+	to_state: string;
+	scheduled_for: string;
+	status: ScheduledTransitionStatus;
+	executed_at?: string;
+	cancelled_at?: string;
+	cancelled_by?: string;
+	error_message?: string;
+	created_at: string;
+}
+
+export interface ScheduledTransitionListResponse {
+	items: ScheduledTransitionResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Bulk Operations (state transitions) ---
+
+export interface CreateBulkOperationRequest {
+	transition_id: string;
+	object_ids: string[];
+}
+
+export type BulkOperationStatus = 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
+
+export interface BulkOperationResponse {
+	id: string;
+	transition_id: string;
+	status: BulkOperationStatus;
+	total_count: number;
+	processed_count: number;
+	success_count: number;
+	failure_count: number;
+	progress_percent: number;
+	requested_by: string;
+	created_at: string;
+	started_at?: string;
+	completed_at?: string;
+}
+
+export interface BulkOperationListResponse {
+	items: BulkOperationResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Backward-compatible aliases ---
+// These aliases map old names to new response types for gradual migration
+export type SlaPolicy = SlaPolicyResponse;
+export type TicketingConfig = TicketingConfigurationResponse;
+export type BulkAction = BulkActionResponse;
+export type FailedOperation = FailedOperationResponse;
+export type ScheduledTransition = ScheduledTransitionResponse;
+export type BulkStateOperation = BulkOperationResponse;
+export type CreateTicketingConfigRequest = CreateTicketingConfigurationRequest;
+export type UpdateTicketingConfigRequest = UpdateTicketingConfigurationRequest;
+export type TicketingConfigListResponse = TicketingConfigurationListResponse;
+export type BulkActionPreview = BulkActionPreviewResponse;
+export type UpdateBulkActionRequest = Partial<CreateBulkActionRequest>;
+export type ExpressionValidationResult = ExpressionValidationResponse;
+export type CreateBulkStateOperationRequest = CreateBulkOperationRequest;
