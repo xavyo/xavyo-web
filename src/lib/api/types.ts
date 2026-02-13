@@ -5087,3 +5087,155 @@ export interface UpdateCatalogItemRequest {
 	tags?: string[];
 }
 
+// ============================================================================
+// Lifecycle Configuration Types
+// ============================================================================
+
+export type LifecycleObjectType = 'user' | 'entitlement' | 'role';
+
+export type EntitlementAction = 'none' | 'pause' | 'revoke';
+
+export interface LifecycleConfig {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	object_type: LifecycleObjectType;
+	is_active: boolean;
+	auto_assign_initial_state: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface LifecycleState {
+	id: string;
+	config_id: string;
+	name: string;
+	description: string | null;
+	is_initial: boolean;
+	is_terminal: boolean;
+	entitlement_action: EntitlementAction;
+	position: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface LifecycleTransition {
+	id: string;
+	config_id: string;
+	name: string;
+	from_state_id: string;
+	to_state_id: string;
+	requires_approval: boolean;
+	grace_period_hours: number | null;
+	created_at: string;
+}
+
+export interface TransitionCondition {
+	condition_type: string;
+	attribute_path: string;
+	expression: string;
+}
+
+export interface LifecycleStateAction {
+	action_type: string;
+	parameters: Record<string, unknown>;
+}
+
+export interface LifecycleConfigDetail extends LifecycleConfig {
+	states: LifecycleState[];
+	transitions: LifecycleTransition[];
+}
+
+export interface UserLifecycleStatus {
+	user_id: string;
+	config_id: string | null;
+	config_name: string | null;
+	state_id: string | null;
+	state_name: string | null;
+	is_initial: boolean;
+	is_terminal: boolean;
+	entered_at: string | null;
+	entitlement_action: string | null;
+}
+
+export interface LifecycleConfigListResponse {
+	items: LifecycleConfig[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateLifecycleConfigRequest {
+	name: string;
+	object_type: LifecycleObjectType;
+	description?: string;
+	auto_assign_initial_state?: boolean;
+}
+
+export interface UpdateLifecycleConfigRequest {
+	name?: string;
+	description?: string | null;
+	is_active?: boolean;
+	auto_assign_initial_state?: boolean;
+}
+
+export interface CreateLifecycleStateRequest {
+	name: string;
+	description?: string;
+	is_initial: boolean;
+	is_terminal: boolean;
+	entitlement_action: EntitlementAction;
+	position: number;
+}
+
+export interface UpdateLifecycleStateRequest {
+	name?: string;
+	description?: string | null;
+	is_initial?: boolean;
+	is_terminal?: boolean;
+	entitlement_action?: EntitlementAction;
+	position?: number;
+}
+
+export interface CreateLifecycleTransitionRequest {
+	name: string;
+	from_state_id: string;
+	to_state_id: string;
+	requires_approval?: boolean;
+	grace_period_hours?: number;
+}
+
+export interface TransitionConditionsResponse {
+	conditions: TransitionCondition[];
+}
+
+export interface UpdateTransitionConditionsRequest {
+	conditions: TransitionCondition[];
+}
+
+export interface EvaluateConditionsRequest {
+	context: Record<string, unknown>;
+}
+
+export interface ConditionEvaluationResult {
+	condition_type: string;
+	passed: boolean;
+	message?: string;
+}
+
+export interface EvaluateConditionsResponse {
+	is_allowed: boolean;
+	results: ConditionEvaluationResult[];
+}
+
+export interface StateActionsResponse {
+	entry_actions: LifecycleStateAction[];
+	exit_actions: LifecycleStateAction[];
+}
+
+export interface UpdateStateActionsRequest {
+	entry_actions?: LifecycleStateAction[];
+	exit_actions?: LifecycleStateAction[];
+}
+

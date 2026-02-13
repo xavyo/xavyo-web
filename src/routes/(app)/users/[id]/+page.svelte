@@ -11,6 +11,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import ActivityTimeline from '$lib/components/audit/activity-timeline.svelte';
+	import LifecycleStatus from '$lib/components/lifecycle/lifecycle-status.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { PageData, ActionData } from './$types';
 	import * as Dialog from '$lib/components/ui/dialog';
@@ -218,6 +219,12 @@
 			</Button>
 		</CardContent>
 	</Card>
+
+	<Separator class="my-6" />
+
+	<div class="max-w-lg">
+		<LifecycleStatus status={data.lifecycleStatus ?? null} />
+	</div>
 
 	<Dialog.Root bind:open={showDisableConfirm}>
 		<Dialog.Content>

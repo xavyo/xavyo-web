@@ -4,7 +4,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { updateUserSchema } from '$lib/schemas/user';
 import { getUser, updateUser, deleteUser } from '$lib/api/users';
+import { getUserLifecycleStatus } from '$lib/api/lifecycle';
 import { ApiError } from '$lib/api/client';
+import type { UserLifecycleStatus } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	let user;
@@ -26,10 +28,19 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateUserSchema)
 	);
 
+	// Load lifecycle status (gracefully handle 404/errors)
+	let lifecycleStatus: UserLifecycleStatus | null = null;
+	try {
+		lifecycleStatus = await getUserLifecycleStatus(params.id, locals.accessToken!, locals.tenantId!, fetch);
+	} catch {
+		// User may not have a lifecycle assignment — silently ignore
+	}
+
 	return {
 		user,
 		form,
-		currentUserId: locals.user!.id
+		currentUserId: locals.user!.id,
+		lifecycleStatus
 	};
 };
 
