@@ -12,6 +12,10 @@
 	import NhiNameLink from './nhi-name-link.svelte';
 	import NhiTypeBadge from './nhi-type-badge.svelte';
 	import NhiStateBadge from './nhi-state-badge.svelte';
+	import NhiSummaryCards from '$lib/components/nhi/nhi-summary-cards.svelte';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 
 	const columnHelper = createColumnHelper<NhiIdentityResponse>();
 
@@ -49,7 +53,7 @@
 		})
 	] as ColumnDef<NhiIdentityResponse>[];
 
-	let data: NhiIdentityResponse[] = $state([]);
+	let tableData: NhiIdentityResponse[] = $state([]);
 	let pageCount: number = $state(0);
 	let pagination: PaginationState = $state({ pageIndex: 0, pageSize: 20 });
 	let isLoading: boolean = $state(false);
@@ -95,7 +99,7 @@
 			}
 
 			const result: NhiListResponse = await response.json();
-			data = result.data;
+			tableData = result.data;
 			pageCount = Math.ceil(result.total / pagination.pageSize);
 		} catch {
 			addToast('error', 'Failed to load non-human identities');
@@ -142,6 +146,12 @@
 		</DropdownMenu.Content>
 	</DropdownMenu.Root>
 </div>
+
+{#if data.summary}
+	<div class="mb-4">
+		<NhiSummaryCards summary={data.summary} />
+	</div>
+{/if}
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -191,7 +201,7 @@
 
 <DataTable
 	{columns}
-	{data}
+	data={tableData}
 	{pageCount}
 	{pagination}
 	onPaginationChange={handlePaginationChange}

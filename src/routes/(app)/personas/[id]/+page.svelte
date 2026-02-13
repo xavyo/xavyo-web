@@ -268,6 +268,24 @@
 						Archive
 					</Button>
 				{/if}
+
+				<form
+					method="POST"
+					action="?/propagate"
+					use:formEnhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								const attrCount = (result.data as Record<string, unknown>)?.attributesUpdated ?? 0;
+								addToast('success', `Propagated ${attrCount} attributes from archetype`);
+								await invalidateAll();
+							} else if (result.type === 'failure') {
+								addToast('error', String(result.data?.error ?? 'Failed to propagate attributes'));
+							}
+						};
+					}}
+				>
+					<Button type="submit" variant="outline">Propagate Attributes</Button>
+				</form>
 			</CardContent>
 		</Card>
 	{/if}

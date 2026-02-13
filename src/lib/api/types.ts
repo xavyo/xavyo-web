@@ -6329,3 +6329,219 @@ export type BulkActionPreview = BulkActionPreviewResponse;
 export type UpdateBulkActionRequest = Partial<CreateBulkActionRequest>;
 export type ExpressionValidationResult = ExpressionValidationResponse;
 export type CreateBulkStateOperationRequest = CreateBulkOperationRequest;
+
+// --- Phase 038: NHI Access Requests ---
+
+export type NhiRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+
+export interface NhiAccessRequest {
+	id: string;
+	requester_id: string;
+	requested_name: string;
+	purpose: string;
+	requested_permissions: string[];
+	requested_expiration: string | null;
+	rotation_interval_days: number | null;
+	nhi_type: string;
+	status: NhiRequestStatus;
+	reviewer_id: string | null;
+	review_comments: string | null;
+	created_at: string;
+	reviewed_at: string | null;
+	nhi_id: string | null;
+}
+
+export interface NhiAccessRequestListResponse {
+	items: NhiAccessRequest[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface SubmitNhiRequestBody {
+	name: string;
+	purpose: string;
+	requested_permissions?: string[];
+	requested_expiration?: string;
+	rotation_interval_days?: number;
+}
+
+export interface NhiRequestSummary {
+	pending: number;
+	approved: number;
+	rejected: number;
+	cancelled: number;
+}
+
+export interface ApproveNhiRequestBody {
+	comments?: string;
+}
+
+export interface RejectNhiRequestBody {
+	reason: string;
+}
+
+// --- Phase 038: NHI Usage Tracking ---
+
+export interface NhiUsageRecord {
+	id: string;
+	nhi_id: string;
+	activity_type: string;
+	details: string | null;
+	performed_at: string;
+	source_ip: string | null;
+}
+
+export interface NhiUsageListResponse {
+	items: NhiUsageRecord[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface NhiUsageSummary {
+	nhi_id: string;
+	total_events: number;
+	last_activity_at: string | null;
+	first_activity_at: string | null;
+	activity_types: Record<string, number>;
+	daily_average: number;
+}
+
+export interface NhiStalenessEntry {
+	id: string;
+	name: string;
+	nhi_type: string;
+	last_activity_at: string | null;
+	days_inactive: number;
+	state: string;
+}
+
+export interface NhiStalenessReportResponse {
+	items: NhiStalenessEntry[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface NhiOverallSummary {
+	total: number;
+	active: number;
+	expired: number;
+	suspended: number;
+	needs_certification: number;
+	needs_rotation: number;
+	inactive: number;
+}
+
+// --- Phase 038: Enhanced NHI Certifications ---
+
+export interface NhiCertCampaignSummary {
+	total_items: number;
+	decided: number;
+	pending: number;
+	certified: number;
+	revoked: number;
+	flagged: number;
+}
+
+export type NhiCertItemDecision = 'certify' | 'revoke' | 'flag';
+
+export interface DecideNhiCertItemBody {
+	decision: NhiCertItemDecision;
+	notes?: string;
+}
+
+export interface BulkDecideNhiCertBody {
+	item_ids: string[];
+	decision: NhiCertItemDecision;
+	notes?: string;
+}
+
+export interface BulkDecideResult {
+	decided: number;
+	failed: number;
+}
+
+// --- Phase 038: Persona Context Switching ---
+
+export interface SwitchContextRequest {
+	persona_id: string;
+	reason?: string;
+}
+
+export interface SwitchBackRequest {
+	reason?: string;
+}
+
+export interface SwitchContextResponse {
+	session_id: string;
+	access_token: string;
+	active_persona_id: string | null;
+	active_persona_name: string | null;
+	switched_at: string;
+}
+
+export interface CurrentContextResponse {
+	physical_user_id: string;
+	physical_user_name: string | null;
+	is_persona_active: boolean;
+	active_persona: {
+		id: string;
+		name: string;
+		archetype_name?: string;
+	} | null;
+	session_started_at: string | null;
+	session_expires_at: string | null;
+}
+
+export interface ContextSessionSummary {
+	id: string;
+	switched_at: string;
+	from_context: string;
+	to_context: string;
+	reason: string | null;
+}
+
+export interface ContextSessionListResponse {
+	items: ContextSessionSummary[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Phase 038: Persona Expiry & Propagation ---
+
+export interface ExtendPersonaRequest {
+	new_valid_until: string;
+	reason?: string;
+}
+
+export type ExtendPersonaStatus = 'approved' | 'pending_approval';
+
+export interface ExtendPersonaResponse {
+	status: ExtendPersonaStatus;
+	persona: Record<string, unknown> | null;
+	approval_request_id: string | null;
+}
+
+export interface ExpiringPersona {
+	id: string;
+	name: string;
+	archetype_name: string | null;
+	valid_until: string;
+	days_until_expiry: number;
+	assigned_user_name: string | null;
+}
+
+export interface ExpiringPersonaListResponse {
+	items: ExpiringPersona[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface PropagateAttributesResponse {
+	persona_id: string;
+	attributes_updated: number;
+}

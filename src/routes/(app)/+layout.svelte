@@ -2,13 +2,14 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass, UserCheck, AlertTriangle } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
 	import ToastContainer from '$lib/components/layout/toast-container.svelte';
 	import { initThemeListener } from '$lib/stores/theme.svelte';
 	import AssumedIdentityIndicator from '$lib/components/poa/assumed-identity-indicator.svelte';
+	import ContextIndicator from '$lib/components/persona/context-indicator.svelte';
 	import type { LayoutData } from './$types';
 
 	interface Props {
@@ -25,8 +26,10 @@
 			{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
 			{ label: 'Users', href: '/users', icon: Users },
 			{ label: 'Personas', href: '/personas', icon: Drama },
+			{ label: 'Persona Context', href: '/personas/context', icon: UserCheck },
 			{ label: 'NHI', href: '/nhi', icon: Bot },
 			{ label: 'A2A Tasks', href: '/nhi/a2a', icon: ArrowRightLeft },
+			{ label: 'NHI Requests', href: '/nhi/requests', icon: FileInput },
 			{ label: 'Request Catalog', href: '/governance/catalog', icon: ShoppingBag },
 			{ label: 'My Requests', href: '/my-requests', icon: FileQuestion },
 			{ label: 'My Approvals', href: '/my-approvals', icon: CheckCircle },
@@ -34,6 +37,7 @@
 		];
 		if (data.isAdmin) {
 			items.push({ label: 'Groups', href: '/groups', icon: UsersRound });
+			items.push({ label: 'Expiring Personas', href: '/personas/expiring', icon: Hourglass });
 			items.push({ label: 'Connectors', href: '/connectors', icon: Plug });
 			items.push({ label: 'Provisioning Ops', href: '/connectors/operations', icon: Activity });
 			items.push({ label: 'Reconciliation', href: '/connectors/reconciliation', icon: RefreshCw });
@@ -44,6 +48,7 @@
 			items.push({ label: 'Roles', href: '/governance/roles', icon: KeyRound });
 			items.push({ label: 'Meta-Roles', href: '/governance/meta-roles', icon: Layers });
 			items.push({ label: 'NHI Governance', href: '/nhi/governance', icon: ShieldCheck });
+			items.push({ label: 'NHI Staleness', href: '/nhi/staleness', icon: AlertTriangle });
 			items.push({ label: 'Approval Config', href: '/governance/approval-config', icon: Workflow });
 			items.push({ label: 'Reports', href: '/governance/reports', icon: FileBarChart });
 			items.push({ label: 'Outlier Detection', href: '/governance/outliers', icon: ScanSearch });
@@ -117,6 +122,11 @@
 					donorId={data.currentAssumption.donor_id}
 					poaId={data.currentAssumption.poa_id ?? ''}
 				/>
+			</div>
+		{/if}
+		{#if data.personaContext?.is_persona_active && data.personaContext.active_persona}
+			<div class="px-4 pt-2 sm:px-6">
+				<ContextIndicator personaName={data.personaContext.active_persona.name ?? 'Unknown'} isActive={true} />
 			</div>
 		{/if}
 		<main class="flex-1 overflow-y-auto p-4 sm:p-6">

@@ -14,8 +14,11 @@
 	import CredentialsSection from '../../credentials-section.svelte';
 	import PermissionsTab from '$lib/components/nhi/permissions-tab.svelte';
 	import RiskBreakdown from '$lib/components/nhi/risk-breakdown.svelte';
-	import type { NhiRiskBreakdown } from '$lib/api/types';
+	import UsageHistoryTable from '$lib/components/nhi/usage-history-table.svelte';
+	import UsageSummaryStats from '$lib/components/nhi/usage-summary-stats.svelte';
+	import type { NhiRiskBreakdown, NhiUsageSummary, NhiUsageRecord } from '$lib/api/types';
 	import { fetchNhiRisk } from '$lib/api/nhi-governance-client';
+	import { fetchNhiUsageHistory, fetchNhiUsageSummary } from '$lib/api/nhi-usage-client';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { PageData } from './$types';
@@ -41,6 +44,11 @@
 	let riskLoading = $state(true);
 	let riskError = $state<string | null>(null);
 
+	let usageRecords = $state<NhiUsageRecord[]>([]);
+	let usageSummary = $state<NhiUsageSummary | null>(null);
+	let usageLoading = $state(false);
+	let usageLoaded = $state(false);
+
 	$effect(() => {
 		fetchNhiRisk(data.nhi.id)
 			.then((r) => { riskData = r; })
@@ -49,6 +57,24 @@
 	});
 
 	const isArchived = $derived(data.nhi.lifecycle_state === 'archived');
+
+	async function loadUsage() {
+		if (usageLoaded) return;
+		usageLoading = true;
+		try {
+			const [records, summary] = await Promise.all([
+				fetchNhiUsageHistory(data.nhi.id),
+				fetchNhiUsageSummary(data.nhi.id)
+			]);
+			usageRecords = records.items;
+			usageSummary = summary;
+			usageLoaded = true;
+		} catch {
+			// silently fail
+		} finally {
+			usageLoading = false;
+		}
+	}
 
 	function startEdit() {
 		$form.name = data.nhi.name;
@@ -82,6 +108,7 @@
 	<TabsList>
 		<TabsTrigger value="details">Details</TabsTrigger>
 		<TabsTrigger value="permissions">Permissions</TabsTrigger>
+		<TabsTrigger value="usage">Usage</TabsTrigger>
 		<TabsTrigger value="risk">Risk</TabsTrigger>
 	</TabsList>
 
@@ -283,6 +310,32 @@
 
 	<TabsContent value="permissions">
 		<PermissionsTab nhiId={data.nhi.id} entityType="service_account" />
+	</TabsContent>
+
+	<TabsContent value="usage">
+		{#if !usageLoaded && !usageLoading}
+			<div class="space-y-2">
+				<p class="text-sm text-muted-foreground">Click to load usage data.</p>
+				<button
+					onclick={loadUsage}
+					class="rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary/90"
+				>
+					Load Usage
+				</button>
+			</div>
+		{:else if usageLoading}
+			<div class="animate-pulse space-y-3">
+				<div class="h-8 rounded bg-muted"></div>
+				<div class="h-48 rounded bg-muted"></div>
+			</div>
+		{:else}
+			{#if usageSummary}
+				<UsageSummaryStats summary={usageSummary} />
+			{/if}
+			<div class="mt-4">
+				<UsageHistoryTable records={usageRecords} />
+			</div>
+		{/if}
 	</TabsContent>
 
 	<TabsContent value="risk">

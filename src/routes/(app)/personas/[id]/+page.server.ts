@@ -10,6 +10,7 @@ import {
 	deactivatePersona,
 	archivePersona
 } from '$lib/api/personas';
+import { propagateAttributes } from '$lib/api/persona-expiry';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
@@ -116,5 +117,17 @@ export const actions: Actions = {
 		}
 
 		return { success: true, action: 'archived' };
+	},
+
+	propagate: async ({ params, locals, fetch }) => {
+		try {
+			const result = await propagateAttributes(params.id, locals.accessToken!, locals.tenantId!, fetch);
+			return { success: true, action: 'propagated', attributesUpdated: result.attributes_updated };
+		} catch (e) {
+			if (e instanceof ApiError) {
+				return fail(e.status, { error: e.message });
+			}
+			return fail(500, { error: 'An unexpected error occurred' });
+		}
 	}
 };

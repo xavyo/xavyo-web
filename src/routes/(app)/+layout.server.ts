@@ -3,7 +3,8 @@ import type { LayoutServerLoad } from './$types';
 import { SYSTEM_TENANT_ID, hasAdminRole } from '$lib/server/auth';
 import { fetchAlerts } from '$lib/api/alerts';
 import { getCurrentAssumption } from '$lib/api/power-of-attorney';
-import type { CurrentAssumptionStatus } from '$lib/api/types';
+import { getCurrentContext } from '$lib/api/persona-context';
+import type { CurrentAssumptionStatus, CurrentContextResponse } from '$lib/api/types';
 
 export const load: LayoutServerLoad = async ({ locals, url }) => {
 	if (!locals.user) {
@@ -38,10 +39,18 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		// Non-critical; default to not assuming
 	}
 
+	let personaContext: CurrentContextResponse | null = null;
+	try {
+		personaContext = await getCurrentContext(locals.accessToken!, locals.tenantId!, fetch);
+	} catch {
+		// Non-critical
+	}
+
 	return {
 		user: locals.user,
 		unacknowledgedAlertCount,
 		isAdmin: hasAdminRole(locals.user.roles),
-		currentAssumption
+		currentAssumption,
+		personaContext
 	};
 };

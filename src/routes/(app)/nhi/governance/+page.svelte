@@ -65,11 +65,11 @@
 		sodLoading = true;
 		try {
 			const result = await fetchNhiSodRules();
-			sodRules = result.items;
-			sodLoaded = true;
+			sodRules = Array.isArray(result?.items) ? result.items : [];
 		} catch {
 			addToast('error', 'Failed to load SoD rules');
 		} finally {
+			sodLoaded = true;
 			sodLoading = false;
 		}
 	}
@@ -77,11 +77,12 @@
 	async function loadCertCampaigns() {
 		certLoading = true;
 		try {
-			certCampaigns = await fetchNhiCertCampaigns();
-			certLoaded = true;
+			const result = await fetchNhiCertCampaigns();
+			certCampaigns = Array.isArray(result) ? result : Array.isArray(result?.items) ? result.items : [];
 		} catch {
 			addToast('error', 'Failed to load certification campaigns');
 		} finally {
+			certLoaded = true;
 			certLoading = false;
 		}
 	}
