@@ -35,7 +35,8 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/signup', {
 				method: 'POST',
 				body: signupData,
-				fetch: mockFetch
+				fetch: mockFetch,
+				tenantId: '00000000-0000-0000-0000-000000000001'
 			});
 			expect(result).toEqual(mockResponse);
 		});
@@ -64,11 +65,12 @@ describe('auth API functions', () => {
 			const mockResponse = { access_token: 'new-at', refresh_token: 'new-rt', token_type: 'Bearer', expires_in: 3600 };
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await refresh('old-rt', mockFetch);
+			const result = await refresh('old-rt', undefined, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/refresh', {
 				method: 'POST',
 				body: { refresh_token: 'old-rt' },
+				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
@@ -79,11 +81,12 @@ describe('auth API functions', () => {
 		it('calls POST /auth/logout with refresh_token', async () => {
 			mockApiClient.mockResolvedValue(null);
 
-			await logout('my-rt', mockFetch);
+			await logout('my-rt', undefined, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/logout', {
 				method: 'POST',
 				body: { refresh_token: 'my-rt' },
+				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 		});
@@ -94,11 +97,12 @@ describe('auth API functions', () => {
 			const mockResponse = { message: 'Reset link sent' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
-			const result = await forgotPassword('test@example.com', mockFetch);
+			const result = await forgotPassword('test@example.com', undefined, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/forgot-password', {
 				method: 'POST',
 				body: { email: 'test@example.com' },
+				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
@@ -115,6 +119,7 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/reset-password', {
 				method: 'POST',
 				body: { token: 'tok123', new_password: 'newpass123' },
+				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
@@ -131,6 +136,7 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/verify-email', {
 				method: 'POST',
 				body: { token: 'tok456' },
+				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);

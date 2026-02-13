@@ -11,10 +11,12 @@ export const createToolSchema = z.object({
 	provider: z.string().max(255).optional()
 });
 
+export const AGENT_TYPES = ['autonomous', 'copilot', 'workflow', 'orchestrator'] as const;
+
 export const createAgentSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(255),
 	description: z.string().max(1000).optional(),
-	agent_type: z.string().min(1, 'Agent type is required').max(100),
+	agent_type: z.enum(AGENT_TYPES, { errorMap: () => ({ message: 'Agent type is required' }) }),
 	model_provider: z.string().max(255).optional(),
 	model_name: z.string().max(255).optional(),
 	model_version: z.string().max(100).optional(),
@@ -43,7 +45,7 @@ export const updateToolSchema = z.object({
 export const updateAgentSchema = z.object({
 	name: z.string().min(1).max(255).optional(),
 	description: z.string().max(1000).optional(),
-	agent_type: z.string().min(1).max(100).optional(),
+	agent_type: z.enum(AGENT_TYPES).optional(),
 	model_provider: z.string().max(255).optional(),
 	model_name: z.string().max(255).optional(),
 	model_version: z.string().max(100).optional(),

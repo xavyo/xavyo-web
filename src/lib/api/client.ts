@@ -48,13 +48,27 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 	if (!response.ok) {
 		let errorMessage = 'An error occurred';
 		try {
-			const errorBody = await response.json();
-			errorMessage = errorBody.error || errorBody.message || errorBody.detail || errorMessage;
+			const text = await response.text();
+			try {
+				const errorBody = JSON.parse(text);
+				errorMessage = errorBody.message || errorBody.detail || errorBody.error || errorMessage;
+			} catch {
+				// Response body not JSON — use plain text if available
+				if (text) {
+					errorMessage = text;
+				}
+			}
 		} catch {
-			// Response body not JSON
+			// Could not read response body
 		}
 		throw new ApiError(errorMessage, response.status);
 	}
 
-	return response.json() as Promise<T>;
+	// Handle empty 200 responses (e.g. DELETE returning 200 with no body)
+	const text = await response.text();
+	if (!text) {
+		return null as T;
+	}
+
+	return JSON.parse(text) as T;
 }

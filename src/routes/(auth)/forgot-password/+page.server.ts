@@ -20,7 +20,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await forgotPassword(form.data.email, fetch);
+			await forgotPassword(form.data.email, undefined, fetch);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

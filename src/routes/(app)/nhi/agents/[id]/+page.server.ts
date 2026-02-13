@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		{
 			name: nhi.name,
 			description: nhi.description ?? undefined,
-			agent_type: nhi.agent?.agent_type ?? undefined,
+			agent_type: (nhi.agent?.agent_type as 'autonomous' | 'copilot' | 'workflow' | 'orchestrator' | undefined) ?? undefined,
 			model_provider: nhi.agent?.model_provider ?? undefined,
 			model_name: nhi.agent?.model_name ?? undefined,
 			model_version: nhi.agent?.model_version ?? undefined,
