@@ -45,9 +45,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
+- 033-role-mining: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 - 032-lifecycle-config: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 - 031-catalog-birthright: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
-- 030-power-of-attorney: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 
 
 <!-- MANUAL ADDITIONS START -->

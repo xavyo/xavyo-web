@@ -5239,3 +5239,232 @@ export interface UpdateStateActionsRequest {
 	exit_actions?: LifecycleStateAction[];
 }
 
+// Role Mining Types
+
+export type MiningJobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+export type CandidatePromotionStatus = 'pending' | 'promoted' | 'dismissed';
+export type PrivilegeFlagStatus = 'pending' | 'reviewed' | 'remediated' | 'accepted';
+export type PrivilegeReviewAction = 'accept' | 'remediate';
+export type ConsolidationStatus = 'pending' | 'merged' | 'dismissed';
+export type ScenarioType = 'add_entitlement' | 'remove_entitlement' | 'add_role' | 'remove_role' | 'modify_role';
+export type SimulationStatus = 'draft' | 'executed' | 'applied' | 'cancelled';
+export type TrendDirection = 'up' | 'stable' | 'down';
+
+export interface MiningJobParameters {
+	min_users?: number;
+	min_entitlements?: number;
+	confidence_threshold?: number;
+	include_excessive_privilege?: boolean;
+	include_consolidation?: boolean;
+	consolidation_threshold?: number;
+	deviation_threshold?: number;
+	peer_group_attribute?: string | null;
+}
+
+export interface MiningJob {
+	id: string;
+	tenant_id: string;
+	name: string;
+	status: MiningJobStatus;
+	parameters: MiningJobParameters;
+	progress_percent: number;
+	candidate_count: number;
+	excessive_privilege_count: number;
+	consolidation_suggestion_count: number;
+	started_at: string | null;
+	completed_at: string | null;
+	error_message: string | null;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface MiningJobListResponse {
+	items: MiningJob[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface CreateMiningJobRequest {
+	name: string;
+	parameters?: MiningJobParameters;
+}
+
+export interface RoleCandidate {
+	id: string;
+	job_id: string;
+	proposed_name: string;
+	confidence_score: number;
+	member_count: number;
+	entitlement_ids: string[];
+	user_ids: string[];
+	promotion_status: CandidatePromotionStatus;
+	promoted_role_id: string | null;
+	dismissed_reason: string | null;
+	created_at: string;
+}
+
+export interface RoleCandidateListResponse {
+	items: RoleCandidate[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface PromoteCandidateRequest {
+	role_name?: string;
+	description?: string;
+}
+
+export interface DismissCandidateRequest {
+	reason?: string;
+}
+
+export interface AccessPattern {
+	id: string;
+	job_id: string;
+	entitlement_ids: string[];
+	frequency: number;
+	user_count: number;
+	sample_user_ids: string[];
+	created_at: string;
+}
+
+export interface AccessPatternListResponse {
+	items: AccessPattern[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface ExcessivePrivilege {
+	id: string;
+	job_id: string;
+	user_id: string;
+	peer_group_id: string | null;
+	deviation_percent: number;
+	excess_entitlements: string[];
+	peer_average: number;
+	user_count: number;
+	status: PrivilegeFlagStatus;
+	notes: string | null;
+	reviewed_by: string | null;
+	reviewed_at: string | null;
+	created_at: string;
+}
+
+export interface ExcessivePrivilegeListResponse {
+	items: ExcessivePrivilege[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface ReviewExcessivePrivilegeRequest {
+	action: PrivilegeReviewAction;
+	notes?: string;
+}
+
+export interface ConsolidationSuggestion {
+	id: string;
+	job_id: string;
+	role_a_id: string;
+	role_b_id: string;
+	overlap_percent: number;
+	shared_entitlements: string[];
+	unique_to_a: string[];
+	unique_to_b: string[];
+	status: ConsolidationStatus;
+	dismissed_reason: string | null;
+	created_at: string;
+}
+
+export interface ConsolidationSuggestionListResponse {
+	items: ConsolidationSuggestion[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface DismissConsolidationRequest {
+	reason?: string;
+}
+
+export interface SimulationChanges {
+	change_type?: string;
+	role_id?: string;
+	entitlement_id?: string;
+	entitlement_ids?: string[];
+	user_ids?: string[];
+	role_name?: string;
+	role_description?: string;
+}
+
+export interface Simulation {
+	id: string;
+	tenant_id: string;
+	name: string;
+	scenario_type: ScenarioType;
+	target_role_id: string | null;
+	changes: SimulationChanges;
+	status: SimulationStatus;
+	affected_users: string[];
+	access_gained: unknown;
+	access_lost: unknown;
+	applied_by: string | null;
+	applied_at: string | null;
+	created_by: string;
+	created_at: string;
+}
+
+export interface SimulationListResponse {
+	items: Simulation[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface CreateSimulationRequest {
+	name: string;
+	scenario_type: ScenarioType;
+	target_role_id?: string;
+	changes: SimulationChanges;
+}
+
+export interface EntitlementUsage {
+	entitlement_id: string;
+	used_by_count: number;
+	total_users: number;
+	usage_rate: number;
+}
+
+export interface RoleMetrics {
+	id: string;
+	tenant_id: string;
+	role_id: string;
+	utilization_rate: number;
+	coverage_rate: number;
+	user_count: number;
+	active_user_count: number;
+	entitlement_usage: EntitlementUsage[];
+	trend_direction: TrendDirection;
+	calculated_at: string;
+}
+
+export interface RoleMetricsListResponse {
+	items: RoleMetrics[];
+	total: number;
+	page: number;
+	page_size: number;
+}
+
+export interface CalculateMetricsRequest {
+	role_ids?: string[];
+}
+
+export interface CalculateMetricsResponse {
+	roles_calculated: number;
+	calculated_at: string;
+}
+
