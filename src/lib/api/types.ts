@@ -6804,3 +6804,120 @@ export interface TemplateSimulationResult {
 	computed_values: Record<string, unknown>;
 	affected_count: number;
 }
+
+// Manual Provisioning Tasks
+
+export interface ManualTask {
+	id: string;
+	assignment_id: string;
+	application_id: string;
+	application_name: string | null;
+	user_id: string;
+	user_name: string | null;
+	entitlement_id: string;
+	entitlement_name: string | null;
+	operation_type: 'grant' | 'revoke' | 'modify';
+	status: 'pending' | 'in_progress' | 'completed' | 'rejected' | 'cancelled';
+	assignee_id: string | null;
+	assignee_name: string | null;
+	sla_deadline: string | null;
+	sla_warning_sent: boolean;
+	sla_breached: boolean;
+	retry_count: number;
+	next_retry_at: string | null;
+	notes: string | null;
+	created_at: string;
+	updated_at: string;
+	completed_at: string | null;
+}
+
+export interface ManualTaskListResponse {
+	items: ManualTask[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ManualTaskDashboard {
+	pending_count: number;
+	in_progress_count: number;
+	sla_at_risk_count: number;
+	sla_breached_count: number;
+	completed_today: number;
+	average_completion_time_seconds: number | null;
+}
+
+export interface ConfirmTaskRequest {
+	notes?: string;
+}
+
+export interface RejectTaskRequest {
+	reason: string;
+}
+
+// Semi-Manual Application Configuration
+
+export interface SemiManualApplication {
+	id: string;
+	name: string;
+	description: string | null;
+	is_semi_manual: boolean;
+	ticketing_config_id: string | null;
+	sla_policy_id: string | null;
+	requires_approval_before_ticket: boolean;
+	status: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface SemiManualApplicationListResponse {
+	items: SemiManualApplication[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ConfigureSemiManualRequest {
+	is_semi_manual: boolean;
+	ticketing_config_id?: string | null;
+	sla_policy_id?: string | null;
+	requires_approval_before_ticket: boolean;
+}
+
+// Detection Rules
+
+export interface DetectionRule {
+	id: string;
+	name: string;
+	rule_type: 'no_manager' | 'terminated' | 'inactive' | 'custom';
+	is_enabled: boolean;
+	priority: number;
+	parameters: Record<string, unknown>;
+	description: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface DetectionRuleListResponse {
+	items: DetectionRule[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateDetectionRuleRequest {
+	name: string;
+	rule_type: 'no_manager' | 'terminated' | 'inactive' | 'custom';
+	is_enabled: boolean;
+	priority: number;
+	parameters?: Record<string, unknown>;
+	description?: string;
+}
+
+export interface UpdateDetectionRuleRequest {
+	name?: string;
+	is_enabled?: boolean;
+	priority?: number;
+	parameters?: Record<string, unknown>;
+	description?: string;
+}

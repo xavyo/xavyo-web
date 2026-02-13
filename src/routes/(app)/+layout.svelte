@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass, UserCheck, AlertTriangle, FlaskConical, Blocks } from 'lucide-svelte';
+	import { LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList, Network, Shield, ShieldCheck, FileQuestion, FileBarChart, Workflow, KeyRound, Layers, Mail, Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook, LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag, RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass, UserCheck, AlertTriangle, FlaskConical, Blocks, HandMetal, Radar } from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavItem } from '$lib/components/layout/sidebar.svelte';
 	import Header from '$lib/components/layout/header.svelte';
@@ -67,6 +67,8 @@
 			items.push({ label: 'SIEM', href: '/governance/siem', icon: Radio });
 			items.push({ label: 'Provisioning Scripts', href: '/governance/provisioning-scripts', icon: ScrollText });
 			items.push({ label: 'Operations', href: '/governance/operations', icon: Clock });
+			items.push({ label: 'Manual Tasks', href: '/governance/manual-tasks', icon: HandMetal });
+			items.push({ label: 'Detection Rules', href: '/governance/detection-rules', icon: Radar });
 			items.push({ label: 'Webhooks', href: '/settings/webhooks', icon: Webhook });
 			items.push({ label: 'Imports', href: '/settings/imports', icon: Upload });
 			items.push({ label: 'SCIM', href: '/settings/scim', icon: Key });
