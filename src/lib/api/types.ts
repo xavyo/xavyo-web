@@ -5631,3 +5631,191 @@ export interface UpdateTriggerRuleRequest {
 	metadata?: Record<string, unknown>;
 }
 
+// ===== SIEM Export & Audit Streaming (Phase 035) =====
+
+export type DestinationType = 'syslog_tcp_tls' | 'syslog_udp' | 'webhook' | 'splunk_hec';
+export type ExportFormat = 'cef' | 'syslog_rfc5424' | 'json' | 'csv';
+export type CircuitState = 'closed' | 'open' | 'half_open';
+export type BatchExportStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type DeliveryStatus = 'pending' | 'delivered' | 'failed' | 'dead_letter' | 'dropped';
+export type EventCategory = 'authentication' | 'user_lifecycle' | 'group_changes' | 'access_requests' | 'provisioning' | 'administrative' | 'security' | 'entitlement' | 'sod_violation';
+
+export interface SiemDestination {
+	id: string;
+	tenant_id: string;
+	name: string;
+	destination_type: DestinationType;
+	endpoint_host: string;
+	endpoint_port: number | null;
+	export_format: ExportFormat;
+	has_auth_config: boolean;
+	event_type_filter: EventCategory[];
+	rate_limit_per_second: number;
+	queue_buffer_size: number;
+	circuit_breaker_threshold: number;
+	circuit_breaker_cooldown_secs: number;
+	circuit_state: CircuitState;
+	circuit_last_failure_at: string | null;
+	enabled: boolean;
+	splunk_source: string | null;
+	splunk_sourcetype: string | null;
+	splunk_index: string | null;
+	splunk_ack_enabled: boolean;
+	syslog_facility: number;
+	tls_verify_cert: boolean;
+	created_at: string;
+	updated_at: string;
+	created_by: string;
+}
+
+export interface SiemDestinationListResponse {
+	items: SiemDestination[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateSiemDestinationRequest {
+	name: string;
+	destination_type: DestinationType;
+	endpoint_host: string;
+	endpoint_port?: number;
+	export_format: ExportFormat;
+	auth_config_b64?: string;
+	event_type_filter?: EventCategory[];
+	rate_limit_per_second?: number;
+	queue_buffer_size?: number;
+	circuit_breaker_threshold?: number;
+	circuit_breaker_cooldown_secs?: number;
+	enabled?: boolean;
+	splunk_source?: string;
+	splunk_sourcetype?: string;
+	splunk_index?: string;
+	splunk_ack_enabled?: boolean;
+	syslog_facility?: number;
+	tls_verify_cert?: boolean;
+}
+
+export interface UpdateSiemDestinationRequest {
+	name?: string;
+	endpoint_host?: string;
+	endpoint_port?: number;
+	export_format?: ExportFormat;
+	auth_config_b64?: string;
+	event_type_filter?: EventCategory[];
+	rate_limit_per_second?: number;
+	queue_buffer_size?: number;
+	circuit_breaker_threshold?: number;
+	circuit_breaker_cooldown_secs?: number;
+	enabled?: boolean;
+	splunk_source?: string;
+	splunk_sourcetype?: string;
+	splunk_index?: string;
+	splunk_ack_enabled?: boolean;
+	syslog_facility?: number;
+	tls_verify_cert?: boolean;
+}
+
+export interface SiemBatchExport {
+	id: string;
+	tenant_id: string;
+	requested_by: string;
+	date_range_start: string;
+	date_range_end: string;
+	event_type_filter: EventCategory[];
+	output_format: ExportFormat;
+	status: BatchExportStatus;
+	total_events: number | null;
+	file_size_bytes: number | null;
+	error_detail: string | null;
+	started_at: string | null;
+	completed_at: string | null;
+	expires_at: string | null;
+	created_at: string;
+}
+
+export interface SiemBatchExportListResponse {
+	items: SiemBatchExport[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateSiemExportRequest {
+	date_range_start: string;
+	date_range_end: string;
+	event_type_filter?: EventCategory[];
+	output_format: ExportFormat;
+}
+
+export interface SiemHealthSummary {
+	destination_id: string;
+	total_events_sent: number;
+	total_events_delivered: number;
+	total_events_failed: number;
+	total_events_dropped: number;
+	avg_latency_ms: number | null;
+	last_success_at: string | null;
+	last_failure_at: string | null;
+	success_rate_percent: number;
+	circuit_state: CircuitState;
+	dead_letter_count: number;
+}
+
+export interface SiemDeliveryHealth {
+	id: string;
+	destination_id: string;
+	window_start: string;
+	window_end: string;
+	events_sent: number;
+	events_delivered: number;
+	events_failed: number;
+	events_dropped: number;
+	avg_latency_ms: number | null;
+	p95_latency_ms: number | null;
+	last_success_at: string | null;
+	last_failure_at: string | null;
+	created_at: string;
+}
+
+export interface SiemDeliveryHealthListResponse {
+	items: SiemDeliveryHealth[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface SiemExportEvent {
+	id: string;
+	destination_id: string;
+	source_event_id: string;
+	source_event_type: string;
+	event_timestamp: string;
+	formatted_payload: string | null;
+	delivery_status: DeliveryStatus;
+	retry_count: number;
+	next_retry_at: string | null;
+	last_attempt_at: string | null;
+	error_detail: string | null;
+	delivered_at: string | null;
+	delivery_latency_ms: number | null;
+	created_at: string;
+}
+
+export interface SiemExportEventListResponse {
+	items: SiemExportEvent[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface TestConnectivityResponse {
+	success: boolean;
+	latency_ms: number | null;
+	error: string | null;
+}
+
+export interface RedeliverResponse {
+	events_requeued: number;
+}
+
