@@ -5819,3 +5819,248 @@ export interface RedeliverResponse {
 	events_requeued: number;
 }
 
+// ===== Provisioning Scripts (Phase 036) =====
+
+export interface ProvisioningScript {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	current_version: number;
+	status: string; // draft | active | inactive
+	is_system: boolean;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ProvisioningScriptListResponse {
+	scripts: ProvisioningScript[];
+	total: number;
+}
+
+export interface ScriptVersion {
+	id: string;
+	script_id: string;
+	version_number: number;
+	script_body: string;
+	change_description: string | null;
+	created_by: string;
+	created_at: string;
+}
+
+export interface ScriptVersionListResponse {
+	versions: ScriptVersion[];
+	total: number;
+}
+
+export interface VersionDiffLine {
+	line_number: number;
+	change_type: string; // added | removed | unchanged
+	content: string;
+}
+
+export interface VersionCompareResponse {
+	version_a: number;
+	version_b: number;
+	diff_lines: VersionDiffLine[];
+}
+
+export interface CreateProvisioningScriptRequest {
+	name: string;
+	description?: string;
+}
+
+export interface UpdateProvisioningScriptRequest {
+	name?: string;
+	description?: string;
+}
+
+export interface CreateScriptVersionRequest {
+	script_body: string;
+	change_description?: string;
+}
+
+export interface RollbackScriptRequest {
+	target_version: number;
+	reason?: string;
+}
+
+export interface HookBinding {
+	id: string;
+	tenant_id: string;
+	script_id: string;
+	connector_id: string;
+	hook_phase: string; // before | after
+	operation_type: string; // create | update | delete | enable | disable
+	execution_order: number;
+	failure_policy: string; // abort | continue | retry
+	max_retries: number | null;
+	timeout_seconds: number | null;
+	enabled: boolean;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface HookBindingListResponse {
+	bindings: HookBinding[];
+	total: number;
+}
+
+export interface CreateHookBindingRequest {
+	script_id: string;
+	connector_id: string;
+	hook_phase: string;
+	operation_type: string;
+	execution_order: number;
+	failure_policy?: string;
+	max_retries?: number;
+	timeout_seconds?: number;
+}
+
+export interface UpdateHookBindingRequest {
+	execution_order?: number;
+	failure_policy?: string;
+	max_retries?: number;
+	timeout_seconds?: number;
+	enabled?: boolean;
+}
+
+export interface ScriptTemplate {
+	id: string;
+	tenant_id: string;
+	name: string;
+	description: string | null;
+	category: string; // attribute_mapping | value_generation | conditional_logic | data_formatting | custom
+	template_body: string;
+	placeholder_annotations: unknown;
+	is_system: boolean;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ScriptTemplateListResponse {
+	templates: ScriptTemplate[];
+	total: number;
+}
+
+export interface CreateScriptTemplateRequest {
+	name: string;
+	description?: string;
+	category: string;
+	template_body: string;
+	placeholder_annotations?: unknown;
+}
+
+export interface UpdateScriptTemplateRequest {
+	name?: string;
+	description?: string;
+	category?: string;
+	template_body?: string;
+	placeholder_annotations?: unknown;
+}
+
+export interface InstantiateTemplateRequest {
+	name: string;
+	description?: string;
+}
+
+export interface ScriptValidationError {
+	line: number | null;
+	column: number | null;
+	message: string;
+}
+
+export interface ScriptValidationResult {
+	valid: boolean;
+	errors: ScriptValidationError[];
+}
+
+export interface ScriptDryRunResult {
+	success: boolean;
+	output: unknown;
+	error: string | null;
+	duration_ms: number;
+}
+
+export interface ScriptAnalyticsSummaryItem {
+	script_id: string;
+	name: string;
+	total_executions: number;
+	success_count: number;
+	failure_count: number;
+	avg_duration_ms: number;
+}
+
+export interface ScriptAnalyticsDashboard {
+	total_scripts: number;
+	active_scripts: number;
+	total_executions: number;
+	success_rate: number;
+	avg_duration_ms: number;
+	scripts: ScriptAnalyticsSummaryItem[];
+}
+
+export interface ScriptDailyTrend {
+	date: string;
+	executions: number;
+	successes: number;
+	failures: number;
+	avg_duration_ms: number;
+}
+
+export interface ScriptTopError {
+	error_message: string;
+	count: number;
+	last_occurred: string;
+}
+
+export interface ScriptAnalyticsDetail {
+	script_id: string;
+	name: string;
+	total_executions: number;
+	success_rate: number;
+	avg_duration_ms: number;
+	p95_duration_ms: number;
+	daily_trends: ScriptDailyTrend[];
+	top_errors: ScriptTopError[];
+}
+
+export interface ScriptExecutionLog {
+	id: string;
+	tenant_id: string;
+	script_id: string;
+	binding_id: string | null;
+	connector_id: string | null;
+	script_version: number;
+	status: string; // success | failure | timeout | skipped
+	dry_run: boolean;
+	input_context: unknown;
+	output: unknown;
+	error: string | null;
+	duration_ms: number;
+	executed_by: string;
+	executed_at: string;
+}
+
+export interface ScriptExecutionLogListResponse {
+	logs: ScriptExecutionLog[];
+	total: number;
+}
+
+export interface ScriptAuditEvent {
+	event_id: string;
+	script_id: string;
+	action: string;
+	actor_id: string;
+	details: string | null;
+	created_at: string;
+}
+
+export interface ScriptAuditEventListResponse {
+	events: ScriptAuditEvent[];
+	total: number;
+}
+
