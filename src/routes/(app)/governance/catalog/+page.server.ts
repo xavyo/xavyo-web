@@ -9,17 +9,17 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	const item_type = url.searchParams.get('item_type') ?? undefined;
 	const search = url.searchParams.get('search') ?? undefined;
 
-	const [categoriesRes, itemsRes, cartRes] = await Promise.all([
+	const [categoriesRes, itemsRes, cartRes] = await Promise.allSettled([
 		listCategories({ limit: 100, offset: 0 }, locals.accessToken, locals.tenantId, fetch),
 		listCatalogItems({ category_id, item_type, search, limit: 50, offset: 0 }, locals.accessToken, locals.tenantId, fetch),
-		getCart(undefined, locals.accessToken, locals.tenantId, fetch).catch(() => null)
+		getCart(undefined, locals.accessToken, locals.tenantId, fetch)
 	]);
 
 	return {
-		categories: categoriesRes.items,
-		items: itemsRes.items,
-		itemsTotal: itemsRes.total,
-		cartItemCount: cartRes?.item_count ?? 0,
+		categories: categoriesRes.status === 'fulfilled' ? categoriesRes.value.items : [],
+		items: itemsRes.status === 'fulfilled' ? itemsRes.value.items : [],
+		itemsTotal: itemsRes.status === 'fulfilled' ? itemsRes.value.total : 0,
+		cartItemCount: cartRes.status === 'fulfilled' ? (cartRes.value?.item_count ?? 0) : 0,
 		filters: { category_id, item_type, search }
 	};
 };

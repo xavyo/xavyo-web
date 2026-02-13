@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Card, CardHeader, CardContent } from '$lib/components/ui/card';
-	import { Skeleton } from '$lib/components/ui/skeleton';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
+	import { Users, Drama, Bot, Activity } from 'lucide-svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -18,37 +18,49 @@
 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 	<Card>
 		<CardHeader>
-			<p class="text-sm font-medium text-muted-foreground">Total Users</p>
+			<div class="flex items-center justify-between">
+				<p class="text-sm font-medium text-muted-foreground">Total Users</p>
+				<Users class="h-4 w-4 text-muted-foreground" />
+			</div>
 		</CardHeader>
 		<CardContent>
-			<Skeleton class="h-8 w-16" />
+			<p class="text-2xl font-bold">{data.totalUsers}</p>
 		</CardContent>
 	</Card>
 
 	<Card>
 		<CardHeader>
-			<p class="text-sm font-medium text-muted-foreground">Active Personas</p>
+			<div class="flex items-center justify-between">
+				<p class="text-sm font-medium text-muted-foreground">Active Personas</p>
+				<Drama class="h-4 w-4 text-muted-foreground" />
+			</div>
 		</CardHeader>
 		<CardContent>
-			<Skeleton class="h-8 w-16" />
+			<p class="text-2xl font-bold">{data.activePersonas}</p>
 		</CardContent>
 	</Card>
 
 	<Card>
 		<CardHeader>
-			<p class="text-sm font-medium text-muted-foreground">NHI Identities</p>
+			<div class="flex items-center justify-between">
+				<p class="text-sm font-medium text-muted-foreground">NHI Identities</p>
+				<Bot class="h-4 w-4 text-muted-foreground" />
+			</div>
 		</CardHeader>
 		<CardContent>
-			<Skeleton class="h-8 w-16" />
+			<p class="text-2xl font-bold">{data.nhiIdentities}</p>
 		</CardContent>
 	</Card>
 
 	<Card>
 		<CardHeader>
-			<p class="text-sm font-medium text-muted-foreground">Recent Activity</p>
+			<div class="flex items-center justify-between">
+				<p class="text-sm font-medium text-muted-foreground">Recent Activity</p>
+				<Activity class="h-4 w-4 text-muted-foreground" />
+			</div>
 		</CardHeader>
 		<CardContent>
-			<Skeleton class="h-8 w-24" />
+			<p class="text-2xl font-bold">{data.recentActivity}</p>
 		</CardContent>
 	</Card>
 </div>
