@@ -56,8 +56,16 @@
 		saveCollapsedState();
 	}
 
+	// Collect all hrefs for longest-match comparison
+	const allHrefs = $derived(sections.flatMap((s) => s.items.map((i) => i.href)));
+
 	function isActive(href: string): boolean {
-		return currentPath === href || currentPath.startsWith(href + '/');
+		if (currentPath === href) return true;
+		if (!currentPath.startsWith(href + '/')) return false;
+		// Only highlight if no other nav item has a longer matching prefix
+		return !allHrefs.some(
+			(other) => other !== href && other.length > href.length && (currentPath === other || currentPath.startsWith(other + '/'))
+		);
 	}
 
 	function handleClick() {

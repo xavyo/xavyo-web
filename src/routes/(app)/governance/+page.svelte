@@ -34,6 +34,9 @@
 	import RiskLevelBadge from './risk-level-badge.svelte';
 	import ClassificationBadge from './classification-badge.svelte';
 	import StatusBadge from './status-badge.svelte';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 
 	// Tabs
 	const tabs = [
@@ -44,7 +47,8 @@
 		{ id: 'risk', label: 'Risk' }
 	];
 
-	let activeTab: string = $state('entitlements');
+	const validTabs = tabs.map(t => t.id);
+	let activeTab: string = $state(data.tab && validTabs.includes(data.tab) ? data.tab : 'entitlements');
 
 	// === Entitlements tab ===
 	const entColumnHelper = createColumnHelper<EntitlementResponse>();

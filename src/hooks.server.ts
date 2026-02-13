@@ -44,5 +44,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 		clearAuthCookies(event.cookies);
 	}
 
-	return resolve(event);
+	const response = await resolve(event);
+
+	// Security headers — prevent clickjacking (RFC 6749 §10.13) and other attacks
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+	return response;
 };

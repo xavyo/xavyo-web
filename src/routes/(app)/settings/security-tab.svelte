@@ -10,8 +10,9 @@
 		mfaStatus: MfaStatus | null;
 	}
 
-	let { securityOverview, mfaStatus: initialMfaStatus }: Props = $props();
+	let { securityOverview: initialSecurityOverview, mfaStatus: initialMfaStatus }: Props = $props();
 
+	let securityOverview = $state<SecurityOverview | null>(initialSecurityOverview);
 	let mfaStatus = $state<MfaStatus | null>(initialMfaStatus);
 	let webauthnCredentials = $state<WebAuthnCredential[]>([]);
 	let isLoadingCredentials = $state(true);
@@ -47,14 +48,27 @@
 		}
 	}
 
+	async function refreshSecurityOverview() {
+		try {
+			const response = await fetch('/api/me/security');
+			if (response.ok) {
+				securityOverview = (await response.json()) as SecurityOverview;
+			}
+		} catch {
+			// Non-critical
+		}
+	}
+
 	function handleMfaUpdated() {
 		refreshMfaStatus();
+		refreshSecurityOverview();
 		loadWebauthnCredentials();
 	}
 
 	function handleCredentialsChanged() {
 		loadWebauthnCredentials();
 		refreshMfaStatus();
+		refreshSecurityOverview();
 	}
 </script>
 
