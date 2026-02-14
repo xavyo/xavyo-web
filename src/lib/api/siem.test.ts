@@ -16,8 +16,8 @@ import {
 	downloadSiemExport
 } from './siem';
 
-vi.mock('$env/static/private', () => ({
-	API_BASE_URL: 'http://localhost:8080'
+vi.mock('$env/dynamic/private', () => ({
+	env: { API_BASE_URL: 'http://localhost:8080' }
 }));
 
 vi.mock('./client', () => ({

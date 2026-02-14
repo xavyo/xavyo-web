@@ -1,6 +1,6 @@
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { API_BASE_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async ({ params, locals, fetch: svelteKitFetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ params, locals, fetch: svelteKitFetc
 	headers.set('X-Tenant-Id', locals.tenantId);
 
 	const res = await svelteKitFetch(
-		`${API_BASE_URL}/auth/social/link/${params.provider}/authorize`,
+		`${env.API_BASE_URL}/auth/social/link/${params.provider}/authorize`,
 		{
 			method: 'GET',
 			headers,

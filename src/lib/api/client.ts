@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export class ApiError extends Error {
 	status: number;
@@ -32,7 +32,7 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 		headers.set('X-Tenant-Id', tenantId);
 	}
 
-	const baseUrl = API_BASE_URL;
+	const baseUrl = env.API_BASE_URL;
 	const url = `${baseUrl}${endpoint}`;
 
 	const response = await fetchFn(url, {

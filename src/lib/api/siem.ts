@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { apiClient, ApiError } from './client';
 import type {
 	SiemDestination,
@@ -283,7 +283,7 @@ export async function downloadSiemExport(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<Response> {
 	const f = fetchFn ?? globalThis.fetch;
-	const res = await f(`${API_BASE_URL}/governance/siem/exports/${id}/download`, {
+	const res = await f(`${env.API_BASE_URL}/governance/siem/exports/${id}/download`, {
 		headers: {
 			'Authorization': `Bearer ${token}`,
 			'X-Tenant-Id': tenantId

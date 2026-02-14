@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { apiClient, ApiError } from './client';
 import type {
 	PolicySimulation,
@@ -245,7 +245,7 @@ export async function exportPolicySimulation(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<Response> {
 	const f = fetchFn ?? globalThis.fetch;
-	const res = await f(`${API_BASE_URL}/governance/simulations/policy/${id}/export?format=${format}`, {
+	const res = await f(`${env.API_BASE_URL}/governance/simulations/policy/${id}/export?format=${format}`, {
 		headers: {
 			'Authorization': `Bearer ${token}`,
 			'X-Tenant-Id': tenantId
@@ -439,7 +439,7 @@ export async function exportBatchSimulation(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<Response> {
 	const f = fetchFn ?? globalThis.fetch;
-	const res = await f(`${API_BASE_URL}/governance/simulations/batch/${id}/export?format=${format}`, {
+	const res = await f(`${env.API_BASE_URL}/governance/simulations/batch/${id}/export?format=${format}`, {
 		headers: {
 			'Authorization': `Bearer ${token}`,
 			'X-Tenant-Id': tenantId
@@ -523,7 +523,7 @@ export async function exportSimulationComparison(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<Response> {
 	const f = fetchFn ?? globalThis.fetch;
-	const res = await f(`${API_BASE_URL}/governance/simulations/comparisons/${id}/export?format=${format}`, {
+	const res = await f(`${env.API_BASE_URL}/governance/simulations/comparisons/${id}/export?format=${format}`, {
 		headers: {
 			'Authorization': `Bearer ${token}`,
 			'X-Tenant-Id': tenantId
