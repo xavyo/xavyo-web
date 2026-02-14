@@ -2,11 +2,13 @@ import { env } from '$env/dynamic/private';
 
 export class ApiError extends Error {
 	status: number;
+	errorType: string;
 
-	constructor(message: string, status: number) {
+	constructor(message: string, status: number, errorType?: string) {
 		super(message);
 		this.name = 'ApiError';
 		this.status = status;
+		this.errorType = errorType ?? '';
 	}
 }
 
@@ -47,11 +49,13 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 
 	if (!response.ok) {
 		let errorMessage = 'An error occurred';
+		let errorType = '';
 		try {
 			const text = await response.text();
 			try {
 				const errorBody = JSON.parse(text);
 				errorMessage = errorBody.message || errorBody.detail || errorBody.error || errorMessage;
+				errorType = errorBody.type ?? '';
 			} catch {
 				// Response body not JSON — use plain text if available
 				if (text) {
@@ -61,7 +65,7 @@ export async function apiClient<T>(endpoint: string, options: ApiClientOptions):
 		} catch {
 			// Could not read response body
 		}
-		throw new ApiError(errorMessage, response.status);
+		throw new ApiError(errorMessage, response.status, errorType);
 	}
 
 	// Handle empty 200 responses (e.g. DELETE returning 200 with no body)

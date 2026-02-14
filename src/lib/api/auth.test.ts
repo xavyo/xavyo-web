@@ -6,9 +6,11 @@ vi.mock('./client', () => ({
 	apiClient: vi.fn(),
 	ApiError: class ApiError extends Error {
 		status: number;
-		constructor(message: string, status: number) {
+		errorType: string;
+		constructor(message: string, status: number, errorType?: string) {
 			super(message);
 			this.status = status;
+			this.errorType = errorType ?? '';
 		}
 	}
 }));
