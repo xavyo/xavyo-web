@@ -103,7 +103,7 @@ export const actions: Actions = {
 				path: '/',
 				httpOnly: true,
 				secure: true,
-				sameSite: 'lax',
+				sameSite: 'strict',
 				maxAge: 60 * 60 * 4 // 4 hours max
 			});
 			// Swap to assumed identity token

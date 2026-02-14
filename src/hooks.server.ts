@@ -51,6 +51,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
 	response.headers.set('X-Content-Type-Options', 'nosniff');
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+	response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+	response.headers.set(
+		'Permissions-Policy',
+		'payment=(), usb=(), bluetooth=(), interest-cohort=()'
+	);
 
 	return response;
 };

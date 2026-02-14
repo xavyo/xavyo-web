@@ -18,7 +18,9 @@ import type {
 	CertificationItemResponse,
 	CertificationDecisionRequest,
 	ApplicationListResponse,
-	ApplicationResponse
+	ApplicationResponse,
+	CreateApplicationRequest,
+	UpdateApplicationRequest
 } from './types';
 
 // --- Param interfaces ---
@@ -501,7 +503,7 @@ export async function listMyCertifications(
 // --- Applications ---
 
 export async function createApplication(
-	body: { name: string; description?: string; app_type?: string },
+	body: CreateApplicationRequest,
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
@@ -511,6 +513,50 @@ export async function createApplication(
 		token,
 		tenantId,
 		body,
+		fetch: fetchFn
+	});
+}
+
+export async function getApplication(
+	id: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<ApplicationResponse> {
+	return apiClient<ApplicationResponse>(`/governance/applications/${id}`, {
+		method: 'GET',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+export async function updateApplication(
+	id: string,
+	data: UpdateApplicationRequest,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<ApplicationResponse> {
+	return apiClient<ApplicationResponse>(`/governance/applications/${id}`, {
+		method: 'PUT',
+		body: data,
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+export async function deleteApplication(
+	id: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<void> {
+	await apiClient(`/governance/applications/${id}`, {
+		method: 'DELETE',
+		token,
+		tenantId,
 		fetch: fetchFn
 	});
 }

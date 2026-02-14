@@ -8,7 +8,7 @@
 		Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook,
 		LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag,
 		RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass,
-		UserCheck, AlertTriangle, FlaskConical, Blocks, HandMetal, Radar, FileQuestion
+		UserCheck, AlertTriangle, FlaskConical, Blocks, HandMetal, Radar, FileQuestion, Grid3X3
 	} from 'lucide-svelte';
 	import Sidebar from '$lib/components/layout/sidebar.svelte';
 	import type { NavSection } from '$lib/components/layout/sidebar.svelte';
@@ -76,6 +76,7 @@
 					label: 'Governance',
 					collapsible: true,
 					items: [
+						{ label: 'Applications', href: '/governance/applications', icon: Grid3X3 },
 						{ label: 'Overview', href: '/governance', icon: Shield },
 						{ label: 'Roles', href: '/governance/roles', icon: KeyRound },
 						{ label: 'Meta-Roles', href: '/governance/meta-roles', icon: Layers },
