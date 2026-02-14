@@ -82,6 +82,16 @@
 	let showCancelConfirm = $state(false);
 	let cancelInvitationId: string | null = $state(null);
 
+	function roleBadgeColor(role: string): string {
+		return role === 'admin'
+			? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+			: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200';
+	}
+
+	function roleBadgeLabel(role: string): string {
+		return role === 'admin' ? 'Administrator' : 'Member';
+	}
+
 	function canActOn(invitation: { status: string; expires_at: string }): boolean {
 		return invitation.status === 'sent' && !isExpired(invitation);
 	}
@@ -148,6 +158,7 @@
 			<thead>
 				<tr class="border-b bg-muted/50">
 					<th class="px-4 py-3 text-left font-medium text-muted-foreground">Email</th>
+					<th class="px-4 py-3 text-left font-medium text-muted-foreground">Role</th>
 					<th class="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
 					<th class="px-4 py-3 text-left font-medium text-muted-foreground">Invited</th>
 					<th class="px-4 py-3 text-left font-medium text-muted-foreground">Expires</th>
@@ -159,6 +170,13 @@
 					<tr class="border-b transition-colors hover:bg-muted/50">
 						<td class="px-4 py-3 font-medium">
 							{invitation.email}
+						</td>
+						<td class="px-4 py-3">
+							<span
+								class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {roleBadgeColor(invitation.role)}"
+							>
+								{roleBadgeLabel(invitation.role)}
+							</span>
 						</td>
 						<td class="px-4 py-3">
 							<span

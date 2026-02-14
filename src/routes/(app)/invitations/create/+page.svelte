@@ -48,6 +48,23 @@
 				{/if}
 			</div>
 
+			<div class="space-y-2">
+				<Label for="role">Role</Label>
+				<select
+					id="role"
+					name="role"
+					class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+					value={String($form.role ?? 'member')}
+					onchange={(e) => { $form.role = e.currentTarget.value as 'member' | 'admin'; }}
+				>
+					<option value="member">Member</option>
+					<option value="admin">Administrator</option>
+				</select>
+				{#if $errors.role}
+					<p class="text-sm text-destructive">{$errors.role}</p>
+				{/if}
+			</div>
+
 			<div class="flex gap-2 pt-2">
 				<Button type="submit">Send Invitation</Button>
 				<a
