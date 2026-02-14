@@ -52,6 +52,10 @@ export const actions: Actions = {
 			}
 		} catch (e) {
 			if (e instanceof ApiError) {
+				// Email not verified — redirect to check-email page
+				if (e.errorType.endsWith('email-not-verified')) {
+					redirect(302, `/check-email?email=${encodeURIComponent(form.data.email)}`);
+				}
 				return message(form, e.message, { status: e.status as ErrorStatus });
 			}
 			return message(form, 'An unexpected error occurred', { status: 500 });

@@ -1,4 +1,3 @@
-import { dev } from '$app/environment';
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -17,7 +16,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies, fetch }) => {
+	default: async ({ request, fetch }) => {
 		const form = await superValidate(request, zod(signupSchema));
 
 		if (!form.valid) {
@@ -25,7 +24,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const result = await signup(
+			await signup(
 				{
 					email: form.data.email,
 					password: form.data.password,
@@ -33,15 +32,6 @@ export const actions: Actions = {
 				},
 				fetch
 			);
-
-			const secure = !dev;
-			cookies.set('access_token', result.access_token, {
-				httpOnly: true,
-				secure,
-				sameSite: 'lax',
-				path: '/',
-				maxAge: result.expires_in
-			});
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
@@ -49,6 +39,6 @@ export const actions: Actions = {
 			return message(form, 'An unexpected error occurred', { status: 500 });
 		}
 
-		redirect(302, '/onboarding');
+		redirect(302, `/check-email?email=${encodeURIComponent(form.data.email)}`);
 	}
 };
