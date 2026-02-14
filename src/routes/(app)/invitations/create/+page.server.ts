@@ -22,7 +22,7 @@ export const actions: Actions = {
 
 		try {
 			await createInvitation(
-				{ email: form.data.email },
+				{ email: form.data.email, role: form.data.role },
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch

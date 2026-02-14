@@ -2582,6 +2582,7 @@ export interface Invitation {
 	id: string;
 	email: string;
 	status: 'sent' | 'cancelled' | 'accepted';
+	role: string;
 	role_template_id: string | null;
 	invited_by_user_id: string;
 	expires_at: string;
@@ -2598,7 +2599,7 @@ export interface InvitationListResponse {
 
 export interface CreateInvitationRequest {
 	email: string;
-	roles?: string[];
+	role?: string;
 }
 
 // --- Connector Management Types ---
