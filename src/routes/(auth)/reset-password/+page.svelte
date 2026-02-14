@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { superForm } from 'sveltekit-superforms';
 	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -10,6 +11,12 @@
 	let { data }: { data: PageData } = $props();
 
 	const { form, errors, enhance, message } = superForm(data.form);
+
+	const tenantParam = $derived(
+		$page.url.searchParams.get('tenant')
+			? `?tenant=${$page.url.searchParams.get('tenant')}`
+			: ''
+	);
 </script>
 
 <Card>
@@ -23,7 +30,7 @@
 				<AlertDescription>
 					{$message}
 					{#if typeof $message === 'string' && $message.includes('successfully')}
-						<a href="/login" class="text-primary underline-offset-4 hover:underline ml-1">Go to login</a>
+						<a href="/login{tenantParam}" class="text-primary underline-offset-4 hover:underline ml-1">Go to login</a>
 					{/if}
 				</AlertDescription>
 			</Alert>
@@ -49,7 +56,7 @@
 	</CardContent>
 	<CardFooter>
 		<p class="text-sm text-muted-foreground">
-			<a href="/login" class="text-primary underline-offset-4 hover:underline">Back to login</a>
+			<a href="/login{tenantParam}" class="text-primary underline-offset-4 hover:underline">Back to login</a>
 		</p>
 	</CardFooter>
 </Card>

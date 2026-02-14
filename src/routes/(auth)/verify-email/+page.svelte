@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	const tenantParam = $derived(
+		$page.url.searchParams.get('tenant')
+			? `?tenant=${$page.url.searchParams.get('tenant')}`
+			: ''
+	);
 </script>
 
 <Card>
@@ -26,6 +33,6 @@
 		{/if}
 	</CardContent>
 	<CardFooter>
-		<a href="/login" class="text-sm text-primary underline-offset-4 hover:underline">Go to login</a>
+		<a href="/login{tenantParam}" class="text-sm text-primary underline-offset-4 hover:underline">Go to login</a>
 	</CardFooter>
 </Card>

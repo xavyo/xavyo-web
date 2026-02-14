@@ -27,7 +27,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			name: client.name,
 			redirect_uris: client.redirect_uris.join(', '),
 			grant_types: client.grant_types.join(', '),
-			scopes: client.scopes.join(', ')
+			scopes: client.scopes.join(', '),
+			logo_url: client.logo_url ?? '',
+			description: client.description ?? ''
 		},
 		zod(updateOAuthClientSchema)
 	);
@@ -62,7 +64,9 @@ export const actions: Actions = {
 						.split(',')
 						.map((s) => s.trim())
 						.filter(Boolean)
-				: undefined
+				: undefined,
+			...(form.data.logo_url ? { logo_url: form.data.logo_url } : {}),
+			...(form.data.description ? { description: form.data.description } : {})
 		};
 
 		try {

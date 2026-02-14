@@ -183,6 +183,36 @@
 					{/if}
 				</div>
 
+				<div class="space-y-2">
+					<Label for="logo_url">Logo URL (optional)</Label>
+					<Input
+						id="logo_url"
+						name="logo_url"
+						type="text"
+						placeholder="https://example.com/app-logo.png"
+						value={String($form.logo_url ?? '')}
+					/>
+					{#if $errors.logo_url}
+						<p class="text-sm text-destructive">{$errors.logo_url}</p>
+					{/if}
+					<p class="text-xs text-muted-foreground">Shown on the consent page when users authorize this client.</p>
+				</div>
+
+				<div class="space-y-2">
+					<Label for="description">Description (optional)</Label>
+					<textarea
+						id="description"
+						name="description"
+						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						placeholder="Brief description of what this application does"
+						value={String($form.description ?? '')}
+					></textarea>
+					{#if $errors.description}
+						<p class="text-sm text-destructive">{$errors.description}</p>
+					{/if}
+					<p class="text-xs text-muted-foreground">Shown on the consent page below the application name.</p>
+				</div>
+
 				<div class="flex gap-2 pt-2">
 					<Button type="submit">Create Client</Button>
 					<a

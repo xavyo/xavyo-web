@@ -32,7 +32,9 @@ export const actions: Actions = {
 					scopes: form.data.scopes
 						.split(',')
 						.map((s) => s.trim())
-						.filter(Boolean)
+						.filter(Boolean),
+					...(form.data.logo_url ? { logo_url: form.data.logo_url } : {}),
+					...(form.data.description ? { description: form.data.description } : {})
 				},
 				locals.accessToken!,
 				locals.tenantId!,

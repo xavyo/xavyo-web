@@ -34,7 +34,11 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 			footer_text: branding?.footer_text ?? '',
 			privacy_policy_url: branding?.privacy_policy_url ?? '',
 			terms_of_service_url: branding?.terms_of_service_url ?? '',
-			support_url: branding?.support_url ?? ''
+			support_url: branding?.support_url ?? '',
+			consent_page_title: branding?.consent_page_title ?? '',
+			consent_page_subtitle: branding?.consent_page_subtitle ?? '',
+			consent_approval_button_text: branding?.consent_approval_button_text ?? '',
+			consent_denial_button_text: branding?.consent_denial_button_text ?? ''
 		},
 		zod(updateBrandingSchema)
 	);

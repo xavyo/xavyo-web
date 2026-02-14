@@ -34,6 +34,8 @@
 		$form.redirect_uris = data.client.redirect_uris.join(', ');
 		$form.grant_types = data.client.grant_types.join(', ');
 		$form.scopes = data.client.scopes.join(', ');
+		$form.logo_url = data.client.logo_url ?? '';
+		$form.description = data.client.description ?? '';
 		isEditing = true;
 	}
 
@@ -119,6 +121,28 @@
 					{/if}
 				</div>
 
+				<div class="space-y-2">
+					<Label for="logo_url">Logo URL</Label>
+					<Input id="logo_url" name="logo_url" type="text" placeholder="https://example.com/app-logo.png" value={String($form.logo_url ?? '')} />
+					{#if $errors.logo_url}
+						<p class="text-sm text-destructive">{$errors.logo_url}</p>
+					{/if}
+				</div>
+
+				<div class="space-y-2">
+					<Label for="description">Description</Label>
+					<textarea
+						id="description"
+						name="description"
+						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						placeholder="Brief description of what this application does"
+						value={String($form.description ?? '')}
+					></textarea>
+					{#if $errors.description}
+						<p class="text-sm text-destructive">{$errors.description}</p>
+					{/if}
+				</div>
+
 				<div class="flex gap-2 pt-2">
 					<Button type="submit">Save changes</Button>
 					<Button type="button" variant="outline" onclick={cancelEdit}>Cancel</Button>
@@ -152,6 +176,23 @@
 						<Badge variant="outline">Public</Badge>
 					{/if}
 				</div>
+
+				{#if data.client.logo_url}
+					<div class="flex justify-between items-start">
+						<span class="text-sm text-muted-foreground">Logo</span>
+						<img
+							src={data.client.logo_url}
+							alt="{data.client.name} logo"
+							class="h-10 w-10 rounded object-contain"
+						/>
+					</div>
+				{/if}
+				{#if data.client.description}
+					<div class="flex justify-between items-start">
+						<span class="text-sm text-muted-foreground">Description</span>
+						<span class="text-sm text-right max-w-[60%]">{data.client.description}</span>
+					</div>
+				{/if}
 
 				<Separator />
 

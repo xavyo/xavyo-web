@@ -27,7 +27,11 @@ export const updateBrandingSchema = z.object({
 	footer_text: z.string().max(500).optional().nullable(),
 	privacy_policy_url: urlOrEmpty,
 	terms_of_service_url: urlOrEmpty,
-	support_url: urlOrEmpty
+	support_url: urlOrEmpty,
+	consent_page_title: z.string().max(255).optional().nullable(),
+	consent_page_subtitle: z.string().max(500).optional().nullable(),
+	consent_approval_button_text: z.string().max(100).optional().nullable(),
+	consent_denial_button_text: z.string().max(100).optional().nullable()
 });
 
 export type UpdateBrandingSchema = typeof updateBrandingSchema;

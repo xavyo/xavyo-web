@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { superForm } from 'sveltekit-superforms';
 	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -10,11 +11,18 @@
 	let { data }: { data: PageData } = $props();
 
 	const { form, errors, enhance, message } = superForm(data.form);
+
+	const b = $derived(data.branding);
+	const tenantParam = $derived(
+		$page.url.searchParams.get('tenant')
+			? `?tenant=${$page.url.searchParams.get('tenant')}`
+			: ''
+	);
 </script>
 
 <Card>
 	<CardHeader>
-		<h1 class="text-2xl font-semibold tracking-tight">Welcome back</h1>
+		<h1 class="text-2xl font-semibold tracking-tight">{b?.login_page_title ?? 'Welcome back'}</h1>
 		<p class="text-sm text-muted-foreground">Enter your credentials to log in</p>
 	</CardHeader>
 	<CardContent>
@@ -46,9 +54,9 @@
 	</CardContent>
 	<CardFooter>
 		<div class="flex w-full flex-col gap-2 text-sm text-muted-foreground">
-			<a href="/forgot-password" class="text-primary underline-offset-4 hover:underline">Forgot your password?</a>
+			<a href="/forgot-password{tenantParam}" class="text-primary underline-offset-4 hover:underline">Forgot your password?</a>
 			<p>
-				Don't have an account? <a href="/signup" class="text-primary underline-offset-4 hover:underline">Sign up</a>
+				Don't have an account? <a href="/signup{tenantParam}" class="text-primary underline-offset-4 hover:underline">Sign up</a>
 			</p>
 		</div>
 	</CardFooter>

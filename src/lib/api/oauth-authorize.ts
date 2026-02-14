@@ -5,6 +5,8 @@ export interface AuthorizeInfo {
 	client_id: string;
 	scopes: string[];
 	redirect_uri: string;
+	client_logo_url: string | null;
+	client_description: string | null;
 }
 
 export interface AuthorizeGrantResponse {

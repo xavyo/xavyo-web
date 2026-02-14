@@ -3242,6 +3242,31 @@ export interface UserPeerComparison {
 	is_outlier: boolean;
 }
 
+// --- Public Branding (unauthenticated, for auth pages) ---
+
+export interface PublicBranding {
+	logo_url: string | null;
+	logo_dark_url: string | null;
+	favicon_url: string | null;
+	primary_color: string;
+	secondary_color: string | null;
+	accent_color: string | null;
+	background_color: string | null;
+	text_color: string | null;
+	font_family: string | null;
+	login_page_title: string;
+	login_page_subtitle: string | null;
+	login_page_background_url: string | null;
+	footer_text: string | null;
+	privacy_policy_url: string | null;
+	terms_of_service_url: string | null;
+	support_url: string | null;
+	consent_page_title: string | null;
+	consent_page_subtitle: string | null;
+	consent_approval_button_text: string | null;
+	consent_denial_button_text: string | null;
+}
+
 // --- Tenant Branding Types ---
 
 export interface BrandingConfig {
@@ -3263,6 +3288,10 @@ export interface BrandingConfig {
 	privacy_policy_url: string | null;
 	terms_of_service_url: string | null;
 	support_url: string | null;
+	consent_page_title: string | null;
+	consent_page_subtitle: string | null;
+	consent_approval_button_text: string | null;
+	consent_denial_button_text: string | null;
 	updated_at: string;
 }
 
@@ -3279,6 +3308,8 @@ export interface OAuthClient {
 	grant_types: string[];
 	scopes: string[];
 	is_active: boolean;
+	logo_url: string | null;
+	description: string | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -3298,6 +3329,8 @@ export interface CreateOAuthClientRequest {
 	redirect_uris: string[];
 	grant_types: string[];
 	scopes: string[];
+	logo_url?: string;
+	description?: string;
 }
 
 export interface UpdateOAuthClientRequest {
@@ -3306,6 +3339,8 @@ export interface UpdateOAuthClientRequest {
 	grant_types?: string[];
 	scopes?: string[];
 	is_active?: boolean;
+	logo_url?: string;
+	description?: string;
 }
 
 // --- User Group Types ---

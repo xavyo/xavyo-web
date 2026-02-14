@@ -279,6 +279,80 @@
 			</div>
 		</div>
 
+		<!-- OAuth Consent -->
+		<div class="rounded-lg border bg-card p-6">
+			<h3 class="mb-4 text-lg font-medium">OAuth Consent</h3>
+			<p class="mb-4 text-sm text-muted-foreground">Customize the consent page shown when users authorize third-party applications.</p>
+			<div class="space-y-4">
+				<div class="space-y-2">
+					<Label for="consent_page_title">Consent Page Title</Label>
+					<input
+						id="consent_page_title"
+						name="consent_page_title"
+						type="text"
+						placeholder="Authorize Application"
+						value={String($form.consent_page_title ?? '')}
+						oninput={handleInput('consent_page_title')}
+						class={inputClass}
+					/>
+					{#if $errors.consent_page_title}
+						<p class="text-sm text-destructive">{$errors.consent_page_title}</p>
+					{/if}
+				</div>
+
+				<div class="space-y-2">
+					<Label for="consent_page_subtitle">Consent Page Subtitle</Label>
+					<input
+						id="consent_page_subtitle"
+						name="consent_page_subtitle"
+						type="text"
+						placeholder={'{client_name} wants to access your account'}
+						value={String($form.consent_page_subtitle ?? '')}
+						oninput={handleInput('consent_page_subtitle')}
+						class={inputClass}
+					/>
+					{#if $errors.consent_page_subtitle}
+						<p class="text-sm text-destructive">{$errors.consent_page_subtitle}</p>
+					{/if}
+					<p class="text-xs text-muted-foreground">Use <code class="rounded bg-muted px-1">&#123;client_name&#125;</code> to insert the application name.</p>
+				</div>
+
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+					<div class="space-y-2">
+						<Label for="consent_approval_button_text">Allow Button Text</Label>
+						<input
+							id="consent_approval_button_text"
+							name="consent_approval_button_text"
+							type="text"
+							placeholder="Allow"
+							value={String($form.consent_approval_button_text ?? '')}
+							oninput={handleInput('consent_approval_button_text')}
+							class={inputClass}
+						/>
+						{#if $errors.consent_approval_button_text}
+							<p class="text-sm text-destructive">{$errors.consent_approval_button_text}</p>
+						{/if}
+					</div>
+
+					<div class="space-y-2">
+						<Label for="consent_denial_button_text">Deny Button Text</Label>
+						<input
+							id="consent_denial_button_text"
+							name="consent_denial_button_text"
+							type="text"
+							placeholder="Deny"
+							value={String($form.consent_denial_button_text ?? '')}
+							oninput={handleInput('consent_denial_button_text')}
+							class={inputClass}
+						/>
+						{#if $errors.consent_denial_button_text}
+							<p class="text-sm text-destructive">{$errors.consent_denial_button_text}</p>
+						{/if}
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Legal -->
 		<div class="rounded-lg border bg-card p-6">
 			<h3 class="mb-4 text-lg font-medium">Legal</h3>

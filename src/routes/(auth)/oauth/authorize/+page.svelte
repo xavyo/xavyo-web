@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
@@ -8,6 +9,25 @@
 	let { data, form: actionData }: { data: PageData; form: ActionData } = $props();
 
 	let submitting: 'approve' | 'deny' | null = $state(null);
+
+	const tenantParam = $derived(
+		$page.url.searchParams.get('tenant')
+			? `?tenant=${$page.url.searchParams.get('tenant')}`
+			: ''
+	);
+
+	const b = $derived(data.branding);
+
+	const consentTitle = $derived(b?.consent_page_title ?? 'Authorize Application');
+
+	function getConsentSubtitle(): string {
+		if (!data.clientInfo) return '';
+		const template = b?.consent_page_subtitle ?? '{client_name} wants to access your account';
+		return template.replace(/\{client_name\}/g, data.clientInfo.client_name);
+	}
+
+	const approveLabel = $derived(b?.consent_approval_button_text ?? 'Allow');
+	const denyLabel = $derived(b?.consent_denial_button_text ?? 'Deny');
 
 	const scopeLabels: Record<string, string> = {
 		openid: 'Verify your identity',
@@ -49,7 +69,7 @@
 		</CardContent>
 		<CardFooter>
 			<a
-				href="/login"
+				href="/login{tenantParam}"
 				class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
 			>
 				Back to login
@@ -58,12 +78,25 @@
 	</Card>
 {:else if data.clientInfo}
 	<Card class="max-w-md">
-		<CardHeader>
-			<h2 class="text-xl font-semibold tracking-tight">Authorize Application</h2>
+		<CardHeader class="text-center">
+			{#if data.clientInfo.client_logo_url}
+				<div class="mb-3 flex justify-center">
+					<img
+						src={data.clientInfo.client_logo_url}
+						alt="{data.clientInfo.client_name} logo"
+						class="h-16 w-16 rounded-lg object-contain"
+					/>
+				</div>
+			{/if}
+			<h2 class="text-xl font-semibold tracking-tight">{consentTitle}</h2>
 			<p class="text-sm text-muted-foreground">
-				<span class="font-medium text-foreground">{data.clientInfo.client_name}</span>
-				wants to access your account
+				{getConsentSubtitle()}
 			</p>
+			{#if data.clientInfo.client_description}
+				<p class="mt-1 text-xs text-muted-foreground">
+					{data.clientInfo.client_description}
+				</p>
+			{/if}
 		</CardHeader>
 		<CardContent class="space-y-4">
 			{#if actionData?.error}
@@ -122,7 +155,7 @@
 					class="w-full"
 					disabled={submitting !== null}
 				>
-					{submitting === 'deny' ? 'Denying...' : 'Deny'}
+					{submitting === 'deny' ? `${denyLabel}...` : denyLabel}
 				</Button>
 			</form>
 			<form
@@ -143,7 +176,7 @@
 				/>
 				<input type="hidden" name="nonce" value={data.oauthParams.nonce} />
 				<Button type="submit" class="w-full" disabled={submitting !== null}>
-					{submitting === 'approve' ? 'Allowing...' : 'Allow'}
+					{submitting === 'approve' ? `${approveLabel}...` : approveLabel}
 				</Button>
 			</form>
 		</CardFooter>
