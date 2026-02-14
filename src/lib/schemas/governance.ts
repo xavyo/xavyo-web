@@ -100,6 +100,22 @@ export const certificationDecisionSchema = z.object({
 	notes: z.string().optional()
 });
 
+export const createApplicationSchema = z.object({
+	name: z.string().min(1, 'Name is required').max(255),
+	app_type: z.enum(['internal', 'external']),
+	description: z.string().max(2000).optional(),
+	external_id: z.string().max(255).optional(),
+	is_delegable: z.boolean().optional().default(true)
+});
+
+export const updateApplicationSchema = z.object({
+	name: z.string().min(1, 'Name is required').max(255).optional(),
+	status: z.enum(['active', 'inactive']).optional(),
+	description: z.string().max(2000).optional(),
+	external_id: z.string().max(255).optional(),
+	is_delegable: z.boolean().optional()
+});
+
 export type CreateEntitlementSchema = typeof createEntitlementSchema;
 export type UpdateEntitlementSchema = typeof updateEntitlementSchema;
 export type CreateSodRuleSchema = typeof createSodRuleSchema;
@@ -109,3 +125,5 @@ export type CreateAccessRequestSchema = typeof createAccessRequestSchema;
 export type ApproveRequestSchema = typeof approveRequestSchema;
 export type RejectRequestSchema = typeof rejectRequestSchema;
 export type CertificationDecisionSchema = typeof certificationDecisionSchema;
+export type CreateApplicationSchema = typeof createApplicationSchema;
+export type UpdateApplicationSchema = typeof updateApplicationSchema;

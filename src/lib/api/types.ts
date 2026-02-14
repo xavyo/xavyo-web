@@ -1342,6 +1342,26 @@ export interface ApplicationListResponse {
 	offset: number;
 }
 
+export interface CreateApplicationRequest {
+	name: string;
+	app_type: AppType;
+	description?: string;
+	owner_id?: string;
+	external_id?: string;
+	metadata?: Record<string, unknown>;
+	is_delegable?: boolean;
+}
+
+export interface UpdateApplicationRequest {
+	name?: string;
+	status?: AppStatus;
+	description?: string;
+	owner_id?: string;
+	external_id?: string;
+	metadata?: Record<string, unknown>;
+	is_delegable?: boolean;
+}
+
 // --- NHI Protocol Types (MCP, A2A, Permissions, Agent Card) ---
 
 // MCP Types

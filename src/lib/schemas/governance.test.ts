@@ -7,7 +7,9 @@ import {
 	createAccessRequestSchema,
 	approveRequestSchema,
 	rejectRequestSchema,
-	certificationDecisionSchema
+	certificationDecisionSchema,
+	createApplicationSchema,
+	updateApplicationSchema
 } from './governance';
 
 describe('createEntitlementSchema', () => {
@@ -678,5 +680,170 @@ describe('certificationDecisionSchema', () => {
 			notes: 'Some notes'
 		});
 		expect(result.success).toBe(false);
+	});
+});
+
+describe('createApplicationSchema', () => {
+	it('accepts valid input with required fields only', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'SAP ERP',
+			app_type: 'internal'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts valid input with all optional fields', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'Salesforce CRM',
+			app_type: 'external',
+			description: 'Customer relationship management platform',
+			external_id: 'SF-001',
+			is_delegable: false
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('defaults is_delegable to true when omitted', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'Test App',
+			app_type: 'internal'
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.is_delegable).toBe(true);
+		}
+	});
+
+	it('rejects missing name', () => {
+		const result = createApplicationSchema.safeParse({
+			app_type: 'internal'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects empty name', () => {
+		const result = createApplicationSchema.safeParse({
+			name: '',
+			app_type: 'internal'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects name over 255 chars', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'x'.repeat(256),
+			app_type: 'internal'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects missing app_type', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'Test App'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects invalid app_type', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'Test App',
+			app_type: 'cloud'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('accepts all valid app_type values', () => {
+		for (const type of ['internal', 'external']) {
+			const result = createApplicationSchema.safeParse({
+				name: 'Test App',
+				app_type: type
+			});
+			expect(result.success).toBe(true);
+		}
+	});
+
+	it('rejects description over 2000 chars', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'Test App',
+			app_type: 'internal',
+			description: 'x'.repeat(2001)
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects external_id over 255 chars', () => {
+		const result = createApplicationSchema.safeParse({
+			name: 'Test App',
+			app_type: 'internal',
+			external_id: 'x'.repeat(256)
+		});
+		expect(result.success).toBe(false);
+	});
+});
+
+describe('updateApplicationSchema', () => {
+	it('accepts empty object (all optional)', () => {
+		const result = updateApplicationSchema.safeParse({});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts valid partial update with name', () => {
+		const result = updateApplicationSchema.safeParse({
+			name: 'Updated Name'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts valid partial update with status', () => {
+		const result = updateApplicationSchema.safeParse({
+			status: 'inactive'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts all valid status values', () => {
+		for (const status of ['active', 'inactive']) {
+			const result = updateApplicationSchema.safeParse({ status });
+			expect(result.success).toBe(true);
+		}
+	});
+
+	it('rejects invalid status', () => {
+		const result = updateApplicationSchema.safeParse({
+			status: 'archived'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects name over 255 chars', () => {
+		const result = updateApplicationSchema.safeParse({
+			name: 'x'.repeat(256)
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects description over 2000 chars', () => {
+		const result = updateApplicationSchema.safeParse({
+			description: 'x'.repeat(2001)
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects external_id over 255 chars', () => {
+		const result = updateApplicationSchema.safeParse({
+			external_id: 'x'.repeat(256)
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('accepts full update with all fields', () => {
+		const result = updateApplicationSchema.safeParse({
+			name: 'Updated App',
+			status: 'active',
+			description: 'Updated description',
+			external_id: 'EXT-002',
+			is_delegable: false
+		});
+		expect(result.success).toBe(true);
 	});
 });

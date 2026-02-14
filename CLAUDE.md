@@ -45,9 +45,9 @@ npm test && npm run lint
 TypeScript 5.x / Svelte 5 (runes mode): Follow standard conventions
 
 ## Recent Changes
+- 001-governance-applications: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), TanStack Table (`@tanstack/svelte-table`), lucide-svelte
 - 001-manual-tasks-detection-rules: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 - 040-object-templates: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
-- 039-policy-simulations: Added TypeScript 5.x / Svelte 5 (runes mode) + SvelteKit + Bits UI, Tailwind CSS v4, Superforms + Zod (via `zod/v3`), lucide-svelte
 
 
 <!-- MANUAL ADDITIONS START -->
