@@ -12,6 +12,11 @@
 
 	const { form, errors, enhance, message } = superForm(data.form);
 
+	const canSubmit = $derived(
+		($form.email ?? '').toString().length > 0 &&
+		($form.password ?? '').toString().length > 0
+	);
+
 	const tenantParam = $derived(
 		$page.url.searchParams.get('tenant')
 			? `?tenant=${$page.url.searchParams.get('tenant')}`
@@ -34,7 +39,7 @@
 		<form method="POST" use:enhance class="space-y-4">
 			<div class="space-y-2">
 				<Label for="email">Email</Label>
-				<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($form.email ?? '')} />
+				<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($form.email ?? '')} oninput={(e) => { $form.email = e.currentTarget.value; }} />
 				{#if $errors.email}
 					<p class="text-sm text-destructive">{$errors.email}</p>
 				{/if}
@@ -42,7 +47,7 @@
 
 			<div class="space-y-2">
 				<Label for="password">Password</Label>
-				<Input id="password" name="password" type="password" placeholder="Min. 8 characters" value={String($form.password ?? '')} />
+				<Input id="password" name="password" type="password" placeholder="Min. 8 characters" value={String($form.password ?? '')} oninput={(e) => { $form.password = e.currentTarget.value; }} />
 				{#if $errors.password}
 					<p class="text-sm text-destructive">{$errors.password}</p>
 				{/if}
@@ -56,7 +61,7 @@
 				{/if}
 			</div>
 
-			<Button type="submit" class="w-full">Sign up</Button>
+			<Button type="submit" class="w-full" disabled={!canSubmit}>Sign up</Button>
 		</form>
 	</CardContent>
 	<CardFooter>
