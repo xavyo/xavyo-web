@@ -936,8 +936,6 @@ export type CampaignReviewerType =
 export type CertificationItemStatus = 'pending' | 'approved' | 'revoked' | 'skipped';
 export type CertificationDecision = 'approved' | 'revoked';
 
-export type RiskDirection = 'increasing' | 'stable' | 'decreasing';
-
 // Entitlement
 
 export interface EntitlementResponse {
@@ -1215,41 +1213,7 @@ export interface CertificationDecisionRequest {
 	notes?: string;
 }
 
-// Risk Scoring
-
-export interface FactorContribution {
-	factor_name: string;
-	score: number;
-	weight: number;
-	description: string | null;
-}
-
-export interface PeerComparison {
-	percentile: number;
-	peer_group_average: number;
-	peer_group_size: number;
-}
-
-export interface RiskScoreResponse {
-	id: string;
-	user_id: string;
-	total_score: number;
-	risk_level: RiskLevel;
-	static_score: number;
-	dynamic_score: number;
-	factor_breakdown: FactorContribution[];
-	peer_comparison: PeerComparison | null;
-	calculated_at: string;
-	created_at: string;
-	updated_at: string;
-}
-
-export interface RiskScoreListResponse {
-	items: RiskScoreResponse[];
-	total: number;
-	limit: number;
-	offset: number;
-}
+// Risk Scoring (legacy summary types — used by governance overview)
 
 export interface RiskLevelCount {
 	level: RiskLevel;
@@ -1262,29 +1226,6 @@ export interface RiskScoreSummary {
 	average_score: number;
 }
 
-export interface RiskHistoryEntry {
-	snapshot_date: string;
-	score: number;
-	risk_level: RiskLevel;
-}
-
-export interface RiskTrendResponse {
-	score_30d_ago?: number;
-	score_60d_ago?: number;
-	score_90d_ago?: number;
-	change_30d?: number;
-	change_60d?: number;
-	change_90d?: number;
-	direction: RiskDirection;
-}
-
-export interface RiskScoreHistoryResponse {
-	user_id: string;
-	current_score: number;
-	trend: RiskTrendResponse;
-	history: RiskHistoryEntry[];
-}
-
 export interface RiskAlertsSummary {
 	total_alerts: number;
 	unread_count: number;
@@ -1294,25 +1235,6 @@ export interface RiskAlertsSummary {
 		high: number;
 		critical: number;
 	};
-}
-
-export interface RiskAlertResponse {
-	id: string;
-	user_id: string;
-	alert_type: string;
-	severity: RiskLevel;
-	title: string;
-	message: string;
-	metadata: Record<string, unknown>;
-	acknowledged_at: string | null;
-	created_at: string;
-}
-
-export interface RiskAlertListResponse {
-	items: RiskAlertResponse[];
-	total: number;
-	limit: number;
-	offset: number;
 }
 
 // --- Governance Applications ---
@@ -6976,4 +6898,211 @@ export interface UpdateDetectionRuleRequest {
 	priority?: number;
 	parameters?: Record<string, unknown>;
 	description?: string;
+}
+
+// ============================================================================
+// Risk Dashboard & Management (Phase 042)
+// ============================================================================
+
+// --- Enums ---
+
+export type ThresholdAction = 'alert' | 'require_mfa' | 'block';
+export type RiskFactorCategory = 'static' | 'dynamic';
+export type EnforcementAction = 'none' | 'alert' | 'require_mfa' | 'block';
+
+// --- Risk Alerts ---
+
+export interface RiskAlertResponse {
+	id: string;
+	user_id: string;
+	threshold_id: string;
+	score_at_alert: number;
+	severity: AlertSeverity;
+	acknowledged: boolean;
+	acknowledged_by?: string;
+	acknowledged_at?: string;
+	created_at: string;
+}
+
+export interface RiskAlertListResponse {
+	items: RiskAlertResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface RiskAlertSummaryResponse {
+	unacknowledged: { severity: AlertSeverity; count: number }[];
+	total_unacknowledged: number;
+}
+
+// --- Risk Scores ---
+
+export interface RiskScoreFactorBreakdown {
+	factor_id: string;
+	factor_name: string;
+	category: string;
+	raw_value: number;
+	weight: number;
+	contribution: number;
+}
+
+export interface RiskScorePeerComparison {
+	group_id: string;
+	group_name: string;
+	user_entitlement_count: number;
+	group_average: number;
+	group_stddev: number;
+	deviation: number;
+	is_outlier: boolean;
+}
+
+export interface RiskScoreResponse {
+	id: string;
+	user_id: string;
+	total_score: number;
+	risk_level: RiskLevel;
+	static_score: number;
+	dynamic_score: number;
+	factor_breakdown: RiskScoreFactorBreakdown[];
+	peer_comparison?: RiskScorePeerComparison;
+	calculated_at: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface RiskScoreListResponse {
+	items: RiskScoreResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface RiskScoreSummaryResponse {
+	by_level: { level: RiskLevel; count: number }[];
+	total_users: number;
+	average_score: number;
+}
+
+export interface RiskScoreHistoryEntry {
+	id: string;
+	score: number;
+	risk_level: RiskLevel;
+	snapshot_date: string;
+	created_at: string;
+}
+
+export interface RiskScoreTrend {
+	score_30d_ago?: number;
+	score_60d_ago?: number;
+	score_90d_ago?: number;
+	change_30d?: number;
+	change_60d?: number;
+	change_90d?: number;
+	direction: TrendDirection;
+}
+
+export interface RiskScoreHistoryResponse {
+	user_id: string;
+	current_score: number;
+	trend: RiskScoreTrend;
+	history: RiskScoreHistoryEntry[];
+}
+
+// --- Risk Factors ---
+
+export interface RiskFactorResponse {
+	id: string;
+	name: string;
+	category: RiskFactorCategory;
+	factor_type: string;
+	weight: number;
+	description?: string;
+	is_enabled: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface RiskFactorListResponse {
+	items: RiskFactorResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateRiskFactorRequest {
+	name: string;
+	category: RiskFactorCategory;
+	factor_type: string;
+	weight: number;
+	description?: string;
+	is_enabled?: boolean;
+}
+
+export interface UpdateRiskFactorRequest {
+	name?: string;
+	category?: RiskFactorCategory;
+	factor_type?: string;
+	weight?: number;
+	description?: string;
+	is_enabled?: boolean;
+}
+
+// --- Risk Events ---
+
+export interface RiskEventResponse {
+	id: string;
+	user_id: string;
+	factor_id?: string;
+	event_type: string;
+	value: number;
+	source_ref?: string;
+	created_at: string;
+	expires_at?: string;
+}
+
+export interface RiskEventListResponse {
+	items: RiskEventResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+// --- Risk Thresholds ---
+
+export interface RiskThresholdResponse {
+	id: string;
+	name: string;
+	score_value: number;
+	severity: AlertSeverity;
+	action: ThresholdAction;
+	cooldown_hours: number;
+	is_enabled: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface RiskThresholdListResponse {
+	items: RiskThresholdResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateRiskThresholdRequest {
+	name: string;
+	score_value: number;
+	severity: AlertSeverity;
+	action?: ThresholdAction;
+	cooldown_hours?: number;
+	is_enabled?: boolean;
+}
+
+export interface UpdateRiskThresholdRequest {
+	name?: string;
+	score_value?: number;
+	severity?: AlertSeverity;
+	action?: ThresholdAction;
+	cooldown_hours?: number;
+	is_enabled?: boolean;
 }
