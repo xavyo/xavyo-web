@@ -7106,3 +7106,168 @@ export interface UpdateRiskThresholdRequest {
 	cooldown_hours?: number;
 	is_enabled?: boolean;
 }
+
+// ─── SCIM Targets (Outbound) ────────────────────────────────────────────
+
+export type ScimTargetStatus = 'active' | 'unreachable' | 'inactive' | 'error';
+export type ScimTargetAuthMethod = 'bearer' | 'oauth2';
+export type ScimTargetDeprovisioningStrategy = 'deactivate' | 'delete';
+
+export interface ScimBearerCredentials {
+	type: 'bearer';
+	token: string;
+}
+
+export interface ScimOAuth2Credentials {
+	type: 'oauth2';
+	client_id: string;
+	client_secret: string;
+	token_endpoint: string;
+	scopes?: string[];
+}
+
+export type ScimCredentials = ScimBearerCredentials | ScimOAuth2Credentials;
+
+export interface ScimTargetResponse {
+	id: string;
+	tenant_id: string;
+	name: string;
+	base_url: string;
+	auth_method: ScimTargetAuthMethod;
+	deprovisioning_strategy: ScimTargetDeprovisioningStrategy;
+	tls_verify: boolean;
+	rate_limit_per_minute: number;
+	request_timeout_secs: number;
+	max_retries: number;
+	status: ScimTargetStatus;
+	last_health_check_at?: string | null;
+	last_health_check_error?: string | null;
+	service_provider_config?: Record<string, unknown> | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ScimTargetListResponse {
+	items: ScimTargetResponse[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface CreateScimTargetRequest {
+	name: string;
+	base_url: string;
+	auth_method: ScimTargetAuthMethod;
+	credentials: ScimCredentials;
+	deprovisioning_strategy?: ScimTargetDeprovisioningStrategy;
+	tls_verify?: boolean;
+	rate_limit_per_minute?: number;
+	request_timeout_secs?: number;
+	max_retries?: number;
+}
+
+export interface UpdateScimTargetRequest {
+	name?: string;
+	base_url?: string;
+	auth_method?: ScimTargetAuthMethod;
+	credentials?: ScimCredentials;
+	deprovisioning_strategy?: ScimTargetDeprovisioningStrategy;
+	tls_verify?: boolean;
+	rate_limit_per_minute?: number;
+	request_timeout_secs?: number;
+	max_retries?: number;
+}
+
+export interface ScimTargetHealthCheckResponse {
+	status: string;
+	checked_at: string;
+	service_provider_config?: Record<string, unknown> | null;
+	error?: string | null;
+}
+
+export interface ScimSyncRunResponse {
+	sync_run_id: string;
+	status: string;
+	message?: string;
+}
+
+export interface ScimSyncRun {
+	id: string;
+	target_id: string;
+	sync_type: string;
+	status: string;
+	total_processed?: number;
+	total_created?: number;
+	total_updated?: number;
+	total_failed?: number;
+	started_at: string;
+	completed_at?: string | null;
+	error?: string | null;
+}
+
+export interface ScimSyncRunListResponse {
+	items: ScimSyncRun[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ScimProvisioningState {
+	id: string;
+	target_id: string;
+	resource_type: string;
+	resource_id: string;
+	external_id?: string | null;
+	status: string;
+	last_synced_at?: string | null;
+	last_error?: string | null;
+	retry_count: number;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface ScimProvisioningStateListResponse {
+	items: ScimProvisioningState[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ScimProvisioningLog {
+	id: string;
+	target_id: string;
+	operation: string;
+	resource_type: string;
+	resource_id?: string | null;
+	http_method?: string | null;
+	http_status?: number | null;
+	duration_ms?: number | null;
+	error?: string | null;
+	created_at: string;
+}
+
+export interface ScimProvisioningLogListResponse {
+	items: ScimProvisioningLog[];
+	total: number;
+	limit: number;
+	offset: number;
+}
+
+export interface ScimTargetMappingEntry {
+	source_field: string;
+	target_scim_path: string;
+	mapping_type: string;
+	constant_value?: string | null;
+	transform?: string | null;
+	resource_type: string;
+}
+
+export interface ScimTargetMappingsResponse {
+	target_id: string;
+	mappings: ScimTargetMappingEntry[];
+	total_count: number;
+}
+
+export interface ScimReplaceMappingsRequest {
+	mappings: ScimTargetMappingEntry[];
+}
