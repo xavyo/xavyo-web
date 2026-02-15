@@ -122,7 +122,8 @@
 						{ label: 'Operations', href: '/governance/operations', icon: Clock },
 						{ label: 'Webhooks', href: '/settings/webhooks', icon: Webhook },
 						{ label: 'Imports', href: '/settings/imports', icon: Upload },
-						{ label: 'SCIM', href: '/settings/scim', icon: Key }
+						{ label: 'SCIM', href: '/settings/scim', icon: Key },
+						{ label: 'SCIM Targets', href: '/settings/scim-targets', icon: ArrowRightLeft }
 					]
 				}
 			);
