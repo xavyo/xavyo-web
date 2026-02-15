@@ -14,6 +14,7 @@
 	import CredentialsSection from '../../credentials-section.svelte';
 	import McpToolsTab from '$lib/components/nhi/mcp-tools-tab.svelte';
 	import PermissionsTab from '$lib/components/nhi/permissions-tab.svelte';
+	import DelegationsTab from '$lib/components/nhi/delegations-tab.svelte';
 	import RiskBreakdown from '$lib/components/nhi/risk-breakdown.svelte';
 	import UsageHistoryTable from '$lib/components/nhi/usage-history-table.svelte';
 	import UsageSummaryStats from '$lib/components/nhi/usage-summary-stats.svelte';
@@ -123,6 +124,7 @@
 		<TabsTrigger value="details">Details</TabsTrigger>
 		<TabsTrigger value="mcp-tools">MCP Tools</TabsTrigger>
 		<TabsTrigger value="permissions">Permissions</TabsTrigger>
+		<TabsTrigger value="delegations">Delegations</TabsTrigger>
 		<TabsTrigger value="usage">Usage</TabsTrigger>
 		<TabsTrigger value="risk">Risk</TabsTrigger>
 	</TabsList>
@@ -400,6 +402,10 @@
 
 	<TabsContent value="permissions">
 		<PermissionsTab nhiId={data.nhi.id} entityType="tool" />
+	</TabsContent>
+
+	<TabsContent value="delegations">
+		<DelegationsTab nhiId={data.nhi.id} />
 	</TabsContent>
 
 	<TabsContent value="usage">

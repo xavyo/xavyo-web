@@ -6,7 +6,7 @@
 		LayoutDashboard, Users, Drama, Bot, ArrowRightLeft, Settings, ClipboardList,
 		Network, Shield, ShieldCheck, FileBarChart, Workflow, KeyRound, Layers, Mail,
 		Plug, Activity, RefreshCw, ScanSearch, UsersRound, CheckCircle, Award, Webhook,
-		LockKeyhole, Upload, Key, GitMerge, Scale, Link, Milestone, Stamp, ShoppingBag,
+		LockKeyhole, Upload, Key, GitMerge, Scale, Link, Share2, Milestone, Stamp, ShoppingBag,
 		RotateCw, Pickaxe, ClipboardCheck, Radio, ScrollText, Clock, FileInput, Hourglass,
 		UserCheck, AlertTriangle, FlaskConical, Blocks, HandMetal, Radar, FileQuestion, Grid3X3,
 		ShieldAlert
@@ -68,6 +68,7 @@
 					items: [
 						{ label: 'NHI', href: '/nhi', icon: Bot },
 						{ label: 'A2A Tasks', href: '/nhi/a2a', icon: ArrowRightLeft },
+						{ label: 'Delegations', href: '/nhi/delegations', icon: Share2 },
 						{ label: 'NHI Requests', href: '/nhi/requests', icon: FileInput },
 						{ label: 'NHI Governance', href: '/nhi/governance', icon: ShieldCheck },
 						{ label: 'NHI Staleness', href: '/nhi/staleness', icon: AlertTriangle }
