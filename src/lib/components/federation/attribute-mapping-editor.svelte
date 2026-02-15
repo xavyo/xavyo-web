@@ -150,37 +150,41 @@
 			<div class="space-y-2">
 				<Label class="text-xs text-muted-foreground">Attributes</Label>
 				{#each mapping.attributes as row, i}
-					<div class="flex items-center gap-2 rounded-md border border-input p-2">
-						<select
-							class="h-8 rounded-md border border-input bg-transparent px-2 text-sm"
-							value={row.source}
-							onchange={(e) => updateRowSource(i, (e.target as HTMLSelectElement).value)}
-						>
-							{#each AVAILABLE_SOURCES as src}
-								<option value={src}>{src}</option>
-							{/each}
-						</select>
-						<span class="text-muted-foreground text-xs">&rarr;</span>
-						<input
-							type="text"
-							placeholder="Target name"
-							class="h-8 flex-1 rounded-md border border-input bg-transparent px-2 text-sm placeholder:text-muted-foreground"
-							value={row.target_name}
-							oninput={(e) => updateRowTargetName(i, (e.target as HTMLInputElement).value)}
-						/>
-						<input
-							type="text"
-							placeholder="Friendly name"
-							class="h-8 flex-1 rounded-md border border-input bg-transparent px-2 text-sm placeholder:text-muted-foreground"
-							value={row.target_friendly_name}
-							oninput={(e) => updateRowFriendlyName(i, (e.target as HTMLInputElement).value)}
-						/>
-						{#if row.multi_value}
-							<span class="text-xs text-muted-foreground whitespace-nowrap" title="Multi-value attribute">multi</span>
-						{/if}
-						<Button type="button" variant="ghost" size="sm" onclick={() => removeRow(i)}>
-							<Trash2 class="h-3.5 w-3.5 text-destructive" />
-						</Button>
+					<div class="space-y-2 rounded-md border border-input p-3">
+						<div class="flex items-center gap-2">
+							<select
+								class="h-8 rounded-md border border-input bg-transparent px-2 text-sm"
+								value={row.source}
+								onchange={(e) => updateRowSource(i, (e.target as HTMLSelectElement).value)}
+							>
+								{#each AVAILABLE_SOURCES as src}
+									<option value={src}>{src}</option>
+								{/each}
+							</select>
+							{#if row.multi_value}
+								<span class="text-xs text-muted-foreground whitespace-nowrap" title="Multi-value attribute">multi</span>
+							{/if}
+							<div class="flex-1"></div>
+							<Button type="button" variant="ghost" size="sm" onclick={() => removeRow(i)}>
+								<Trash2 class="h-3.5 w-3.5 text-destructive" />
+							</Button>
+						</div>
+						<div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+							<input
+								type="text"
+								placeholder="Target name (e.g. User.Email)"
+								class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm placeholder:text-muted-foreground"
+								value={row.target_name}
+								oninput={(e) => updateRowTargetName(i, (e.target as HTMLInputElement).value)}
+							/>
+							<input
+								type="text"
+								placeholder="Friendly name (e.g. Email)"
+								class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm placeholder:text-muted-foreground"
+								value={row.target_friendly_name}
+								oninput={(e) => updateRowFriendlyName(i, (e.target as HTMLInputElement).value)}
+							/>
+						</div>
 					</div>
 				{/each}
 			</div>
