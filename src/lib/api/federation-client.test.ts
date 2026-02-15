@@ -4,7 +4,17 @@ function mockResponse(data: unknown, ok = true, status = 200) {
 	return {
 		ok,
 		status,
-		json: () => Promise.resolve(data)
+		json: () => Promise.resolve(data),
+		text: () => Promise.resolve(typeof data === 'string' ? data : JSON.stringify(data))
+	};
+}
+
+function mockTextResponse(text: string, ok = true, status = 200) {
+	return {
+		ok,
+		status,
+		text: () => Promise.resolve(text),
+		json: () => Promise.resolve(JSON.parse(text))
 	};
 }
 
@@ -304,6 +314,147 @@ describe('federation-client', () => {
 			await expect(activateCertificate('bad-id', mockFetch)).rejects.toThrow(
 				'Failed to activate certificate: 404'
 			);
+		});
+	});
+
+	// --- Generate Certificate (P1) ---
+
+	describe('generateCertificate', () => {
+		it('sends POST to /api/federation/saml/certificates/generate', async () => {
+			const certData = { id: 'cert-1', key_id: 'test-cn', is_active: false };
+			mockFetch.mockResolvedValueOnce(mockResponse(certData));
+			const { generateCertificate } = await import('./federation-client');
+
+			const result = await generateCertificate(
+				{ common_name: 'test-cn', organization: 'TestOrg' },
+				mockFetch
+			);
+
+			expect(mockFetch).toHaveBeenCalledWith('/api/federation/saml/certificates/generate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ common_name: 'test-cn', organization: 'TestOrg' })
+			});
+			expect(result).toEqual(certData);
+		});
+
+		it('throws with error message on non-ok response', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ message: 'Bad CN' }, false, 400));
+			const { generateCertificate } = await import('./federation-client');
+
+			await expect(
+				generateCertificate({ common_name: '' }, mockFetch)
+			).rejects.toThrow('Bad CN');
+		});
+
+		it('throws generic message when error body has no message', async () => {
+			mockFetch.mockResolvedValueOnce({
+				ok: false,
+				status: 500,
+				json: () => Promise.reject(new Error('not json'))
+			});
+			const { generateCertificate } = await import('./federation-client');
+
+			await expect(
+				generateCertificate({ common_name: 'test' }, mockFetch)
+			).rejects.toThrow('Failed to generate certificate: 500');
+		});
+	});
+
+	// --- IdP Info (P2) ---
+
+	describe('getIdPInfo', () => {
+		it('fetches from /api/federation/saml/idp-info', async () => {
+			const info = {
+				entity_id: 'http://localhost:8080/saml/metadata?tenant=t1',
+				sso_url: 'http://localhost:8080/saml/sso',
+				metadata_url: 'http://localhost:8080/saml/metadata?tenant=t1'
+			};
+			mockFetch.mockResolvedValueOnce(mockResponse(info));
+			const { getIdPInfo } = await import('./federation-client');
+
+			const result = await getIdPInfo(mockFetch);
+
+			expect(mockFetch).toHaveBeenCalledWith('/api/federation/saml/idp-info');
+			expect(result).toEqual(info);
+		});
+
+		it('throws on non-ok response', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 401));
+			const { getIdPInfo } = await import('./federation-client');
+
+			await expect(getIdPInfo(mockFetch)).rejects.toThrow('Failed to fetch IdP info: 401');
+		});
+	});
+
+	describe('getIdPMetadataXml', () => {
+		it('fetches XML from /api/federation/saml/metadata', async () => {
+			const xml = '<EntityDescriptor>...</EntityDescriptor>';
+			mockFetch.mockResolvedValueOnce(mockTextResponse(xml));
+			const { getIdPMetadataXml } = await import('./federation-client');
+
+			const result = await getIdPMetadataXml(mockFetch);
+
+			expect(mockFetch).toHaveBeenCalledWith('/api/federation/saml/metadata');
+			expect(result).toBe(xml);
+		});
+
+		it('throws on non-ok response', async () => {
+			mockFetch.mockResolvedValueOnce(mockTextResponse('error', false, 500));
+			const { getIdPMetadataXml } = await import('./federation-client');
+
+			await expect(getIdPMetadataXml(mockFetch)).rejects.toThrow(
+				'Failed to fetch IdP metadata: 500'
+			);
+		});
+	});
+
+	// --- SP Metadata Import (P3) ---
+
+	describe('importSpFromMetadata', () => {
+		it('sends POST to /api/federation/saml/service-providers/from-metadata', async () => {
+			const sp = { id: 'sp-1', name: 'Salesforce', entity_id: 'https://sf.com' };
+			mockFetch.mockResolvedValueOnce(mockResponse(sp));
+			const { importSpFromMetadata } = await import('./federation-client');
+
+			const result = await importSpFromMetadata(
+				{ metadata_url: 'https://sf.com/metadata' },
+				mockFetch
+			);
+
+			expect(mockFetch).toHaveBeenCalledWith(
+				'/api/federation/saml/service-providers/from-metadata',
+				{
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ metadata_url: 'https://sf.com/metadata' })
+				}
+			);
+			expect(result).toEqual(sp);
+		});
+
+		it('sends metadata_xml in body when provided', async () => {
+			const sp = { id: 'sp-2', name: 'Test SP' };
+			mockFetch.mockResolvedValueOnce(mockResponse(sp));
+			const { importSpFromMetadata } = await import('./federation-client');
+
+			await importSpFromMetadata({ metadata_xml: '<EntityDescriptor />' }, mockFetch);
+
+			expect(mockFetch).toHaveBeenCalledWith(
+				'/api/federation/saml/service-providers/from-metadata',
+				expect.objectContaining({
+					body: JSON.stringify({ metadata_xml: '<EntityDescriptor />' })
+				})
+			);
+		});
+
+		it('throws with error message on non-ok response', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ message: 'Invalid XML' }, false, 400));
+			const { importSpFromMetadata } = await import('./federation-client');
+
+			await expect(
+				importSpFromMetadata({ metadata_xml: 'bad' }, mockFetch)
+			).rejects.toThrow('Invalid XML');
 		});
 	});
 });

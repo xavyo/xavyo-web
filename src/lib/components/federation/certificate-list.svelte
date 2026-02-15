@@ -5,7 +5,7 @@
 	import EmptyState from '$lib/components/ui/empty-state/empty-state.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import { activateCertificate as activateCertificateClient } from '$lib/api/federation-client';
-	import { CheckCircle, Shield } from 'lucide-svelte';
+	import { CheckCircle, Shield, Download, Copy } from 'lucide-svelte';
 	import type { IdPCertificate } from '$lib/api/types';
 
 	interface Props {
@@ -16,6 +16,65 @@
 	let { certificates, onActivate }: Props = $props();
 
 	let activatingId = $state<string | null>(null);
+	let exportingId = $state<string | null>(null);
+
+	async function fetchActiveCertPem(): Promise<string | null> {
+		try {
+			const res = await fetch('/api/federation/saml/metadata');
+			if (!res.ok) return null;
+			const xml = await res.text();
+			// Extract X509Certificate content from metadata XML
+			const match = xml.match(/<(?:ds:)?X509Certificate>([\s\S]*?)<\/(?:ds:)?X509Certificate>/);
+			if (!match) return null;
+			const base64 = match[1].replace(/\s/g, '');
+			const lines: string[] = [];
+			for (let i = 0; i < base64.length; i += 64) {
+				lines.push(base64.substring(i, i + 64));
+			}
+			return `-----BEGIN CERTIFICATE-----\n${lines.join('\n')}\n-----END CERTIFICATE-----\n`;
+		} catch {
+			return null;
+		}
+	}
+
+	async function handleDownloadPem(cert: IdPCertificate) {
+		exportingId = cert.id;
+		try {
+			const pem = await fetchActiveCertPem();
+			if (!pem) {
+				addToast('error', 'Could not extract certificate from metadata');
+				return;
+			}
+			const blob = new Blob([pem], { type: 'application/x-pem-file' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `${cert.key_id}.pem`;
+			a.click();
+			URL.revokeObjectURL(url);
+		} catch {
+			addToast('error', 'Failed to download certificate');
+		} finally {
+			exportingId = null;
+		}
+	}
+
+	async function handleCopyPem(cert: IdPCertificate) {
+		exportingId = cert.id;
+		try {
+			const pem = await fetchActiveCertPem();
+			if (!pem) {
+				addToast('error', 'Could not extract certificate from metadata');
+				return;
+			}
+			await navigator.clipboard.writeText(pem);
+			addToast('success', 'Certificate PEM copied to clipboard');
+		} catch {
+			addToast('error', 'Failed to copy certificate');
+		} finally {
+			exportingId = null;
+		}
+	}
 
 	async function handleActivate(cert: IdPCertificate) {
 		activatingId = cert.id;
@@ -68,8 +127,27 @@
 							<span>Valid: {formatDate(cert.not_before)} &ndash; {formatDate(cert.not_after)}</span>
 						</div>
 					</div>
-					<div class="ml-4 shrink-0">
-						{#if !cert.is_active}
+					<div class="ml-4 flex shrink-0 gap-2">
+						{#if cert.is_active}
+							<Button
+								variant="ghost"
+								size="sm"
+								disabled={exportingId === cert.id}
+								onclick={() => handleDownloadPem(cert)}
+								title="Download PEM"
+							>
+								<Download class="h-4 w-4" />
+							</Button>
+							<Button
+								variant="ghost"
+								size="sm"
+								disabled={exportingId === cert.id}
+								onclick={() => handleCopyPem(cert)}
+								title="Copy PEM"
+							>
+								<Copy class="h-4 w-4" />
+							</Button>
+						{:else}
 							<Button
 								variant="outline"
 								size="sm"

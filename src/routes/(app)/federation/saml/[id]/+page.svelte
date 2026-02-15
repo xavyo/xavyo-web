@@ -10,7 +10,8 @@
 	import SpForm from '$lib/components/federation/sp-form.svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import { addToast } from '$lib/stores/toast.svelte';
-	import { CheckCircle, XCircle } from 'lucide-svelte';
+	import { CheckCircle, XCircle, Copy } from 'lucide-svelte';
+	import { parseMappingObject } from '$lib/utils/attribute-mapping';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -39,6 +40,23 @@
 	function formatDate(dateStr: string): string {
 		return new Date(dateStr).toLocaleString();
 	}
+
+	async function copyToClipboard(text: string, label: string) {
+		try {
+			await navigator.clipboard.writeText(text);
+			addToast('success', `${label} copied to clipboard`);
+		} catch {
+			addToast('error', 'Failed to copy to clipboard');
+		}
+	}
+
+	let parsedMapping = $derived(
+		data.sp.attribute_mapping ? parseMappingObject(data.sp.attribute_mapping) : null
+	);
+
+	let idpInitiateUrl = $derived(
+		data.idpInfo?.initiate_base_url ? `${data.idpInfo.initiate_base_url}/${data.sp.id}` : null
+	);
 </script>
 
 <div class="flex items-center justify-between">
@@ -67,7 +85,7 @@
 {#if isEditing}
 	<SpForm superform={sf} mode="edit" onCancel={cancelEdit} />
 {:else}
-	<Card class="max-w-lg">
+	<Card class="max-w-2xl">
 		<CardHeader>
 			<div class="flex items-center justify-between">
 				<h2 class="text-xl font-semibold">Provider information</h2>
@@ -80,8 +98,8 @@
 					<span class="text-sm text-muted-foreground">Name</span>
 					<span class="text-sm font-medium">{data.sp.name}</span>
 				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Entity ID</span>
+				<div class="flex justify-between gap-4">
+					<span class="shrink-0 text-sm text-muted-foreground">Entity ID</span>
 					<span class="truncate text-sm font-mono" title={data.sp.entity_id}>
 						{data.sp.entity_id}
 					</span>
@@ -94,9 +112,9 @@
 						{/each}
 					</ul>
 				</div>
-				<div class="flex justify-between">
-					<span class="text-sm text-muted-foreground">Name ID format</span>
-					<span class="text-sm">{data.sp.name_id_format || '\u2014'}</span>
+				<div class="flex justify-between gap-4">
+					<span class="shrink-0 text-sm text-muted-foreground">Name ID format</span>
+					<span class="truncate text-sm font-mono" title={data.sp.name_id_format || ''}>{data.sp.name_id_format || '\u2014'}</span>
 				</div>
 				<div class="flex justify-between">
 					<span class="text-sm text-muted-foreground">Sign assertions</span>
@@ -111,8 +129,8 @@
 					<span class="text-sm">{data.sp.assertion_validity_seconds}s</span>
 				</div>
 				{#if data.sp.metadata_url}
-					<div class="flex justify-between">
-						<span class="text-sm text-muted-foreground">Metadata URL</span>
+					<div class="flex justify-between gap-4">
+						<span class="shrink-0 text-sm text-muted-foreground">Metadata URL</span>
 						<span class="truncate text-sm font-mono" title={data.sp.metadata_url}>
 							{data.sp.metadata_url}
 						</span>
@@ -124,14 +142,67 @@
 						<pre class="mt-1 max-h-24 overflow-auto rounded-md bg-muted p-2 font-mono text-xs">{data.sp.certificate}</pre>
 					</div>
 				{/if}
+
 				{#if data.sp.attribute_mapping}
-					<div>
-						<span class="text-sm text-muted-foreground">Attribute mapping</span>
-						<pre class="mt-1 max-h-48 overflow-auto rounded-md bg-muted p-2 font-mono text-xs">{JSON.stringify(data.sp.attribute_mapping, null, 2)}</pre>
+					<Separator />
+					<div class="space-y-2">
+						<span class="text-sm font-medium">Attribute mapping</span>
+						{#if parsedMapping}
+							<div class="space-y-2">
+								<div class="flex justify-between text-sm">
+									<span class="text-muted-foreground">NameID source</span>
+									<span class="font-mono">{parsedMapping.name_id_source}</span>
+								</div>
+								{#if parsedMapping.attributes.length > 0}
+									<div class="overflow-auto rounded-md border">
+										<table class="w-full text-sm">
+											<thead>
+												<tr class="border-b bg-muted/50">
+													<th class="px-3 py-1.5 text-left font-medium">Source</th>
+													<th class="px-3 py-1.5 text-left font-medium">Target</th>
+													<th class="px-3 py-1.5 text-left font-medium">Friendly name</th>
+													<th class="px-3 py-1.5 text-left font-medium">Multi</th>
+												</tr>
+											</thead>
+											<tbody>
+												{#each parsedMapping.attributes as attr}
+													<tr class="border-b last:border-0">
+														<td class="px-3 py-1.5 font-mono">{attr.source}</td>
+														<td class="px-3 py-1.5 font-mono">{attr.target_name || '\u2014'}</td>
+														<td class="px-3 py-1.5">{attr.target_friendly_name || '\u2014'}</td>
+														<td class="px-3 py-1.5">{attr.multi_value ? 'Yes' : 'No'}</td>
+													</tr>
+												{/each}
+											</tbody>
+										</table>
+									</div>
+								{/if}
+							</div>
+						{:else}
+							<pre class="max-h-48 overflow-auto rounded-md bg-muted p-2 font-mono text-xs">{JSON.stringify(data.sp.attribute_mapping, null, 2)}</pre>
+						{/if}
 					</div>
 				{/if}
 
 				<Separator />
+
+				{#if idpInitiateUrl}
+					<div class="flex items-center justify-between gap-2">
+						<div class="min-w-0 flex-1">
+							<span class="text-sm text-muted-foreground">IdP-Initiated SSO URL</span>
+							<p class="mt-0.5 break-all font-mono text-sm">{idpInitiateUrl}</p>
+							<p class="mt-0.5 text-xs text-muted-foreground">Use this URL to start an IdP-initiated SSO flow for this SP</p>
+						</div>
+						<Button
+							variant="ghost"
+							size="sm"
+							onclick={() => copyToClipboard(idpInitiateUrl!, 'IdP-Initiated SSO URL')}
+						>
+							<Copy class="h-4 w-4" />
+						</Button>
+					</div>
+					<Separator />
+				{/if}
 
 				<div class="flex justify-between">
 					<span class="text-sm text-muted-foreground">Status</span>
@@ -152,12 +223,11 @@
 	<Separator class="my-6" />
 
 	<!-- Actions -->
-	<Card class="max-w-lg">
+	<Card class="max-w-2xl">
 		<CardHeader>
 			<h2 class="text-xl font-semibold">Actions</h2>
 		</CardHeader>
 		<CardContent class="flex flex-wrap gap-2">
-			<!-- Delete -->
 			<Button variant="destructive" onclick={() => (showDeleteDialog = true)}>Delete</Button>
 		</CardContent>
 	</Card>

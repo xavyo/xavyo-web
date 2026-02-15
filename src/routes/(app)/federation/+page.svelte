@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { Network, Globe, Shield, Share2, Plus, CheckCircle, XCircle, ChevronDown, ChevronUp } from 'lucide-svelte';
+	import { Network, Globe, Shield, Share2, Plus, CheckCircle, XCircle, ChevronDown, ChevronUp, Copy, Download, Loader2, Wand2 } from 'lucide-svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { Card, CardContent, CardHeader } from '$lib/components/ui/card';
@@ -15,6 +15,8 @@
 	import OverviewTab from '$lib/components/federation/overview-tab.svelte';
 	import SocialTab from '$lib/components/federation/social-tab.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { Input } from '$lib/components/ui/input';
+	import { Label } from '$lib/components/ui/label';
 	import type {
 		IdentityProvider,
 		IdentityProviderListResponse,
@@ -22,7 +24,8 @@
 		ServiceProviderListResponse,
 		IdPCertificate,
 		CertificateListResponse,
-		UploadCertificateRequest
+		UploadCertificateRequest,
+		IdPInfo
 	} from '$lib/api/types';
 
 	let activeTab = $derived($page.url.searchParams.get('tab') ?? 'overview');
@@ -96,6 +99,20 @@
 	let certsLoaded = $state(false);
 	let showCertForm = $state(false);
 
+	// IdP info state (P2)
+	let idpInfo = $state<IdPInfo | null>(null);
+	let idpInfoLoading = $state(false);
+	let idpInfoError = $state<string | null>(null);
+	let idpInfoLoaded = $state(false);
+
+	// Generate certificate state (P1)
+	let showGenerateForm = $state(false);
+	let generating = $state(false);
+	let genCommonName = $state('xavyo-idp');
+	let genOrganization = $state('xavyo');
+	let genCountry = $state('FR');
+	let genValidityDays = $state(365);
+
 	async function loadSamlProviders() {
 		samlLoading = true;
 		samlError = null;
@@ -129,6 +146,74 @@
 		}
 	}
 
+	async function loadIdPInfo() {
+		idpInfoLoading = true;
+		idpInfoError = null;
+		try {
+			const res = await fetch('/api/federation/saml/idp-info');
+			if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
+			idpInfo = await res.json();
+		} catch (e) {
+			idpInfoError = e instanceof Error ? e.message : 'Failed to load IdP info';
+		} finally {
+			idpInfoLoading = false;
+			idpInfoLoaded = true;
+		}
+	}
+
+	async function handleGenerateCertificate() {
+		generating = true;
+		try {
+			const res = await fetch('/api/federation/saml/certificates/generate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					common_name: genCommonName,
+					organization: genOrganization || undefined,
+					country: genCountry || undefined,
+					validity_days: genValidityDays
+				})
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => null);
+				throw new Error(err?.message || `Generation failed: ${res.status}`);
+			}
+			addToast('success', 'Certificate generated successfully');
+			showGenerateForm = false;
+			certsLoaded = false;
+		} catch (e) {
+			addToast('error', e instanceof Error ? e.message : 'Failed to generate certificate');
+		} finally {
+			generating = false;
+		}
+	}
+
+	async function copyToClipboard(text: string, label: string) {
+		try {
+			await navigator.clipboard.writeText(text);
+			addToast('success', `${label} copied to clipboard`);
+		} catch {
+			addToast('error', 'Failed to copy to clipboard');
+		}
+	}
+
+	async function downloadMetadataXml() {
+		try {
+			const res = await fetch('/api/federation/saml/metadata');
+			if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+			const xml = await res.text();
+			const blob = new Blob([xml], { type: 'application/xml' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'idp-metadata.xml';
+			a.click();
+			URL.revokeObjectURL(url);
+		} catch (e) {
+			addToast('error', e instanceof Error ? e.message : 'Failed to download metadata');
+		}
+	}
+
 	// Load SAML data when tab is active
 	$effect(() => {
 		if (activeTab === 'saml' && !samlLoaded) {
@@ -139,6 +224,12 @@
 	$effect(() => {
 		if (activeTab === 'saml' && !certsLoaded) {
 			loadCertificates();
+		}
+	});
+
+	$effect(() => {
+		if (activeTab === 'saml' && !idpInfoLoaded) {
+			loadIdPInfo();
 		}
 	});
 
@@ -290,6 +381,64 @@
 	<!-- SAML Tab -->
 	<TabsContent value="saml">
 		<div class="space-y-4">
+			<!-- IdP Configuration card (P2) -->
+			<Card>
+				<CardHeader>
+					<h2 class="text-lg font-semibold">IdP Configuration</h2>
+				</CardHeader>
+				<CardContent class="space-y-3">
+					{#if idpInfoLoading}
+						<Skeleton class="h-16 w-full" />
+					{:else if idpInfoError}
+						<div class="rounded-md border border-destructive/50 bg-destructive/10 p-3">
+							<p class="text-sm text-destructive">{idpInfoError}</p>
+							<Button variant="outline" size="sm" class="mt-2" onclick={() => { idpInfoLoaded = false; }}>
+								Retry
+							</Button>
+						</div>
+					{:else if idpInfo}
+						<div class="space-y-2">
+							<div class="flex items-center justify-between gap-2">
+								<div class="min-w-0 flex-1">
+									<Label class="text-xs text-muted-foreground">Entity ID</Label>
+									<p class="truncate font-mono text-sm">{idpInfo.entity_id}</p>
+									<p class="text-xs text-muted-foreground mt-0.5">Configure as the Issuer in your SP's SSO settings</p>
+								</div>
+								<Button
+									variant="ghost"
+									size="sm"
+									onclick={() => copyToClipboard(idpInfo!.entity_id, 'Entity ID')}
+								>
+									<Copy class="h-4 w-4" />
+								</Button>
+							</div>
+							<div class="flex items-center justify-between gap-2">
+								<div class="min-w-0 flex-1">
+									<Label class="text-xs text-muted-foreground">SSO URL</Label>
+									<p class="truncate font-mono text-sm">{idpInfo.sso_url}</p>
+									<p class="text-xs text-muted-foreground mt-0.5">Configure as the IdP Login URL in your SP's SSO settings</p>
+								</div>
+								<Button
+									variant="ghost"
+									size="sm"
+									onclick={() => copyToClipboard(idpInfo!.sso_url, 'SSO URL')}
+								>
+									<Copy class="h-4 w-4" />
+								</Button>
+							</div>
+						</div>
+						<Button variant="outline" size="sm" onclick={downloadMetadataXml}>
+							<Download class="mr-2 h-4 w-4" />Download Metadata XML
+						</Button>
+						<p class="text-xs text-muted-foreground">Or import this metadata file into your SP to auto-configure</p>
+						<Separator class="my-2" />
+						<p class="text-xs text-muted-foreground">Single Logout (SLO) is not currently supported.</p>
+					{/if}
+				</CardContent>
+			</Card>
+
+			<Separator class="my-2" />
+
 			<!-- Service Providers section -->
 			<div class="flex items-center justify-between">
 				<h2 class="text-lg font-semibold">SAML Service Providers</h2>
@@ -393,11 +542,21 @@
 					<CertificateList {certificates} onActivate={handleCertificateActivated} />
 				{/if}
 
-				<!-- Upload certificate expandable section -->
-				<div>
+				<!-- Certificate actions -->
+				<div class="flex flex-wrap gap-2">
 					<Button
 						variant="outline"
-						onclick={() => (showCertForm = !showCertForm)}
+						onclick={() => { showGenerateForm = !showGenerateForm; if (showGenerateForm) showCertForm = false; }}
+					>
+						{#if showGenerateForm}
+							<ChevronUp class="mr-2 h-4 w-4" />Hide generate form
+						{:else}
+							<Wand2 class="mr-2 h-4 w-4" />Generate certificate
+						{/if}
+					</Button>
+					<Button
+						variant="outline"
+						onclick={() => { showCertForm = !showCertForm; if (showCertForm) showGenerateForm = false; }}
 					>
 						{#if showCertForm}
 							<ChevronUp class="mr-2 h-4 w-4" />Hide upload form
@@ -405,13 +564,67 @@
 							<ChevronDown class="mr-2 h-4 w-4" />Upload certificate
 						{/if}
 					</Button>
-
-					{#if showCertForm}
-						<div class="mt-4">
-							<CertificateForm onSubmit={handleCertificateUpload} />
-						</div>
-					{/if}
 				</div>
+
+				<!-- Generate certificate form (P1) -->
+				{#if showGenerateForm}
+					<Card class="mt-4">
+						<CardContent class="space-y-4 pt-6">
+							<div class="grid gap-4 sm:grid-cols-2">
+								<div class="space-y-2">
+									<Label for="gen-cn">Common Name *</Label>
+									<Input
+										id="gen-cn"
+										value={genCommonName}
+										oninput={(e) => { genCommonName = (e.target as HTMLInputElement).value; }}
+									/>
+								</div>
+								<div class="space-y-2">
+									<Label for="gen-org">Organization</Label>
+									<Input
+										id="gen-org"
+										value={genOrganization}
+										oninput={(e) => { genOrganization = (e.target as HTMLInputElement).value; }}
+									/>
+								</div>
+								<div class="space-y-2">
+									<Label for="gen-country">Country</Label>
+									<Input
+										id="gen-country"
+										value={genCountry}
+										oninput={(e) => { genCountry = (e.target as HTMLInputElement).value; }}
+										maxlength={2}
+									/>
+								</div>
+								<div class="space-y-2">
+									<Label for="gen-days">Validity (days)</Label>
+									<Input
+										id="gen-days"
+										type="number"
+										value={String(genValidityDays)}
+										oninput={(e) => { genValidityDays = parseInt((e.target as HTMLInputElement).value) || 365; }}
+										min="1"
+										max="3650"
+									/>
+								</div>
+							</div>
+							<Button onclick={handleGenerateCertificate} disabled={generating || !genCommonName}>
+								{#if generating}
+									<Loader2 class="mr-2 h-4 w-4 animate-spin" />Generating...
+								{:else}
+									<Wand2 class="mr-2 h-4 w-4" />Generate
+								{/if}
+							</Button>
+						</CardContent>
+					</Card>
+				{/if}
+
+				<!-- Upload certificate expandable section -->
+				{#if showCertForm}
+					<div class="mt-4">
+						<CertificateForm onSubmit={handleCertificateUpload} />
+					</div>
+				{/if}
 			</div>
 		</div>
 	</TabsContent>

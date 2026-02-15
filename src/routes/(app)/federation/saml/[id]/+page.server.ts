@@ -6,7 +6,7 @@ import { hasAdminRole } from '$lib/server/auth';
 import { updateServiceProviderSchema } from '$lib/schemas/federation';
 import { getServiceProvider, updateServiceProvider, deleteServiceProvider } from '$lib/api/federation';
 import { ApiError } from '$lib/api/client';
-import type { UpdateServiceProviderRequest } from '$lib/api/types';
+import type { UpdateServiceProviderRequest, IdPInfo } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -21,6 +21,17 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			error(e.status, e.message);
 		}
 		error(500, 'Failed to load service provider');
+	}
+
+	// Fetch IdP info for IdP-initiated SSO URL (non-blocking — fail silently)
+	let idpInfo: IdPInfo | null = null;
+	try {
+		const idpRes = await fetch('/api/federation/saml/idp-info');
+		if (idpRes.ok) {
+			idpInfo = await idpRes.json();
+		}
+	} catch {
+		// IdP info is optional — don't block the page
 	}
 
 	const form = await superValidate(
@@ -42,7 +53,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateServiceProviderSchema)
 	);
 
-	return { sp, form };
+	return { sp, form, idpInfo };
 };
 
 export const actions: Actions = {

@@ -6,7 +6,9 @@ import {
 	updateServiceProviderSchema,
 	uploadCertificateSchema,
 	updateSocialProviderSchema,
-	addDomainSchema
+	addDomainSchema,
+	generateCertificateSchema,
+	importSpMetadataSchema
 } from './federation';
 
 describe('createIdentityProviderSchema', () => {
@@ -469,6 +471,114 @@ describe('addDomainSchema', () => {
 
 	it('rejects negative priority', () => {
 		const result = addDomainSchema.safeParse({ domain: 'example.com', priority: -1 });
+		expect(result.success).toBe(false);
+	});
+});
+
+describe('generateCertificateSchema', () => {
+	it('accepts valid input with all fields', () => {
+		const result = generateCertificateSchema.safeParse({
+			common_name: 'xavyo-idp',
+			organization: 'xavyo',
+			country: 'FR',
+			validity_days: 365
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.common_name).toBe('xavyo-idp');
+			expect(result.data.organization).toBe('xavyo');
+			expect(result.data.country).toBe('FR');
+			expect(result.data.validity_days).toBe(365);
+		}
+	});
+
+	it('accepts minimal input with only common_name', () => {
+		const result = generateCertificateSchema.safeParse({ common_name: 'test' });
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.common_name).toBe('test');
+			expect(result.data.validity_days).toBe(365); // default
+		}
+	});
+
+	it('rejects empty common_name', () => {
+		const result = generateCertificateSchema.safeParse({ common_name: '' });
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects missing common_name', () => {
+		const result = generateCertificateSchema.safeParse({});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects validity_days below 1', () => {
+		const result = generateCertificateSchema.safeParse({
+			common_name: 'test',
+			validity_days: 0
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects validity_days above 3650', () => {
+		const result = generateCertificateSchema.safeParse({
+			common_name: 'test',
+			validity_days: 5000
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('coerces string validity_days to number', () => {
+		const result = generateCertificateSchema.safeParse({
+			common_name: 'test',
+			validity_days: '730'
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.validity_days).toBe(730);
+		}
+	});
+
+	it('rejects country longer than 2 chars', () => {
+		const result = generateCertificateSchema.safeParse({
+			common_name: 'test',
+			country: 'FRA'
+		});
+		expect(result.success).toBe(false);
+	});
+});
+
+describe('importSpMetadataSchema', () => {
+	it('accepts metadata_url', () => {
+		const result = importSpMetadataSchema.safeParse({
+			metadata_url: 'https://example.com/saml/metadata'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts metadata_xml', () => {
+		const result = importSpMetadataSchema.safeParse({
+			metadata_xml: '<EntityDescriptor entityID="https://sp.example.com" />'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts both metadata_url and metadata_xml', () => {
+		const result = importSpMetadataSchema.safeParse({
+			metadata_url: 'https://example.com/saml/metadata',
+			metadata_xml: '<EntityDescriptor />'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('accepts empty object (both optional)', () => {
+		const result = importSpMetadataSchema.safeParse({});
+		expect(result.success).toBe(true);
+	});
+
+	it('rejects invalid URL for metadata_url', () => {
+		const result = importSpMetadataSchema.safeParse({
+			metadata_url: 'not-a-url'
+		});
 		expect(result.success).toBe(false);
 	});
 });

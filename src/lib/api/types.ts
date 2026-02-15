@@ -857,6 +857,25 @@ export interface UploadCertificateRequest {
 	not_after?: string;
 }
 
+export interface GenerateCertificateRequest {
+	common_name: string;
+	organization?: string;
+	country?: string;
+	validity_days?: number;
+}
+
+export interface IdPInfo {
+	entity_id: string;
+	sso_url: string;
+	metadata_url: string;
+	initiate_base_url: string;
+}
+
+export interface ImportSpMetadataRequest {
+	metadata_url?: string;
+	metadata_xml?: string;
+}
+
 // Social Login
 
 export interface SocialProviderConfig {

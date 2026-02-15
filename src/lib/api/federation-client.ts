@@ -5,7 +5,12 @@ import type {
 	DomainListResponse,
 	IdentityProviderDomain,
 	ServiceProviderListResponse,
-	CertificateListResponse
+	ServiceProvider,
+	CertificateListResponse,
+	IdPCertificate,
+	IdPInfo,
+	GenerateCertificateRequest,
+	ImportSpMetadataRequest
 } from './types';
 
 // --- Helper ---
@@ -142,4 +147,56 @@ export async function activateCertificate(
 		method: 'POST'
 	});
 	if (!res.ok) throw new Error(`Failed to activate certificate: ${res.status}`);
+}
+
+export async function generateCertificate(
+	params: GenerateCertificateRequest,
+	fetchFn: typeof fetch = fetch
+): Promise<IdPCertificate> {
+	const res = await fetchFn('/api/federation/saml/certificates/generate', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(params)
+	});
+	if (!res.ok) {
+		const err = await res.json().catch(() => null);
+		throw new Error(err?.message || `Failed to generate certificate: ${res.status}`);
+	}
+	return res.json();
+}
+
+// --- IdP Info ---
+
+export async function getIdPInfo(
+	fetchFn: typeof fetch = fetch
+): Promise<IdPInfo> {
+	const res = await fetchFn('/api/federation/saml/idp-info');
+	if (!res.ok) throw new Error(`Failed to fetch IdP info: ${res.status}`);
+	return res.json();
+}
+
+export async function getIdPMetadataXml(
+	fetchFn: typeof fetch = fetch
+): Promise<string> {
+	const res = await fetchFn('/api/federation/saml/metadata');
+	if (!res.ok) throw new Error(`Failed to fetch IdP metadata: ${res.status}`);
+	return res.text();
+}
+
+// --- SP Metadata Import ---
+
+export async function importSpFromMetadata(
+	params: ImportSpMetadataRequest,
+	fetchFn: typeof fetch = fetch
+): Promise<ServiceProvider> {
+	const res = await fetchFn('/api/federation/saml/service-providers/from-metadata', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(params)
+	});
+	if (!res.ok) {
+		const err = await res.json().catch(() => null);
+		throw new Error(err?.message || `Failed to import SP from metadata: ${res.status}`);
+	}
+	return res.json();
 }

@@ -109,6 +109,18 @@ export const addDomainSchema = z.object({
 	priority: z.coerce.number().int().min(0).optional()
 });
 
+export const generateCertificateSchema = z.object({
+	common_name: z.string().min(1, 'Common Name is required').max(255),
+	organization: z.string().max(255).optional(),
+	country: z.string().max(2).optional(),
+	validity_days: z.coerce.number().int().min(1).max(3650).optional().default(365)
+});
+
+export const importSpMetadataSchema = z.object({
+	metadata_url: z.string().url('Must be a valid URL').optional(),
+	metadata_xml: z.string().optional()
+});
+
 export type CreateIdentityProviderSchema = typeof createIdentityProviderSchema;
 export type UpdateIdentityProviderSchema = typeof updateIdentityProviderSchema;
 export type CreateServiceProviderSchema = typeof createServiceProviderSchema;
@@ -116,3 +128,5 @@ export type UpdateServiceProviderSchema = typeof updateServiceProviderSchema;
 export type UploadCertificateSchema = typeof uploadCertificateSchema;
 export type UpdateSocialProviderSchema = typeof updateSocialProviderSchema;
 export type AddDomainSchema = typeof addDomainSchema;
+export type GenerateCertificateSchema = typeof generateCertificateSchema;
+export type ImportSpMetadataSchema = typeof importSpMetadataSchema;

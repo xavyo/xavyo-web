@@ -6,6 +6,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Separator } from '$lib/components/ui/separator';
+	import AttributeMappingEditor from './attribute-mapping-editor.svelte';
 
 	interface Props {
 		superform: SuperForm<any>;
@@ -18,7 +19,7 @@
 	const { form, errors, enhance, message } = superform;
 </script>
 
-<Card class="max-w-lg">
+<Card class="max-w-2xl">
 	<CardHeader>
 		<h2 class="text-xl font-semibold">
 			{mode === 'create' ? 'Service provider details' : 'Edit service provider'}
@@ -57,9 +58,10 @@
 					id="sp-entity-id"
 					name="entity_id"
 					type="text"
-					placeholder="e.g. urn:myapp:saml"
+					placeholder="urn:myapp:saml"
 					value={String($form.entity_id ?? '')}
 				/>
+				<p class="text-xs text-muted-foreground">The unique identifier for the service provider (e.g., a URN or URL)</p>
 				{#if $errors.entity_id}
 					<p class="text-sm text-destructive">{$errors.entity_id}</p>
 				{/if}
@@ -75,6 +77,7 @@
 					class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 					value={String($form.acs_urls ?? '')}
 				></textarea>
+				<p class="text-xs text-muted-foreground">The URL(s) where the SP receives SAML assertions</p>
 				{#if $errors.acs_urls}
 					<p class="text-sm text-destructive">{$errors.acs_urls}</p>
 				{/if}
@@ -94,6 +97,7 @@
 					<option value="transient">transient</option>
 					<option value="unspecified">unspecified</option>
 				</select>
+				<p class="text-xs text-muted-foreground">Format used for the subject identifier (emailAddress is most common)</p>
 				{#if $errors.name_id_format}
 					<p class="text-sm text-destructive">{$errors.name_id_format}</p>
 				{/if}
@@ -109,6 +113,7 @@
 					class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 font-mono"
 					value={String($form.certificate ?? '')}
 				></textarea>
+				<p class="text-xs text-muted-foreground">SP signing certificate. Only needed if you enable request signature validation.</p>
 				{#if $errors.certificate}
 					<p class="text-sm text-destructive">{$errors.certificate}</p>
 				{/if}
@@ -118,20 +123,13 @@
 
 			<h3 class="text-base font-medium">Advanced settings</h3>
 
-			<div class="space-y-2">
-				<Label for="sp-attribute-mapping">Attribute mapping (JSON, optional)</Label>
-				<textarea
-					id="sp-attribute-mapping"
-					name="attribute_mapping"
-					placeholder={'{"email": "user.email", "name": "user.name"}'}
-					rows="3"
-					class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-					value={String($form.attribute_mapping ?? '')}
-				></textarea>
-				{#if $errors.attribute_mapping}
-					<p class="text-sm text-destructive">{$errors.attribute_mapping}</p>
-				{/if}
-			</div>
+			<AttributeMappingEditor
+				value={String($form.attribute_mapping ?? '')}
+				onchange={(v) => { $form.attribute_mapping = v; }}
+			/>
+			{#if $errors.attribute_mapping}
+				<p class="text-sm text-destructive">{$errors.attribute_mapping}</p>
+			{/if}
 
 			<div class="flex items-center gap-2">
 				<input
@@ -143,6 +141,7 @@
 				/>
 				<Label for="sp-sign-assertions">Sign assertions</Label>
 			</div>
+			<p class="text-xs text-muted-foreground -mt-2">Most service providers require signed assertions</p>
 			{#if $errors.sign_assertions}
 				<p class="text-sm text-destructive">{$errors.sign_assertions}</p>
 			{/if}
@@ -186,6 +185,7 @@
 					placeholder="https://myapp.example.com/saml/metadata"
 					value={String($form.metadata_url ?? '')}
 				/>
+				<p class="text-xs text-muted-foreground">URL where the SP publishes its SAML metadata document</p>
 				{#if $errors.metadata_url}
 					<p class="text-sm text-destructive">{$errors.metadata_url}</p>
 				{/if}
