@@ -7290,3 +7290,43 @@ export interface ScimTargetMappingsResponse {
 export interface ScimReplaceMappingsRequest {
 	mappings: ScimTargetMappingEntry[];
 }
+
+// --- NHI Delegation Grants (RFC 8693 Token Exchange) ---
+
+export type NhiDelegationStatus = 'active' | 'expired' | 'revoked';
+export type NhiDelegationPrincipalType = 'user' | 'nhi';
+
+export interface NhiDelegationGrant {
+	id: string;
+	tenant_id: string;
+	principal_id: string;
+	principal_type: NhiDelegationPrincipalType;
+	actor_nhi_id: string;
+	allowed_scopes: string[];
+	allowed_resource_types: string[];
+	max_delegation_depth: number;
+	status: NhiDelegationStatus;
+	granted_at: string;
+	granted_by: string;
+	expires_at: string | null;
+	revoked_at: string | null;
+	revoked_by: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateDelegationGrantRequest {
+	principal_id: string;
+	principal_type: NhiDelegationPrincipalType;
+	actor_nhi_id: string;
+	allowed_scopes: string[];
+	allowed_resource_types: string[];
+	max_delegation_depth?: number;
+	expires_at?: string;
+}
+
+export interface PaginatedDelegationResponse {
+	data: NhiDelegationGrant[];
+	limit: number;
+	offset: number;
+}

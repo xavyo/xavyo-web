@@ -13,6 +13,7 @@
 	import NhiStateBadge from '../../nhi-state-badge.svelte';
 	import CredentialsSection from '../../credentials-section.svelte';
 	import PermissionsTab from '$lib/components/nhi/permissions-tab.svelte';
+	import DelegationsTab from '$lib/components/nhi/delegations-tab.svelte';
 	import RiskBreakdown from '$lib/components/nhi/risk-breakdown.svelte';
 	import UsageHistoryTable from '$lib/components/nhi/usage-history-table.svelte';
 	import UsageSummaryStats from '$lib/components/nhi/usage-summary-stats.svelte';
@@ -108,6 +109,7 @@
 	<TabsList>
 		<TabsTrigger value="details">Details</TabsTrigger>
 		<TabsTrigger value="permissions">Permissions</TabsTrigger>
+		<TabsTrigger value="delegations">Delegations</TabsTrigger>
 		<TabsTrigger value="usage">Usage</TabsTrigger>
 		<TabsTrigger value="risk">Risk</TabsTrigger>
 	</TabsList>
@@ -310,6 +312,10 @@
 
 	<TabsContent value="permissions">
 		<PermissionsTab nhiId={data.nhi.id} entityType="service_account" />
+	</TabsContent>
+
+	<TabsContent value="delegations">
+		<DelegationsTab nhiId={data.nhi.id} />
 	</TabsContent>
 
 	<TabsContent value="usage">
