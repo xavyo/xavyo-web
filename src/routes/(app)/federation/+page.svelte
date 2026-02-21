@@ -432,7 +432,7 @@
 						</Button>
 						<p class="text-xs text-muted-foreground">Or import this metadata file into your SP to auto-configure</p>
 						<Separator class="my-2" />
-						<p class="text-xs text-muted-foreground">Single Logout (SLO) is not currently supported.</p>
+						<p class="text-xs text-muted-foreground">Single Logout (SLO) is supported. Configure SLO URL per service provider.</p>
 					{/if}
 				</CardContent>
 			</Card>

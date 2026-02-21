@@ -18,7 +18,11 @@ import type {
 	ValidateParametersRequest,
 	ValidateParametersResponse,
 	InheritanceBlock,
-	AddInheritanceBlockRequest
+	AddInheritanceBlockRequest,
+	RoleInducement,
+	InducementListResponse,
+	CreateRoleInducementRequest,
+	InducedRoleInfo
 } from './types';
 
 // --- Param interfaces ---
@@ -427,5 +431,91 @@ export async function removeInheritanceBlock(
 		token,
 		tenantId,
 		fetch: fetchFn
+	});
+}
+
+// --- Inducements ---
+
+export async function listRoleInducements(
+	roleId: string,
+	params: { enabled_only?: boolean; limit?: number; offset?: number } = {},
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<InducementListResponse> {
+	const qs = buildSearchParams({ enabled_only: params.enabled_only, limit: params.limit, offset: params.offset });
+	return apiClient<InducementListResponse>(`/governance/roles/${roleId}/inducements${qs}`, {
+		method: 'GET', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function createRoleInducement(
+	roleId: string,
+	data: CreateRoleInducementRequest,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RoleInducement> {
+	return apiClient<RoleInducement>(`/governance/roles/${roleId}/inducements`, {
+		method: 'POST', body: data, token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function getRoleInducement(
+	roleId: string,
+	inducementId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RoleInducement> {
+	return apiClient<RoleInducement>(`/governance/roles/${roleId}/inducements/${inducementId}`, {
+		method: 'GET', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function deleteRoleInducement(
+	roleId: string,
+	inducementId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<void> {
+	await apiClient(`/governance/roles/${roleId}/inducements/${inducementId}`, {
+		method: 'DELETE', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function enableRoleInducement(
+	roleId: string,
+	inducementId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RoleInducement> {
+	return apiClient<RoleInducement>(`/governance/roles/${roleId}/inducements/${inducementId}/enable`, {
+		method: 'POST', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function disableRoleInducement(
+	roleId: string,
+	inducementId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RoleInducement> {
+	return apiClient<RoleInducement>(`/governance/roles/${roleId}/inducements/${inducementId}/disable`, {
+		method: 'POST', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function getInducedRoles(
+	roleId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<InducedRoleInfo[]> {
+	return apiClient<InducedRoleInfo[]>(`/governance/roles/${roleId}/induced-roles`, {
+		method: 'GET', token, tenantId, fetch: fetchFn
 	});
 }

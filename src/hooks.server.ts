@@ -3,6 +3,18 @@ import { decodeAccessToken, isTokenExpired, setCookies, clearAuthCookies } from 
 import { refresh } from '$lib/api/auth';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	// CSRF protection for API routes — SvelteKit protects form actions automatically,
+	// but /api/ endpoints (BFF proxies) need explicit Origin header validation.
+	if (
+		event.url.pathname.startsWith('/api/') &&
+		['POST', 'PUT', 'PATCH', 'DELETE'].includes(event.request.method)
+	) {
+		const origin = event.request.headers.get('origin');
+		if (!origin || new URL(origin).origin !== event.url.origin) {
+			return new Response('CSRF validation failed', { status: 403 });
+		}
+	}
+
 	const accessToken = event.cookies.get('access_token');
 	const refreshToken = event.cookies.get('refresh_token');
 	const tenantId = event.cookies.get('tenant_id');

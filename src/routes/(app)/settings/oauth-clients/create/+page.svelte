@@ -184,6 +184,21 @@
 				</div>
 
 				<div class="space-y-2">
+					<Label for="post_logout_redirect_uris">Post-Logout Redirect URIs (comma-separated, optional)</Label>
+					<textarea
+						id="post_logout_redirect_uris"
+						name="post_logout_redirect_uris"
+						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						placeholder="https://app.example.com/logout-callback"
+						value={String($form.post_logout_redirect_uris ?? '')}
+					></textarea>
+					{#if $errors.post_logout_redirect_uris}
+						<p class="text-sm text-destructive">{$errors.post_logout_redirect_uris}</p>
+					{/if}
+					<p class="text-xs text-muted-foreground">URIs where users can be redirected after OIDC logout.</p>
+				</div>
+
+				<div class="space-y-2">
 					<Label for="logo_url">Logo URL (optional)</Label>
 					<Input
 						id="logo_url"

@@ -293,6 +293,8 @@ export interface NhiToolExtension {
 	provider: string | null;
 	provider_verified: boolean;
 	checksum: string | null;
+	last_discovered_at: string | null;
+	discovery_source: string | null;
 }
 
 export interface NhiAgentExtension {
@@ -378,30 +380,6 @@ export interface UpdateServiceAccountRequest {
 	description?: string;
 	purpose?: string;
 	environment?: string;
-}
-
-export interface NhiCredentialResponse {
-	id: string;
-	nhi_id: string;
-	credential_type: string;
-	valid_from: string;
-	valid_until: string;
-	is_active: boolean;
-	created_at: string;
-}
-
-export interface CredentialIssuedResponse {
-	credential: NhiCredentialResponse;
-	secret: string;
-}
-
-export interface IssueCredentialRequest {
-	credential_type: string;
-	valid_days?: number;
-}
-
-export interface RotateCredentialRequest {
-	grace_period_hours?: number;
 }
 
 export interface SuspendNhiRequest {
@@ -792,6 +770,8 @@ export interface ServiceProvider {
 	assertion_validity_seconds: number;
 	enabled: boolean;
 	metadata_url: string | null;
+	slo_url: string | null;
+	slo_binding: string;
 	created_at: string;
 	updated_at: string;
 }
@@ -814,6 +794,8 @@ export interface CreateServiceProviderRequest {
 	validate_signatures?: boolean;
 	assertion_validity_seconds?: number;
 	metadata_url?: string;
+	slo_url?: string;
+	slo_binding?: string;
 }
 
 export interface UpdateServiceProviderRequest {
@@ -828,6 +810,17 @@ export interface UpdateServiceProviderRequest {
 	assertion_validity_seconds?: number;
 	enabled?: boolean;
 	metadata_url?: string;
+	slo_url?: string;
+	slo_binding?: string;
+}
+
+// --- SAML SLO ---
+
+export interface SloResult {
+	total: number;
+	succeeded: number;
+	failed: number;
+	no_slo_url: number;
 }
 
 // SAML Certificates
@@ -3272,6 +3265,8 @@ export interface OAuthClient {
 	is_active: boolean;
 	logo_url: string | null;
 	description: string | null;
+	nhi_id: string | null;
+	post_logout_redirect_uris: string[];
 	created_at: string;
 	updated_at: string;
 }
@@ -3293,6 +3288,8 @@ export interface CreateOAuthClientRequest {
 	scopes: string[];
 	logo_url?: string;
 	description?: string;
+	post_logout_redirect_uris?: string[];
+	nhi_id?: string;
 }
 
 export interface UpdateOAuthClientRequest {
@@ -3303,6 +3300,8 @@ export interface UpdateOAuthClientRequest {
 	is_active?: boolean;
 	logo_url?: string;
 	description?: string;
+	post_logout_redirect_uris?: string[];
+	nhi_id?: string;
 }
 
 // --- User Group Types ---
@@ -7329,4 +7328,252 @@ export interface PaginatedDelegationResponse {
 	data: NhiDelegationGrant[];
 	limit: number;
 	offset: number;
+}
+
+// Authorization Explain NHI
+
+export type ExplainStep =
+	| 'nhi_identity'
+	| 'lifecycle_state'
+	| 'agent_details'
+	| 'risk_score'
+	| 'delegation_grants'
+	| 'pdp_evaluation';
+
+export interface ExplainCheckStep {
+	step: ExplainStep;
+	pass: boolean;
+	detail: string;
+}
+
+export interface ExplainNhiResponse {
+	nhi_id: string;
+	tenant_id: string;
+	would_allow: boolean;
+	checks: ExplainCheckStep[];
+}
+
+// Passwordless Authentication
+
+export interface PasswordlessInitResponse {
+	message: string;
+	expires_in_seconds: number;
+}
+
+export interface PasswordlessMfaRequiredResponse {
+	partial_token: string;
+	expires_in: number;
+	mfa_required: boolean;
+}
+
+export interface AvailableMethodsResponse {
+	magic_link: boolean;
+	email_otp: boolean;
+}
+
+export interface PasswordlessPolicyResponse {
+	enabled_methods: string;
+	magic_link_expiry_minutes: number;
+	otp_expiry_minutes: number;
+	otp_max_attempts: number;
+	require_mfa_after_passwordless: boolean;
+}
+
+// MCP Discovery Types
+
+export interface GatewayInfo {
+	name: string;
+}
+
+export interface DiscoveredTool {
+	name: string;
+	description: string | null;
+	input_schema: Record<string, unknown>;
+	server_name: string | null;
+	gateway_name: string | null;
+}
+
+export interface GatewayError {
+	gateway_name: string;
+	error: string;
+}
+
+export interface DiscoverToolsResponse {
+	tools: DiscoveredTool[];
+	gateways: GatewayInfo[];
+	errors?: GatewayError[];
+}
+
+export interface ImportResult {
+	tool_name: string;
+	nhi_id: string | null;
+	error: string | null;
+}
+
+export interface ImportToolsResponse {
+	results: ImportResult[];
+}
+
+// --- Schema Freshness (WS3) ---
+
+export interface ChangedTool {
+	nhi_id: string;
+	name: string;
+	old_checksum: string | null;
+	new_checksum: string | null;
+}
+
+export interface SyncCheckResult {
+	up_to_date: number;
+	changed: ChangedTool[];
+	new_tools: string[];
+	removed: string[];
+}
+
+// --- Bulk Grant (WS1) ---
+
+export interface BulkGrantRequest {
+	tool_ids: string[];
+	permission_type?: string;
+	expires_at?: string;
+}
+
+export interface BulkGrantResult {
+	tool_id: string;
+	success: boolean;
+	error: string | null;
+}
+
+export interface BulkGrantResponse {
+	results: BulkGrantResult[];
+	granted: number;
+	failed: number;
+}
+
+// --- Vault (WS2) ---
+
+export interface SecretMetadata {
+	id: string;
+	nhi_id: string;
+	name: string;
+	secret_type: string | null;
+	description: string | null;
+	inject_as: string | null;
+	inject_format: string | null;
+	expires_at: string | null;
+	last_rotated_at: string | null;
+	rotation_interval_days: number | null;
+	max_lease_duration_secs: number | null;
+	max_concurrent_leases: number | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface StoreSecretRequest {
+	name: string;
+	value: string;
+	secret_type?: string;
+	description?: string;
+	inject_as?: string;
+	inject_format?: string;
+	expires_at?: string;
+	rotation_interval_days?: number;
+	max_lease_duration_secs?: number;
+	max_concurrent_leases?: number;
+}
+
+export interface RotateSecretRequest {
+	value: string;
+}
+
+export interface NhiSecretLease {
+	id: string;
+	tenant_id: string;
+	secret_id: string;
+	lessee_nhi_id: string;
+	lessee_type: string | null;
+	issued_at: string;
+	expires_at: string;
+	renewed_at: string | null;
+	revoked_at: string | null;
+	status: string;
+	revocation_reason: string | null;
+	issued_by: string | null;
+	source_ip: string | null;
+}
+
+export interface CreateLeaseRequest {
+	secret_id: string;
+	lessee_nhi_id: string;
+	lessee_type?: string;
+	duration_secs?: number;
+}
+
+export interface RenewLeaseRequest {
+	extend_secs: number;
+}
+
+// --- Role Inducements ---
+
+export interface RoleInducement {
+	id: string;
+	tenant_id: string;
+	inducing_role_id: string;
+	inducing_role_name: string | null;
+	induced_role_id: string;
+	induced_role_name: string | null;
+	is_enabled: boolean;
+	description: string | null;
+	created_by: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface InducementListResponse {
+	items: RoleInducement[];
+	total: number;
+}
+
+export interface CreateRoleInducementRequest {
+	induced_role_id: string;
+	description?: string;
+}
+
+export interface InducedRoleInfo {
+	role_id: string;
+	role_name: string;
+	depth: number;
+}
+
+// --- GDPR Data Protection ---
+
+export interface GdprReport {
+	tenant_id: string;
+	generated_at: string;
+	total_entitlements: number;
+	classified_entitlements: number;
+	classification_summary: Record<string, number>;
+	legal_basis_summary: Record<string, number>;
+	classified_entitlements_detail: ClassifiedEntitlementDetail[];
+	entitlements_with_retention: ClassifiedEntitlementDetail[];
+}
+
+export interface ClassifiedEntitlementDetail {
+	entitlement_id: string;
+	entitlement_name: string;
+	application_name: string;
+	classification: string;
+	legal_basis: string | null;
+	retention_period_days: number | null;
+	data_controller: string | null;
+	data_processor: string | null;
+	purposes: string[] | null;
+	active_assignment_count: number;
+}
+
+export interface UserDataProtectionSummary {
+	user_id: string;
+	entitlements: EntitlementResponse[];
+	total_classified: number;
+	classifications: Record<string, number>;
 }

@@ -81,6 +81,12 @@
 	>
 		Test
 	</a>
+	<a
+		href="/governance/authorization/explain"
+		class="border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+	>
+		Explain NHI
+	</a>
 </div>
 
 {#if data.policies.length === 0}

@@ -41,8 +41,15 @@ export const authCheckSchema = z.object({
 		.default('')
 });
 
+export const explainNhiSchema = z.object({
+	nhi_id: z.string().uuid('Must be a valid UUID'),
+	action: z.string().min(1, 'Action is required').default('create'),
+	resource_type: z.string().min(1, 'Resource type is required').default('mcp')
+});
+
 export type CreateConditionSchema = typeof createConditionSchema;
 export type CreatePolicySchema = typeof createPolicySchema;
 export type UpdatePolicySchema = typeof updatePolicySchema;
 export type CreateMappingSchema = typeof createMappingSchema;
 export type AuthCheckSchema = typeof authCheckSchema;
+export type ExplainNhiSchema = typeof explainNhiSchema;

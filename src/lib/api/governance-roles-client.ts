@@ -17,7 +17,11 @@ import type {
 	ValidateParametersRequest,
 	ValidateParametersResponse,
 	InheritanceBlock,
-	AddInheritanceBlockRequest
+	AddInheritanceBlockRequest,
+	RoleInducement,
+	InducementListResponse,
+	CreateRoleInducementRequest,
+	InducedRoleInfo
 } from './types';
 
 // --- Helper ---
@@ -316,4 +320,75 @@ export async function removeInheritanceBlockClient(
 		method: 'DELETE'
 	});
 	if (!res.ok) throw new Error(`Failed to remove inheritance block: ${res.status}`);
+}
+
+// --- Inducements ---
+
+export async function fetchRoleInducements(
+	roleId: string,
+	params: { enabled_only?: boolean; limit?: number; offset?: number } = {},
+	fetchFn: typeof fetch = fetch
+): Promise<InducementListResponse> {
+	const qs = buildSearchParams({ enabled_only: params.enabled_only, limit: params.limit, offset: params.offset });
+	const res = await fetchFn(`/api/governance/roles/${roleId}/inducements${qs}`);
+	if (!res.ok) throw new Error(`Failed to fetch inducements: ${res.status}`);
+	return res.json();
+}
+
+export async function createRoleInducementClient(
+	roleId: string,
+	data: CreateRoleInducementRequest,
+	fetchFn: typeof fetch = fetch
+): Promise<RoleInducement> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/inducements`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(data)
+	});
+	if (!res.ok) throw new Error(`Failed to create inducement: ${res.status}`);
+	return res.json();
+}
+
+export async function deleteRoleInducementClient(
+	roleId: string,
+	inducementId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<void> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/inducements/${inducementId}`, {
+		method: 'DELETE'
+	});
+	if (!res.ok) throw new Error(`Failed to delete inducement: ${res.status}`);
+}
+
+export async function enableRoleInducementClient(
+	roleId: string,
+	inducementId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<RoleInducement> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/inducements/${inducementId}/enable`, {
+		method: 'POST'
+	});
+	if (!res.ok) throw new Error(`Failed to enable inducement: ${res.status}`);
+	return res.json();
+}
+
+export async function disableRoleInducementClient(
+	roleId: string,
+	inducementId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<RoleInducement> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/inducements/${inducementId}/disable`, {
+		method: 'POST'
+	});
+	if (!res.ok) throw new Error(`Failed to disable inducement: ${res.status}`);
+	return res.json();
+}
+
+export async function fetchInducedRoles(
+	roleId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<InducedRoleInfo[]> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/induced-roles`);
+	if (!res.ok) throw new Error(`Failed to fetch induced roles: ${res.status}`);
+	return res.json();
 }

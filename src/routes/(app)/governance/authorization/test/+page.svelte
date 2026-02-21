@@ -47,6 +47,11 @@
 		href="/governance/authorization/test"
 		class="border-b-2 border-primary px-3 py-2 text-sm font-medium text-foreground">Test</a
 	>
+	<a
+		href="/governance/authorization/explain"
+		class="border-b-2 border-transparent px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+		>Explain NHI</a
+	>
 </div>
 
 <div class="grid gap-6 lg:grid-cols-2">

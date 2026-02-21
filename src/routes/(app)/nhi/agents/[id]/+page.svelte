@@ -12,11 +12,11 @@
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { AGENT_TYPES } from '$lib/schemas/nhi';
 	import NhiStateBadge from '../../nhi-state-badge.svelte';
-	import CredentialsSection from '../../credentials-section.svelte';
 	import McpToolsTab from '$lib/components/nhi/mcp-tools-tab.svelte';
 	import PermissionsTab from '$lib/components/nhi/permissions-tab.svelte';
 	import AgentCardTab from '$lib/components/nhi/agent-card-tab.svelte';
 	import DelegationsTab from '$lib/components/nhi/delegations-tab.svelte';
+	import VaultTab from '$lib/components/nhi/vault-tab.svelte';
 	import RiskBreakdown from '$lib/components/nhi/risk-breakdown.svelte';
 	import UsageHistoryTable from '$lib/components/nhi/usage-history-table.svelte';
 	import UsageSummaryStats from '$lib/components/nhi/usage-summary-stats.svelte';
@@ -52,6 +52,7 @@
 	let usageSummary = $state<NhiUsageSummary | null>(null);
 	let usageLoading = $state(false);
 	let usageLoaded = $state(false);
+	let usageError = $state<string | null>(null);
 
 	$effect(() => {
 		fetchNhiRisk(data.nhi.id)
@@ -63,8 +64,10 @@
 	const isArchived = $derived(data.nhi.lifecycle_state === 'archived');
 
 	async function loadUsage() {
-		if (usageLoaded) return;
+		if (usageLoaded && !usageError) return;
 		usageLoading = true;
+		usageError = null;
+		usageLoaded = false;
 		try {
 			const [records, summary] = await Promise.all([
 				fetchNhiUsageHistory(data.nhi.id),
@@ -73,8 +76,8 @@
 			usageRecords = records.items;
 			usageSummary = summary;
 			usageLoaded = true;
-		} catch {
-			// silently fail
+		} catch (err: unknown) {
+			usageError = err instanceof Error ? err.message : 'Failed to load usage data';
 		} finally {
 			usageLoading = false;
 		}
@@ -119,6 +122,7 @@
 		<TabsTrigger value="permissions">Permissions</TabsTrigger>
 		<TabsTrigger value="agent-card">Agent Card</TabsTrigger>
 		<TabsTrigger value="delegations">Delegations</TabsTrigger>
+		<TabsTrigger value="vault">Vault</TabsTrigger>
 		<TabsTrigger value="usage">Usage</TabsTrigger>
 		<TabsTrigger value="risk">Risk</TabsTrigger>
 	</TabsList>
@@ -372,9 +376,6 @@
 				</Card>
 			{/if}
 
-			<Separator class="my-6" />
-
-			<CredentialsSection credentials={data.credentials} {isArchived} />
 		{/if}
 	</TabsContent>
 
@@ -394,6 +395,10 @@
 		<DelegationsTab nhiId={data.nhi.id} />
 	</TabsContent>
 
+	<TabsContent value="vault">
+		<VaultTab nhiId={data.nhi.id} />
+	</TabsContent>
+
 	<TabsContent value="usage">
 		{#if !usageLoaded && !usageLoading}
 			<div class="space-y-2">
@@ -410,6 +415,16 @@
 				<div class="h-8 rounded bg-muted"></div>
 				<div class="h-48 rounded bg-muted"></div>
 			</div>
+		{:else if usageError}
+			<Alert variant="destructive">
+				<AlertDescription>{usageError}</AlertDescription>
+			</Alert>
+			<button
+				onclick={loadUsage}
+				class="mt-2 rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground hover:bg-primary/90"
+			>
+				Retry
+			</button>
 		{:else}
 			{#if usageSummary}
 				<UsageSummaryStats summary={usageSummary} />

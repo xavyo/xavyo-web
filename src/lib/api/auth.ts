@@ -6,7 +6,9 @@ import type {
 	TokenResponse,
 	ForgotPasswordResponse,
 	ResetPasswordResponse,
-	VerifyEmailResponse
+	VerifyEmailResponse,
+	PasswordlessInitResponse,
+	AvailableMethodsResponse
 } from './types';
 
 const SYSTEM_TENANT_ID = '00000000-0000-0000-0000-000000000001';
@@ -95,6 +97,102 @@ export async function verifyEmail(
 	return apiClient<VerifyEmailResponse>('/auth/verify-email', {
 		method: 'POST',
 		body: { token },
+		tenantId: SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+// Passwordless authentication
+
+export async function requestMagicLink(
+	email: string,
+	tenantId?: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<PasswordlessInitResponse> {
+	return apiClient<PasswordlessInitResponse>('/auth/passwordless/magic-link', {
+		method: 'POST',
+		body: { email },
+		tenantId: tenantId || SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+export async function verifyMagicLink(
+	token: string,
+	tenantId?: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<TokenResponse> {
+	return apiClient<TokenResponse>('/auth/passwordless/magic-link/verify', {
+		method: 'POST',
+		body: { token },
+		tenantId: tenantId || SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+export async function requestEmailOtp(
+	email: string,
+	tenantId?: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<PasswordlessInitResponse> {
+	return apiClient<PasswordlessInitResponse>('/auth/passwordless/email-otp', {
+		method: 'POST',
+		body: { email },
+		tenantId: tenantId || SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+export async function verifyEmailOtp(
+	email: string,
+	code: string,
+	tenantId?: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<TokenResponse> {
+	return apiClient<TokenResponse>('/auth/passwordless/email-otp/verify', {
+		method: 'POST',
+		body: { email, code },
+		tenantId: tenantId || SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+export async function getAvailableMethods(
+	tenantId?: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<AvailableMethodsResponse> {
+	return apiClient<AvailableMethodsResponse>('/auth/passwordless/methods', {
+		method: 'GET',
+		tenantId: tenantId || SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+// MFA verification during login flow
+
+export async function verifyMfaTotp(
+	partialToken: string,
+	code: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<TokenResponse> {
+	return apiClient<TokenResponse>('/auth/mfa/totp/verify', {
+		method: 'POST',
+		body: { code },
+		token: partialToken,
+		tenantId: SYSTEM_TENANT_ID,
+		fetch: fetchFn
+	});
+}
+
+export async function verifyMfaRecovery(
+	partialToken: string,
+	code: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<TokenResponse> {
+	return apiClient<TokenResponse>('/auth/mfa/recovery/verify', {
+		method: 'POST',
+		body: { code },
+		token: partialToken,
 		tenantId: SYSTEM_TENANT_ID,
 		fetch: fetchFn
 	});

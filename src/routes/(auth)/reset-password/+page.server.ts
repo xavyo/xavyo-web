@@ -7,9 +7,9 @@ import { resetPassword } from '$lib/api/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ url }) => {
-	const token = url.searchParams.get('token') ?? '';
-	const form = await superValidate({ token, newPassword: '' }, zod(resetPasswordSchema));
-	return { form };
+	const hasToken = !!url.searchParams.get('token');
+	const form = await superValidate(zod(resetPasswordSchema));
+	return { form, hasToken };
 };
 
 export const actions: Actions = {

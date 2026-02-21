@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ parent, locals, fetch }) => {
 
 	const [usersResult, personasResult, nhiResult, activityResult] = await Promise.allSettled([
 		listUsers({ limit: 1 }, token, tenantId, fetch),
-		listPersonas({ limit: 1, lifecycle_state: 'active' }, token, tenantId, fetch),
+		listPersonas({ limit: 1, status: 'active' }, token, tenantId, fetch),
 		listNhi({ limit: 1 }, token, tenantId, fetch),
 		fetchAdminLoginAttempts({ limit: 1 }, token, tenantId, fetch)
 	]);

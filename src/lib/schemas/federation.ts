@@ -53,7 +53,9 @@ export const createServiceProviderSchema = z.object({
 	sign_assertions: z.boolean().optional().default(true),
 	validate_signatures: z.boolean().optional().default(false),
 	assertion_validity_seconds: z.coerce.number().int().min(60).max(86400).optional().default(300),
-	metadata_url: z.string().url('Must be a valid URL').optional()
+	metadata_url: z.string().url('Must be a valid URL').optional(),
+	slo_url: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
+	slo_binding: z.string().optional()
 });
 
 export const updateServiceProviderSchema = z.object({
@@ -67,6 +69,8 @@ export const updateServiceProviderSchema = z.object({
 	validate_signatures: z.boolean().optional(),
 	assertion_validity_seconds: z.coerce.number().int().min(60).max(86400).optional(),
 	metadata_url: z.string().url('Must be a valid URL').optional(),
+	slo_url: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
+	slo_binding: z.string().optional(),
 	enabled: z.boolean().optional()
 });
 

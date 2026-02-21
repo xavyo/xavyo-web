@@ -48,6 +48,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			validate_signatures: sp.validate_signatures,
 			assertion_validity_seconds: sp.assertion_validity_seconds,
 			metadata_url: sp.metadata_url ?? '',
+			slo_url: sp.slo_url ?? '',
+			slo_binding: sp.slo_binding ?? '',
 			enabled: sp.enabled
 		},
 		zod(updateServiceProviderSchema)
@@ -95,7 +97,9 @@ export const actions: Actions = {
 			validate_signatures: form.data.validate_signatures,
 			assertion_validity_seconds: form.data.assertion_validity_seconds,
 			enabled: form.data.enabled,
-			metadata_url: form.data.metadata_url || undefined
+			metadata_url: form.data.metadata_url || undefined,
+			slo_url: form.data.slo_url || undefined,
+			slo_binding: form.data.slo_binding || undefined
 		};
 
 		try {

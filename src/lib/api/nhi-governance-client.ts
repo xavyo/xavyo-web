@@ -4,6 +4,7 @@ import type {
 	StalenessReportResponse,
 	AutoSuspendResult,
 	OrphanDetectionListResponse,
+	NhiSodRule,
 	NhiSodRuleListResponse,
 	NhiSodCheckResult,
 	NhiCertificationCampaign,
@@ -103,6 +104,15 @@ export async function fetchNhiSodRules(
 	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
 	const res = await fetchFn(`/api/nhi/governance/sod/rules${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch NHI SoD rules: ${res.status}`);
+	return res.json();
+}
+
+export async function fetchNhiSodRule(
+	id: string,
+	fetchFn: typeof fetch = fetch
+): Promise<NhiSodRule> {
+	const res = await fetchFn(`/api/nhi/governance/sod/rules/${id}`);
+	if (!res.ok) throw new Error(`Failed to fetch NHI SoD rule: ${res.status}`);
 	return res.json();
 }
 

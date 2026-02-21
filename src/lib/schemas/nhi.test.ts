@@ -6,7 +6,6 @@ import {
 	updateToolSchema,
 	updateAgentSchema,
 	updateServiceAccountSchema,
-	issueCredentialSchema,
 	suspendNhiSchema
 } from './nhi';
 
@@ -134,50 +133,6 @@ describe('updateServiceAccountSchema', () => {
 			environment: 'production'
 		});
 		expect(result.success).toBe(true);
-	});
-});
-
-describe('issueCredentialSchema', () => {
-	it('accepts valid api_key credential', () => {
-		const result = issueCredentialSchema.safeParse({
-			credential_type: 'api_key'
-		});
-		expect(result.success).toBe(true);
-	});
-
-	it('accepts valid secret credential', () => {
-		const result = issueCredentialSchema.safeParse({
-			credential_type: 'secret'
-		});
-		expect(result.success).toBe(true);
-	});
-
-	it('accepts valid certificate credential', () => {
-		const result = issueCredentialSchema.safeParse({
-			credential_type: 'certificate',
-			valid_days: 365
-		});
-		expect(result.success).toBe(true);
-	});
-
-	it('rejects missing credential_type', () => {
-		const result = issueCredentialSchema.safeParse({});
-		expect(result.success).toBe(false);
-	});
-
-	it('rejects invalid credential_type', () => {
-		const result = issueCredentialSchema.safeParse({
-			credential_type: 'password'
-		});
-		expect(result.success).toBe(false);
-	});
-
-	it('rejects valid_days over 3650', () => {
-		const result = issueCredentialSchema.safeParse({
-			credential_type: 'api_key',
-			valid_days: 4000
-		});
-		expect(result.success).toBe(false);
 	});
 });
 

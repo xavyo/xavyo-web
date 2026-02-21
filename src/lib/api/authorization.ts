@@ -7,7 +7,8 @@ import type {
 	MappingListResponse,
 	EntitlementActionMapping,
 	CreateMappingRequest,
-	AuthorizationDecision
+	AuthorizationDecision,
+	ExplainNhiResponse
 } from './types';
 
 export interface ListPoliciesParams {
@@ -156,6 +157,31 @@ export async function deleteMapping(
 ): Promise<void> {
 	await apiClient(`/admin/authorization/mappings/${id}`, {
 		method: 'DELETE',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+export interface ExplainNhiParams {
+	nhi_id: string;
+	action?: string;
+	resource_type?: string;
+}
+
+export async function explainNhi(
+	params: ExplainNhiParams,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<ExplainNhiResponse> {
+	const qs = buildSearchParams({
+		nhi_id: params.nhi_id,
+		action: params.action,
+		resource_type: params.resource_type
+	});
+	return apiClient<ExplainNhiResponse>(`/admin/authorization/explain-nhi${qs}`, {
+		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn

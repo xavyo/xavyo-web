@@ -10,7 +10,8 @@ import type {
 	IdPCertificate,
 	IdPInfo,
 	GenerateCertificateRequest,
-	ImportSpMetadataRequest
+	ImportSpMetadataRequest,
+	SloResult
 } from './types';
 
 // --- Helper ---
@@ -198,5 +199,17 @@ export async function importSpFromMetadata(
 		const err = await res.json().catch(() => null);
 		throw new Error(err?.message || `Failed to import SP from metadata: ${res.status}`);
 	}
+	return res.json();
+}
+
+// --- SAML SLO ---
+
+export async function initiateSamlSloClient(
+	fetchFn: typeof fetch = fetch
+): Promise<SloResult> {
+	const res = await fetchFn('/api/federation/saml/slo/initiate', {
+		method: 'POST'
+	});
+	if (!res.ok) throw new Error(`Failed to initiate SLO: ${res.status}`);
 	return res.json();
 }

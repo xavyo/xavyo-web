@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { apiClient, ApiError } from './client';
 import type {
 	ImportJobListResponse,
@@ -38,7 +39,7 @@ export async function uploadImport(
 	tenantId: string,
 	fetchFn: typeof globalThis.fetch = globalThis.fetch
 ): Promise<ImportJobCreatedResponse> {
-	const url = 'http://localhost:8080/admin/users/import';
+	const url = `${env.API_BASE_URL}/admin/users/import`;
 	const formData = new FormData();
 	formData.append('file', file);
 	formData.append('send_invitations', String(sendInvitations));
@@ -131,7 +132,7 @@ export async function downloadImportErrors(
 	tenantId: string,
 	fetchFn: typeof globalThis.fetch = globalThis.fetch
 ): Promise<Response> {
-	const url = `http://localhost:8080/admin/users/imports/${jobId}/errors/download`;
+	const url = `${env.API_BASE_URL}/admin/users/imports/${jobId}/errors/download`;
 
 	const response = await fetchFn(url, {
 		method: 'GET',
@@ -180,7 +181,7 @@ export async function validateInvitation(
 	tokenValue: string,
 	fetchFn: typeof globalThis.fetch = globalThis.fetch
 ): Promise<InvitationValidationResponse> {
-	const url = `http://localhost:8080/invite/${tokenValue}`;
+	const url = `${env.API_BASE_URL}/invite/${tokenValue}`;
 
 	const response = await fetchFn(url, {
 		method: 'GET'
@@ -212,7 +213,7 @@ export async function acceptInvitation(
 	password: string,
 	fetchFn: typeof globalThis.fetch = globalThis.fetch
 ): Promise<AcceptInvitationResponse> {
-	const url = `http://localhost:8080/invite/${tokenValue}`;
+	const url = `${env.API_BASE_URL}/invite/${tokenValue}`;
 
 	const response = await fetchFn(url, {
 		method: 'POST',

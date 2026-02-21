@@ -6,7 +6,9 @@ import type {
 	GrantNhiPermissionRequest,
 	NhiUserPermission,
 	RevokeResponse,
-	PaginatedPermissionResponse
+	PaginatedPermissionResponse,
+	BulkGrantRequest,
+	BulkGrantResponse
 } from './types';
 
 export interface PaginationParams {
@@ -209,6 +211,24 @@ export async function listNhiUsers(
 	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
 	return apiClient<PaginatedPermissionResponse<NhiUserPermission>>(`/nhi/${id}/users${qs}`, {
 		method: 'GET',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+// --- Bulk Grant ---
+
+export async function bulkGrantToolPermissions(
+	agentId: string,
+	body: BulkGrantRequest,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<BulkGrantResponse> {
+	return apiClient<BulkGrantResponse>(`/nhi/agents/${agentId}/tools/bulk-grant`, {
+		method: 'POST',
+		body,
 		token,
 		tenantId,
 		fetch: fetchFn

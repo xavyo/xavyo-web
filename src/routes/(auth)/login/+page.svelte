@@ -6,6 +6,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import { Separator } from '$lib/components/ui/separator';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -52,6 +53,30 @@
 			<Button type="submit" class="w-full">Log in</Button>
 		</form>
 	</CardContent>
+	{#if data.availableMethods?.magic_link || data.availableMethods?.email_otp}
+		<div class="px-6 pb-2">
+			<Separator class="mb-4" />
+			<p class="mb-2 text-center text-sm text-muted-foreground">Or sign in without a password</p>
+			<div class="flex gap-2">
+				{#if data.availableMethods.magic_link}
+					<a
+						href="/passwordless/magic-link{tenantParam}"
+						class="flex-1 inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+					>
+						Magic link
+					</a>
+				{/if}
+				{#if data.availableMethods.email_otp}
+					<a
+						href="/passwordless/email-otp{tenantParam}"
+						class="flex-1 inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+					>
+						Email code
+					</a>
+				{/if}
+			</div>
+		</div>
+	{/if}
 	<CardFooter>
 		<div class="flex w-full flex-col gap-2 text-sm text-muted-foreground">
 			<a href="/forgot-password{tenantParam}" class="text-primary underline-offset-4 hover:underline">Forgot your password?</a>

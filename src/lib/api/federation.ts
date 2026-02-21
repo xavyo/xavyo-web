@@ -15,7 +15,8 @@ import type {
 	UpdateServiceProviderRequest,
 	CertificateListResponse,
 	IdPCertificate,
-	UploadCertificateRequest
+	UploadCertificateRequest,
+	SloResult
 } from './types';
 
 // --- OIDC Identity Providers ---
@@ -303,6 +304,21 @@ export async function activateCertificate(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<void> {
 	await apiClient(`/admin/saml/certificates/${id}/activate`, {
+		method: 'POST',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+// --- SAML SLO ---
+
+export async function initiateSamlSlo(
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<SloResult> {
+	return apiClient<SloResult>('/saml/slo/initiate', {
 		method: 'POST',
 		token,
 		tenantId,

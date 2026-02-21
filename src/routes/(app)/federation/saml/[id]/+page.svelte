@@ -136,7 +136,19 @@
 						</span>
 					</div>
 				{/if}
-				{#if data.sp.certificate}
+				{#if data.sp.slo_url}
+				<div class="flex justify-between gap-4">
+					<span class="shrink-0 text-sm text-muted-foreground">SLO URL</span>
+					<span class="truncate text-sm font-mono" title={data.sp.slo_url}>
+						{data.sp.slo_url}
+					</span>
+				</div>
+			{/if}
+			<div class="flex justify-between">
+				<span class="text-sm text-muted-foreground">SLO Binding</span>
+				<span class="text-sm">{data.sp.slo_binding || 'HTTP-POST'}</span>
+			</div>
+			{#if data.sp.certificate}
 					<div>
 						<span class="text-sm text-muted-foreground">Certificate</span>
 						<pre class="mt-1 max-h-24 overflow-auto rounded-md bg-muted p-2 font-mono text-xs">{data.sp.certificate}</pre>

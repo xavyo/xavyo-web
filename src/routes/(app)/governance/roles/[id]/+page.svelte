@@ -18,7 +18,9 @@
 		EffectiveEntitlementsResponse,
 		RoleParameter,
 		InheritanceBlock,
-		ImpactAnalysisResponse
+		ImpactAnalysisResponse,
+		RoleInducement,
+		InducedRoleInfo
 	} from '$lib/api/types';
 	import {
 		fetchRoleAncestors,
@@ -38,7 +40,13 @@
 		validateRoleParametersClient,
 		fetchInheritanceBlocks,
 		addInheritanceBlockClient,
-		removeInheritanceBlockClient
+		removeInheritanceBlockClient,
+		fetchRoleInducements,
+		createRoleInducementClient,
+		deleteRoleInducementClient,
+		enableRoleInducementClient,
+		disableRoleInducementClient,
+		fetchInducedRoles
 	} from '$lib/api/governance-roles-client';
 	import { fetchEntitlements } from '$lib/api/governance-client';
 	import { Trash2, RefreshCw, Plus } from 'lucide-svelte';
@@ -334,6 +342,82 @@
 		}
 	}
 
+	// --- Inducements tab state ---
+	let inducements = $state<RoleInducement[]>([]);
+	let inducedRoles = $state<InducedRoleInfo[]>([]);
+	let inducementsLoaded = $state(false);
+	let inducementsLoading = $state(false);
+	let showAddInducement = $state(false);
+	let inducementRoleId = $state('');
+	let inducementDescription = $state('');
+	let addInducementLoading = $state(false);
+
+	async function loadInducements() {
+		if (inducementsLoaded) return;
+		inducementsLoading = true;
+		try {
+			const [indResult, induced] = await Promise.all([
+				fetchRoleInducements(data.role.id),
+				fetchInducedRoles(data.role.id)
+			]);
+			inducements = indResult.items;
+			inducedRoles = induced;
+			inducementsLoaded = true;
+		} catch {
+			// Error loading inducements
+		} finally {
+			inducementsLoading = false;
+		}
+	}
+
+	async function handleAddInducement() {
+		if (!inducementRoleId) return;
+		addInducementLoading = true;
+		try {
+			await createRoleInducementClient(data.role.id, {
+				induced_role_id: inducementRoleId,
+				description: inducementDescription || undefined
+			});
+			addToast('success', 'Inducement added');
+			showAddInducement = false;
+			inducementRoleId = '';
+			inducementDescription = '';
+			inducementsLoaded = false;
+			await loadInducements();
+		} catch (e: any) {
+			addToast('error', e.message || 'Failed to add inducement');
+		} finally {
+			addInducementLoading = false;
+		}
+	}
+
+	async function handleDeleteInducement(inducementId: string) {
+		try {
+			await deleteRoleInducementClient(data.role.id, inducementId);
+			addToast('success', 'Inducement removed');
+			inducementsLoaded = false;
+			await loadInducements();
+		} catch (e: any) {
+			addToast('error', e.message || 'Failed to remove inducement');
+		}
+	}
+
+	async function handleToggleInducement(inducement: RoleInducement) {
+		try {
+			if (inducement.is_enabled) {
+				await disableRoleInducementClient(data.role.id, inducement.id);
+				addToast('success', 'Inducement disabled');
+			} else {
+				await enableRoleInducementClient(data.role.id, inducement.id);
+				addToast('success', 'Inducement enabled');
+			}
+			inducementsLoaded = false;
+			await loadInducements();
+		} catch (e: any) {
+			addToast('error', e.message || 'Failed to toggle inducement');
+		}
+	}
+
 	// Tab change handler — lazy load data
 	function handleTabChange(tab: string) {
 		activeTab = tab;
@@ -341,6 +425,7 @@
 		if (tab === 'entitlements') loadEntitlements();
 		if (tab === 'parameters') loadParameters();
 		if (tab === 'blocks') { loadBlocks(); loadBlockEntitlements(); }
+		if (tab === 'inducements') loadInducements();
 	}
 </script>
 
@@ -367,6 +452,7 @@
 		<TabsTrigger value="parameters">Parameters</TabsTrigger>
 		<TabsTrigger value="hierarchy">Hierarchy</TabsTrigger>
 		<TabsTrigger value="blocks">Blocks</TabsTrigger>
+		<TabsTrigger value="inducements">Inducements</TabsTrigger>
 	</TabsList>
 
 	<!-- Details Tab -->
@@ -839,6 +925,108 @@
 								</Button>
 							</div>
 						</div>
+					</div>
+				{/if}
+			</CardContent>
+		</Card>
+	</TabsContent>
+
+	<!-- Inducements Tab -->
+	<TabsContent value="inducements">
+		<Card>
+			<CardHeader>
+				<div class="flex items-center justify-between">
+					<h2 class="text-xl font-semibold">Inducements</h2>
+					<Button size="sm" onclick={() => (showAddInducement = true)}>
+						<Plus class="mr-1 h-3 w-3" />
+						Add Inducement
+					</Button>
+				</div>
+			</CardHeader>
+			<CardContent>
+				{#if inducementsLoading}
+					<div class="space-y-3">
+						{#each [1, 2, 3] as _}
+							<div class="h-8 animate-pulse rounded bg-muted"></div>
+						{/each}
+					</div>
+				{:else if inducements.length === 0}
+					<p class="text-sm text-muted-foreground">No inducements configured.</p>
+				{:else}
+					<div class="space-y-2">
+						{#each inducements as ind (ind.id)}
+							<div class="flex items-center justify-between rounded-md border p-3">
+								<div>
+									<span class="text-sm font-medium">{ind.induced_role_name ?? ind.induced_role_id}</span>
+									{#if ind.description}
+										<p class="text-xs text-muted-foreground">{ind.description}</p>
+									{/if}
+								</div>
+								<div class="flex items-center gap-2">
+									<button
+										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {ind.is_enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}"
+										onclick={() => handleToggleInducement(ind)}
+									>
+										{ind.is_enabled ? 'Enabled' : 'Disabled'}
+									</button>
+									<Button variant="ghost" size="sm" onclick={() => handleDeleteInducement(ind.id)}>
+										<Trash2 class="h-4 w-4 text-destructive" />
+									</Button>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+
+				<!-- Add inducement dialog -->
+				{#if showAddInducement}
+					<div class="mt-4 rounded-md border p-4">
+						<h4 class="font-medium">Add inducement</h4>
+						<p class="mt-1 text-xs text-muted-foreground">Select a role whose constructions will be inherited by this role.</p>
+						<div class="mt-2 space-y-3">
+							<div class="space-y-1">
+								<Label for="inducement_role">Induced Role</Label>
+								<select
+									id="inducement_role"
+									class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+									bind:value={inducementRoleId}
+								>
+									<option value="">Select a role</option>
+									{#each data.availableRoles as role}
+										{#if role.id !== data.role.id}
+											<option value={role.id}>{role.name}</option>
+										{/if}
+									{/each}
+								</select>
+							</div>
+							<div class="space-y-1">
+								<Label for="inducement_desc">Description (optional)</Label>
+								<Input id="inducement_desc" bind:value={inducementDescription} placeholder="Why this inducement?" />
+							</div>
+							<div class="flex gap-2">
+								<Button size="sm" disabled={!inducementRoleId || addInducementLoading} onclick={handleAddInducement}>
+									Add Inducement
+								</Button>
+								<Button variant="outline" size="sm" onclick={() => (showAddInducement = false)}>
+									Cancel
+								</Button>
+							</div>
+						</div>
+					</div>
+				{/if}
+
+				<!-- Induced Roles (recursive traversal) -->
+				{#if inducedRoles.length > 0}
+					<Separator class="my-4" />
+					<h3 class="font-medium">Induced Roles (recursive)</h3>
+					<p class="mt-1 text-xs text-muted-foreground">All roles induced by this role, including transitive inducements.</p>
+					<div class="mt-2 space-y-1">
+						{#each inducedRoles as ir (ir.role_id)}
+							<div class="flex items-center gap-2 rounded px-2 py-1 text-sm">
+								<span style="margin-left: {ir.depth * 16}px">{ir.depth > 0 ? '\u2514\u2500 ' : ''}{ir.role_name}</span>
+								<Badge variant="outline">depth {ir.depth}</Badge>
+							</div>
+						{/each}
 					</div>
 				{/if}
 			</CardContent>

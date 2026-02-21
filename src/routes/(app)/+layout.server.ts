@@ -12,10 +12,11 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		redirect(302, `/login?redirectTo=${redirectTo}`);
 	}
 
-	// Redirect system-tenant users to onboarding (unless already there)
+	// Redirect system-tenant users to onboarding (unless already there or logging out)
 	if (
 		(!locals.tenantId || locals.tenantId === SYSTEM_TENANT_ID) &&
-		!url.pathname.startsWith('/onboarding')
+		!url.pathname.startsWith('/onboarding') &&
+		!url.pathname.startsWith('/logout')
 	) {
 		redirect(302, '/onboarding');
 	}
