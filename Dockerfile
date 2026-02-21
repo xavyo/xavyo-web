@@ -37,17 +37,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tini curl \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd -r -u 1001 -m xavyo \
+    && useradd -r -u 1001 -m -s /usr/sbin/nologin xavyo \
     && find / -perm /6000 -type f -exec chmod a-s {} + 2>/dev/null || true
 
 WORKDIR /app
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder --chown=xavyo:xavyo /app/build ./build
+COPY --from=builder --chown=xavyo:xavyo /app/package.json ./
+COPY --from=deps --chown=xavyo:xavyo /app/node_modules ./node_modules
 
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV HOST=0.0.0.0
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOST=0.0.0.0
 EXPOSE 3000
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=15s \
