@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { revokeNhiCert } from '$lib/api/nhi-governance';
+import { decideNhiCertItem } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
 
@@ -13,7 +13,7 @@ export const POST: RequestHandler = async ({ params, locals, fetch }) => {
 	}
 
 	try {
-		const result = await revokeNhiCert(params.campaignId, params.nhiId, locals.accessToken, locals.tenantId, fetch);
+		const result = await decideNhiCertItem(params.nhiId, 'revoke', locals.accessToken, locals.tenantId, fetch);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);

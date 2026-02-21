@@ -64,10 +64,10 @@
 	style:--brand-text={b?.text_color ?? undefined}
 	style:--brand-font={b?.font_family ?? undefined}
 >
-	{#if b?.login_page_background_url}
+	{#if b?.login_page_background_url && /^https?:\/\//i.test(b.login_page_background_url)}
 		<div
 			class="absolute inset-0 bg-cover bg-center"
-			style="background-image: url({b.login_page_background_url})"
+			style:background-image="url({b.login_page_background_url})"
 		>
 			<div class="absolute inset-0 bg-background/80 backdrop-blur-sm"></div>
 		</div>

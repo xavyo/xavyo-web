@@ -98,6 +98,7 @@
 					items: [
 						{ label: 'Audit', href: '/audit', icon: ClipboardList },
 						{ label: 'Reports', href: '/governance/reports', icon: FileBarChart },
+						{ label: 'GDPR', href: '/governance/gdpr', icon: Shield },
 						{ label: 'Certifications', href: '/governance/certifications', icon: ClipboardCheck },
 						{ label: 'Micro Certs', href: '/governance/micro-certifications', icon: Award },
 						{ label: 'Outlier Detection', href: '/governance/outliers', icon: ScanSearch },

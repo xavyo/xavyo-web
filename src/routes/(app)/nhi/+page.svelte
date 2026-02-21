@@ -9,6 +9,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { NhiIdentityResponse, NhiListResponse } from '$lib/api/types';
+	import { relativeTime } from '$lib/utils/relative-time';
 	import NhiNameLink from './nhi-name-link.svelte';
 	import NhiTypeBadge from './nhi-type-badge.svelte';
 	import NhiStateBadge from './nhi-state-badge.svelte';
@@ -46,6 +47,10 @@
 				if (!val) return '—';
 				return val.length > 60 ? val.substring(0, 60) + '…' : val;
 			}
+		}),
+		columnHelper.accessor('last_activity_at', {
+			header: 'Last Activity',
+			cell: (info) => relativeTime(info.getValue())
 		}),
 		columnHelper.accessor('created_at', {
 			header: 'Created',
@@ -127,24 +132,32 @@
 
 <div class="flex items-center justify-between">
 	<PageHeader title="Non-Human Identities" description="Manage tools, agents, and service accounts" />
-	<DropdownMenu.Root>
-		<DropdownMenu.Trigger
-			class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+	<div class="flex items-center gap-2">
+		<a
+			href="/nhi/discover"
+			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
-			Create NHI
-		</DropdownMenu.Trigger>
-		<DropdownMenu.Content>
-			<DropdownMenu.Item>
-				<a href="/nhi/tools/create" class="w-full">Tool</a>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item>
-				<a href="/nhi/agents/create" class="w-full">Agent</a>
-			</DropdownMenu.Item>
-			<DropdownMenu.Item>
-				<a href="/nhi/service-accounts/create" class="w-full">Service Account</a>
-			</DropdownMenu.Item>
-		</DropdownMenu.Content>
-	</DropdownMenu.Root>
+			Discover from Gateway
+		</a>
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger
+				class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+			>
+				Create NHI
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content>
+				<DropdownMenu.Item>
+					<a href="/nhi/tools/create" class="w-full">Tool</a>
+				</DropdownMenu.Item>
+				<DropdownMenu.Item>
+					<a href="/nhi/agents/create" class="w-full">Agent</a>
+				</DropdownMenu.Item>
+				<DropdownMenu.Item>
+					<a href="/nhi/service-accounts/create" class="w-full">Service Account</a>
+				</DropdownMenu.Item>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</div>
 </div>
 
 {#if data.summary}

@@ -17,11 +17,7 @@ import {
 	suspendNhi,
 	reactivateNhi,
 	deprecateNhi,
-	archiveNhi,
-	listCredentials,
-	issueCredential,
-	rotateCredential,
-	revokeCredential
+	archiveNhi
 } from './nhi';
 
 vi.mock('./client', () => ({
@@ -415,75 +411,3 @@ describe('NHI API — lifecycle', () => {
 	});
 });
 
-describe('NHI API — credentials', () => {
-	const mockFetch = vi.fn();
-	const token = 'test-token';
-	const tenantId = 'test-tenant';
-
-	beforeEach(() => {
-		vi.clearAllMocks();
-	});
-
-	describe('listCredentials', () => {
-		it('calls GET /nhi/:id/credentials', async () => {
-			mockApiClient.mockResolvedValue([]);
-
-			await listCredentials('nhi-1', token, tenantId, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/nhi-1/credentials', {
-				method: 'GET',
-				token,
-				tenantId,
-				fetch: mockFetch
-			});
-		});
-	});
-
-	describe('issueCredential', () => {
-		it('calls POST /nhi/:id/credentials with body', async () => {
-			const data = { credential_type: 'api_key', valid_days: 90 };
-			mockApiClient.mockResolvedValue({ credential: { id: 'cred-1' }, secret: 'abc123' });
-
-			await issueCredential('nhi-1', data, token, tenantId, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/nhi-1/credentials', {
-				method: 'POST',
-				body: data,
-				token,
-				tenantId,
-				fetch: mockFetch
-			});
-		});
-	});
-
-	describe('rotateCredential', () => {
-		it('calls POST /nhi/:id/credentials/:credId/rotate', async () => {
-			mockApiClient.mockResolvedValue({ credential: { id: 'cred-2' }, secret: 'new123' });
-
-			await rotateCredential('nhi-1', 'cred-1', { grace_period_hours: 24 }, token, tenantId, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/nhi-1/credentials/cred-1/rotate', {
-				method: 'POST',
-				body: { grace_period_hours: 24 },
-				token,
-				tenantId,
-				fetch: mockFetch
-			});
-		});
-	});
-
-	describe('revokeCredential', () => {
-		it('calls DELETE /nhi/:id/credentials/:credId', async () => {
-			mockApiClient.mockResolvedValue(undefined);
-
-			await revokeCredential('nhi-1', 'cred-1', token, tenantId, mockFetch);
-
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/nhi-1/credentials/cred-1', {
-				method: 'DELETE',
-				token,
-				tenantId,
-				fetch: mockFetch
-			});
-		});
-	});
-});

@@ -5,7 +5,9 @@ import type {
 	GrantNhiPermissionRequest,
 	NhiUserPermission,
 	RevokeResponse,
-	PaginatedPermissionResponse
+	PaginatedPermissionResponse,
+	BulkGrantRequest,
+	BulkGrantResponse
 } from './types';
 
 // --- Helper ---
@@ -163,5 +165,21 @@ export async function fetchNhiUsers(
 	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
 	const res = await fetchFn(`/api/nhi/permissions/${id}/users${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch NHI users: ${res.status}`);
+	return res.json();
+}
+
+// --- Bulk Grant ---
+
+export async function bulkGrantToolPermissionsClient(
+	agentId: string,
+	body: BulkGrantRequest,
+	fetchFn: typeof fetch = fetch
+): Promise<BulkGrantResponse> {
+	const res = await fetchFn(`/api/nhi/permissions/agents/${agentId}/tools/bulk-grant`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(body)
+	});
+	if (!res.ok) throw new Error(`Failed to bulk grant tool permissions: ${res.status}`);
 	return res.json();
 }

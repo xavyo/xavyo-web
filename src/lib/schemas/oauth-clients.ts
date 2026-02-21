@@ -14,6 +14,7 @@ export const createOAuthClientSchema = z.object({
 	redirect_uris: z.string().min(1, 'At least one redirect URI is required'),
 	grant_types: z.string().min(1, 'At least one grant type is required'),
 	scopes: z.string().min(1, 'At least one scope is required'),
+	post_logout_redirect_uris: z.string().optional().nullable(),
 	logo_url: z.string().url().or(z.literal('')).optional().nullable(),
 	description: z.string().max(500).optional().nullable()
 });
@@ -23,6 +24,7 @@ export const updateOAuthClientSchema = z.object({
 	redirect_uris: z.string().optional(),
 	grant_types: z.string().optional(),
 	scopes: z.string().optional(),
+	post_logout_redirect_uris: z.string().optional().nullable(),
 	is_active: z.boolean().optional(),
 	logo_url: z.string().url().or(z.literal('')).optional().nullable(),
 	description: z.string().max(500).optional().nullable()

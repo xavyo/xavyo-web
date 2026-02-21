@@ -55,7 +55,9 @@ export const actions: Actions = {
 			sign_assertions: form.data.sign_assertions,
 			validate_signatures: form.data.validate_signatures,
 			assertion_validity_seconds: form.data.assertion_validity_seconds,
-			metadata_url: form.data.metadata_url || undefined
+			metadata_url: form.data.metadata_url || undefined,
+			slo_url: form.data.slo_url || undefined,
+			slo_binding: form.data.slo_binding || undefined
 		};
 
 		try {

@@ -59,15 +59,16 @@
 		isLoadingMore = true;
 		loadMoreError = null;
 		try {
+			const pageSize = 20;
 			const result = await fetchDelegationGrants({
 				principal_id: serverFilters.principal_id || undefined,
 				actor_nhi_id: serverFilters.actor_nhi_id || undefined,
 				status: serverFilters.status || undefined,
-				limit: 20,
+				limit: pageSize,
 				offset: allGrants.length
 			});
 			additionalGrants = [...additionalGrants, ...result.data];
-			loadMoreHasMore = result.data.length >= 20;
+			loadMoreHasMore = result.data.length === pageSize;
 		} catch (err: unknown) {
 			loadMoreError = err instanceof Error ? err.message : 'Failed to load more grants';
 		} finally {

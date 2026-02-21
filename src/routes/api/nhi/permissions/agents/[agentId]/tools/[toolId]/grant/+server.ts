@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { grantToolPermission } from '$lib/api/nhi-permissions';
+import { ApiError } from '$lib/api/client';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -8,14 +9,20 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	}
 
 	const body = await request.json();
-	const result = await grantToolPermission(
-		params.agentId,
-		params.toolId,
-		body,
-		locals.accessToken,
-		locals.tenantId,
-		fetch
-	);
 
-	return json(result, { status: 201 });
+	try {
+		const result = await grantToolPermission(
+			params.agentId,
+			params.toolId,
+			body,
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
+
+		return json(result, { status: 201 });
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		throw e;
+	}
 };

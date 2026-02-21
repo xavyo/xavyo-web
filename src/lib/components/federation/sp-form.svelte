@@ -191,6 +191,39 @@
 				{/if}
 			</div>
 
+			<div class="space-y-2">
+				<Label for="sp-slo-url">SLO URL (optional)</Label>
+				<Input
+					id="sp-slo-url"
+					name="slo_url"
+					type="url"
+					placeholder="https://myapp.example.com/saml/slo"
+					value={String($form.slo_url ?? '')}
+				/>
+				<p class="text-xs text-muted-foreground">URL where logout requests are sent for Single Logout</p>
+				{#if $errors.slo_url}
+					<p class="text-sm text-destructive">{$errors.slo_url}</p>
+				{/if}
+			</div>
+
+			<div class="space-y-2">
+				<Label for="sp-slo-binding">SLO Binding</Label>
+				<select
+					id="sp-slo-binding"
+					name="slo_binding"
+					class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+					value={String($form.slo_binding ?? '')}
+				>
+					<option value="">-- Default (HTTP-POST) --</option>
+					<option value="HTTP-POST">HTTP-POST</option>
+					<option value="HTTP-Redirect">HTTP-Redirect</option>
+				</select>
+				<p class="text-xs text-muted-foreground">SAML binding for Single Logout requests</p>
+				{#if $errors.slo_binding}
+					<p class="text-sm text-destructive">{$errors.slo_binding}</p>
+				{/if}
+			</div>
+
 			{#if mode === 'edit'}
 				<div class="flex items-center gap-2">
 					<input

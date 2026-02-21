@@ -3,9 +3,8 @@ import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
-import { dev } from '$app/environment';
-import { login } from '$lib/api/auth';
-import { setCookies, SYSTEM_TENANT_ID, decodeAccessToken } from '$lib/server/auth';
+import { login, getAvailableMethods } from '$lib/api/auth';
+import { setCookies, SYSTEM_TENANT_ID } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -14,7 +13,15 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	const form = await superValidate(zod(loginSchema));
-	return { form, redirectTo: url.searchParams.get('redirectTo') ?? '' };
+
+	let availableMethods = { magic_link: false, email_otp: false };
+	try {
+		availableMethods = await getAvailableMethods(undefined, fetch);
+	} catch {
+		// passwordless not available
+	}
+
+	return { form, redirectTo: url.searchParams.get('redirectTo') ?? '', availableMethods };
 };
 
 export const actions: Actions = {
@@ -28,7 +35,7 @@ export const actions: Actions = {
 		const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
 
 		try {
-			const tokens = await login(
+			const result = await login(
 				{
 					email: form.data.email,
 					password: form.data.password
@@ -37,19 +44,13 @@ export const actions: Actions = {
 				fetch
 			);
 
-			setCookies(cookies, tokens);
-
-			// Ensure tenant_id cookie is set from JWT claims
-			const claims = decodeAccessToken(tokens.access_token);
-			if (claims?.tid) {
-				cookies.set('tenant_id', claims.tid, {
-					httpOnly: true,
-					secure: !dev,
-					sameSite: 'lax',
-					path: '/',
-					maxAge: 60 * 60 * 24 * 30
-				});
+			// Check if MFA is required (partial_token in response)
+			const asRecord = result as unknown as Record<string, unknown>;
+			if (asRecord.mfa_required && asRecord.partial_token) {
+				redirect(302, `/mfa?partial_token=${encodeURIComponent(String(asRecord.partial_token))}`);
 			}
+
+			setCookies(cookies, result);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				// Email not verified — redirect to check-email page
@@ -62,8 +63,15 @@ export const actions: Actions = {
 		}
 
 		const redirectTo = url.searchParams.get('redirectTo');
-		if (redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')) {
-			redirect(302, redirectTo);
+		if (redirectTo) {
+			try {
+				const target = new URL(redirectTo, url.origin);
+				if (target.origin === url.origin && target.pathname.startsWith('/')) {
+					redirect(302, target.pathname + target.search + target.hash);
+				}
+			} catch {
+				// invalid URL — ignore
+			}
 		}
 		redirect(302, '/dashboard');
 	}

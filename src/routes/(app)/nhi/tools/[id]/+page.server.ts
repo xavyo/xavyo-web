@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { updateToolSchema, issueCredentialSchema, suspendNhiSchema } from '$lib/schemas/nhi';
+import { updateToolSchema, suspendNhiSchema } from '$lib/schemas/nhi';
 import {
 	getTool,
 	updateTool,
@@ -11,21 +11,15 @@ import {
 	suspendNhi,
 	reactivateNhi,
 	deprecateNhi,
-	archiveNhi,
-	listCredentials,
-	issueCredential,
-	rotateCredential,
-	revokeCredential
+	archiveNhi
 } from '$lib/api/nhi';
 import { ApiError } from '$lib/api/client';
 import type { UpdateToolRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	let nhi;
-	let credentials;
 	try {
 		nhi = await getTool(params.id, locals.accessToken!, locals.tenantId!, fetch);
-		credentials = await listCredentials(params.id, locals.accessToken!, locals.tenantId!, fetch);
 	} catch (e) {
 		if (e instanceof ApiError) {
 			error(e.status, e.message);
@@ -47,7 +41,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateToolSchema)
 	);
 
-	return { nhi, credentials, form };
+	return { nhi, form };
 };
 
 export const actions: Actions = {
@@ -179,69 +173,4 @@ export const actions: Actions = {
 		return { success: true, action: 'archived' };
 	},
 
-	issueCredential: async ({ request, params, locals, fetch }) => {
-		const formData = await request.formData();
-		const parsed = issueCredentialSchema.safeParse({
-			credential_type: formData.get('credential_type')?.toString(),
-			valid_days: formData.get('valid_days')?.toString() || undefined
-		});
-		if (!parsed.success) {
-			return fail(400, { error: 'Invalid credential parameters' });
-		}
-
-		try {
-			const result = await issueCredential(
-				params.id,
-				parsed.data,
-				locals.accessToken!,
-				locals.tenantId!,
-				fetch
-			);
-			return { success: true, action: 'credentialIssued', credential: result.credential, secret: result.secret };
-		} catch (e) {
-			if (e instanceof ApiError) {
-				return fail(e.status, { error: e.message });
-			}
-			return fail(500, { error: 'An unexpected error occurred' });
-		}
-	},
-
-	rotateCredential: async ({ request, params, locals, fetch }) => {
-		const formData = await request.formData();
-		const credential_id = formData.get('credential_id')?.toString()!;
-		const grace_str = formData.get('grace_period_hours')?.toString();
-		const grace_period_hours = grace_str ? Number(grace_str) : undefined;
-
-		try {
-			const result = await rotateCredential(
-				params.id,
-				credential_id,
-				grace_period_hours ? { grace_period_hours } : undefined,
-				locals.accessToken!,
-				locals.tenantId!,
-				fetch
-			);
-			return { success: true, action: 'credentialRotated', credential: result.credential, secret: result.secret };
-		} catch (e) {
-			if (e instanceof ApiError) {
-				return fail(e.status, { error: e.message });
-			}
-			return fail(500, { error: 'An unexpected error occurred' });
-		}
-	},
-
-	revokeCredential: async ({ request, params, locals, fetch }) => {
-		const formData = await request.formData();
-		const credential_id = formData.get('credential_id')?.toString()!;
-
-		try {
-			await revokeCredential(params.id, credential_id, locals.accessToken!, locals.tenantId!, fetch);
-		} catch (e) {
-			if (e instanceof ApiError) {
-				return fail(e.status, { error: e.message });
-			}
-			return fail(500, { error: 'An unexpected error occurred' });
-		}
-		return { success: true, action: 'credentialRevoked' };
-	}
 };

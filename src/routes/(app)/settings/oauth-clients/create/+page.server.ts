@@ -33,6 +33,14 @@ export const actions: Actions = {
 						.split(',')
 						.map((s) => s.trim())
 						.filter(Boolean),
+					...(form.data.post_logout_redirect_uris
+						? {
+								post_logout_redirect_uris: form.data.post_logout_redirect_uris
+									.split(',')
+									.map((s) => s.trim())
+									.filter(Boolean)
+							}
+						: {}),
 					...(form.data.logo_url ? { logo_url: form.data.logo_url } : {}),
 					...(form.data.description ? { description: form.data.description } : {})
 				},

@@ -26,7 +26,35 @@ export const resetPasswordSchema = z.object({
 		.max(128, 'Password must not exceed 128 characters')
 });
 
+export const magicLinkRequestSchema = z.object({
+	email: z.string().email('Invalid email address')
+});
+
+export const emailOtpRequestSchema = z.object({
+	email: z.string().email('Invalid email address')
+});
+
+export const emailOtpVerifySchema = z.object({
+	email: z.string().email('Invalid email address'),
+	code: z.string().length(6, 'Code must be 6 digits')
+});
+
+export const mfaTotpVerifySchema = z.object({
+	partial_token: z.string().min(1, 'Partial token is required'),
+	code: z.string().length(6, 'Code must be 6 digits')
+});
+
+export const mfaRecoveryVerifySchema = z.object({
+	partial_token: z.string().min(1, 'Partial token is required'),
+	code: z.string().min(1, 'Recovery code is required')
+});
+
 export type LoginSchema = typeof loginSchema;
 export type SignupSchema = typeof signupSchema;
 export type ForgotPasswordSchema = typeof forgotPasswordSchema;
 export type ResetPasswordSchema = typeof resetPasswordSchema;
+export type MagicLinkRequestSchema = typeof magicLinkRequestSchema;
+export type EmailOtpRequestSchema = typeof emailOtpRequestSchema;
+export type EmailOtpVerifySchema = typeof emailOtpVerifySchema;
+export type MfaTotpVerifySchema = typeof mfaTotpVerifySchema;
+export type MfaRecoveryVerifySchema = typeof mfaRecoveryVerifySchema;

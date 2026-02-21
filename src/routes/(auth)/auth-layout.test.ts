@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { PublicBranding } from '$lib/api/types';
 
 vi.mock('$lib/api/branding', () => ({
 	getPublicBranding: vi.fn()
@@ -8,6 +9,11 @@ import { load } from './+layout.server';
 import { getPublicBranding } from '$lib/api/branding';
 
 const mockGetPublicBranding = vi.mocked(getPublicBranding);
+
+interface AuthLayoutData {
+	branding: PublicBranding | null;
+	tenantSlug: string;
+}
 
 describe('(auth) +layout.server', () => {
 	beforeEach(() => {
@@ -47,7 +53,7 @@ describe('(auth) +layout.server', () => {
 		};
 		mockGetPublicBranding.mockResolvedValue(mockBranding);
 
-		const result = await load(makeLoadArgs({ tenant: 'acme-corp' }));
+		const result = (await load(makeLoadArgs({ tenant: 'acme-corp' }))) as AuthLayoutData;
 
 		expect(mockGetPublicBranding).toHaveBeenCalledWith('acme-corp', expect.any(Function));
 		expect(result.branding).toEqual(mockBranding);
@@ -79,7 +85,7 @@ describe('(auth) +layout.server', () => {
 		};
 		mockGetPublicBranding.mockResolvedValue(mockBranding);
 
-		const result = await load(makeLoadArgs());
+		const result = (await load(makeLoadArgs())) as AuthLayoutData;
 
 		expect(mockGetPublicBranding).toHaveBeenCalledWith('system', expect.any(Function));
 		expect(result.branding).toEqual(mockBranding);
@@ -89,7 +95,7 @@ describe('(auth) +layout.server', () => {
 	it('returns null branding when API fails (404)', async () => {
 		mockGetPublicBranding.mockRejectedValue(new Error('Branding not found'));
 
-		const result = await load(makeLoadArgs({ tenant: 'nonexistent' }));
+		const result = (await load(makeLoadArgs({ tenant: 'nonexistent' }))) as AuthLayoutData;
 
 		expect(result.branding).toBeNull();
 		expect(result.tenantSlug).toBe('nonexistent');
@@ -98,7 +104,7 @@ describe('(auth) +layout.server', () => {
 	it('returns null branding when API fails (500)', async () => {
 		mockGetPublicBranding.mockRejectedValue(new Error('Internal Server Error'));
 
-		const result = await load(makeLoadArgs({ tenant: 'broken' }));
+		const result = (await load(makeLoadArgs({ tenant: 'broken' }))) as AuthLayoutData;
 
 		expect(result.branding).toBeNull();
 		expect(result.tenantSlug).toBe('broken');
@@ -107,7 +113,7 @@ describe('(auth) +layout.server', () => {
 	it('returns null branding on network error', async () => {
 		mockGetPublicBranding.mockRejectedValue(new TypeError('Failed to fetch'));
 
-		const result = await load(makeLoadArgs());
+		const result = (await load(makeLoadArgs())) as AuthLayoutData;
 
 		expect(result.branding).toBeNull();
 		expect(result.tenantSlug).toBe('system');

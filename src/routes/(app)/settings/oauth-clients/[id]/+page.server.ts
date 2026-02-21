@@ -28,6 +28,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			redirect_uris: client.redirect_uris.join(', '),
 			grant_types: client.grant_types.join(', '),
 			scopes: client.scopes.join(', '),
+			post_logout_redirect_uris: client.post_logout_redirect_uris.join(', '),
 			logo_url: client.logo_url ?? '',
 			description: client.description ?? ''
 		},
@@ -61,6 +62,12 @@ export const actions: Actions = {
 				: undefined,
 			scopes: form.data.scopes
 				? form.data.scopes
+						.split(',')
+						.map((s) => s.trim())
+						.filter(Boolean)
+				: undefined,
+			post_logout_redirect_uris: form.data.post_logout_redirect_uris
+				? form.data.post_logout_redirect_uris
 						.split(',')
 						.map((s) => s.trim())
 						.filter(Boolean)

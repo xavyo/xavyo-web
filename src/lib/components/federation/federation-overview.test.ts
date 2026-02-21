@@ -36,6 +36,8 @@ function makeSp(overrides: Partial<ServiceProvider> = {}): ServiceProvider {
 		assertion_validity_seconds: 300,
 		enabled: true,
 		metadata_url: null,
+		slo_url: null,
+		slo_binding: 'HTTP-POST',
 		created_at: '2024-01-01T00:00:00Z',
 		updated_at: '2024-01-01T00:00:00Z',
 		...overrides

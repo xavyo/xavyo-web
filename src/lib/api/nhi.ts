@@ -10,11 +10,7 @@ import type {
 	CreateAgentRequest,
 	UpdateAgentRequest,
 	CreateServiceAccountRequest,
-	UpdateServiceAccountRequest,
-	NhiCredentialResponse,
-	CredentialIssuedResponse,
-	IssueCredentialRequest,
-	RotateCredentialRequest
+	UpdateServiceAccountRequest
 } from './types';
 
 // Backend entity-specific endpoints return flat structs (all fields at top level).
@@ -28,7 +24,8 @@ const AGENT_EXT_KEYS: (keyof NhiAgentExtension)[] = [
 
 const TOOL_EXT_KEYS: (keyof NhiToolExtension)[] = [
 	'category', 'input_schema', 'output_schema', 'requires_approval',
-	'max_calls_per_hour', 'provider', 'provider_verified', 'checksum'
+	'max_calls_per_hour', 'provider', 'provider_verified', 'checksum',
+	'last_discovered_at', 'discovery_source'
 ];
 
 const SA_EXT_KEYS: (keyof NhiServiceAccountExtension)[] = ['purpose', 'environment'];
@@ -357,66 +354,3 @@ export async function archiveNhi(
 	});
 }
 
-// Credentials
-
-export async function listCredentials(
-	nhiId: string,
-	token: string,
-	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
-): Promise<NhiCredentialResponse[]> {
-	return apiClient<NhiCredentialResponse[]>(`/nhi/${nhiId}/credentials`, {
-		method: 'GET',
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
-}
-
-export async function issueCredential(
-	nhiId: string,
-	data: IssueCredentialRequest,
-	token: string,
-	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
-): Promise<CredentialIssuedResponse> {
-	return apiClient<CredentialIssuedResponse>(`/nhi/${nhiId}/credentials`, {
-		method: 'POST',
-		body: data,
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
-}
-
-export async function rotateCredential(
-	nhiId: string,
-	credId: string,
-	data: RotateCredentialRequest | undefined,
-	token: string,
-	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
-): Promise<CredentialIssuedResponse> {
-	return apiClient<CredentialIssuedResponse>(`/nhi/${nhiId}/credentials/${credId}/rotate`, {
-		method: 'POST',
-		body: data,
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
-}
-
-export async function revokeCredential(
-	nhiId: string,
-	credId: string,
-	token: string,
-	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
-): Promise<void> {
-	await apiClient(`/nhi/${nhiId}/credentials/${credId}`, {
-		method: 'DELETE',
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
-}

@@ -60,11 +60,6 @@ export const updateServiceAccountSchema = z.object({
 	environment: z.string().max(100).optional()
 });
 
-export const issueCredentialSchema = z.object({
-	credential_type: z.enum(['api_key', 'secret', 'certificate']),
-	valid_days: z.coerce.number().int().min(1).max(3650).optional()
-});
-
 export const suspendNhiSchema = z.object({
 	reason: z.string().max(1000).optional()
 });
@@ -75,5 +70,4 @@ export type CreateServiceAccountSchema = typeof createServiceAccountSchema;
 export type UpdateToolSchema = typeof updateToolSchema;
 export type UpdateAgentSchema = typeof updateAgentSchema;
 export type UpdateServiceAccountSchema = typeof updateServiceAccountSchema;
-export type IssueCredentialSchema = typeof issueCredentialSchema;
 export type SuspendNhiSchema = typeof suspendNhiSchema;

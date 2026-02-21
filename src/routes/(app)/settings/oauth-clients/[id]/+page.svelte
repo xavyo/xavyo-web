@@ -34,6 +34,7 @@
 		$form.redirect_uris = data.client.redirect_uris.join(', ');
 		$form.grant_types = data.client.grant_types.join(', ');
 		$form.scopes = data.client.scopes.join(', ');
+		$form.post_logout_redirect_uris = data.client.post_logout_redirect_uris.join(', ');
 		$form.logo_url = data.client.logo_url ?? '';
 		$form.description = data.client.description ?? '';
 		isEditing = true;
@@ -119,6 +120,21 @@
 					{#if $errors.scopes}
 						<p class="text-sm text-destructive">{$errors.scopes}</p>
 					{/if}
+				</div>
+
+				<div class="space-y-2">
+					<Label for="post_logout_redirect_uris">Post-Logout Redirect URIs (comma-separated, optional)</Label>
+					<textarea
+						id="post_logout_redirect_uris"
+						name="post_logout_redirect_uris"
+						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						placeholder="https://app.example.com/logout-callback"
+						value={String($form.post_logout_redirect_uris ?? '')}
+					></textarea>
+					{#if $errors.post_logout_redirect_uris}
+						<p class="text-sm text-destructive">{$errors.post_logout_redirect_uris}</p>
+					{/if}
+					<p class="text-xs text-muted-foreground">URIs where users can be redirected after OIDC logout.</p>
 				</div>
 
 				<div class="space-y-2">
@@ -216,6 +232,14 @@
 					<span class="text-sm text-muted-foreground">Scopes</span>
 					<span class="text-sm">
 						{data.client.scopes.length ? data.client.scopes.join(', ') : '\u2014'}
+					</span>
+				</div>
+				<div class="flex justify-between">
+					<span class="text-sm text-muted-foreground">Post-Logout URIs</span>
+					<span class="text-sm text-right max-w-[60%] break-all">
+						{data.client.post_logout_redirect_uris.length
+							? data.client.post_logout_redirect_uris.join(', ')
+							: '\u2014'}
 					</span>
 				</div>
 

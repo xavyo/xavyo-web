@@ -40,6 +40,18 @@ export function setCookies(cookies: Cookies, tokens: TokenResponse): void {
 		path: '/',
 		maxAge: 60 * 60 * 24 * 30 // 30 days
 	});
+
+	// Set tenant_id from JWT claims
+	const claims = decodeAccessToken(tokens.access_token);
+	if (claims?.tid) {
+		cookies.set('tenant_id', claims.tid, {
+			httpOnly: true,
+			secure,
+			sameSite: 'lax',
+			path: '/',
+			maxAge: 60 * 60 * 24 * 30 // 30 days
+		});
+	}
 }
 
 export function clearAuthCookies(cookies: Cookies): void {

@@ -37,7 +37,7 @@
 		{/if}
 
 		<form method="POST" use:enhance class="space-y-4">
-			<input type="hidden" name="token" value={String($form.token ?? '')} />
+			<input type="hidden" name="token" value={$page.url.searchParams.get('token') ?? ''} />
 
 			<div class="space-y-2">
 				<Label for="newPassword">New password</Label>
