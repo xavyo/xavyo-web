@@ -7,7 +7,14 @@ import { login, getAvailableMethods } from '$lib/api/auth';
 import { setCookies, SYSTEM_TENANT_ID } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals, url, cookies }) => {
+	// Allow clearing a stale tenant cookie from the login page
+	// (e.g., when the tenant was deleted and login keeps failing)
+	if (url.searchParams.get('reset_tenant') === 'true') {
+		cookies.delete('tenant_id', { path: '/' });
+		redirect(302, '/login');
+	}
+
 	if (locals.user) {
 		redirect(302, '/dashboard');
 	}

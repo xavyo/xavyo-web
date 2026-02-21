@@ -57,7 +57,8 @@ export function setCookies(cookies: Cookies, tokens: TokenResponse): void {
 export function clearAuthCookies(cookies: Cookies): void {
 	cookies.delete('access_token', { path: '/' });
 	cookies.delete('refresh_token', { path: '/' });
-	cookies.delete('tenant_id', { path: '/' });
+	// tenant_id is intentionally preserved so users return to their
+	// tenant on next login instead of being redirected to onboarding
 }
 
 /**

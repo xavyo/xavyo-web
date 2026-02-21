@@ -4,7 +4,7 @@ import { logout } from '$lib/api/auth';
 import { initiateSamlSlo } from '$lib/api/federation';
 import { clearAuthCookies } from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ cookies, fetch }) => {
+export const load: PageServerLoad = async ({ cookies, fetch, url }) => {
 	const refreshToken = cookies.get('refresh_token');
 	const tenantId = cookies.get('tenant_id');
 
@@ -27,5 +27,11 @@ export const load: PageServerLoad = async ({ cookies, fetch }) => {
 	}
 
 	clearAuthCookies(cookies);
+
+	// Full logout (explicit tenant switch) also clears tenant context
+	if (url.searchParams.get('full') === 'true') {
+		cookies.delete('tenant_id', { path: '/' });
+	}
+
 	redirect(302, '/login');
 };

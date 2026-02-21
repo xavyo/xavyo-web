@@ -87,7 +87,7 @@ describe('setCookies', () => {
 });
 
 describe('clearAuthCookies', () => {
-	it('deletes all auth cookies', () => {
+	it('deletes auth tokens but preserves tenant_id', () => {
 		const deleteCookie = vi.fn();
 		const cookies = { delete: deleteCookie } as unknown as Parameters<typeof clearAuthCookies>[0];
 
@@ -95,6 +95,7 @@ describe('clearAuthCookies', () => {
 
 		expect(deleteCookie).toHaveBeenCalledWith('access_token', { path: '/' });
 		expect(deleteCookie).toHaveBeenCalledWith('refresh_token', { path: '/' });
-		expect(deleteCookie).toHaveBeenCalledWith('tenant_id', { path: '/' });
+		expect(deleteCookie).not.toHaveBeenCalledWith('tenant_id', { path: '/' });
+		expect(deleteCookie).toHaveBeenCalledTimes(2);
 	});
 });
