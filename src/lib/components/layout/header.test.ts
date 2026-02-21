@@ -1,5 +1,6 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/svelte';
+import { tick } from 'svelte';
 import Header from './header.svelte';
 
 const localStorageMock = (() => {
@@ -24,6 +25,7 @@ const matchMediaMock = vi.fn(() => ({
 }));
 
 beforeEach(() => {
+	vi.useFakeTimers();
 	vi.stubGlobal('localStorage', localStorageMock);
 	vi.stubGlobal('matchMedia', matchMediaMock);
 	localStorageMock.clear();
@@ -31,8 +33,12 @@ beforeEach(() => {
 	document.documentElement.classList.remove('dark');
 });
 
-afterEach(() => {
+afterEach(async () => {
 	cleanup();
+	await tick();
+	// Flush bits-ui body-scroll-lock cleanup timeout while jsdom is still alive
+	vi.runAllTimers();
+	vi.useRealTimers();
 	vi.unstubAllGlobals();
 });
 
@@ -45,20 +51,24 @@ describe('Header', () => {
 	it('renders Settings link pointing to /settings in the dropdown menu', async () => {
 		render(Header, { props: { email: 'test@example.com' } });
 		const trigger = screen.getByText('test@example.com').closest('button');
+		vi.useRealTimers(); // bits-ui needs real timers for dropdown open animation
 		await fireEvent.click(trigger!);
 		const settingsLink = await screen.findByText('Settings');
 		const anchor = settingsLink.closest('a');
 		expect(anchor).toBeTruthy();
 		expect(anchor?.getAttribute('href')).toBe('/settings');
+		vi.useFakeTimers(); // re-enable for cleanup
 	});
 
 	it('renders Profile link pointing to /settings?tab=profile in the dropdown menu', async () => {
 		render(Header, { props: { email: 'test@example.com' } });
 		const trigger = screen.getByText('test@example.com').closest('button');
+		vi.useRealTimers(); // bits-ui needs real timers for dropdown open animation
 		await fireEvent.click(trigger!);
 		const profileLink = await screen.findByText('Profile');
 		const anchor = profileLink.closest('a');
 		expect(anchor).toBeTruthy();
 		expect(anchor?.getAttribute('href')).toBe('/settings?tab=profile');
+		vi.useFakeTimers(); // re-enable for cleanup
 	});
 });
