@@ -12,17 +12,17 @@ describe('RuleTypeBadge', () => {
 
 	it('renders Terminated type', () => {
 		render(RuleTypeBadge, { props: { ruleType: 'terminated' } });
-		expect(screen.getByText('terminated')).toBeTruthy();
+		expect(screen.getByText('Terminated')).toBeTruthy();
 	});
 
 	it('renders Inactive type', () => {
 		render(RuleTypeBadge, { props: { ruleType: 'inactive' } });
-		expect(screen.getByText('inactive')).toBeTruthy();
+		expect(screen.getByText('Inactive')).toBeTruthy();
 	});
 
 	it('renders Custom type', () => {
 		render(RuleTypeBadge, { props: { ruleType: 'custom' } });
-		expect(screen.getByText('custom')).toBeTruthy();
+		expect(screen.getByText('Custom')).toBeTruthy();
 	});
 
 	it('applies orange class for NoManager', () => {

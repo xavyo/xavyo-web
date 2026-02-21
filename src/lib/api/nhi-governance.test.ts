@@ -197,14 +197,14 @@ describe('NHI Governance API', () => {
 	// --- Certifications ---
 
 	describe('createNhiCertCampaign', () => {
-		it('calls POST /nhi/certifications/campaigns with body', async () => {
+		it('calls POST /nhi/certifications with body', async () => {
 			const body = { name: 'Q1 Cert' };
 			const mockResponse = { id: 'camp-1', tenant_id: 'test-tenant', name: 'Q1 Cert', description: null, scope: 'all', nhi_type_filter: null, specific_nhi_ids: null, status: 'active', due_date: null, created_by: null, created_at: '2026-01-01', updated_at: '2026-01-01' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await createNhiCertCampaign(body, token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications/campaigns', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications', {
 				method: 'POST', token, tenantId, body, fetch: mockFetch
 			});
 			expect(result.id).toBe('camp-1');
@@ -212,13 +212,13 @@ describe('NHI Governance API', () => {
 	});
 
 	describe('listNhiCertCampaigns', () => {
-		it('calls GET /nhi/certifications/campaigns', async () => {
+		it('calls GET /nhi/certifications', async () => {
 			mockApiClient.mockResolvedValue([]);
 
 			const result = await listNhiCertCampaigns({}, token, tenantId, mockFetch);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			expect(calledPath).toContain('/nhi/certifications/campaigns');
+			expect(calledPath).toContain('/nhi/certifications');
 			expect(result).toEqual([]);
 		});
 
@@ -233,13 +233,13 @@ describe('NHI Governance API', () => {
 	});
 
 	describe('getNhiCertCampaign', () => {
-		it('calls GET /nhi/certifications/campaigns/:id', async () => {
+		it('calls GET /nhi/certifications/:id', async () => {
 			const mockResponse = { id: 'camp-1', name: 'Q1 Cert', status: 'active' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await getNhiCertCampaign('camp-1', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications/campaigns/camp-1', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications/camp-1', {
 				method: 'GET', token, tenantId, fetch: mockFetch
 			});
 			expect(result.id).toBe('camp-1');

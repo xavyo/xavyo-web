@@ -107,7 +107,7 @@ describe('Invitations Create +page.server', () => {
 				expect(e.location).toBe('/invitations');
 			}
 			expect(createInvitation).toHaveBeenCalledWith(
-				{ email: 'user@example.com' },
+				{ email: 'user@example.com', role: 'member' },
 				'tok',
 				'tid',
 				expect.any(Function)
