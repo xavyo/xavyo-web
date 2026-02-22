@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { SYSTEM_TENANT_ID, hasAdminRole } from '$lib/server/auth';
 import { fetchAlerts } from '$lib/api/alerts';
@@ -52,6 +53,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		unacknowledgedAlertCount,
 		isAdmin: hasAdminRole(locals.user.roles),
 		currentAssumption,
-		personaContext
+		personaContext,
+		appVersion: env.APP_VERSION || 'dev'
 	};
 };

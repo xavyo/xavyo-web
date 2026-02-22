@@ -18,6 +18,7 @@
 	import { initThemeListener } from '$lib/stores/theme.svelte';
 	import AssumedIdentityIndicator from '$lib/components/poa/assumed-identity-indicator.svelte';
 	import ContextIndicator from '$lib/components/persona/context-indicator.svelte';
+	import AppFooter from '$lib/components/layout/app-footer.svelte';
 	import type { LayoutData } from './$types';
 
 	interface Props {
@@ -201,6 +202,7 @@
 		<main class="flex-1 overflow-y-auto p-4 sm:p-6">
 			{@render children()}
 		</main>
+		<AppFooter version={data.appVersion} />
 	</div>
 
 	<ToastContainer />

@@ -18,6 +18,8 @@ RUN npm ci --ignore-scripts
 # Stage 2: Build the SvelteKit app
 # ---------------------------------------------------------------------------
 FROM node:22-slim AS builder
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -45,9 +47,11 @@ COPY --from=builder --chown=xavyo:xavyo /app/build ./build
 COPY --from=builder --chown=xavyo:xavyo /app/package.json ./
 COPY --from=deps --chown=xavyo:xavyo /app/node_modules ./node_modules
 
+ARG APP_VERSION=dev
 ENV NODE_ENV=production \
     PORT=3000 \
-    HOST=0.0.0.0
+    HOST=0.0.0.0 \
+    APP_VERSION=${APP_VERSION}
 EXPOSE 3000
 
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=15s \
