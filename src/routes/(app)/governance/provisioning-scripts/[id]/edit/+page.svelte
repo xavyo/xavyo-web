@@ -16,6 +16,7 @@
 
 	const script = $derived(data.script);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		validators: zodClient(updateProvisioningScriptSchema),
 		onResult({ result }) {

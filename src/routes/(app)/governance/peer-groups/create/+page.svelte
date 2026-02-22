@@ -6,6 +6,7 @@
 
 	let { data } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message, submitting } = superForm(data.form, {
 		validators: zodClient(createPeerGroupSchema)
 	});

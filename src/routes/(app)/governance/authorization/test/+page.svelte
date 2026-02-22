@@ -17,6 +17,7 @@
 
 	let result = $derived(($page.form?.result as AuthorizationDecision | null) ?? data.result);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result: formResult }) {
 			if (formResult.type === 'success') {

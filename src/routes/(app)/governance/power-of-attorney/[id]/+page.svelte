@@ -26,6 +26,7 @@
 
 	// Revoke form
 	let showRevokeDialog = $state(false);
+	// svelte-ignore state_referenced_locally
 	const { form: revokeForm, errors: revokeErrors, enhance: revokeEnhance, message: revokeMessage } = superForm(data.revokeForm, {
 		onResult({ result }) {
 			if (result.type === 'redirect') {
@@ -36,6 +37,7 @@
 
 	// Extend form
 	let showExtendDialog = $state(false);
+	// svelte-ignore state_referenced_locally
 	const { form: extendForm, errors: extendErrors, enhance: extendEnhance, message: extendMessage } = superForm(data.extendForm, {
 		onResult({ result }) {
 			if (result.type === 'redirect') {

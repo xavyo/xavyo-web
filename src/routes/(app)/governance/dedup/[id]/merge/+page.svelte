@@ -13,6 +13,7 @@
 	let preview = $derived(data.preview);
 	let duplicate = $derived(data.duplicate);
 
+	// svelte-ignore state_referenced_locally
 	const { form: mergeFormData, enhance: mergeEnhance } = superForm(data.mergeForm, {
 		invalidateAll: 'force',
 		onUpdated({ form }) {

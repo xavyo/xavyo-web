@@ -21,14 +21,18 @@
 	let activeTab: TabId = $state('destinations');
 
 	// --- Destinations tab state ---
+	// svelte-ignore state_referenced_locally
 	let destinations: SiemDestination[] = $state(data.destinations.items);
+	// svelte-ignore state_referenced_locally
 	let destinationsTotal = $state(data.destinations.total);
 	let destinationsOffset = $state(0);
 	let destinationsLoading = $state(false);
 	const destinationsLimit = 20;
 
 	// --- Batch Exports tab state ---
+	// svelte-ignore state_referenced_locally
 	let exports: SiemBatchExport[] = $state(data.exports.items);
+	// svelte-ignore state_referenced_locally
 	let exportsTotal = $state(data.exports.total);
 	let exportsOffset = $state(0);
 	let exportsLoading = $state(false);
@@ -162,7 +166,7 @@
 	description="Configure SIEM destinations for real-time event streaming and manage batch exports."
 />
 
-<nav class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="SIEM Export tabs">
+<div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="SIEM Export tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -177,7 +181,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	<!-- ===== DESTINATIONS TAB ===== -->

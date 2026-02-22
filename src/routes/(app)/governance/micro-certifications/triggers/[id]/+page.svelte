@@ -15,6 +15,7 @@
 	let isEditing = $state(false);
 	let deleteConfirm = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, submitting, message: formMessage } = superForm(data.form, {
 		validators: zodClient(updateTriggerRuleSchema),
 		onResult({ result }) {

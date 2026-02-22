@@ -105,7 +105,7 @@
 	description="Discover role candidates, access patterns, excessive privileges, and consolidation opportunities"
 />
 
-<nav class="-mb-px flex gap-4 overflow-x-auto border-b border-border" role="tablist" aria-label="Role Mining tabs">
+<div class="-mb-px flex gap-4 overflow-x-auto border-b border-border" role="tablist" aria-label="Role Mining tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -120,7 +120,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	<!-- ===== JOBS TAB ===== -->

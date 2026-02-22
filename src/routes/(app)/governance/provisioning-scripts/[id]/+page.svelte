@@ -66,8 +66,11 @@
 
 	const tabs = [
 		{ id: 'details', label: 'Details' },
+		// svelte-ignore state_referenced_locally
 		{ id: 'versions', label: 'Versions', count: data.versionsTotal },
+		// svelte-ignore state_referenced_locally
 		{ id: 'bindings', label: 'Bindings', count: data.bindingsTotal },
+		// svelte-ignore state_referenced_locally
 		{ id: 'logs', label: 'Logs', count: data.logsTotal }
 	];
 
@@ -274,7 +277,7 @@
 </div>
 
 <!-- Tab navigation -->
-<nav class="mt-6 -mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Script detail tabs">
+<div class="mt-6 -mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Script detail tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -292,7 +295,7 @@
 			{/if}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	{#if activeTab === 'details'}

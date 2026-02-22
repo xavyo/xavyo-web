@@ -9,6 +9,7 @@
 
 	let { data } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, submitting, message: formMessage } = superForm(data.form, {
 		validators: zodClient(manualTriggerSchema),
 		onResult({ result }) {

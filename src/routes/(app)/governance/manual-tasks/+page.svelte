@@ -10,7 +10,9 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let statusFilter = $state(data.filters.status ?? '');
+	// svelte-ignore state_referenced_locally
 	let slaBreachedFilter = $state(data.filters.sla_breached !== undefined ? String(data.filters.sla_breached) : '');
 
 	function applyFilters() {

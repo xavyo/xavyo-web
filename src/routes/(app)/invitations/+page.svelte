@@ -10,8 +10,11 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let currentStatus = $state(data.status ?? '');
+	// svelte-ignore state_referenced_locally
 	let emailSearch = $state(data.email ?? '');
+	// svelte-ignore state_referenced_locally
 	let currentOffset = $state(data.offset);
 	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 	const limit = $derived(data.limit);

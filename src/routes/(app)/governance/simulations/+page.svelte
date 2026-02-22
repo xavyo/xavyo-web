@@ -90,7 +90,7 @@
 	description="Create and manage policy simulations, batch simulations, and comparisons"
 />
 
-<nav class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Simulations tabs">
+<div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Simulations tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -105,7 +105,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	{#if activeTab === 'policy'}

@@ -17,6 +17,7 @@
 
 	let pool = $derived(data.pool);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.type !== 'error') {

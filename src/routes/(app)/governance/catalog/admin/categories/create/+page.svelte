@@ -7,6 +7,7 @@
 	import { createCategorySchema } from '$lib/schemas/catalog';
 
 	let { data }: { data: PageData } = $props();
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance } = superForm(data.form, {
 		validators: zodClient(createCategorySchema)
 	});

@@ -12,6 +12,7 @@
 	const schedules = $derived(data.schedules);
 
 	// Trend tab state
+	// svelte-ignore state_referenced_locally
 	let trendData = $state<DiscrepancyTrendResponse | null>(data.trend);
 	let trendConnectorFilter = $state('');
 	let trendFrom = $state('');

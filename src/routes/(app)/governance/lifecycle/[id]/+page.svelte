@@ -39,6 +39,7 @@
 	let deleteError = $state('');
 
 	// Edit form
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		invalidateAll: 'force',
 		onResult({ result }) {

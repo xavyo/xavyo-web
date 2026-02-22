@@ -17,6 +17,7 @@
 	let typeFilter = $state('');
 	let fromDate = $state('');
 	let toDate = $state('');
+	// svelte-ignore state_referenced_locally
 	let stats = $state<QueueStatistics | null>(data.stats);
 
 	const operations = $derived(data.operations.operations);

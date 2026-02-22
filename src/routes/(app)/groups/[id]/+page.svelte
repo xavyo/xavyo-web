@@ -22,6 +22,7 @@
 		errors: editErrors,
 		enhance: editEnhance,
 		message: editMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.editForm, {
 		id: 'edit',
 		onResult({ result }) {
@@ -39,6 +40,7 @@
 		errors: addMemberErrors,
 		enhance: addMemberEnhance,
 		message: addMemberMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.addMemberForm, {
 		id: 'addMember',
 		onResult({ result }) {

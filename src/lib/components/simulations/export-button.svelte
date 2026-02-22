@@ -7,11 +7,11 @@
 
 	let open = $state(false);
 
-	const urlMap: Record<string, string> = {
+	const urlMap = $derived<Record<string, string>>({
 		policy: `/api/governance/simulations/policy/${simulationId}/export`,
 		batch: `/api/governance/simulations/batch/${simulationId}/export`,
 		comparison: `/api/governance/simulations/comparisons/${simulationId}/export`
-	};
+	});
 
 	let exportUrl = $derived(baseUrl || urlMap[simulationType]);
 

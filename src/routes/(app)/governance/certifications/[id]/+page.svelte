@@ -18,6 +18,7 @@
 	const isDraft = $derived(data.campaign.status === 'draft');
 	const isActive = $derived(data.campaign.status === 'active');
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.updated) {

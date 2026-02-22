@@ -13,11 +13,17 @@
 	const schedule = $derived(data.schedule);
 
 	// Form state for create/edit
+	// svelte-ignore state_referenced_locally
 	let mode = $state<string>(schedule?.mode ?? 'full');
+	// svelte-ignore state_referenced_locally
 	let frequency = $state<string>(schedule?.frequency ?? 'daily');
+	// svelte-ignore state_referenced_locally
 	let dayOfWeek = $state<string>(schedule?.day_of_week?.toString() ?? '');
+	// svelte-ignore state_referenced_locally
 	let dayOfMonth = $state<string>(schedule?.day_of_month?.toString() ?? '');
+	// svelte-ignore state_referenced_locally
 	let hourOfDay = $state<string>(schedule?.hour_of_day?.toString() ?? '0');
+	// svelte-ignore state_referenced_locally
 	let enabled = $state<boolean>(schedule?.enabled ?? true);
 
 	// Delete confirmation dialog
@@ -317,48 +323,6 @@
 			<div class="mt-6 flex items-center gap-3">
 				<Button type="submit">Save</Button>
 
-				{#if schedule.enabled}
-					<form
-						method="POST"
-						action="?/disable"
-						use:formEnhance={() => {
-							return async ({ result }) => {
-								if (result.type === 'success') {
-									addToast('success', 'Schedule disabled');
-									await invalidateAll();
-								} else if (result.type === 'failure') {
-									addToast(
-										'error',
-										(result.data?.error as string) || 'Failed to disable schedule'
-									);
-								}
-							};
-						}}
-					>
-						<Button type="submit" variant="outline">Disable</Button>
-					</form>
-				{:else}
-					<form
-						method="POST"
-						action="?/enable"
-						use:formEnhance={() => {
-							return async ({ result }) => {
-								if (result.type === 'success') {
-									addToast('success', 'Schedule enabled');
-									await invalidateAll();
-								} else if (result.type === 'failure') {
-									addToast(
-										'error',
-										(result.data?.error as string) || 'Failed to enable schedule'
-									);
-								}
-							};
-						}}
-					>
-						<Button type="submit" variant="outline">Enable</Button>
-					</form>
-				{/if}
-
 				<Button
 					variant="destructive"
 					onclick={() => {
@@ -367,6 +331,51 @@
 				>
 			</div>
 		</form>
+
+		<!-- Enable/Disable forms (separate from edit form to avoid nested forms) -->
+		<div class="mt-3 flex items-center gap-3">
+			{#if schedule.enabled}
+				<form
+					method="POST"
+					action="?/disable"
+					use:formEnhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								addToast('success', 'Schedule disabled');
+								await invalidateAll();
+							} else if (result.type === 'failure') {
+								addToast(
+									'error',
+									(result.data?.error as string) || 'Failed to disable schedule'
+								);
+							}
+						};
+					}}
+				>
+					<Button type="submit" variant="outline">Disable</Button>
+				</form>
+			{:else}
+				<form
+					method="POST"
+					action="?/enable"
+					use:formEnhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								addToast('success', 'Schedule enabled');
+								await invalidateAll();
+							} else if (result.type === 'failure') {
+								addToast(
+									'error',
+									(result.data?.error as string) || 'Failed to enable schedule'
+								);
+							}
+						};
+					}}
+				>
+					<Button type="submit" variant="outline">Enable</Button>
+				</form>
+			{/if}
+		</div>
 	</div>
 {/if}
 

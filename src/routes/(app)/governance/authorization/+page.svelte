@@ -7,6 +7,7 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let currentOffset = $state(data.offset);
 	const limit = $derived(data.limit);
 	const total = $derived(data.total);

@@ -19,6 +19,7 @@
 		initialConditions?: TransitionCondition[];
 	} = $props();
 
+	// svelte-ignore state_referenced_locally
 	let conditions = $state<TransitionCondition[]>([...initialConditions]);
 	let saving = $state(false);
 	let error = $state('');

@@ -126,7 +126,7 @@
 
 <PageHeader title="NHI Governance" description="Risk scoring, inactivity detection, orphan detection, SoD rules, and certifications for non-human identities" />
 
-<nav class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="NHI Governance tabs">
+<div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="NHI Governance tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -141,7 +141,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	{#if activeTab === 'risk'}

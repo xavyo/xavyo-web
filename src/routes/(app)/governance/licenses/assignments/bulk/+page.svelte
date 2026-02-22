@@ -19,6 +19,7 @@
 		errors: assignErrors,
 		enhance: assignEnhance,
 		message: assignMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.assignForm, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.bulkResult) {
@@ -39,6 +40,7 @@
 		errors: reclaimErrors,
 		enhance: reclaimEnhance,
 		message: reclaimMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.reclaimForm, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.bulkResult) {

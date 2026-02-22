@@ -12,6 +12,7 @@
 
 	let { data }: { data: PageData } = $props();
 	let item = $derived(data.item);
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance } = superForm(data.form, {
 		validators: zodClient(updateCatalogItemSchema)
 	});

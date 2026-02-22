@@ -430,7 +430,7 @@
 	description="Manage software license pools, assignments, reclamation rules, and compliance"
 />
 
-<nav class="-mb-px flex gap-4 overflow-x-auto border-b border-border" role="tablist" aria-label="License Management tabs">
+<div class="-mb-px flex gap-4 overflow-x-auto border-b border-border" role="tablist" aria-label="License Management tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -445,7 +445,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	<!-- ===== POOLS TAB ===== -->

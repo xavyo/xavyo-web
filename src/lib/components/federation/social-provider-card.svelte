@@ -20,13 +20,18 @@
 	let expanded = $state(false);
 	let saving = $state(false);
 	let toggling = $state(false);
+	// svelte-ignore state_referenced_locally
 	let editedClientId = $state(provider.client_id ?? '');
 	let editedSecret = $state('');
+	// svelte-ignore state_referenced_locally
 	let editedScopes = $state(provider.scopes.join(', '));
+	// svelte-ignore state_referenced_locally
 	let editedAzureTenant = $state(
 		(provider.additional_config?.azure_tenant as string) ?? 'common'
 	);
+	// svelte-ignore state_referenced_locally
 	let editedTeamId = $state((provider.additional_config?.team_id as string) ?? '');
+	// svelte-ignore state_referenced_locally
 	let editedKeyId = $state((provider.additional_config?.key_id as string) ?? '');
 
 	// Reset edited fields when provider prop changes

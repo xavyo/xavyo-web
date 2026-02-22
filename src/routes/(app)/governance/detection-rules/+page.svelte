@@ -11,7 +11,9 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let typeFilter = $state(data.filters.rule_type ?? '');
+	// svelte-ignore state_referenced_locally
 	let enabledFilter = $state(data.filters.is_enabled !== undefined ? String(data.filters.is_enabled) : '');
 	let deleteOpen = $state(false);
 	let deleteRuleId = $state('');

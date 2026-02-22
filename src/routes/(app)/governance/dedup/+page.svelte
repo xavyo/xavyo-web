@@ -21,6 +21,7 @@
 	let duplicates = $derived(data.duplicates);
 
 	// Detection form
+	// svelte-ignore state_referenced_locally
 	const { form: detectFormData, enhance: detectEnhance, message: detectMessage } = superForm(data.detectForm, {
 		resetForm: false,
 		invalidateAll: 'force',

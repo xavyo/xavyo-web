@@ -108,6 +108,6 @@
 
 <datalist id="attr-suggestions">
 	{#each attributeSuggestions as suggestion}
-		<option value={suggestion} />
+		<option value={suggestion}></option>
 	{/each}
 </datalist>

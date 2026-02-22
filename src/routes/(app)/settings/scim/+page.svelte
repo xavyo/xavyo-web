@@ -31,6 +31,7 @@
 	let activeTab = $state('tokens');
 
 	// Create token form
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.tokenCreated) {
@@ -87,7 +88,7 @@
 
 <PageHeader title="SCIM Administration" description="Manage SCIM provisioning tokens and attribute mappings" />
 
-<nav class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="SCIM Administration tabs">
+<div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="SCIM Administration tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -102,7 +103,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <!-- Tokens Tab -->
 <div

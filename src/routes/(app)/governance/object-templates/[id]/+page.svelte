@@ -265,7 +265,7 @@
 
 <!-- Tabs -->
 <div class="mt-4 border-b border-zinc-200 dark:border-zinc-700">
-	<nav class="-mb-px flex gap-4" role="tablist">
+	<div class="-mb-px flex gap-4" role="tablist">
 		{#each [
 			{ id: 'details', label: 'Details' },
 			{ id: 'rules', label: `Rules (${template.rules.length})` },
@@ -284,7 +284,7 @@
 				{tab.label}
 			</button>
 		{/each}
-	</nav>
+	</div>
 </div>
 
 <div class="mt-6">

@@ -6,6 +6,7 @@
 
 	let { data } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance } = superForm(data.form, {
 		validators: zodClient(generateReportSchema),
 		onResult: ({ result }) => {

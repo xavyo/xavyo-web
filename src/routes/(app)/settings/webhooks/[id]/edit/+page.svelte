@@ -13,8 +13,10 @@
 	let { data }: { data: PageData } = $props();
 
 	// Initialize selected event types from the current subscription
+	// svelte-ignore state_referenced_locally
 	let selectedEventTypes = $state<Set<string>>(new Set(data.subscription.event_types));
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'redirect') {

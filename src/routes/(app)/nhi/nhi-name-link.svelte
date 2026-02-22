@@ -9,7 +9,7 @@
 		service_account: 'service-accounts'
 	};
 
-	const href = `/nhi/${typePathMap[nhiType]}/${id}`;
+	const href = $derived(`/nhi/${typePathMap[nhiType]}/${id}`);
 </script>
 
 <a {href} class="font-medium text-primary hover:underline">{name}</a>

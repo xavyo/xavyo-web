@@ -9,7 +9,9 @@
 
 	let { startDate = '', endDate = '', onchange }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	let start = $state(startDate);
+	// svelte-ignore state_referenced_locally
 	let end = $state(endDate);
 	let validationError = $state('');
 

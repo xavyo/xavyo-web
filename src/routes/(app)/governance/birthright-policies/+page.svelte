@@ -14,6 +14,7 @@
 	let { data }: { data: PageData } = $props();
 	let policies = $derived(data.policies);
 
+	// svelte-ignore state_referenced_locally
 	let statusFilter = $state(data.filters.status ?? '');
 	let showSimulateAll = $state(false);
 	let simAttrs = $state('');

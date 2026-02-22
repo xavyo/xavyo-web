@@ -2,6 +2,7 @@
 	import type { RoleTreeNode } from '$lib/api/types';
 	import { Badge } from '$lib/components/ui/badge';
 	import { ChevronRight, ChevronDown } from 'lucide-svelte';
+	import RoleTreeNodeComponent from './role-tree-node.svelte';
 
 	interface Props {
 		node: RoleTreeNode;
@@ -60,7 +61,7 @@
 	<!-- Recursive children -->
 	{#if isExpanded && hasChildren}
 		{#each node.children as child (child.id)}
-			<svelte:self node={child} {expandedIds} {onToggle} />
+			<RoleTreeNodeComponent node={child} {expandedIds} {onToggle} />
 		{/each}
 	{/if}
 </div>

@@ -11,6 +11,7 @@
 	let { data }: { data: PageData } = $props();
 
 	// Search & filter state
+	// svelte-ignore state_referenced_locally
 	let searchValue = $state(
 		data.metaRoles.items.length > 0 ? ($page.url.searchParams.get('name') ?? '') : ''
 	);

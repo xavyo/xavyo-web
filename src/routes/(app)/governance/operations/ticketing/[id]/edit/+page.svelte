@@ -15,6 +15,7 @@
 
 	const config = $derived(data.config);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		validators: zodClient(updateTicketingConfigSchema),
 		onResult({ result }) {

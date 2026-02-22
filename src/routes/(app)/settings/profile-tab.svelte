@@ -20,6 +20,7 @@
 
 	let { profile, form: formData }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, delayed, message } = superForm(formData, {
 		validators: zodClient(updateProfileSchema),
 		onUpdated({ form }) {

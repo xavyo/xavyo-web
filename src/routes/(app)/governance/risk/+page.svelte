@@ -15,7 +15,9 @@
 	let alerts = $derived(data.alerts);
 	let summary = $derived(data.summary);
 
+	// svelte-ignore state_referenced_locally
 	let severityFilter = $state(data.filters.severity ?? '');
+	// svelte-ignore state_referenced_locally
 	let acknowledgedFilter = $state(data.filters.acknowledged !== undefined ? String(data.filters.acknowledged) : '');
 	let deleteOpen = $state(false);
 	let deleteAlertId = $state('');

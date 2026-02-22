@@ -229,7 +229,7 @@
 {/if}
 
 <!-- Tabs -->
-<nav class="mt-6 -mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Destination detail tabs">
+<div class="mt-6 -mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Destination detail tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -249,7 +249,7 @@
 			{/if}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	<!-- ===== DETAILS TAB ===== -->

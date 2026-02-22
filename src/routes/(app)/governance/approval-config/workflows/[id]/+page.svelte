@@ -20,6 +20,7 @@
 		errors: editErrors,
 		enhance: editEnhance,
 		message: editMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.editForm, {
 		invalidateAll: 'force',
 		onResult({ result }) {
@@ -35,6 +36,7 @@
 		errors: stepErrors,
 		enhance: stepEnhance,
 		message: stepMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.stepForm, {
 		invalidateAll: 'force',
 		resetForm: true,

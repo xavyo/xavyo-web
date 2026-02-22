@@ -7,6 +7,7 @@
 	import { createCatalogItemSchema, CATALOG_ITEM_TYPES, CATALOG_ITEM_TYPE_LABELS } from '$lib/schemas/catalog';
 
 	let { data }: { data: PageData } = $props();
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance } = superForm(data.form, {
 		validators: zodClient(createCatalogItemSchema)
 	});

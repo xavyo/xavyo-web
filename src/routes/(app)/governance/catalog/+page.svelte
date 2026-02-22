@@ -14,10 +14,14 @@
 	let { data }: { data: PageData } = $props();
 	let categories = $derived(data.categories);
 	let items = $derived(data.items);
+	// svelte-ignore state_referenced_locally
 	let cartItemCount = $state(data.cartItemCount);
 
+	// svelte-ignore state_referenced_locally
 	let selectedCategoryId = $state<string | null>(data.filters.category_id ?? null);
+	// svelte-ignore state_referenced_locally
 	let searchQuery = $state(data.filters.search ?? '');
+	// svelte-ignore state_referenced_locally
 	let selectedType = $state(data.filters.item_type ?? '');
 
 	function applyFilters() {

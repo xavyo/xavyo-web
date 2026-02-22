@@ -10,7 +10,9 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form: requestForm, errors: requestErrors, enhance: requestEnhance, message: requestMessage } = superForm(data.requestForm);
+	// svelte-ignore state_referenced_locally
 	const { form: verifyForm, errors: verifyErrors, enhance: verifyEnhance, message: verifyMessage } = superForm(data.verifyForm);
 
 	let codeSent = $derived(!!$page.form?.codeSent);

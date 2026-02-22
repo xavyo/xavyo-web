@@ -17,6 +17,7 @@
 
 	const destination = $derived(data.destination);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		validators: zodClient(updateSiemDestinationSchema),
 		onResult({ result }) {
@@ -51,6 +52,7 @@
 		sod_violation: 'SoD Violation'
 	};
 
+	// svelte-ignore state_referenced_locally
 	let selectedCategories = $state<Set<string>>(
 		new Set(data.form.data.event_type_filter ?? [])
 	);

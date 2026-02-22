@@ -18,6 +18,7 @@
 
 	let { data, form: actionData }: { data: PageData; form: ActionData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.type !== 'error') {

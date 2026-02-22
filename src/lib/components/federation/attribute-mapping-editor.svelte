@@ -22,10 +22,12 @@
 	let showAdvanced = $state(false);
 	let parseError = $state<string | null>(null);
 
+	// svelte-ignore state_referenced_locally
 	let mapping = $state<AttributeMapping>(
 		parseMapping(value) ?? createEmptyMapping()
 	);
 
+	// svelte-ignore state_referenced_locally
 	let advancedJson = $state(value || '');
 
 	function serializeMapping(m: AttributeMapping): string {

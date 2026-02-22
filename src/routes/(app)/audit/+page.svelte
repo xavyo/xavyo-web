@@ -35,14 +35,12 @@
 	}
 
 	// Shared filter state for both panels
-	let listStartDate = $state(startDateISO);
-	let listEndDate = $state(endDateISO);
+	const listStartDate = $derived(startDateISO);
+	const listEndDate = $derived(endDateISO);
 
 	function handleDateRangeChange(range: { start_date: string; end_date: string }) {
 		startDateISO = range.start_date;
 		endDateISO = range.end_date;
-		listStartDate = range.start_date;
-		listEndDate = range.end_date;
 		loadStats();
 	}
 

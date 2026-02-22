@@ -9,6 +9,7 @@
 	let { data }: { data: PageData } = $props();
 	let duplicate = $derived(data.duplicate);
 
+	// svelte-ignore state_referenced_locally
 	const { form: dismissFormData, enhance: dismissEnhance } = superForm(data.dismissForm, {
 		invalidateAll: 'force',
 		onUpdated({ form }) {

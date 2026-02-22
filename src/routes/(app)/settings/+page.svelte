@@ -15,6 +15,7 @@
 
 	let { data } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let unacknowledgedCount = $state(data.unacknowledgedAlertCount ?? 0);
 
 	// Get tab from URL query param, default to 'profile'

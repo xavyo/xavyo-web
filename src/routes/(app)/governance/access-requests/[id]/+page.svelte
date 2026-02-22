@@ -23,6 +23,7 @@
 		errors: approveErrors,
 		enhance: approveEnhance,
 		message: approveMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.approveForm, {
 		onResult({ result }) {
 			if (result.type === 'redirect') {
@@ -36,6 +37,7 @@
 		errors: rejectErrors,
 		enhance: rejectEnhance,
 		message: rejectMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.rejectForm, {
 		onResult({ result }) {
 			if (result.type === 'redirect') {

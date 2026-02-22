@@ -16,10 +16,15 @@
 	let { connectorId, threshold, onSuccess }: Props = $props();
 
 	// Form values as $state (simpler than Superforms for single-save form)
+	// svelte-ignore state_referenced_locally
 	let autoConfirmPct = $state(threshold ? Math.round(threshold.auto_confirm_threshold * 100) : 90);
+	// svelte-ignore state_referenced_locally
 	let manualReviewPct = $state(threshold ? Math.round(threshold.manual_review_threshold * 100) : 70);
+	// svelte-ignore state_referenced_locally
 	let tuningMode = $state(threshold?.tuning_mode ?? false);
+	// svelte-ignore state_referenced_locally
 	let includeDeactivated = $state(threshold?.include_deactivated ?? false);
+	// svelte-ignore state_referenced_locally
 	let batchSize = $state(threshold?.batch_size ?? 100);
 
 	let saving = $state(false);
@@ -141,6 +146,7 @@
 				type="button"
 				role="switch"
 				aria-checked={tuningMode}
+				aria-label="Toggle tuning mode"
 				class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 {tuningMode ? 'bg-primary' : 'bg-muted-foreground/30'}"
 				onclick={() => (tuningMode = !tuningMode)}
 			>

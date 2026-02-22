@@ -17,6 +17,7 @@
 
 	let policy = $derived(data.policy);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'redirect') {
@@ -25,7 +26,9 @@
 		}
 	});
 
+	// svelte-ignore state_referenced_locally
 	let conditions = $state<BirthrightCondition[]>(data.policy.conditions ?? [{ attribute: '', operator: 'equals', value: '' }]);
+	// svelte-ignore state_referenced_locally
 	let selectedEntitlementIds = $state<string[]>(data.policy.entitlement_ids ?? []);
 </script>
 

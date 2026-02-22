@@ -9,6 +9,7 @@
 
 	let events = $derived(data.events);
 
+	// svelte-ignore state_referenced_locally
 	let eventTypeFilter = $state(data.filters.event_type ?? '');
 
 	function applyFilters() {

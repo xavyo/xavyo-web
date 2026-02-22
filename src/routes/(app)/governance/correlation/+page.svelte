@@ -30,7 +30,9 @@
 	let activeTab: TabId = $state('cases');
 
 	// --- Cases tab state ---
+	// svelte-ignore state_referenced_locally
 	let cases: CorrelationCase[] = $state(data.cases);
+	// svelte-ignore state_referenced_locally
 	let casesTotal = $state(data.casesTotal);
 	let casesStatusFilter: CorrelationCaseStatus | '' = $state('pending');
 	let casesOffset = $state(0);
@@ -38,14 +40,18 @@
 	const casesLimit = 50;
 
 	// --- Identity Rules tab state ---
+	// svelte-ignore state_referenced_locally
 	let identityRules: IdentityCorrelationRule[] = $state(data.identityRules);
+	// svelte-ignore state_referenced_locally
 	let identityRulesTotal = $state(data.identityRulesTotal);
 	let identityRulesOffset = $state(0);
 	let identityRulesLoading = $state(false);
 	const identityRulesLimit = 50;
 
 	// --- Audit tab state ---
+	// svelte-ignore state_referenced_locally
 	let auditEvents: CorrelationAuditEvent[] = $state(data.auditEvents);
+	// svelte-ignore state_referenced_locally
 	let auditTotal = $state(data.auditTotal);
 	let auditOffset = $state(0);
 	let auditLoading = $state(false);
@@ -228,7 +234,7 @@
 	description="Review correlation cases, manage identity matching rules, and audit correlation decisions."
 />
 
-<nav class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Correlation tabs">
+<div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Correlation tabs">
 	{#each tabs as tab}
 		<button
 			role="tab"
@@ -243,7 +249,7 @@
 			{tab.label}
 		</button>
 	{/each}
-</nav>
+</div>
 
 <div class="mt-6" role="tabpanel" id="tabpanel-{activeTab}" aria-labelledby="tab-{activeTab}">
 	<!-- Cases Tab -->

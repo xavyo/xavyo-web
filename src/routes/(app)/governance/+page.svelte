@@ -48,6 +48,7 @@
 	];
 
 	const validTabs = tabs.map(t => t.id);
+	// svelte-ignore state_referenced_locally
 	let activeTab: string = $state(data.tab && validTabs.includes(data.tab) ? data.tab : 'entitlements');
 
 	// === Entitlements tab ===

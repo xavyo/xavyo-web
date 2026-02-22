@@ -14,6 +14,7 @@
 	let { data } = $props();
 	let schedule = $derived(data.schedule);
 
+	// svelte-ignore state_referenced_locally
 	const { form: editForm, errors: editErrors, enhance: editEnhance } = superForm(data.editForm, {
 		validators: zodClient(updateScheduleSchema),
 		onResult: ({ result }) => {

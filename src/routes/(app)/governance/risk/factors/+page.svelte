@@ -10,7 +10,9 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let categoryFilter = $state(data.filters.category ?? '');
+	// svelte-ignore state_referenced_locally
 	let enabledFilter = $state(
 		data.filters.is_enabled !== undefined ? String(data.filters.is_enabled) : ''
 	);

@@ -45,13 +45,13 @@
 	</div>
 
 	<div>
-		<label class="mb-2 block text-sm font-medium">Conditions *</label>
+		<span class="mb-2 block text-sm font-medium">Conditions *</span>
 		<ConditionBuilder {conditions} onUpdate={(c) => conditions = c} />
 		<input type="hidden" name="conditions_json" value={JSON.stringify(conditions)} />
 	</div>
 
 	<div>
-		<label class="mb-2 block text-sm font-medium">Entitlements *</label>
+		<span class="mb-2 block text-sm font-medium">Entitlements *</span>
 		{#if data.entitlements.length === 0}
 			<p class="text-sm text-muted-foreground">No entitlements available. Create entitlements first.</p>
 		{:else}

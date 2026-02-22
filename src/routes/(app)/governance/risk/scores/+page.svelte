@@ -10,8 +10,11 @@
 
 	let scores = $derived(data.scores);
 
+	// svelte-ignore state_referenced_locally
 	let riskLevelFilter = $state(data.filters.risk_level ?? '');
+	// svelte-ignore state_referenced_locally
 	let minScoreFilter = $state(data.filters.min_score !== undefined ? String(data.filters.min_score) : '');
+	// svelte-ignore state_referenced_locally
 	let maxScoreFilter = $state(data.filters.max_score !== undefined ? String(data.filters.max_score) : '');
 
 	function applyFilters() {

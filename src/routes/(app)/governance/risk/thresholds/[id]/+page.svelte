@@ -31,6 +31,7 @@
 		errors,
 		enhance: formEnhance,
 		message
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.form, {
 		invalidateAll: 'force',
 		onResult({ result }) {

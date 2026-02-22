@@ -40,16 +40,19 @@
 	let myPending = $derived(data.myPending);
 
 	// All Certifications state
+	// svelte-ignore state_referenced_locally
 	let allCertifications: MicroCertificationListResponse = $state(data.allCertifications as MicroCertificationListResponse);
 	let allLoading = $state(false);
 	let statusFilter = $state('');
 	let selectedIds: string[] = $state([]);
 
 	// Trigger Rules state
+	// svelte-ignore state_referenced_locally
 	let triggerRules: TriggerRuleListResponse = $state(data.triggerRules as TriggerRuleListResponse);
 	let triggersLoading = $state(false);
 
 	// Stats state
+	// svelte-ignore state_referenced_locally
 	let stats: MicroCertificationStats | null = $state(data.stats);
 	let statsLoading = $state(false);
 

@@ -13,7 +13,9 @@
 
 	let thresholds = $derived(data.thresholds);
 
+	// svelte-ignore state_referenced_locally
 	let severityFilter = $state(data.filters.severity ?? '');
+	// svelte-ignore state_referenced_locally
 	let enabledFilter = $state(
 		data.filters.is_enabled !== undefined ? String(data.filters.is_enabled) : ''
 	);

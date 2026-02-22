@@ -46,8 +46,11 @@
 		})
 	] as ColumnDef<ApplicationResponse>[];
 
+	// svelte-ignore state_referenced_locally
 	let appData: ApplicationResponse[] = $state(data.applications);
+	// svelte-ignore state_referenced_locally
 	let pageCount: number = $state(Math.ceil(data.total / data.limit));
+	// svelte-ignore state_referenced_locally
 	let pagination: PaginationState = $state({ pageIndex: Math.floor(data.offset / data.limit), pageSize: data.limit });
 	let loading: boolean = $state(false);
 	let statusFilter: string = $state('');

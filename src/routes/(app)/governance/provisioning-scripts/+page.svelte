@@ -17,7 +17,9 @@
 	let activeTab = $state('scripts');
 
 	const tabs = [
+		// svelte-ignore state_referenced_locally
 		{ id: 'scripts', label: 'Scripts', count: data.scriptsTotal },
+		// svelte-ignore state_referenced_locally
 		{ id: 'templates', label: 'Templates', count: data.templatesTotal },
 		{ id: 'analytics', label: 'Analytics' }
 	];

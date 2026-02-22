@@ -21,7 +21,9 @@
 		initialExitActions?: LifecycleStateAction[];
 	} = $props();
 
+	// svelte-ignore state_referenced_locally
 	let entryActions = $state<LifecycleStateAction[]>([...initialEntryActions]);
+	// svelte-ignore state_referenced_locally
 	let exitActions = $state<LifecycleStateAction[]>([...initialExitActions]);
 	let saving = $state(false);
 	let error = $state('');

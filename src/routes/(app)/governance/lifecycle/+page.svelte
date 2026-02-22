@@ -19,7 +19,9 @@
 	const totalPages = $derived(Math.ceil(total / limit));
 
 	// Filter state — initialized from server filters
+	// svelte-ignore state_referenced_locally
 	let objectTypeFilter = $state(data.filters.object_type ?? '');
+	// svelte-ignore state_referenced_locally
 	let isActiveFilter = $state(
 		data.filters.is_active === true ? 'true' : data.filters.is_active === false ? 'false' : ''
 	);

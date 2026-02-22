@@ -1,7 +1,7 @@
 <script lang="ts">
 	let { name, id }: { name: string; id: string } = $props();
 
-	const href = `/governance/certifications/${id}`;
+	const href = $derived(`/governance/certifications/${id}`);
 </script>
 
 <a {href} class="font-medium text-primary hover:underline">{name}</a>

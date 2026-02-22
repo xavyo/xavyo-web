@@ -25,7 +25,7 @@
 		warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
 	};
 
-	const colorMap = type === 'severity' ? severityColors : type === 'impact' ? impactColors : statusColors;
+	const colorMap = $derived(type === 'severity' ? severityColors : type === 'impact' ? impactColors : statusColors);
 	let colorClass = $derived(colorMap[value] || 'bg-muted text-muted-foreground');
 	let displayValue = $derived(value.replace(/_/g, ' '));
 </script>

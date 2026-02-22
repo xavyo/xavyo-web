@@ -10,6 +10,7 @@
 	let { data } = $props();
 	let template = $derived(data.template);
 
+	// svelte-ignore state_referenced_locally
 	const { form: editForm, errors: editErrors, enhance: editEnhance } = superForm(data.editForm, {
 		validators: zodClient(updateTemplateSchema),
 		onResult: ({ result }) => {
@@ -20,6 +21,7 @@
 		}
 	});
 
+	// svelte-ignore state_referenced_locally
 	const { form: cloneForm, errors: cloneErrors, enhance: cloneEnhance } = superForm(data.cloneForm, {
 		validators: zodClient(cloneTemplateSchema),
 		onResult: ({ result }) => {

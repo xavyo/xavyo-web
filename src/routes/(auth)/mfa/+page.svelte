@@ -11,6 +11,7 @@
 
 	let useRecovery = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	const {
 		form: totpForm,
 		errors: totpErrors,
@@ -18,6 +19,7 @@
 		message: totpMessage
 	} = superForm(data.totpForm);
 
+	// svelte-ignore state_referenced_locally
 	const {
 		form: recoveryForm,
 		errors: recoveryErrors,

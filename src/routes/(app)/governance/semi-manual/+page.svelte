@@ -20,6 +20,7 @@
 	let removeAppId = $state('');
 	let removeAppName = $state('');
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance: formEnhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success') {

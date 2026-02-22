@@ -41,14 +41,23 @@
 		submitLabel = 'Add Rule'
 	}: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	let formRuleType = $state(ruleType);
+	// svelte-ignore state_referenced_locally
 	let formTargetAttribute = $state(targetAttribute);
+	// svelte-ignore state_referenced_locally
 	let formExpression = $state(expression);
+	// svelte-ignore state_referenced_locally
 	let formStrength = $state(strength);
+	// svelte-ignore state_referenced_locally
 	let formPriority = $state(priority);
+	// svelte-ignore state_referenced_locally
 	let formCondition = $state(condition);
+	// svelte-ignore state_referenced_locally
 	let formErrorMessage = $state(errorMessage);
+	// svelte-ignore state_referenced_locally
 	let formAuthoritative = $state(authoritative);
+	// svelte-ignore state_referenced_locally
 	let formExclusive = $state(exclusive);
 
 	function handleSubmit() {

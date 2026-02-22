@@ -28,6 +28,7 @@
 	let results = $derived(data.results);
 	let staleness = $derived(data.staleness);
 
+	// svelte-ignore state_referenced_locally
 	let notesValue = $state(data.simulation.notes ?? '');
 	let notesSaving = $state(false);
 	let actionLoading = $state(false);

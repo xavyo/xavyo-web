@@ -10,6 +10,7 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	let items: NhiCertificationItem[] = $state(data.campaignItems ?? []);
 	let processing = $state<string | null>(null);
 

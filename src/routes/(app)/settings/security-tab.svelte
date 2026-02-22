@@ -12,7 +12,9 @@
 
 	let { securityOverview: initialSecurityOverview, mfaStatus: initialMfaStatus }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	let securityOverview = $state<SecurityOverview | null>(initialSecurityOverview);
+	// svelte-ignore state_referenced_locally
 	let mfaStatus = $state<MfaStatus | null>(initialMfaStatus);
 	let webauthnCredentials = $state<WebAuthnCredential[]>([]);
 	let isLoadingCredentials = $state(true);

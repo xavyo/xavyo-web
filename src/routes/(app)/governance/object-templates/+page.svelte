@@ -28,7 +28,9 @@
 		goto(`/governance/object-templates?${params.toString()}`);
 	}
 
+	// svelte-ignore state_referenced_locally
 	let filterObjectType = $state(filters.object_type);
+	// svelte-ignore state_referenced_locally
 	let filterStatus = $state(filters.status);
 
 	function handleFilterChange() {

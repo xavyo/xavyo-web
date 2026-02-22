@@ -16,6 +16,7 @@
 
 	let { superform, mode, onCancel }: Props = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superform;
 </script>
 

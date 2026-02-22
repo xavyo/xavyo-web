@@ -19,6 +19,7 @@
 	let isEditing = $state(false);
 	let deleteOpen = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		invalidateAll: 'force',
 		onResult({ result }) {

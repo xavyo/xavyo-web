@@ -28,6 +28,7 @@
 	let schema = $derived(isEditing ? updateCorrelationRuleSchema : createCorrelationRuleSchema);
 
 	// Build initial data from the rule (if editing) or defaults
+	// svelte-ignore state_referenced_locally
 	const initialData = rule
 		? {
 				name: rule.name,
@@ -58,6 +59,7 @@
 				priority: 10
 			};
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, submitting: formSubmitting } = superForm(defaults(initialData, zodClient(schema)), {
 		SPA: true,
 		validators: zodClient(schema),

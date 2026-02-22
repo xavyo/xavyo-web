@@ -21,7 +21,9 @@
 	let direction = $state<'outgoing' | 'incoming'>('outgoing');
 
 	// My PoA data
+	// svelte-ignore state_referenced_locally
 	let myItems = $state<PoaGrant[]>(data.outgoing.items);
+	// svelte-ignore state_referenced_locally
 	let myTotal = $state(data.outgoing.total);
 	let myLoading = $state(false);
 

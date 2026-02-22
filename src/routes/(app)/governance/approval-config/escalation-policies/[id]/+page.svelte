@@ -23,6 +23,7 @@
 		errors: editErrors,
 		enhance: editEnhance,
 		message: editMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.editForm, {
 		invalidateAll: 'force',
 		onResult({ result }) {
@@ -37,6 +38,7 @@
 		errors: levelErrors,
 		enhance: levelEnhance,
 		message: levelMessage
+	// svelte-ignore state_referenced_locally
 	} = superForm(data.levelForm, {
 		invalidateAll: 'force',
 		resetForm: true,

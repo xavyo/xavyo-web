@@ -19,6 +19,7 @@
 	let previewing = $state(false);
 	let executing = $state(false);
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		validators: zodClient(updateBulkActionSchema),
 		onResult({ result }) {

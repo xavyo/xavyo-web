@@ -7,6 +7,7 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message: formMessage } = superForm(data.form, {
 		validators: zodClient(createObjectTemplateSchema)
 	});
