@@ -42,13 +42,6 @@
 	function handleAvatarLoad() {
 		avatarError = false;
 	}
-
-	function handleInput(field: keyof typeof $form) {
-		return (e: Event) => {
-			const target = e.target as HTMLInputElement;
-			($form as Record<string, unknown>)[field] = target.value;
-		};
-	}
 </script>
 
 <div class="mt-4 max-w-2xl space-y-6">
@@ -87,8 +80,7 @@
 					name="display_name"
 					type="text"
 					placeholder="Your display name"
-					value={String($form.display_name ?? '')}
-					oninput={handleInput('display_name')}
+					bind:value={$form.display_name}
 				/>
 				{#if $errors.display_name}
 					<p class="text-sm text-destructive">{$errors.display_name}</p>
@@ -103,8 +95,7 @@
 						name="first_name"
 						type="text"
 						placeholder="First name"
-						value={String($form.first_name ?? '')}
-						oninput={handleInput('first_name')}
+						bind:value={$form.first_name}
 					/>
 					{#if $errors.first_name}
 						<p class="text-sm text-destructive">{$errors.first_name}</p>
@@ -118,8 +109,7 @@
 						name="last_name"
 						type="text"
 						placeholder="Last name"
-						value={String($form.last_name ?? '')}
-						oninput={handleInput('last_name')}
+						bind:value={$form.last_name}
 					/>
 					{#if $errors.last_name}
 						<p class="text-sm text-destructive">{$errors.last_name}</p>
@@ -134,8 +124,7 @@
 					name="avatar_url"
 					type="url"
 					placeholder="https://example.com/avatar.jpg"
-					value={String($form.avatar_url ?? '')}
-					oninput={handleInput('avatar_url')}
+					bind:value={$form.avatar_url}
 				/>
 				{#if $errors.avatar_url}
 					<p class="text-sm text-destructive">{$errors.avatar_url}</p>
