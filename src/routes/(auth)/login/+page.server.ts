@@ -16,6 +16,20 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 	}
 
 	if (locals.user) {
+		// Respect redirectTo even when already logged in — this handles the case
+		// where superForm's enhance re-runs the load function after login succeeds
+		// (via invalidateAll) before the form action's redirect is processed.
+		const redirectTo = url.searchParams.get('redirectTo');
+		if (redirectTo) {
+			try {
+				const target = new URL(redirectTo, url.origin);
+				if (target.origin === url.origin && target.pathname.startsWith('/')) {
+					redirect(302, target.pathname + target.search + target.hash);
+				}
+			} catch {
+				// invalid URL — fall through to dashboard
+			}
+		}
 		redirect(302, '/dashboard');
 	}
 
