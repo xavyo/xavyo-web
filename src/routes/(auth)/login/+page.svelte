@@ -14,11 +14,11 @@
 
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
-		onResult: ({ result }) => {
+		onResult: ({ result, cancel }) => {
 			// When login succeeds and we have a redirectTo target (e.g. SAML callback),
-			// navigate there directly instead of relying on the server action's redirect
-			// which may not receive the redirectTo param through superForm's enhance.
+			// cancel superForm's default redirect handling and navigate manually.
 			if (result.type === 'redirect' && data.redirectTo && data.redirectTo.startsWith('/')) {
+				cancel();
 				goto(data.redirectTo);
 			}
 		}
