@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { superForm } from 'sveltekit-superforms';
 	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
@@ -12,7 +13,16 @@
 	let { data }: { data: PageData } = $props();
 
 	// svelte-ignore state_referenced_locally
-	const { form, errors, enhance, message } = superForm(data.form);
+	const { form, errors, enhance, message } = superForm(data.form, {
+		onResult: ({ result }) => {
+			// When login succeeds and we have a redirectTo target (e.g. SAML callback),
+			// navigate there directly instead of relying on the server action's redirect
+			// which may not receive the redirectTo param through superForm's enhance.
+			if (result.type === 'redirect' && data.redirectTo && data.redirectTo.startsWith('/')) {
+				goto(data.redirectTo);
+			}
+		}
+	});
 
 	const b = $derived(data.branding);
 	const tenantParam = $derived(
