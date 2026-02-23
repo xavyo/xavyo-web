@@ -23,6 +23,7 @@
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, delayed, message } = superForm(formData, {
 		validators: zodClient(updateProfileSchema),
+		resetForm: false,
 		onUpdated({ form }) {
 			if (form.valid && form.message) {
 				addToast('success', form.message);
