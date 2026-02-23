@@ -34,7 +34,7 @@
 			</Alert>
 		{/if}
 
-		<form method="POST" use:enhance class="space-y-4">
+		<form method="POST" action="/login{data.redirectTo ? `?redirectTo=${encodeURIComponent(data.redirectTo)}` : ''}" use:enhance class="space-y-4">
 			<div class="space-y-2">
 				<Label for="email">Email</Label>
 				<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($form.email ?? '')} />
