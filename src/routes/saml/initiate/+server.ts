@@ -2,6 +2,8 @@ import { env } from '$env/dynamic/private';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * IdP-initiated SAML SSO endpoint (browser-navigable).
  *
@@ -18,15 +20,19 @@ export const GET: RequestHandler = async ({ url, locals, fetch: svelteFetch }) =
 	const relayState = url.searchParams.get('relay_state') ?? '';
 	const tenant = url.searchParams.get('tenant') ?? '';
 
-	if (!spId) {
-		return new Response('Missing required parameter: sp', { status: 400 });
+	if (!spId || !UUID_RE.test(spId)) {
+		return new Response('Missing or invalid parameter: sp', { status: 400 });
+	}
+
+	if (tenant && !UUID_RE.test(tenant)) {
+		return new Response('Invalid parameter: tenant', { status: 400 });
 	}
 
 	// If not authenticated, redirect to login with return URL
 	if (!locals.user || !locals.accessToken) {
 		const returnUrl = url.pathname + url.search;
 		const loginUrl = tenant
-			? `/login?redirectTo=${encodeURIComponent(returnUrl)}&tenant=${tenant}`
+			? `/login?redirectTo=${encodeURIComponent(returnUrl)}&tenant=${encodeURIComponent(tenant)}`
 			: `/login?redirectTo=${encodeURIComponent(returnUrl)}`;
 		redirect(302, loginUrl);
 	}
@@ -49,8 +55,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch: svelteFetch }) =
 	});
 
 	if (!response.ok) {
-		const text = await response.text();
-		return new Response(`SAML initiation failed: ${text}`, { status: response.status });
+		return new Response('SAML initiation failed', { status: response.status });
 	}
 
 	// Return the auto-submit HTML form from the API as-is
