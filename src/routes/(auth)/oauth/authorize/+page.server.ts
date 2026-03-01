@@ -4,7 +4,7 @@ import { getAuthorizeInfo, grantAuthorizationCode } from '$lib/api/oauth-authori
 import { ApiError } from '$lib/api/client';
 import { SYSTEM_TENANT_ID } from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 	// Parse OAuth query parameters
 	const client_id = url.searchParams.get('client_id') ?? '';
 	const redirect_uri = url.searchParams.get('redirect_uri') ?? '';
@@ -35,10 +35,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	// If not authenticated, redirect to login with full OAuth URL as redirectTo
 	if (!locals.user || !locals.accessToken) {
 		const currentUrl = url.pathname + url.search;
+		// Propagate tenant context from OAuth flow to login page via cookie
+		const tenant = url.searchParams.get('tenant');
+		if (tenant) {
+			cookies.set('tenant_id', tenant, { path: '/', httpOnly: true, sameSite: 'lax', maxAge: 300 });
+		}
 		redirect(302, `/login?redirectTo=${encodeURIComponent(currentUrl)}`);
 	}
 
-	const tenantId = locals.tenantId || SYSTEM_TENANT_ID;
+	// OAuth flows carry tenant context explicitly — prefer it over the session tenant.
+	// This handles the case where the user is already logged in under a different
+	// tenant (e.g., system admin) but the OAuth client belongs to a specific tenant.
+	const oauthTenant = url.searchParams.get('tenant');
+	const tenantId = oauthTenant || locals.tenantId || SYSTEM_TENANT_ID;
 
 	// Fetch client info from backend (validates client_id, redirect_uri, scopes)
 	try {
@@ -90,12 +99,13 @@ export const actions: Actions = {
 		const code_challenge = formData.get('code_challenge')?.toString() ?? '';
 		const code_challenge_method = formData.get('code_challenge_method')?.toString() ?? '';
 		const nonce = formData.get('nonce')?.toString() ?? '';
+		const tenant = formData.get('tenant')?.toString() ?? '';
 
 		if (!client_id || !redirect_uri || !code_challenge || !code_challenge_method) {
 			return fail(400, { error: 'Missing required OAuth parameters' });
 		}
 
-		const tenantId = locals.tenantId || SYSTEM_TENANT_ID;
+		const tenantId = tenant || locals.tenantId || SYSTEM_TENANT_ID;
 
 		try {
 			const result = await grantAuthorizationCode(
@@ -142,12 +152,13 @@ export const actions: Actions = {
 		const redirect_uri = formData.get('redirect_uri')?.toString() ?? '';
 		const scope = formData.get('scope')?.toString() ?? '';
 		const state = formData.get('state')?.toString() ?? '';
+		const tenant = formData.get('tenant')?.toString() ?? '';
 
 		if (!client_id || !redirect_uri) {
 			return fail(400, { error: 'Missing required parameters' });
 		}
 
-		const tenantId = locals.tenantId || SYSTEM_TENANT_ID;
+		const tenantId = tenant || locals.tenantId || SYSTEM_TENANT_ID;
 
 		// Re-validate redirect_uri against the backend before redirecting.
 		// Hidden form fields are tamper-able — we must not redirect to an

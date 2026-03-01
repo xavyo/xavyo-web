@@ -92,3 +92,19 @@ export async function deleteUser(
 		fetch: fetchFn
 	});
 }
+
+export async function resetUserPassword(
+	id: string,
+	newPassword: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<{ user_id: string; message: string; sessions_revoked: number }> {
+	return apiClient(`/admin/users/${id}/reset-password`, {
+		method: 'POST',
+		body: { new_password: newPassword },
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}

@@ -304,6 +304,23 @@ export async function disableSodRule(
 	});
 }
 
+export async function scanSodRule(
+	id: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<{ violations_found: number; violations_created: number }> {
+	return apiClient<{ violations_found: number; violations_created: number }>(
+		`/governance/sod-rules/${id}/scan`,
+		{
+			method: 'POST',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
+}
+
 export async function listSodViolations(
 	params: ListSodViolationsParams,
 	token: string,

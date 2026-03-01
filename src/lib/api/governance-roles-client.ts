@@ -392,3 +392,51 @@ export async function fetchInducedRoles(
 	if (!res.ok) throw new Error(`Failed to fetch induced roles: ${res.status}`);
 	return res.json();
 }
+
+// --- Assignments ---
+
+export async function assignRole(
+	roleId: string,
+	userId: string,
+	request: { justification?: string; expires_at?: string },
+	fetchFn: typeof fetch = fetch
+): Promise<{ role_id: string; user_id: string; entitlement_assignments_created: number; provisioning_operations_queued: number }> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/assignments/${userId}`, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(request)
+	});
+	if (!res.ok) throw new Error(`Failed to assign role: ${res.status}`);
+	return res.json();
+}
+
+export async function revokeRole(
+	roleId: string,
+	userId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<{ role_id: string; user_id: string; entitlement_assignments_revoked: number; deprovisioning_operations_queued: number }> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/assignments/${userId}`, {
+		method: 'DELETE'
+	});
+	if (!res.ok) throw new Error(`Failed to revoke role: ${res.status}`);
+	return res.json();
+}
+
+export async function checkUserHasRole(
+	roleId: string,
+	userId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<{ user_id: string; role_id: string; has_role: boolean }> {
+	const res = await fetchFn(`/api/governance/roles/${roleId}/assignments/${userId}`);
+	if (!res.ok) throw new Error(`Failed to check user role: ${res.status}`);
+	return res.json();
+}
+
+export async function listUserRoles(
+	userId: string,
+	fetchFn: typeof fetch = fetch
+): Promise<{ user_id: string; role_ids: string[] }> {
+	const res = await fetchFn(`/api/governance/users/${userId}/roles`);
+	if (!res.ok) throw new Error(`Failed to list user roles: ${res.status}`);
+	return res.json();
+}

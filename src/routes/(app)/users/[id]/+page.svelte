@@ -32,6 +32,8 @@
 	let isEditing: boolean = $state(false);
 	let showDeleteDialog: boolean = $state(false);
 	let showDisableConfirm: boolean = $state(false);
+	let showResetPasswordDialog: boolean = $state(false);
+	let newPassword: string = $state('');
 
 	const isSelf = $derived(data.user.id === data.currentUserId);
 
@@ -192,6 +194,29 @@
 			<h2 class="text-xl font-semibold">Actions</h2>
 		</CardHeader>
 		<CardContent class="flex gap-2">
+			<Button variant="outline" onclick={() => { newPassword = ''; showResetPasswordDialog = true; }}>
+				Reset Password
+			</Button>
+
+			{#if !data.user.email_verified}
+				<form
+					method="POST"
+					action="?/verifyEmail"
+					use:formEnhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								addToast('success', 'Email marked as verified');
+								await invalidateAll();
+							} else if (result.type === 'failure') {
+								addToast('error', String(result.data?.error ?? 'Failed to verify email'));
+							}
+						};
+					}}
+				>
+					<Button type="submit" variant="outline">Verify Email</Button>
+				</form>
+			{/if}
+
 			{#if data.user.is_active}
 				{#if !isSelf}
 					<Button variant="outline" onclick={() => (showDisableConfirm = true)}>Disable</Button>
@@ -289,6 +314,51 @@
 					<Button type="submit" variant="destructive">Confirm delete</Button>
 				</form>
 			</Dialog.Footer>
+		</Dialog.Content>
+	</Dialog.Root>
+
+	<Dialog.Root bind:open={showResetPasswordDialog}>
+		<Dialog.Content>
+			<Dialog.Header>
+				<Dialog.Title>Reset password</Dialog.Title>
+				<Dialog.Description>
+					Set a new password for <strong>{data.user.email}</strong>. All their active sessions
+					will be revoked.
+				</Dialog.Description>
+			</Dialog.Header>
+			<form
+				method="POST"
+				action="?/resetPassword"
+				use:formEnhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							addToast('success', 'Password reset successfully');
+							showResetPasswordDialog = false;
+						} else if (result.type === 'failure') {
+							addToast('error', String(result.data?.error ?? 'Failed to reset password'));
+						}
+					};
+				}}
+				class="space-y-4"
+			>
+				<div class="space-y-2">
+					<Label for="new_password">New password</Label>
+					<Input
+						id="new_password"
+						name="new_password"
+						type="password"
+						bind:value={newPassword}
+						placeholder="Enter new password"
+						autocomplete="new-password"
+					/>
+				</div>
+				<Dialog.Footer>
+					<Button variant="outline" type="button" onclick={() => (showResetPasswordDialog = false)}>
+						Cancel
+					</Button>
+					<Button type="submit" disabled={newPassword.length < 8}>Reset password</Button>
+				</Dialog.Footer>
+			</form>
 		</Dialog.Content>
 	</Dialog.Root>
 

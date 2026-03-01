@@ -144,6 +144,7 @@ export interface UpdateUserRequest {
 	roles?: string[];
 	is_active?: boolean;
 	username?: string;
+	email_verified?: boolean;
 }
 
 // Persona & Archetype Types (mirror Rust governance DTOs)

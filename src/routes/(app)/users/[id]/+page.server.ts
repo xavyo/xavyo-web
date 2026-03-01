@@ -3,7 +3,7 @@ import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { updateUserSchema } from '$lib/schemas/user';
-import { getUser, updateUser, deleteUser } from '$lib/api/users';
+import { getUser, updateUser, deleteUser, resetUserPassword } from '$lib/api/users';
 import { getUserLifecycleStatus } from '$lib/api/lifecycle';
 import { ApiError } from '$lib/api/client';
 import type { UserLifecycleStatus } from '$lib/api/types';
@@ -127,5 +127,49 @@ export const actions: Actions = {
 		}
 
 		return { success: true, action: 'disabled' };
+	},
+
+	resetPassword: async ({ request, params, locals, fetch }) => {
+		const formData = await request.formData();
+		const newPassword = formData.get('new_password') as string;
+
+		if (!newPassword || newPassword.length < 8) {
+			return fail(400, { error: 'Password must be at least 8 characters' });
+		}
+
+		try {
+			const result = await resetUserPassword(
+				params.id,
+				newPassword,
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			);
+			return { success: true, action: 'password_reset', sessionsRevoked: result.sessions_revoked };
+		} catch (e) {
+			if (e instanceof ApiError) {
+				return fail(e.status, { error: e.message });
+			}
+			return fail(500, { error: 'An unexpected error occurred' });
+		}
+	},
+
+	verifyEmail: async ({ params, locals, fetch }) => {
+		try {
+			await updateUser(
+				params.id,
+				{ email_verified: true },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			);
+		} catch (e) {
+			if (e instanceof ApiError) {
+				return fail(e.status, { error: e.message });
+			}
+			return fail(500, { error: 'An unexpected error occurred' });
+		}
+
+		return { success: true, action: 'email_verified' };
 	}
 };

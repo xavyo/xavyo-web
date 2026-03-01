@@ -519,3 +519,89 @@ export async function getInducedRoles(
 		method: 'GET', token, tenantId, fetch: fetchFn
 	});
 }
+
+// --- Assignments ---
+
+export interface AssignRoleResponse {
+	role_id: string;
+	user_id: string;
+	entitlement_assignments_created: number;
+	provisioning_operations_queued: number;
+}
+
+export interface RevokeRoleResponse {
+	role_id: string;
+	user_id: string;
+	entitlement_assignments_revoked: number;
+	deprovisioning_operations_queued: number;
+}
+
+export interface CheckUserHasRoleResponse {
+	user_id: string;
+	role_id: string;
+	has_role: boolean;
+}
+
+export interface ListUserRolesResponse {
+	user_id: string;
+	role_ids: string[];
+}
+
+export async function listRoleAssignments(
+	roleId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<unknown> {
+	return apiClient(`/governance/roles/${roleId}/assignments`, {
+		method: 'GET', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function assignRole(
+	roleId: string,
+	userId: string,
+	data: { justification?: string; expires_at?: string },
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<AssignRoleResponse> {
+	return apiClient<AssignRoleResponse>(`/governance/roles/${roleId}/assignments/${userId}`, {
+		method: 'POST', body: data, token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function revokeRole(
+	roleId: string,
+	userId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RevokeRoleResponse> {
+	return apiClient<RevokeRoleResponse>(`/governance/roles/${roleId}/assignments/${userId}`, {
+		method: 'DELETE', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function checkUserHasRole(
+	roleId: string,
+	userId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<CheckUserHasRoleResponse> {
+	return apiClient<CheckUserHasRoleResponse>(`/governance/roles/${roleId}/assignments/${userId}`, {
+		method: 'GET', token, tenantId, fetch: fetchFn
+	});
+}
+
+export async function listUserRoles(
+	userId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<ListUserRolesResponse> {
+	return apiClient<ListUserRolesResponse>(`/governance/users/${userId}/roles`, {
+		method: 'GET', token, tenantId, fetch: fetchFn
+	});
+}

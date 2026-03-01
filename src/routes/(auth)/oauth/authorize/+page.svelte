@@ -149,6 +149,7 @@
 				<input type="hidden" name="redirect_uri" value={data.oauthParams.redirect_uri} />
 				<input type="hidden" name="scope" value={data.oauthParams.scope} />
 				<input type="hidden" name="state" value={data.oauthParams.state} />
+				<input type="hidden" name="tenant" value={$page.url.searchParams.get('tenant') ?? ''} />
 				<Button
 					type="submit"
 					variant="outline"
@@ -175,6 +176,7 @@
 					value={data.oauthParams.code_challenge_method}
 				/>
 				<input type="hidden" name="nonce" value={data.oauthParams.nonce} />
+				<input type="hidden" name="tenant" value={$page.url.searchParams.get('tenant') ?? ''} />
 				<Button type="submit" class="w-full" disabled={submitting !== null}>
 					{submitting === 'approve' ? `${approveLabel}...` : approveLabel}
 				</Button>
