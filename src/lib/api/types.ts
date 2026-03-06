@@ -277,10 +277,16 @@ export interface NhiIdentityResponse {
 	suspension_reason: string | null;
 	expires_at: string | null;
 	last_activity_at: string | null;
-	risk_score: number;
+	backup_owner_id: string | null;
+	risk_score: number | null;
+	inactivity_threshold_days: number | null;
+	grace_period_ends_at: string | null;
+	rotation_interval_days: number | null;
+	last_rotation_at: string | null;
 	last_certified_at: string | null;
 	last_certified_by: string | null;
 	next_certification_at: string | null;
+	created_by: string | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -1911,6 +1917,7 @@ export interface GovernanceRole {
 	is_abstract: boolean;
 	hierarchy_depth: number;
 	version: number;
+	application_id: string | null;
 	created_by: string;
 	created_at: string;
 	updated_at: string;
@@ -1927,6 +1934,7 @@ export interface CreateGovernanceRoleRequest {
 	name: string;
 	description?: string;
 	parent_role_id?: string;
+	application_id?: string;
 }
 
 export interface UpdateGovernanceRoleRequest {

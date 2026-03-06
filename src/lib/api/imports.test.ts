@@ -10,6 +10,10 @@ import {
 	acceptInvitation
 } from './imports';
 
+vi.mock('$env/dynamic/private', () => ({
+	env: { API_BASE_URL: 'http://localhost:8080' }
+}));
+
 vi.mock('./client', () => ({
 	apiClient: vi.fn(),
 	ApiError: class ApiError extends Error {
