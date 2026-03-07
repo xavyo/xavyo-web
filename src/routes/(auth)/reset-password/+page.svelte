@@ -18,6 +18,11 @@
 			? `?tenant=${$page.url.searchParams.get('tenant')}`
 			: ''
 	);
+
+	// After a successful reset, link to login with reset_tenant to clear any stale tenant cookie
+	const loginAfterResetUrl = $derived(
+		tenantParam ? `/login${tenantParam}` : '/login?reset_tenant=true'
+	);
 </script>
 
 <Card>
@@ -31,7 +36,7 @@
 				<AlertDescription>
 					{$message}
 					{#if typeof $message === 'string' && $message.includes('successfully')}
-						<a href="/login{tenantParam}" class="text-primary underline-offset-4 hover:underline ml-1">Go to login</a>
+						<a href={loginAfterResetUrl} class="text-primary underline-offset-4 hover:underline ml-1">Go to login</a>
 					{/if}
 				</AlertDescription>
 			</Alert>
