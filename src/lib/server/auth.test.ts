@@ -5,8 +5,11 @@ import {
 	isDecodableJwt,
 	replaceAccessTokenIfJwt,
 	setCookies,
+	setMfaPartialToken,
+	tenantIdFromJwt,
 	clearAuthCookies,
-	omitTokenFields
+	omitTokenFields,
+	SYSTEM_TENANT_ID
 } from './auth';
 
 describe('decodeAccessToken', () => {
@@ -148,6 +151,56 @@ describe('clearAuthCookies', () => {
 		expect(deleteCookie).toHaveBeenCalledWith('original_access_token', { path: '/' });
 		expect(deleteCookie).toHaveBeenCalledWith('mfa_partial_token', { path: '/mfa' });
 		expect(deleteCookie).not.toHaveBeenCalledWith('tenant_id', { path: '/' });
+	});
+});
+
+function fakeJwtWithTid(tid: string): string {
+	const payload = {
+		sub: 'user-1',
+		tid,
+		purpose: 'mfa_verification',
+		exp: 9999999999,
+		iat: 1000000000,
+		iss: 'xavyo',
+		aud: ['xavyo-web'],
+		jti: 'jti-mfa',
+		roles: []
+	};
+	const encodedPayload = btoa(JSON.stringify(payload)).replace(/=/g, '');
+	return `eyJhbGciOiJSUzI1NiJ9.${encodedPayload}.sig`;
+}
+
+describe('tenantIdFromJwt', () => {
+	it('returns tid from a JWT', () => {
+		expect(tenantIdFromJwt(fakeJwtWithTid('tenant-real'))).toBe('tenant-real');
+	});
+
+	it('returns undefined for missing or invalid tokens', () => {
+		expect(tenantIdFromJwt(undefined)).toBeUndefined();
+		expect(tenantIdFromJwt('')).toBeUndefined();
+		expect(tenantIdFromJwt('not-a-jwt')).toBeUndefined();
+	});
+});
+
+describe('setMfaPartialToken', () => {
+	it('stamps tenant_id from the partial JWT tid', () => {
+		const setCookie = vi.fn();
+		const cookies = { set: setCookie } as unknown as Parameters<typeof setMfaPartialToken>[0];
+		const token = fakeJwtWithTid('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+
+		setMfaPartialToken(cookies, token);
+
+		expect(setCookie).toHaveBeenCalledWith(
+			'mfa_partial_token',
+			token,
+			expect.objectContaining({ path: '/mfa' })
+		);
+		expect(setCookie).toHaveBeenCalledWith(
+			'tenant_id',
+			'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+			expect.objectContaining({ path: '/' })
+		);
+		expect(setCookie.mock.calls.map((c) => c[1])).not.toContain(SYSTEM_TENANT_ID);
 	});
 });
 

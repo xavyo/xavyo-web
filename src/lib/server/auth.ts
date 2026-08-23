@@ -33,6 +33,24 @@ export type AccessTokenCookieOptions = {
 	secure?: boolean;
 };
 
+/** Tenant id from a JWT `tid` claim. Empty or missing claims are undefined. */
+export function tenantIdFromJwt(token: string | undefined | null): string | undefined {
+	if (!token) return undefined;
+	const tid = decodeAccessToken(token)?.tid;
+	return typeof tid === 'string' && tid.length > 0 ? tid : undefined;
+}
+
+function persistTenantCookie(cookies: Cookies, tenantId: string): void {
+	const secure = !dev;
+	cookies.set('tenant_id', tenantId, {
+		httpOnly: true,
+		secure,
+		sameSite: 'lax',
+		path: '/',
+		maxAge: 60 * 60 * 24 * 30
+	});
+}
+
 /**
  * Replace the session `access_token` cookie only when `token` is a JWT.
  * Placeholder strings (`persona_token_*`, `assumed_token_*`) must not evict a real session.
@@ -75,16 +93,9 @@ export function setCookies(cookies: Cookies, tokens: TokenResponse): void {
 		maxAge: 60 * 60 * 24 * 30 // 30 days
 	});
 
-	// Set tenant_id from JWT claims
-	const claims = decodeAccessToken(tokens.access_token);
-	if (claims?.tid) {
-		cookies.set('tenant_id', claims.tid, {
-			httpOnly: true,
-			secure,
-			sameSite: 'lax',
-			path: '/',
-			maxAge: 60 * 60 * 24 * 30 // 30 days
-		});
+	const tid = tenantIdFromJwt(tokens.access_token);
+	if (tid) {
+		persistTenantCookie(cookies, tid);
 	}
 }
 
@@ -99,6 +110,12 @@ export function setMfaPartialToken(cookies: Cookies, token: string): void {
 		path: '/mfa',
 		maxAge: 60 * 5
 	});
+	// MFA verify is tenant-scoped. Stamp tid from the partial JWT so /mfa
+	// does not fall back to the system tenant (which 401s a real-tenant user).
+	const tid = tenantIdFromJwt(token);
+	if (tid) {
+		persistTenantCookie(cookies, tid);
+	}
 }
 
 export function clearMfaPartialToken(cookies: Cookies): void {

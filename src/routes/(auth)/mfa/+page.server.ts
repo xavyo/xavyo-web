@@ -8,7 +8,7 @@ import {
 	setCookies,
 	clearMfaPartialToken,
 	MFA_PARTIAL_TOKEN_COOKIE,
-	SYSTEM_TENANT_ID
+	tenantIdFromJwt
 } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
@@ -41,7 +41,10 @@ export const actions: Actions = {
 		}
 
 		try {
-			const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
+			const tenantId = cookies.get('tenant_id') || tenantIdFromJwt(partialToken);
+			if (!tenantId) {
+				redirect(302, '/login');
+			}
 			const tokens = await verifyMfaTotp(partialToken, form.data.code, fetch, tenantId);
 			setCookies(cookies, tokens);
 			clearMfaPartialToken(cookies);
@@ -67,7 +70,10 @@ export const actions: Actions = {
 		}
 
 		try {
-			const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
+			const tenantId = cookies.get('tenant_id') || tenantIdFromJwt(partialToken);
+			if (!tenantId) {
+				redirect(302, '/login');
+			}
 			const tokens = await verifyMfaRecovery(partialToken, form.data.code, fetch, tenantId);
 			setCookies(cookies, tokens);
 			clearMfaPartialToken(cookies);
