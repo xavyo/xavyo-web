@@ -1,7 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { verifyMagicLink } from '$lib/api/auth';
-import { setCookies, decodeAccessToken, setMfaPartialToken } from '$lib/server/auth';
+import { setCookies, decodeAccessToken, setMfaPartialToken, requestTenantId } from '$lib/server/auth';
 import { dev } from '$app/environment';
 import { ApiError } from '$lib/api/client';
 
@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
 		return { error: 'No verification token provided' };
 	}
 
-	const tenantId = cookies.get('tenant_id');
+	const tenantId = requestTenantId(url, cookies);
 
 	try {
 		const result = await verifyMagicLink(token, tenantId, fetch);

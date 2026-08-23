@@ -1,5 +1,6 @@
 import type { Actions, PageServerLoad } from './$types';
 import { apiClient } from '$lib/api/client';
+import { requestTenantId } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ url }) => {
 	return {
@@ -8,7 +9,7 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-	resend: async ({ request, cookies, fetch }) => {
+	resend: async ({ request, cookies, fetch, url }) => {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 
@@ -17,7 +18,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const tenantId = cookies.get('tenant_id');
+			const tenantId = requestTenantId(url, cookies);
 			await apiClient('/auth/resend-verification', {
 				method: 'POST',
 				body: { email },

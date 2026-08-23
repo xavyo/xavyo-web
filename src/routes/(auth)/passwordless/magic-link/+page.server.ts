@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { magicLinkRequestSchema } from '$lib/schemas/auth';
 import { requestMagicLink } from '$lib/api/auth';
+import { requestTenantId } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async () => {
@@ -12,14 +13,14 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies, fetch }) => {
+	default: async ({ request, cookies, fetch, url }) => {
 		const form = await superValidate(request, zod(magicLinkRequestSchema));
 
 		if (!form.valid) {
 			return fail(400, { form });
 		}
 
-		const tenantId = cookies.get('tenant_id');
+		const tenantId = requestTenantId(url, cookies);
 
 		try {
 			await requestMagicLink(form.data.email, tenantId, fetch);

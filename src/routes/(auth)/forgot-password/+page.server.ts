@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail } from '@sveltejs/kit';
 import { forgotPasswordSchema } from '$lib/schemas/auth';
 import { forgotPassword } from '$lib/api/auth';
+import { requestTenantId } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async () => {
@@ -12,7 +13,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, cookies, fetch }) => {
+	default: async ({ request, cookies, fetch, url }) => {
 		const form = await superValidate(request, zod(forgotPasswordSchema));
 
 		if (!form.valid) {
@@ -20,7 +21,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await forgotPassword(form.data.email, cookies.get('tenant_id'), fetch);
+			await forgotPassword(form.data.email, requestTenantId(url, cookies), fetch);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

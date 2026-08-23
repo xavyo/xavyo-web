@@ -26,7 +26,12 @@ vi.mock('$lib/api/auth', () => ({
 vi.mock('$lib/server/auth', () => ({
 	setCookies: vi.fn(),
 	SYSTEM_TENANT_ID: '00000000-0000-0000-0000-000000000001',
-	decodeAccessToken: vi.fn(() => ({ tid: 'tenant-123' }))
+	decodeAccessToken: vi.fn(() => ({ tid: 'tenant-123' })),
+	stampTenantCookieFromQuery: vi.fn(),
+	requestTenantId: vi.fn(
+		(url: URL, cookies: { get: (name: string) => string | undefined }) =>
+			url.searchParams.get('tenant') || cookies.get('tenant_id')
+	)
 }));
 
 vi.mock('$lib/api/client', () => ({
@@ -178,6 +183,36 @@ describe('login page server', () => {
 			} as any);
 
 			expect(result).toBeDefined();
+		});
+
+		it('sends a UUID ?tenant= instead of the system tenant', async () => {
+			const { actions } = await import('./+page.server');
+			mockSuperValidate.mockResolvedValue({
+				valid: true,
+				data: { email: 'user@example.com', password: 'Pass1234!' }
+			} as any);
+			mockLogin.mockResolvedValue({
+				access_token: 'tok',
+				refresh_token: 'rt',
+				token_type: 'Bearer',
+				expires_in: 3600
+			});
+
+			const tenantId = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+			await expect(
+				actions.default({
+					request: new Request(`http://localhost/login?tenant=${tenantId}`, { method: 'POST' }),
+					cookies: makeCookies(),
+					fetch: vi.fn(),
+					url: new URL(`http://localhost/login?tenant=${tenantId}`)
+				} as any)
+			).rejects.toMatchObject({ status: 302, location: '/dashboard' });
+
+			expect(mockLogin).toHaveBeenCalledWith(
+				{ email: 'user@example.com', password: 'Pass1234!' },
+				tenantId,
+				expect.any(Function)
+			);
 		});
 	});
 });
