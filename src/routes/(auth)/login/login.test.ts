@@ -19,7 +19,8 @@ vi.mock('sveltekit-superforms', () => ({
 }));
 
 vi.mock('$lib/api/auth', () => ({
-	login: vi.fn()
+	login: vi.fn(),
+	getAvailableMethods: vi.fn().mockResolvedValue({ magic_link: false, email_otp: false })
 }));
 
 vi.mock('$lib/server/auth', () => ({
@@ -65,7 +66,9 @@ describe('login page server', () => {
 			await expect(
 				load({
 					locals: { user: { sub: '123' } },
-					url: new URL('http://localhost/login')
+					url: new URL('http://localhost/login'),
+					cookies: makeCookies(),
+					fetch: vi.fn()
 				} as any)
 			).rejects.toMatchObject({ status: 302, location: '/dashboard' });
 		});

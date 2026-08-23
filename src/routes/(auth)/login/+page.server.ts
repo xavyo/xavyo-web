@@ -8,7 +8,7 @@ import { setCookies, setMfaPartialToken, SYSTEM_TENANT_ID } from '$lib/server/au
 import { safeInternalPath } from '$lib/utils/redirect';
 import { ApiError } from '$lib/api/client';
 
-export const load: PageServerLoad = async ({ locals, url, cookies }) => {
+export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 	// Allow clearing a stale tenant cookie from the login page
 	// (e.g., when the tenant was deleted and login keeps failing)
 	if (url.searchParams.get('reset_tenant') === 'true') {
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 
 	let availableMethods = { magic_link: false, email_otp: false };
 	try {
-		availableMethods = await getAvailableMethods(undefined, fetch);
+		availableMethods = await getAvailableMethods(cookies.get('tenant_id'), fetch);
 	} catch {
 		// passwordless not available
 	}
