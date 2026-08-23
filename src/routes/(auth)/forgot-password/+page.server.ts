@@ -12,7 +12,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	default: async ({ request, fetch }) => {
+	default: async ({ request, cookies, fetch }) => {
 		const form = await superValidate(request, zod(forgotPasswordSchema));
 
 		if (!form.valid) {
@@ -20,7 +20,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await forgotPassword(form.data.email, undefined, fetch);
+			await forgotPassword(form.data.email, cookies.get('tenant_id'), fetch);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

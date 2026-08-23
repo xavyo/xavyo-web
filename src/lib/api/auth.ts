@@ -13,6 +13,11 @@ import type {
 
 const SYSTEM_TENANT_ID = '00000000-0000-0000-0000-000000000001';
 
+/** Only send X-Tenant-Id when the caller knows the tenant. */
+function tenantHeader(tenantId?: string): { tenantId?: string } {
+	return tenantId ? { tenantId } : {};
+}
+
 export async function signup(
 	data: SignupRequest,
 	fetchFn?: typeof globalThis.fetch
@@ -46,7 +51,7 @@ export async function refresh(
 	return apiClient<TokenResponse>('/auth/refresh', {
 		method: 'POST',
 		body: { refresh_token: refreshToken },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -59,7 +64,7 @@ export async function logout(
 	await apiClient('/auth/logout', {
 		method: 'POST',
 		body: { refresh_token: refreshToken },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -72,7 +77,7 @@ export async function forgotPassword(
 	return apiClient<ForgotPasswordResponse>('/auth/forgot-password', {
 		method: 'POST',
 		body: { email },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -85,7 +90,6 @@ export async function resetPassword(
 	return apiClient<ResetPasswordResponse>('/auth/reset-password', {
 		method: 'POST',
 		body: { token, new_password: newPassword },
-		tenantId: SYSTEM_TENANT_ID,
 		fetch: fetchFn
 	});
 }
@@ -97,7 +101,6 @@ export async function verifyEmail(
 	return apiClient<VerifyEmailResponse>('/auth/verify-email', {
 		method: 'POST',
 		body: { token },
-		tenantId: SYSTEM_TENANT_ID,
 		fetch: fetchFn
 	});
 }
@@ -112,7 +115,7 @@ export async function requestMagicLink(
 	return apiClient<PasswordlessInitResponse>('/auth/passwordless/magic-link', {
 		method: 'POST',
 		body: { email },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -125,7 +128,7 @@ export async function verifyMagicLink(
 	return apiClient<TokenResponse>('/auth/passwordless/magic-link/verify', {
 		method: 'POST',
 		body: { token },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -138,7 +141,7 @@ export async function requestEmailOtp(
 	return apiClient<PasswordlessInitResponse>('/auth/passwordless/email-otp', {
 		method: 'POST',
 		body: { email },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -152,7 +155,7 @@ export async function verifyEmailOtp(
 	return apiClient<TokenResponse>('/auth/passwordless/email-otp/verify', {
 		method: 'POST',
 		body: { email, code },
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }
@@ -163,7 +166,7 @@ export async function getAvailableMethods(
 ): Promise<AvailableMethodsResponse> {
 	return apiClient<AvailableMethodsResponse>('/auth/passwordless/methods', {
 		method: 'GET',
-		tenantId: tenantId || SYSTEM_TENANT_ID,
+		...tenantHeader(tenantId),
 		fetch: fetchFn
 	});
 }

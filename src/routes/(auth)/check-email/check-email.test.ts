@@ -1,10 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock modules
-vi.mock('$lib/server/auth', () => ({
-	SYSTEM_TENANT_ID: '00000000-0000-0000-0000-000000000001'
-}));
-
 vi.mock('$lib/api/client', () => ({
 	apiClient: vi.fn(),
 	ApiError: class ApiError extends Error {
@@ -64,16 +59,45 @@ describe('check-email page', () => {
 
 			const result = await actions.resend({
 				request,
+				cookies: { get: () => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/resend-verification', {
 				method: 'POST',
 				body: { email: 'test@example.com' },
-				tenantId: '00000000-0000-0000-0000-000000000001',
+				tenantId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
 				fetch: expect.any(Function)
 			});
 			expect(result).toEqual({ success: true });
+		});
+
+		it('does not send the system tenant when no tenant cookie is set', async () => {
+			const { actions } = await import('./+page.server');
+			mockApiClient.mockResolvedValue({ message: 'ok' });
+
+			const formData = new FormData();
+			formData.set('email', 'test@example.com');
+			const request = new Request('http://localhost/check-email?/resend', {
+				method: 'POST',
+				body: formData
+			});
+
+			await actions.resend({
+				request,
+				cookies: { get: () => undefined },
+				fetch: vi.fn() as unknown as typeof globalThis.fetch
+			} as any);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/auth/resend-verification', {
+				method: 'POST',
+				body: { email: 'test@example.com' },
+				fetch: expect.any(Function)
+			});
+			expect(mockApiClient.mock.calls[0][1]).not.toHaveProperty(
+				'tenantId',
+				'00000000-0000-0000-0000-000000000001'
+			);
 		});
 
 		it('returns success even on API error (anti-enumeration)', async () => {
@@ -89,6 +113,7 @@ describe('check-email page', () => {
 
 			const result = await actions.resend({
 				request,
+				cookies: { get: () => undefined },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);
 
@@ -106,6 +131,7 @@ describe('check-email page', () => {
 
 			const result = await actions.resend({
 				request,
+				cookies: { get: () => undefined },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);
 

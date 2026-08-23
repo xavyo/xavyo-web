@@ -82,10 +82,31 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/refresh', {
 				method: 'POST',
 				body: { refresh_token: 'old-rt' },
-				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
+			expect(mockApiClient.mock.calls[0][1]).not.toHaveProperty(
+				'tenantId',
+				'00000000-0000-0000-0000-000000000001'
+			);
 			expect(result).toEqual(mockResponse);
+		});
+
+		it('forwards a known tenant id and does not substitute the system tenant', async () => {
+			mockApiClient.mockResolvedValue({
+				access_token: 'new-at',
+				refresh_token: 'new-rt',
+				token_type: 'Bearer',
+				expires_in: 3600
+			});
+
+			await refresh('old-rt', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/auth/refresh', {
+				method: 'POST',
+				body: { refresh_token: 'old-rt' },
+				tenantId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+				fetch: mockFetch
+			});
 		});
 	});
 
@@ -98,7 +119,6 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/logout', {
 				method: 'POST',
 				body: { refresh_token: 'my-rt' },
-				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 		});
@@ -114,7 +134,6 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/forgot-password', {
 				method: 'POST',
 				body: { email: 'test@example.com' },
-				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
@@ -131,7 +150,6 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/reset-password', {
 				method: 'POST',
 				body: { token: 'tok123', new_password: 'newpass123' },
-				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
@@ -193,7 +211,6 @@ describe('auth API functions', () => {
 			expect(mockApiClient).toHaveBeenCalledWith('/auth/verify-email', {
 				method: 'POST',
 				body: { token: 'tok456' },
-				tenantId: '00000000-0000-0000-0000-000000000001',
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);

@@ -1,5 +1,4 @@
 import type { Actions, PageServerLoad } from './$types';
-import { SYSTEM_TENANT_ID } from '$lib/server/auth';
 import { apiClient } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ url }) => {
@@ -9,7 +8,7 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-	resend: async ({ request, fetch }) => {
+	resend: async ({ request, cookies, fetch }) => {
 		const formData = await request.formData();
 		const email = formData.get('email') as string;
 
@@ -18,10 +17,11 @@ export const actions: Actions = {
 		}
 
 		try {
+			const tenantId = cookies.get('tenant_id');
 			await apiClient('/auth/resend-verification', {
 				method: 'POST',
 				body: { email },
-				tenantId: SYSTEM_TENANT_ID,
+				...(tenantId ? { tenantId } : {}),
 				fetch
 			});
 			return { success: true };
