@@ -22,6 +22,40 @@ export function isTokenExpired(token: string): boolean {
 	return claims.exp <= now;
 }
 
+/** True when `token` decodes as a JWT (header.payload.signature). */
+export function isDecodableJwt(token: string): boolean {
+	return decodeAccessToken(token) !== null;
+}
+
+export type AccessTokenCookieOptions = {
+	maxAge: number;
+	sameSite?: 'lax' | 'strict' | 'none';
+	secure?: boolean;
+};
+
+/**
+ * Replace the session `access_token` cookie only when `token` is a JWT.
+ * Placeholder strings (`persona_token_*`, `assumed_token_*`) must not evict a real session.
+ */
+export function replaceAccessTokenIfJwt(
+	cookies: Cookies,
+	token: string | undefined | null,
+	options: AccessTokenCookieOptions
+): boolean {
+	if (!token || !isDecodableJwt(token)) {
+		return false;
+	}
+	const secure = options.secure ?? !dev;
+	cookies.set('access_token', token, {
+		httpOnly: true,
+		secure,
+		sameSite: options.sameSite ?? 'lax',
+		path: '/',
+		maxAge: options.maxAge
+	});
+	return true;
+}
+
 export function setCookies(cookies: Cookies, tokens: TokenResponse): void {
 	const secure = !dev;
 
