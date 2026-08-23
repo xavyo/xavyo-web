@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('$lib/server/auth', () => ({
+	requestTenantId: vi.fn(
+		(url: URL, cookies: { get: (name: string) => string | undefined }) =>
+			url.searchParams.get('tenant') || cookies.get('tenant_id')
+	)
+}));
+
 vi.mock('$lib/api/client', () => ({
 	apiClient: vi.fn(),
 	ApiError: class ApiError extends Error {
@@ -59,6 +66,7 @@ describe('check-email page', () => {
 
 			const result = await actions.resend({
 				request,
+				url: new URL('http://localhost/check-email'),
 				cookies: { get: () => 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee' },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);
@@ -85,6 +93,7 @@ describe('check-email page', () => {
 
 			await actions.resend({
 				request,
+				url: new URL('http://localhost/check-email'),
 				cookies: { get: () => undefined },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);
@@ -113,6 +122,7 @@ describe('check-email page', () => {
 
 			const result = await actions.resend({
 				request,
+				url: new URL('http://localhost/check-email'),
 				cookies: { get: () => undefined },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);
@@ -131,6 +141,7 @@ describe('check-email page', () => {
 
 			const result = await actions.resend({
 				request,
+				url: new URL('http://localhost/check-email'),
 				cookies: { get: () => undefined },
 				fetch: vi.fn() as unknown as typeof globalThis.fetch
 			} as any);

@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { emailOtpRequestSchema, emailOtpVerifySchema } from '$lib/schemas/auth';
 import { requestEmailOtp, verifyEmailOtp } from '$lib/api/auth';
-import { setCookies, decodeAccessToken, setMfaPartialToken } from '$lib/server/auth';
+import { setCookies, decodeAccessToken, setMfaPartialToken, requestTenantId } from '$lib/server/auth';
 import { dev } from '$app/environment';
 import { ApiError } from '$lib/api/client';
 
@@ -15,14 +15,14 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	request: async ({ request, cookies, fetch }) => {
+	request: async ({ request, cookies, fetch, url }) => {
 		const requestForm = await superValidate(request, zod(emailOtpRequestSchema), { id: 'request' });
 
 		if (!requestForm.valid) {
 			return fail(400, { requestForm });
 		}
 
-		const tenantId = cookies.get('tenant_id');
+		const tenantId = requestTenantId(url, cookies);
 
 		try {
 			await requestEmailOtp(requestForm.data.email, tenantId, fetch);
@@ -36,14 +36,14 @@ export const actions: Actions = {
 		return { requestForm, codeSent: true, email: requestForm.data.email };
 	},
 
-	verify: async ({ request, cookies, fetch }) => {
+	verify: async ({ request, cookies, fetch, url }) => {
 		const verifyForm = await superValidate(request, zod(emailOtpVerifySchema), { id: 'verify' });
 
 		if (!verifyForm.valid) {
 			return fail(400, { verifyForm });
 		}
 
-		const tenantId = cookies.get('tenant_id');
+		const tenantId = requestTenantId(url, cookies);
 
 		try {
 			const result = await verifyEmailOtp(

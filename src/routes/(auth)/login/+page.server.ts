@@ -4,7 +4,13 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
 import { login, getAvailableMethods } from '$lib/api/auth';
-import { setCookies, setMfaPartialToken, SYSTEM_TENANT_ID } from '$lib/server/auth';
+import {
+	setCookies,
+	setMfaPartialToken,
+	SYSTEM_TENANT_ID,
+	requestTenantId,
+	stampTenantCookieFromQuery
+} from '$lib/server/auth';
 import { safeInternalPath } from '$lib/utils/redirect';
 import { ApiError } from '$lib/api/client';
 
@@ -29,9 +35,10 @@ export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 
 	const form = await superValidate(zod(loginSchema));
 
+	stampTenantCookieFromQuery(cookies, url);
 	let availableMethods = { magic_link: false, email_otp: false };
 	try {
-		availableMethods = await getAvailableMethods(cookies.get('tenant_id'), fetch);
+		availableMethods = await getAvailableMethods(requestTenantId(url, cookies), fetch);
 	} catch {
 		// passwordless not available
 	}
@@ -51,7 +58,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
+		const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
 
 		try {
 			const result = await login(

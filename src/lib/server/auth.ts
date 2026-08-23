@@ -40,6 +40,36 @@ export function tenantIdFromJwt(token: string | undefined | null): string | unde
 	return typeof tid === 'string' && tid.length > 0 ? tid : undefined;
 }
 
+const TENANT_UUID =
+	/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** UUID `?tenant=` values only — branding slugs like `system` are not tenant ids. */
+export function tenantIdFromQuery(value: string | null | undefined): string | undefined {
+	if (!value) return undefined;
+	const trimmed = value.trim();
+	return TENANT_UUID.test(trimmed) ? trimmed : undefined;
+}
+
+/** Tenant for unauthenticated BFF calls: UUID query param, then cookie. */
+export function requestTenantId(
+	url: { searchParams: URLSearchParams },
+	cookies: { get(name: string): string | undefined }
+): string | undefined {
+	return tenantIdFromQuery(url.searchParams.get('tenant')) || cookies.get('tenant_id') || undefined;
+}
+
+/** Persist a UUID `?tenant=` onto the tenant cookie so later actions keep scope. */
+export function stampTenantCookieFromQuery(
+	cookies: Cookies,
+	url: { searchParams: URLSearchParams }
+): string | undefined {
+	const tid = tenantIdFromQuery(url.searchParams.get('tenant'));
+	if (tid) {
+		persistTenantCookie(cookies, tid);
+	}
+	return tid;
+}
+
 function persistTenantCookie(cookies: Cookies, tenantId: string): void {
 	const secure = !dev;
 	cookies.set('tenant_id', tenantId, {

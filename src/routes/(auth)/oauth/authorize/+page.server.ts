@@ -2,7 +2,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { redirect, fail, isRedirect } from '@sveltejs/kit';
 import { getAuthorizeInfo, grantAuthorizationCode } from '$lib/api/oauth-authorize';
 import { ApiError } from '$lib/api/client';
-import { SYSTEM_TENANT_ID } from '$lib/server/auth';
+import { requestTenantId, tenantIdFromQuery } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 	// Parse OAuth query parameters
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 	if (!locals.user || !locals.accessToken) {
 		const currentUrl = url.pathname + url.search;
 		// Propagate tenant context from OAuth flow to login page via cookie
-		const tenant = url.searchParams.get('tenant');
+		const tenant = tenantIdFromQuery(url.searchParams.get('tenant'));
 		if (tenant) {
 			cookies.set('tenant_id', tenant, { path: '/', httpOnly: true, sameSite: 'lax', maxAge: 300 });
 		}
@@ -46,8 +46,13 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 	// OAuth flows carry tenant context explicitly — prefer it over the session tenant.
 	// This handles the case where the user is already logged in under a different
 	// tenant (e.g., system admin) but the OAuth client belongs to a specific tenant.
-	const oauthTenant = url.searchParams.get('tenant');
-	const tenantId = oauthTenant || locals.tenantId || SYSTEM_TENANT_ID;
+	const tenantId = requestTenantId(url, cookies) || locals.tenantId;
+	if (!tenantId) {
+		return {
+			error: 'invalid_request',
+			errorDescription: 'Missing tenant context for this authorization request'
+		};
+	}
 
 	// Fetch client info from backend (validates client_id, redirect_uri, scopes)
 	try {
@@ -105,7 +110,10 @@ export const actions: Actions = {
 			return fail(400, { error: 'Missing required OAuth parameters' });
 		}
 
-		const tenantId = tenant || locals.tenantId || SYSTEM_TENANT_ID;
+		const tenantId = tenantIdFromQuery(tenant) || locals.tenantId;
+		if (!tenantId) {
+			return fail(400, { error: 'Missing tenant context' });
+		}
 
 		try {
 			const result = await grantAuthorizationCode(
@@ -158,7 +166,10 @@ export const actions: Actions = {
 			return fail(400, { error: 'Missing required parameters' });
 		}
 
-		const tenantId = tenant || locals.tenantId || SYSTEM_TENANT_ID;
+		const tenantId = tenantIdFromQuery(tenant) || locals.tenantId;
+		if (!tenantId) {
+			return fail(400, { error: 'Missing tenant context' });
+		}
 
 		// Re-validate redirect_uri against the backend before redirecting.
 		// Hidden form fields are tamper-able — we must not redirect to an

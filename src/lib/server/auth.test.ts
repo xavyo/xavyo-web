@@ -7,6 +7,9 @@ import {
 	setCookies,
 	setMfaPartialToken,
 	tenantIdFromJwt,
+	tenantIdFromQuery,
+	requestTenantId,
+	stampTenantCookieFromQuery,
 	clearAuthCookies,
 	omitTokenFields,
 	SYSTEM_TENANT_ID
@@ -179,6 +182,59 @@ describe('tenantIdFromJwt', () => {
 		expect(tenantIdFromJwt(undefined)).toBeUndefined();
 		expect(tenantIdFromJwt('')).toBeUndefined();
 		expect(tenantIdFromJwt('not-a-jwt')).toBeUndefined();
+	});
+});
+
+describe('tenantIdFromQuery', () => {
+	it('accepts a UUID tenant id', () => {
+		expect(tenantIdFromQuery('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')).toBe(
+			'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+		);
+	});
+
+	it('rejects branding slugs and empty values', () => {
+		expect(tenantIdFromQuery('system')).toBeUndefined();
+		expect(tenantIdFromQuery('acme')).toBeUndefined();
+		expect(tenantIdFromQuery('')).toBeUndefined();
+		expect(tenantIdFromQuery(null)).toBeUndefined();
+	});
+});
+
+describe('requestTenantId', () => {
+	it('prefers a UUID query tenant over the cookie', () => {
+		const url = new URL('http://localhost/login?tenant=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+		expect(requestTenantId(url, { get: () => SYSTEM_TENANT_ID })).toBe(
+			'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+		);
+	});
+
+	it('falls back to the cookie when the query is a slug', () => {
+		const url = new URL('http://localhost/login?tenant=system');
+		expect(requestTenantId(url, { get: () => 'cookie-tenant' })).toBe('cookie-tenant');
+	});
+});
+
+describe('stampTenantCookieFromQuery', () => {
+	it('stamps a UUID query tenant onto the cookie', () => {
+		const setCookie = vi.fn();
+		const cookies = { set: setCookie } as unknown as Parameters<typeof stampTenantCookieFromQuery>[0];
+		const url = new URL('http://localhost/login?tenant=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+
+		expect(stampTenantCookieFromQuery(cookies, url)).toBe(
+			'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
+		);
+		expect(setCookie).toHaveBeenCalledWith(
+			'tenant_id',
+			'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+			expect.objectContaining({ path: '/' })
+		);
+	});
+
+	it('does not stamp branding slugs', () => {
+		const setCookie = vi.fn();
+		const cookies = { set: setCookie } as unknown as Parameters<typeof stampTenantCookieFromQuery>[0];
+		expect(stampTenantCookieFromQuery(cookies, new URL('http://localhost/login?tenant=system'))).toBeUndefined();
+		expect(setCookie).not.toHaveBeenCalled();
 	});
 });
 
