@@ -11,6 +11,9 @@
 	import type { AccessRequestResponse, AccessRequestListResponse } from '$lib/api/types';
 	import AccessRequestStatusBadge from './access-request-status-badge.svelte';
 	import CancelButton from './cancel-button.svelte';
+	import type { PageData } from './$types';
+
+	let { data: pageData }: { data: PageData } = $props();
 
 	const columnHelper = createColumnHelper<AccessRequestResponse>();
 
@@ -54,7 +57,7 @@
 		})
 	] as ColumnDef<AccessRequestResponse>[];
 
-	let data: AccessRequestResponse[] = $state([]);
+	let data: AccessRequestResponse[] = $state(pageData.items ?? []);
 	let pageCount: number = $state(0);
 	let pagination: PaginationState = $state({ pageIndex: 0, pageSize: 20 });
 	let isLoading: boolean = $state(false);
