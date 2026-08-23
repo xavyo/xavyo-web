@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
 	decodeAccessToken,
 	isTokenExpired,
+	isDecodableJwt,
+	replaceAccessTokenIfJwt,
 	setCookies,
 	clearAuthCookies,
 	omitTokenFields
@@ -63,6 +65,48 @@ describe('isTokenExpired', () => {
 
 	it('returns true for invalid token', () => {
 		expect(isTokenExpired('bad-token')).toBe(true);
+	});
+});
+
+describe('isDecodableJwt', () => {
+	it('accepts a three-part JWT', () => {
+		const payload = btoa(JSON.stringify({ sub: 'user-1', exp: 9999999999 })).replace(/=/g, '');
+		expect(isDecodableJwt(`eyJhbGciOiJSUzI1NiJ9.${payload}.sig`)).toBe(true);
+	});
+
+	it('rejects placeholder identity-switch tokens', () => {
+		expect(isDecodableJwt('persona_token_abc')).toBe(false);
+		expect(isDecodableJwt('physical_token_abc')).toBe(false);
+		expect(isDecodableJwt('assumed_token_abc')).toBe(false);
+		expect(isDecodableJwt('original_token_abc')).toBe(false);
+		expect(isDecodableJwt('not-a-jwt')).toBe(false);
+		expect(isDecodableJwt('')).toBe(false);
+	});
+});
+
+describe('replaceAccessTokenIfJwt', () => {
+	it('sets the access_token cookie for a JWT', () => {
+		const setCookie = vi.fn();
+		const cookies = { set: setCookie } as unknown as Parameters<typeof replaceAccessTokenIfJwt>[0];
+		const payload = btoa(JSON.stringify({ sub: 'user-1', exp: 9999999999 })).replace(/=/g, '');
+		const jwt = `eyJhbGciOiJSUzI1NiJ9.${payload}.sig`;
+
+		expect(replaceAccessTokenIfJwt(cookies, jwt, { maxAge: 3600, sameSite: 'strict', secure: true })).toBe(true);
+		expect(setCookie).toHaveBeenCalledWith(
+			'access_token',
+			jwt,
+			expect.objectContaining({ httpOnly: true, path: '/', maxAge: 3600, sameSite: 'strict' })
+		);
+	});
+
+	it('does not evict the session cookie for a placeholder token', () => {
+		const setCookie = vi.fn();
+		const cookies = { set: setCookie } as unknown as Parameters<typeof replaceAccessTokenIfJwt>[0];
+
+		expect(replaceAccessTokenIfJwt(cookies, 'persona_token_deadbeef', { maxAge: 3600 })).toBe(false);
+		expect(replaceAccessTokenIfJwt(cookies, 'assumed_token_deadbeef', { maxAge: 3600 })).toBe(false);
+		expect(replaceAccessTokenIfJwt(cookies, undefined, { maxAge: 3600 })).toBe(false);
+		expect(setCookie).not.toHaveBeenCalled();
 	});
 });
 

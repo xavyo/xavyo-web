@@ -12,6 +12,7 @@ import {
 } from '$lib/api/power-of-attorney';
 import { listUsers } from '$lib/api/users';
 import { ApiError } from '$lib/api/client';
+import { replaceAccessTokenIfJwt } from '$lib/server/auth';
 import type { PoaGrant, PoaAuditListResponse } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
@@ -98,22 +99,21 @@ export const actions: Actions = {
 	assume: async ({ params, locals, fetch, cookies }) => {
 		try {
 			const result = await assumeIdentity(params.id, locals.accessToken!, locals.tenantId!, fetch);
-			// Store original token for restoration on drop
-			cookies.set('original_access_token', locals.accessToken!, {
-				path: '/',
-				httpOnly: true,
-				secure: true,
-				sameSite: 'strict',
-				maxAge: 60 * 60 * 4 // 4 hours max
-			});
-			// Swap to assumed identity token
-			cookies.set('access_token', result.access_token, {
-				path: '/',
-				httpOnly: true,
-				secure: true,
-				sameSite: 'lax',
-				maxAge: 60 * 60 * 4
-			});
+			if (
+				replaceAccessTokenIfJwt(cookies, result.access_token, {
+					maxAge: 60 * 60 * 4,
+					sameSite: 'lax',
+					secure: true
+				})
+			) {
+				cookies.set('original_access_token', locals.accessToken!, {
+					path: '/',
+					httpOnly: true,
+					secure: true,
+					sameSite: 'strict',
+					maxAge: 60 * 60 * 4 // 4 hours max
+				});
+			}
 		} catch (e) {
 			if (isRedirect(e)) throw e;
 			if (e instanceof ApiError) {

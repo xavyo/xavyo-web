@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { dropIdentity } from '$lib/api/power-of-attorney';
-import { omitTokenFields } from '$lib/server/auth';
+import { isDecodableJwt, omitTokenFields, replaceAccessTokenIfJwt } from '$lib/server/auth';
 
 export const POST: RequestHandler = async ({ locals, fetch, cookies }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,15 +10,12 @@ export const POST: RequestHandler = async ({ locals, fetch, cookies }) => {
 
 	const result = await dropIdentity(locals.accessToken, locals.tenantId, fetch);
 
-	// Restore the original access token if available
 	const originalToken = cookies.get('original_access_token');
-	if (originalToken) {
-		cookies.set('access_token', originalToken, {
-			path: '/',
-			httpOnly: true,
-			secure: true,
+	if (originalToken && isDecodableJwt(originalToken)) {
+		replaceAccessTokenIfJwt(cookies, originalToken, {
+			maxAge: 60 * 60 * 4,
 			sameSite: 'lax',
-			maxAge: 60 * 60 * 4
+			secure: true
 		});
 		cookies.delete('original_access_token', { path: '/' });
 	}
