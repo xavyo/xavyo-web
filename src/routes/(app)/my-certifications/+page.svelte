@@ -4,8 +4,11 @@
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { MyCertificationItem, MyCertificationListResponse } from '$lib/api/types';
+	import type { PageData } from './$types';
 
-	let data: MyCertificationItem[] = $state([]);
+	let { data: pageData }: { data: PageData } = $props();
+
+	let data: MyCertificationItem[] = $state(pageData.items ?? []);
 	let pageCount: number = $state(0);
 	let pagination: PaginationState = $state({ pageIndex: 0, pageSize: 20 });
 	let isLoading: boolean = $state(false);

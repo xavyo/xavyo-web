@@ -11,8 +11,11 @@
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { ApprovalItem, ApprovalItemListResponse } from '$lib/api/types';
+	import type { PageData } from './$types';
 
-	let data: ApprovalItem[] = $state([]);
+	let { data: pageData }: { data: PageData } = $props();
+
+	let data: ApprovalItem[] = $state(pageData.items ?? []);
 	let pageCount: number = $state(0);
 	let pagination: PaginationState = $state({ pageIndex: 0, pageSize: 20 });
 	let isLoading: boolean = $state(false);
