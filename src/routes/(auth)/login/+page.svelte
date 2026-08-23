@@ -9,6 +9,7 @@
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Separator } from '$lib/components/ui/separator';
 	import type { PageData } from './$types';
+	import { safeInternalPath } from '$lib/utils/redirect';
 
 	let { data }: { data: PageData } = $props();
 
@@ -17,9 +18,11 @@
 		onResult: ({ result, cancel }) => {
 			// When login succeeds and we have a redirectTo target (e.g. SAML callback),
 			// cancel superForm's default redirect handling and navigate manually.
-			if (result.type === 'redirect' && data.redirectTo && data.redirectTo.startsWith('/')) {
+			const origin = $page.url.origin;
+			const safe = safeInternalPath(data.redirectTo, origin);
+			if (result.type === 'redirect' && safe) {
 				cancel();
-				goto(data.redirectTo);
+				goto(safe);
 			}
 		}
 	});

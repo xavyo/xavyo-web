@@ -30,7 +30,7 @@ export async function callMcpTool(
 		method: 'POST',
 		token,
 		tenantId,
-		body: JSON.stringify(body),
+		body,
 		fetch: fetchFn
 	});
 }

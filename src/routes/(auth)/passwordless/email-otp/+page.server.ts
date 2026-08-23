@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { emailOtpRequestSchema, emailOtpVerifySchema } from '$lib/schemas/auth';
 import { requestEmailOtp, verifyEmailOtp } from '$lib/api/auth';
-import { setCookies, decodeAccessToken } from '$lib/server/auth';
+import { setCookies, decodeAccessToken, setMfaPartialToken } from '$lib/server/auth';
 import { dev } from '$app/environment';
 import { ApiError } from '$lib/api/client';
 
@@ -55,7 +55,8 @@ export const actions: Actions = {
 
 			if ('mfa_required' in result && (result as Record<string, unknown>).mfa_required) {
 				const partial = result as unknown as { partial_token: string };
-				redirect(302, `/mfa?partial_token=${encodeURIComponent(partial.partial_token)}`);
+				setMfaPartialToken(cookies, partial.partial_token);
+				redirect(302, '/mfa');
 			}
 
 			setCookies(cookies, result);

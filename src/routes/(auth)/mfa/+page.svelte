@@ -48,7 +48,6 @@
 			{/if}
 
 			<form method="POST" action="?/totp" use:totpEnhance class="space-y-4">
-				<input type="hidden" name="partial_token" value={$totpForm.partial_token} />
 				<div class="space-y-2">
 					<Label for="code">Authentication code</Label>
 					<Input
@@ -75,7 +74,6 @@
 			{/if}
 
 			<form method="POST" action="?/recovery" use:recoveryEnhance class="space-y-4">
-				<input type="hidden" name="partial_token" value={$recoveryForm.partial_token} />
 				<div class="space-y-2">
 					<Label for="recovery-code">Recovery code</Label>
 					<Input
