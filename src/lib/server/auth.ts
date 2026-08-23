@@ -54,11 +54,38 @@ export function setCookies(cookies: Cookies, tokens: TokenResponse): void {
 	}
 }
 
+export const MFA_PARTIAL_TOKEN_COOKIE = 'mfa_partial_token';
+
+export function setMfaPartialToken(cookies: Cookies, token: string): void {
+	const secure = !dev;
+	cookies.set(MFA_PARTIAL_TOKEN_COOKIE, token, {
+		httpOnly: true,
+		secure,
+		sameSite: 'lax',
+		path: '/mfa',
+		maxAge: 60 * 5
+	});
+}
+
+export function clearMfaPartialToken(cookies: Cookies): void {
+	cookies.delete(MFA_PARTIAL_TOKEN_COOKIE, { path: '/mfa' });
+}
+
 export function clearAuthCookies(cookies: Cookies): void {
 	cookies.delete('access_token', { path: '/' });
 	cookies.delete('refresh_token', { path: '/' });
+	cookies.delete('original_access_token', { path: '/' });
+	clearMfaPartialToken(cookies);
 	// tenant_id is intentionally preserved so users return to their
 	// tenant on next login instead of being redirected to onboarding
+}
+
+/** Strip bearer tokens so BFF JSON never exposes them to the browser. */
+export function omitTokenFields<T extends Record<string, unknown>>(
+	payload: T
+): Omit<T, 'access_token' | 'refresh_token'> {
+	const { access_token: _access, refresh_token: _refresh, ...rest } = payload;
+	return rest as Omit<T, 'access_token' | 'refresh_token'>;
 }
 
 /**

@@ -4,36 +4,47 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { mfaTotpVerifySchema, mfaRecoveryVerifySchema } from '$lib/schemas/auth';
 import { verifyMfaTotp, verifyMfaRecovery } from '$lib/api/auth';
-import { setCookies } from '$lib/server/auth';
+import {
+	setCookies,
+	clearMfaPartialToken,
+	MFA_PARTIAL_TOKEN_COOKIE,
+	SYSTEM_TENANT_ID
+} from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
-export const load: PageServerLoad = async ({ url }) => {
-	const partialToken = url.searchParams.get('partial_token') ?? '';
+export const load: PageServerLoad = async ({ cookies }) => {
+	const partialToken = cookies.get(MFA_PARTIAL_TOKEN_COOKIE) ?? '';
 
 	if (!partialToken) {
 		redirect(302, '/login');
 	}
 
 	const totpForm = await superValidate(zod(mfaTotpVerifySchema));
-	totpForm.data.partial_token = partialToken;
+	totpForm.data.partial_token = '';
 
 	const recoveryForm = await superValidate(zod(mfaRecoveryVerifySchema));
-	recoveryForm.data.partial_token = partialToken;
+	recoveryForm.data.partial_token = '';
 
-	return { totpForm, recoveryForm, partialToken };
+	return { totpForm, recoveryForm };
 };
 
 export const actions: Actions = {
 	totp: async ({ request, cookies, fetch }) => {
 		const form = await superValidate(request, zod(mfaTotpVerifySchema));
+		const partialToken = cookies.get(MFA_PARTIAL_TOKEN_COOKIE) ?? form.data.partial_token;
 
 		if (!form.valid) {
 			return fail(400, { totpForm: form });
 		}
+		if (!partialToken) {
+			redirect(302, '/login');
+		}
 
 		try {
-			const tokens = await verifyMfaTotp(form.data.partial_token, form.data.code, fetch);
+			const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
+			const tokens = await verifyMfaTotp(partialToken, form.data.code, fetch, tenantId);
 			setCookies(cookies, tokens);
+			clearMfaPartialToken(cookies);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
@@ -46,14 +57,20 @@ export const actions: Actions = {
 
 	recovery: async ({ request, cookies, fetch }) => {
 		const form = await superValidate(request, zod(mfaRecoveryVerifySchema));
+		const partialToken = cookies.get(MFA_PARTIAL_TOKEN_COOKIE) ?? form.data.partial_token;
 
 		if (!form.valid) {
 			return fail(400, { recoveryForm: form });
 		}
+		if (!partialToken) {
+			redirect(302, '/login');
+		}
 
 		try {
-			const tokens = await verifyMfaRecovery(form.data.partial_token, form.data.code, fetch);
+			const tenantId = cookies.get('tenant_id') || SYSTEM_TENANT_ID;
+			const tokens = await verifyMfaRecovery(partialToken, form.data.code, fetch, tenantId);
 			setCookies(cookies, tokens);
+			clearMfaPartialToken(cookies);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

@@ -173,13 +173,14 @@ export async function getAvailableMethods(
 export async function verifyMfaTotp(
 	partialToken: string,
 	code: string,
-	fetchFn?: typeof globalThis.fetch
+	fetchFn: typeof globalThis.fetch | undefined,
+	tenantId: string
 ): Promise<TokenResponse> {
 	return apiClient<TokenResponse>('/auth/mfa/totp/verify', {
 		method: 'POST',
 		body: { code },
 		token: partialToken,
-		tenantId: SYSTEM_TENANT_ID,
+		tenantId,
 		fetch: fetchFn
 	});
 }
@@ -187,13 +188,14 @@ export async function verifyMfaTotp(
 export async function verifyMfaRecovery(
 	partialToken: string,
 	code: string,
-	fetchFn?: typeof globalThis.fetch
+	fetchFn: typeof globalThis.fetch | undefined,
+	tenantId: string
 ): Promise<TokenResponse> {
 	return apiClient<TokenResponse>('/auth/mfa/recovery/verify', {
 		method: 'POST',
 		body: { code },
 		token: partialToken,
-		tenantId: SYSTEM_TENANT_ID,
+		tenantId,
 		fetch: fetchFn
 	});
 }

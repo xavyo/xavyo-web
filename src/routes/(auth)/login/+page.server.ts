@@ -4,7 +4,8 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
 import { login, getAvailableMethods } from '$lib/api/auth';
-import { setCookies, SYSTEM_TENANT_ID } from '$lib/server/auth';
+import { setCookies, setMfaPartialToken, SYSTEM_TENANT_ID } from '$lib/server/auth';
+import { safeInternalPath } from '$lib/utils/redirect';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, url, cookies }) => {
@@ -19,16 +20,9 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 		// Respect redirectTo even when already logged in — this handles the case
 		// where superForm's enhance re-runs the load function after login succeeds
 		// (via invalidateAll) before the form action's redirect is processed.
-		const redirectTo = url.searchParams.get('redirectTo');
-		if (redirectTo) {
-			try {
-				const target = new URL(redirectTo, url.origin);
-				if (target.origin === url.origin && target.pathname.startsWith('/')) {
-					redirect(302, target.pathname + target.search + target.hash);
-				}
-			} catch {
-				// invalid URL — fall through to dashboard
-			}
+		const safe = safeInternalPath(url.searchParams.get('redirectTo'), url.origin);
+		if (safe) {
+			redirect(302, safe);
 		}
 		redirect(302, '/dashboard');
 	}
@@ -42,7 +36,11 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 		// passwordless not available
 	}
 
-	return { form, redirectTo: url.searchParams.get('redirectTo') ?? '', availableMethods };
+	return {
+		form,
+		redirectTo: safeInternalPath(url.searchParams.get('redirectTo'), url.origin) ?? '',
+		availableMethods
+	};
 };
 
 export const actions: Actions = {
@@ -68,7 +66,8 @@ export const actions: Actions = {
 			// Check if MFA is required (partial_token in response)
 			const asRecord = result as unknown as Record<string, unknown>;
 			if (asRecord.mfa_required && asRecord.partial_token) {
-				redirect(302, `/mfa?partial_token=${encodeURIComponent(String(asRecord.partial_token))}`);
+				setMfaPartialToken(cookies, String(asRecord.partial_token));
+				redirect(302, '/mfa');
 			}
 
 			setCookies(cookies, result);
@@ -83,16 +82,9 @@ export const actions: Actions = {
 			return message(form, 'An unexpected error occurred', { status: 500 });
 		}
 
-		const redirectTo = url.searchParams.get('redirectTo');
-		if (redirectTo) {
-			try {
-				const target = new URL(redirectTo, url.origin);
-				if (target.origin === url.origin && target.pathname.startsWith('/')) {
-					redirect(302, target.pathname + target.search + target.hash);
-				}
-			} catch {
-				// invalid URL — ignore
-			}
+		const safe = safeInternalPath(url.searchParams.get('redirectTo'), url.origin);
+		if (safe) {
+			redirect(302, safe);
 		}
 		redirect(302, '/dashboard');
 	}

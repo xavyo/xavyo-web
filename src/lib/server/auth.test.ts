@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { decodeAccessToken, isTokenExpired, setCookies, clearAuthCookies } from './auth';
+import {
+	decodeAccessToken,
+	isTokenExpired,
+	setCookies,
+	clearAuthCookies,
+	omitTokenFields
+} from './auth';
 
 describe('decodeAccessToken', () => {
 	it('extracts user info from a valid JWT', () => {
@@ -87,7 +93,7 @@ describe('setCookies', () => {
 });
 
 describe('clearAuthCookies', () => {
-	it('deletes auth tokens but preserves tenant_id', () => {
+	it('deletes auth tokens including original_access_token but preserves tenant_id', () => {
 		const deleteCookie = vi.fn();
 		const cookies = { delete: deleteCookie } as unknown as Parameters<typeof clearAuthCookies>[0];
 
@@ -95,7 +101,22 @@ describe('clearAuthCookies', () => {
 
 		expect(deleteCookie).toHaveBeenCalledWith('access_token', { path: '/' });
 		expect(deleteCookie).toHaveBeenCalledWith('refresh_token', { path: '/' });
+		expect(deleteCookie).toHaveBeenCalledWith('original_access_token', { path: '/' });
+		expect(deleteCookie).toHaveBeenCalledWith('mfa_partial_token', { path: '/mfa' });
 		expect(deleteCookie).not.toHaveBeenCalledWith('tenant_id', { path: '/' });
-		expect(deleteCookie).toHaveBeenCalledTimes(2);
+	});
+});
+
+describe('omitTokenFields', () => {
+	it('strips access_token and refresh_token from a session payload', () => {
+		const publicPayload = omitTokenFields({
+			session_id: 's-1',
+			access_token: 'secret-at',
+			refresh_token: 'secret-rt',
+			active_persona_id: 'p-1'
+		});
+		expect(publicPayload).toEqual({ session_id: 's-1', active_persona_id: 'p-1' });
+		expect(publicPayload).not.toHaveProperty('access_token');
+		expect(publicPayload).not.toHaveProperty('refresh_token');
 	});
 });

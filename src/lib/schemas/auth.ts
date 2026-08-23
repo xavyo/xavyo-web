@@ -40,12 +40,12 @@ export const emailOtpVerifySchema = z.object({
 });
 
 export const mfaTotpVerifySchema = z.object({
-	partial_token: z.string().min(1, 'Partial token is required'),
+	partial_token: z.string().optional().default(''),
 	code: z.string().length(6, 'Code must be 6 digits')
 });
 
 export const mfaRecoveryVerifySchema = z.object({
-	partial_token: z.string().min(1, 'Partial token is required'),
+	partial_token: z.string().optional().default(''),
 	code: z.string().min(1, 'Recovery code is required')
 });
 

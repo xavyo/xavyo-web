@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { signup, login, refresh, logout, forgotPassword, resetPassword, verifyEmail } from './auth';
+import {
+	signup,
+	login,
+	refresh,
+	logout,
+	forgotPassword,
+	resetPassword,
+	verifyEmail,
+	verifyMfaTotp,
+	verifyMfaRecovery
+} from './auth';
 
 // Mock the client module
 vi.mock('./client', () => ({
@@ -125,6 +135,51 @@ describe('auth API functions', () => {
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
+		});
+	});
+
+	describe('verifyMfaTotp', () => {
+		it('sends the provided tenantId instead of the system tenant', async () => {
+			mockApiClient.mockResolvedValue({
+				access_token: 'at',
+				refresh_token: 'rt',
+				token_type: 'Bearer',
+				expires_in: 3600
+			});
+
+			const tenantId = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+			await verifyMfaTotp('partial-jwt', '123456', mockFetch, tenantId);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/auth/mfa/totp/verify', {
+				method: 'POST',
+				body: { code: '123456' },
+				token: 'partial-jwt',
+				tenantId,
+				fetch: mockFetch
+			});
+			expect(tenantId).not.toBe('00000000-0000-0000-0000-000000000001');
+		});
+	});
+
+	describe('verifyMfaRecovery', () => {
+		it('sends the provided tenantId instead of the system tenant', async () => {
+			mockApiClient.mockResolvedValue({
+				access_token: 'at',
+				refresh_token: 'rt',
+				token_type: 'Bearer',
+				expires_in: 3600
+			});
+
+			const tenantId = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+			await verifyMfaRecovery('partial-jwt', 'abcd-efgh', mockFetch, tenantId);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/auth/mfa/recovery/verify', {
+				method: 'POST',
+				body: { code: 'abcd-efgh' },
+				token: 'partial-jwt',
+				tenantId,
+				fetch: mockFetch
+			});
 		});
 	});
 

@@ -60,12 +60,14 @@
 					</DropdownMenu.Item>
 				</a>
 				<DropdownMenu.Separator />
-				<a href="/logout" class="block">
-					<DropdownMenu.Item>
-						<LogOut class="mr-2 h-4 w-4" />
-						Log out
-					</DropdownMenu.Item>
-				</a>
+				<form method="POST" action="/logout" class="block">
+					<button type="submit" class="w-full text-left">
+						<DropdownMenu.Item>
+							<LogOut class="mr-2 h-4 w-4" />
+							Log out
+						</DropdownMenu.Item>
+					</button>
+				</form>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>

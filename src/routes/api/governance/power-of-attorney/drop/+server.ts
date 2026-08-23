@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { dropIdentity } from '$lib/api/power-of-attorney';
+import { omitTokenFields } from '$lib/server/auth';
 
 export const POST: RequestHandler = async ({ locals, fetch, cookies }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -22,5 +23,5 @@ export const POST: RequestHandler = async ({ locals, fetch, cookies }) => {
 		cookies.delete('original_access_token', { path: '/' });
 	}
 
-	return json(result);
+	return json(omitTokenFields((result ?? {}) as Record<string, unknown>));
 };

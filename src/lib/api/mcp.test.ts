@@ -66,7 +66,7 @@ describe('MCP API', () => {
 				method: 'POST',
 				token,
 				tenantId,
-				body: JSON.stringify(body),
+				body,
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
@@ -93,7 +93,8 @@ describe('MCP API', () => {
 			await callMcpTool('analyze', body, token, tenantId, mockFetch);
 
 			const calledOptions = (mockApiClient.mock.calls[0] as unknown[])[1] as Record<string, unknown>;
-			expect(calledOptions.body).toBe(JSON.stringify(body));
+			expect(calledOptions.body).toEqual(body);
+			expect(typeof calledOptions.body).toBe('object');
 		});
 
 		it('returns call_id and result from response', async () => {
