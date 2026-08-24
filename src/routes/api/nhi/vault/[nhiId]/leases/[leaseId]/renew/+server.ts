@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { renewLease } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import type { RenewLeaseRequest } from '$lib/api/types';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -11,12 +12,27 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (!hasAdminRole(locals.user?.roles)) {
 		error(403, 'Admin role required');
 	}
+
+	let parsed: unknown;
 	try {
-		const body = await request.json();
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.extend_secs !== 'number') {
+		error(400, 'extend_secs is required');
+	}
+	const data: RenewLeaseRequest = { extend_secs: body.extend_secs };
+
+	try {
 		const result = await renewLease(
 			params.nhiId,
 			params.leaseId,
-			body,
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch
