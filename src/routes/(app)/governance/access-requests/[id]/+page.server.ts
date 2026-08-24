@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { approveRequestSchema, rejectRequestSchema } from '$lib/schemas/governance';
 import {
 	getAccessRequest,
@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		throw e;
 	}
 
-	let escalationHistory: EscalationHistoryResponse = { events: [] };
+	let escalationHistory: EscalationHistoryResponse;
 	try {
 		escalationHistory = await getEscalationHistory(
 			params.id,
@@ -40,8 +40,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			locals.tenantId!,
 			fetch
 		);
-	} catch {
-		// Non-fatal: escalation history may not be available
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load escalation history');
 	}
 
 	const approveForm = await superValidate(zod(approveRequestSchema));

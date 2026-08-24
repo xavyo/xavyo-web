@@ -25,7 +25,6 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		error(500, 'Failed to load policy');
 	}
 
-	let entitlementMap: Record<string, string> = {};
 	try {
 		const result = await listEntitlements(
 			{ status: 'active', limit: 100 },
@@ -33,12 +32,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			locals.tenantId!,
 			fetch
 		);
-		entitlementMap = Object.fromEntries(result.items.map((e) => [e.id, e.name]));
-	} catch {
-		// Graceful fallback — entitlement names will show truncated IDs
+		const entitlementMap = Object.fromEntries(result.items.map((e) => [e.id, e.name]));
+		return { policy, entitlementMap };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load entitlements');
 	}
-
-	return { policy, entitlementMap };
 };
 
 export const actions: Actions = {

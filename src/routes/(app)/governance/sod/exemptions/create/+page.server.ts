@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createExemptionSchema } from '$lib/schemas/approval-workflows';
 import { createSodExemption } from '$lib/api/approval-workflows';
 import { listSodRules } from '$lib/api/governance';
@@ -14,13 +14,19 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		redirect(302, '/dashboard');
 	}
 
-	let rules = { items: [] as Awaited<ReturnType<typeof listSodRules>>['items'], total: 0, limit: 100, offset: 0 };
-	try {
-		rules = await listSodRules({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch);
-	} catch { /* Non-fatal */ }
-
 	const form = await superValidate(zod(createExemptionSchema));
-	return { form, rules: rules.items };
+	try {
+		const rules = await listSodRules(
+			{ limit: 100 },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+		return { form, rules: rules.items };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load SoD rules');
+	}
 };
 
 export const actions: Actions = {

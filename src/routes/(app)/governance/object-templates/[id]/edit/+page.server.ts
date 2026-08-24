@@ -23,8 +23,9 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 			zod(updateObjectTemplateSchema)
 		);
 		return { form, template };
-	} catch {
-		error(404, 'Template not found');
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load object template');
 	}
 };
 
