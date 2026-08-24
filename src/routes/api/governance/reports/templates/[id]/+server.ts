@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getTemplate, updateTemplate, archiveTemplate } from '$lib/api/governance-reporting';
+import type { TemplateDefinition, UpdateReportTemplateRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
 
@@ -21,9 +22,37 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
+	let parsed: unknown;
 	try {
-		const body = await request.json();
-		const result = await updateTemplate(params.id, body, locals.accessToken, locals.tenantId, fetch);
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	const data: UpdateReportTemplateRequest = {};
+	if (body.name !== undefined) {
+		if (typeof body.name !== 'string' || body.name.length === 0) {
+			error(400, 'name must be a non-empty string');
+		}
+		data.name = body.name;
+	}
+	if (body.description !== undefined) {
+		if (typeof body.description !== 'string') {
+			error(400, 'description must be a string');
+		}
+		data.description = body.description;
+	}
+	if (body.definition !== undefined) {
+		if (!body.definition || typeof body.definition !== 'object' || Array.isArray(body.definition)) {
+			error(400, 'definition must be an object');
+		}
+		data.definition = body.definition as TemplateDefinition;
+	}
+	try {
+		const result = await updateTemplate(params.id, data, locals.accessToken, locals.tenantId, fetch);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);
