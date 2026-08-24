@@ -1,7 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listMetaRoles } from '$lib/api/meta-roles';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -13,17 +14,16 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const status = url.searchParams.get('status') || undefined;
 	const name = url.searchParams.get('name') || undefined;
 
-	let metaRoles = { items: [] as any[], total: 0, limit, offset };
 	try {
-		metaRoles = await listMetaRoles(
+		const metaRoles = await listMetaRoles(
 			{ status, name, limit, offset },
 			locals.accessToken!,
 			locals.tenantId!,
 			fetch
 		);
-	} catch {
-		// Show empty state on error
+		return { metaRoles };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load meta-roles');
 	}
-
-	return { metaRoles };
 };

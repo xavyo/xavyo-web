@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listDetectionRules, deleteDetectionRule, enableDetectionRule, disableDetectionRule, seedDefaultRules } from '$lib/api/detection-rules';
 import { ApiError } from '$lib/api/client';
@@ -15,12 +15,18 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const limit = Number(url.searchParams.get('limit') ?? '50');
 	const offset = Number(url.searchParams.get('offset') ?? '0');
 
-	const rules = await listDetectionRules(
-		{ rule_type, is_enabled, limit, offset },
-		locals.accessToken!, locals.tenantId!, fetch
-	).catch(() => ({ items: [], total: 0, limit, offset }));
-
-	return { rules, filters: { rule_type, is_enabled } };
+	try {
+		const rules = await listDetectionRules(
+			{ rule_type, is_enabled, limit, offset },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+		return { rules, filters: { rule_type, is_enabled } };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load detection rules');
+	}
 };
 
 export const actions: Actions = {

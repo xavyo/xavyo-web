@@ -1,7 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listObjectTemplates } from '$lib/api/object-templates';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -26,13 +27,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			limit,
 			filters: { object_type: object_type || '', status: status || '' }
 		};
-	} catch {
-		return {
-			templates: [],
-			total: 0,
-			offset: 0,
-			limit: 20,
-			filters: { object_type: '', status: '' }
-		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load object templates');
 	}
 };

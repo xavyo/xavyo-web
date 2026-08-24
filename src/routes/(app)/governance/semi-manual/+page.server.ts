@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { hasAdminRole } from '$lib/server/auth';
@@ -15,14 +15,19 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const limit = Number(url.searchParams.get('limit') ?? '50');
 	const offset = Number(url.searchParams.get('offset') ?? '0');
 
-	const applications = await listSemiManualApplications(
-		{ limit, offset },
-		locals.accessToken!, locals.tenantId!, fetch
-	).catch(() => ({ items: [], total: 0, limit, offset }));
-
-	const form = await superValidate(zod(configureSemiManualSchema));
-
-	return { applications, form };
+	try {
+		const applications = await listSemiManualApplications(
+			{ limit, offset },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+		const form = await superValidate(zod(configureSemiManualSchema));
+		return { applications, form };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load semi-manual applications');
+	}
 };
 
 export const actions: Actions = {
