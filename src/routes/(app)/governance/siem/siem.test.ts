@@ -187,7 +187,7 @@ describe('SIEM hub +page.server', () => {
 			);
 		});
 
-		it('gracefully handles destinations API failure', async () => {
+		it('fails closed when destinations API throws', async () => {
 			mockListDestinations.mockRejectedValue(new Error('API error'));
 			mockListExports.mockResolvedValue({
 				items: [makeExport()],
@@ -196,18 +196,19 @@ describe('SIEM hub +page.server', () => {
 				offset: 0
 			});
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/siem'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.destinations.items).toEqual([]);
-			expect(result.destinations.total).toBe(0);
-			expect(result.exports.items).toHaveLength(1);
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/governance/siem'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles exports API failure', async () => {
+		it('fails closed when exports API throws', async () => {
 			mockListDestinations.mockResolvedValue({
 				items: [makeDestination()],
 				total: 1,
@@ -216,29 +217,16 @@ describe('SIEM hub +page.server', () => {
 			});
 			mockListExports.mockRejectedValue(new Error('API error'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/siem'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.destinations.items).toHaveLength(1);
-			expect(result.exports.items).toEqual([]);
-			expect(result.exports.total).toBe(0);
-		});
-
-		it('gracefully handles all APIs failing', async () => {
-			mockListDestinations.mockRejectedValue(new Error('fail'));
-			mockListExports.mockRejectedValue(new Error('fail'));
-
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/siem'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.destinations).toEqual({ items: [], total: 0, limit: 20, offset: 0 });
-			expect(result.exports).toEqual({ items: [], total: 0, limit: 20, offset: 0 });
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/governance/siem'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct token and tenantId', async () => {

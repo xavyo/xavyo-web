@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
+import { error, fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import {
 	listRiskThresholds,
@@ -21,14 +21,18 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const limit = Number(url.searchParams.get('limit') ?? '50');
 	const offset = Number(url.searchParams.get('offset') ?? '0');
 
-	const thresholds = await listRiskThresholds(
-		{ severity, is_enabled, limit, offset },
-		locals.accessToken!,
-		locals.tenantId!,
-		fetch
-	).catch(() => ({ items: [], total: 0, limit, offset }));
-
-	return { thresholds, filters: { severity, is_enabled } };
+	try {
+		const thresholds = await listRiskThresholds(
+			{ severity, is_enabled, limit, offset },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+		return { thresholds, filters: { severity, is_enabled } };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load risk thresholds');
+	}
 };
 
 export const actions: Actions = {
