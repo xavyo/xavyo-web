@@ -1,14 +1,16 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { redirect, error } from '@sveltejs/kit';
 import { getNhiRiskSummary, getStalenessReport, listOrphanDetections } from '$lib/api/nhi-governance';
 import { listNhi } from '$lib/api/nhi';
 import { hasAdminRole } from '$lib/server/auth';
-import type { NhiRiskSummary, StalenessReportResponse, OrphanDetectionListResponse } from '$lib/api/types';
+import { ApiError } from '$lib/api/client';
+import type { NhiRiskSummary } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const defaultRiskSummary: NhiRiskSummary = {
 		total_count: 0,
@@ -59,44 +61,28 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		};
 	}
 
-	// Load each data source independently — if one fails, the others still render
-	const [rawRiskSummary, stalenessReport, orphanDetections, nhiList] = await Promise.all([
-		getNhiRiskSummary(locals.accessToken!, locals.tenantId!, fetch).catch(
-			(): NhiRiskSummary => defaultRiskSummary
-		),
-		getStalenessReport(locals.accessToken!, locals.tenantId!, fetch).catch(
-			(): StalenessReportResponse => ({
-				generated_at: new Date().toISOString(),
-				min_inactive_days: 30,
-				total_stale: 0,
-				critical_count: 0,
-				warning_count: 0,
-				stale_nhis: []
-			})
-		),
-		listOrphanDetections(locals.accessToken!, locals.tenantId!, fetch).catch(
-			(): OrphanDetectionListResponse => ({
-				items: [],
-				total: 0,
-				limit: 50,
-				offset: 0
-			})
-		),
-		listNhi({ limit: 200, offset: 0 }, locals.accessToken!, locals.tenantId!, fetch).catch(
-			() => ({ items: [] as { id: string; name: string }[], data: [] as { id: string; name: string }[] })
-		)
-	]);
+	try {
+		const [rawRiskSummary, stalenessReport, orphanDetections, nhiList] = await Promise.all([
+			getNhiRiskSummary(locals.accessToken, locals.tenantId, fetch),
+			getStalenessReport(locals.accessToken, locals.tenantId, fetch),
+			listOrphanDetections(locals.accessToken, locals.tenantId, fetch),
+			listNhi({ limit: 200, offset: 0 }, locals.accessToken, locals.tenantId, fetch)
+		]);
 
-	// Build id→name map for SoD rules display — backend returns `items`, type says `data`
-	const nhiNameMap: Record<string, string> = {};
-	const entities = (nhiList as Record<string, unknown>).items as { id: string; name: string }[]
-		?? (nhiList as Record<string, unknown>).data as { id: string; name: string }[]
-		?? [];
-	for (const entity of entities) {
-		nhiNameMap[entity.id] = entity.name;
+		const nhiNameMap: Record<string, string> = {};
+		const entities =
+			((nhiList as Record<string, unknown>).items as { id: string; name: string }[]) ??
+			((nhiList as Record<string, unknown>).data as { id: string; name: string }[]) ??
+			[];
+		for (const entity of entities) {
+			nhiNameMap[entity.id] = entity.name;
+		}
+
+		const riskSummary = normalizeRiskSummary(rawRiskSummary as unknown as Record<string, unknown>);
+
+		return { riskSummary, stalenessReport, orphanDetections, nhiNameMap };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load NHI governance');
 	}
-
-	const riskSummary = normalizeRiskSummary(rawRiskSummary as unknown as Record<string, unknown>);
-
-	return { riskSummary, stalenessReport, orphanDetections, nhiNameMap };
 };

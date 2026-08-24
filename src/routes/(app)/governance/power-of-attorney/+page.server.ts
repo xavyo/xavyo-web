@@ -2,38 +2,47 @@ import type { PageServerLoad } from './$types';
 import { listPoa } from '$lib/api/power-of-attorney';
 import { listUsers } from '$lib/api/users';
 import { hasAdminRole } from '$lib/server/auth';
+import { error } from '@sveltejs/kit';
+import { ApiError } from '$lib/api/client';
 import type { PoaListResponse } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	let outgoing: PoaListResponse = { items: [], total: 0, limit: 20, offset: 0 };
-	let userNameMap: Record<string, string> = {};
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
+	const isAdmin = hasAdminRole(locals.user?.roles);
+	let outgoing: PoaListResponse;
 	try {
-		const [poaResult, usersResult] = await Promise.all([
-			listPoa(
-				{ direction: 'outgoing', limit: 20, offset: 0 },
-				locals.accessToken!,
-				locals.tenantId!,
-				fetch
-			),
-			listUsers(
+		outgoing = await listPoa(
+			{ direction: 'outgoing', limit: 20, offset: 0 },
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load power of attorney grants');
+	}
+
+	const userNameMap: Record<string, string> = {};
+	if (isAdmin) {
+		try {
+			const usersResult = await listUsers(
 				{ limit: 200, offset: 0 },
-				locals.accessToken!,
-				locals.tenantId!,
+				locals.accessToken,
+				locals.tenantId,
 				fetch
-			)
-		]);
-		outgoing = poaResult;
-		for (const u of usersResult.users ?? []) {
-			userNameMap[u.id] = (u as any).display_name ?? u.email;
+			);
+			for (const u of usersResult.users ?? []) {
+				userNameMap[u.id] = (u as { display_name?: string }).display_name ?? u.email;
+			}
+		} catch {
+			// Name map is display-only; a 403 here must not hide self-service PoA.
 		}
-	} catch {
-		// Fail silently — empty list shown
 	}
 
 	return {
 		outgoing,
 		userNameMap,
-		isAdmin: hasAdminRole(locals.user?.roles)
+		isAdmin
 	};
 };

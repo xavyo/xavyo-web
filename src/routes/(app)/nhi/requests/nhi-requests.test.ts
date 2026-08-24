@@ -65,28 +65,30 @@ describe('NHI Requests +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('returns empty data when no accessToken', async () => {
-			const result = (await load({
-				locals: { accessToken: null, tenantId: 'tid', user: { roles: [] } },
-				url: new URL('http://localhost/nhi/requests'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.requests).toEqual([]);
-			expect(result.summary).toBeNull();
-			expect(result.total).toBe(0);
-			expect(result.isAdmin).toBe(false);
+		it('throws 401 when no accessToken', async () => {
+			try {
+				await load({
+					locals: { accessToken: null, tenantId: 'tid', user: { roles: [] } },
+					url: new URL('http://localhost/nhi/requests'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(401);
+			}
 		});
 
-		it('returns empty data when no tenantId', async () => {
-			const result = (await load({
-				locals: { accessToken: 'tok', tenantId: null, user: { roles: [] } },
-				url: new URL('http://localhost/nhi/requests'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.requests).toEqual([]);
-			expect(result.total).toBe(0);
+		it('throws 401 when no tenantId', async () => {
+			try {
+				await load({
+					locals: { accessToken: 'tok', tenantId: null, user: { roles: [] } },
+					url: new URL('http://localhost/nhi/requests'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(401);
+			}
 		});
 
 		it('returns requests and summary for authenticated user', async () => {
@@ -172,32 +174,36 @@ describe('NHI Requests +page.server', () => {
 			expect(result.isAdmin).toBe(false);
 		});
 
-		it('handles API failure gracefully', async () => {
+		it('fails closed when list API throws', async () => {
 			mockListRequests.mockRejectedValue(new Error('API error'));
+			mockGetSummary.mockResolvedValue(makeSummary());
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/nhi/requests'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.requests).toEqual([]);
-			expect(result.total).toBe(0);
-			expect(result.summary).toBeNull();
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/nhi/requests'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('handles summary API failure gracefully', async () => {
+		it('fails closed when summary API throws', async () => {
 			mockListRequests.mockResolvedValue({ items: [makeRequest()], total: 1, limit: 20, offset: 0 });
 			mockGetSummary.mockRejectedValue(new Error('summary failed'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/nhi/requests'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.requests).toHaveLength(1);
-			expect(result.summary).toBeNull();
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/nhi/requests'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 });
