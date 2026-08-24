@@ -42,8 +42,42 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 
 	try {
-		const body = await request.json();
-		const result = await createBulkAction(body, locals.accessToken, locals.tenantId, fetch);
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		if (typeof body.filter_expression !== 'string' || body.filter_expression.length === 0) {
+			return json({ error: 'filter_expression is required' }, { status: 400 });
+		}
+		if (
+			body.action_type !== 'assign_role' &&
+			body.action_type !== 'revoke_role' &&
+			body.action_type !== 'enable' &&
+			body.action_type !== 'disable' &&
+			body.action_type !== 'modify_attribute'
+		) {
+			return json({ error: 'action_type is required' }, { status: 400 });
+		}
+		if (typeof body.justification !== 'string' || body.justification.length === 0) {
+			return json({ error: 'justification is required' }, { status: 400 });
+		}
+		const result = await createBulkAction(
+			{
+				filter_expression: body.filter_expression,
+				action_type: body.action_type,
+				action_params: body.action_params,
+				justification: body.justification
+			},
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result, { status: 201 });
 	} catch (e) {
 		if (e instanceof ApiError) {
