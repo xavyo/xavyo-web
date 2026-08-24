@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
+import { error, fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listRiskAlerts, getRiskAlertSummary, acknowledgeRiskAlert, deleteRiskAlert } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
@@ -15,16 +15,21 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const limit = Number(url.searchParams.get('limit') ?? '50');
 	const offset = Number(url.searchParams.get('offset') ?? '0');
 
-	const [alerts, summary] = await Promise.all([
-		listRiskAlerts(
-			{ severity, acknowledged, limit, offset },
-			locals.accessToken!, locals.tenantId!, fetch
-		).catch(() => ({ items: [], total: 0, limit, offset })),
-		getRiskAlertSummary(locals.accessToken!, locals.tenantId!, fetch)
-			.catch(() => ({ unacknowledged: [], total_unacknowledged: 0 }))
-	]);
-
-	return { alerts, summary, filters: { severity, acknowledged } };
+	try {
+		const [alerts, summary] = await Promise.all([
+			listRiskAlerts(
+				{ severity, acknowledged, limit, offset },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			),
+			getRiskAlertSummary(locals.accessToken!, locals.tenantId!, fetch)
+		]);
+		return { alerts, summary, filters: { severity, acknowledged } };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load risk alerts');
+	}
 };
 
 export const actions: Actions = {

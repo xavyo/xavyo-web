@@ -150,22 +150,20 @@ describe('Simulations hub +page.server', () => {
 			expect(result.comparisons.items[0].name).toBe('Before vs After SoD');
 		});
 
-		it('returns empty items when all APIs fail', async () => {
+		it('fails closed when any API throws', async () => {
 			mockListPolicy.mockRejectedValue(new Error('fail'));
 			mockListBatch.mockRejectedValue(new Error('fail'));
 			mockListComparisons.mockRejectedValue(new Error('fail'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.policySimulations.items).toEqual([]);
-			expect(result.policySimulations.total).toBe(0);
-			expect(result.batchSimulations.items).toEqual([]);
-			expect(result.batchSimulations.total).toBe(0);
-			expect(result.comparisons.items).toEqual([]);
-			expect(result.comparisons.total).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct token and tenantId', async () => {

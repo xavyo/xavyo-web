@@ -227,7 +227,7 @@ describe('Correlation hub +page.server', () => {
 			);
 		});
 
-		it('gracefully handles cases API failure', async () => {
+		it('fails closed when any API throws', async () => {
 			mockListCases.mockRejectedValue(new Error('cases failed'));
 			mockListRules.mockResolvedValue({
 				items: [makeIdentityRule()],
@@ -242,85 +242,15 @@ describe('Correlation hub +page.server', () => {
 				offset: 0
 			});
 
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.cases).toEqual([]);
-			expect(result.casesTotal).toBe(0);
-			expect(result.identityRules).toHaveLength(1);
-			expect(result.auditEvents).toHaveLength(1);
-		});
-
-		it('gracefully handles identity rules API failure', async () => {
-			mockListCases.mockResolvedValue({
-				items: [makeCase()],
-				total: 1,
-				limit: 50,
-				offset: 0
-			});
-			mockListRules.mockRejectedValue(new Error('rules failed'));
-			mockListAudit.mockResolvedValue({
-				items: [makeAuditEvent()],
-				total: 1,
-				limit: 50,
-				offset: 0
-			});
-
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.cases).toHaveLength(1);
-			expect(result.identityRules).toEqual([]);
-			expect(result.identityRulesTotal).toBe(0);
-			expect(result.auditEvents).toHaveLength(1);
-		});
-
-		it('gracefully handles audit events API failure', async () => {
-			mockListCases.mockResolvedValue({
-				items: [makeCase()],
-				total: 1,
-				limit: 50,
-				offset: 0
-			});
-			mockListRules.mockResolvedValue({
-				items: [makeIdentityRule()],
-				total: 1,
-				limit: 50,
-				offset: 0
-			});
-			mockListAudit.mockRejectedValue(new Error('audit failed'));
-
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.cases).toHaveLength(1);
-			expect(result.identityRules).toHaveLength(1);
-			expect(result.auditEvents).toEqual([]);
-			expect(result.auditTotal).toBe(0);
-		});
-
-		it('gracefully handles all APIs failing', async () => {
-			mockListCases.mockRejectedValue(new Error('fail'));
-			mockListRules.mockRejectedValue(new Error('fail'));
-			mockListAudit.mockRejectedValue(new Error('fail'));
-
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.cases).toEqual([]);
-			expect(result.casesTotal).toBe(0);
-			expect(result.identityRules).toEqual([]);
-			expect(result.identityRulesTotal).toBe(0);
-			expect(result.auditEvents).toEqual([]);
-			expect(result.auditTotal).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct accessToken and tenantId', async () => {

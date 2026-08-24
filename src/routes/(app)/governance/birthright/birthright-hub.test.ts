@@ -116,46 +116,36 @@ describe('Birthright hub +page.server', () => {
 			);
 		});
 
-		it('gracefully handles policies API failure', async () => {
+		it('fails closed when policies API throws', async () => {
 			mockListPolicies.mockRejectedValue(new Error('API error'));
 			mockListEvents.mockResolvedValue({ items: [makeEvent()], total: 1, limit: 50, offset: 0 });
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/birthright'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.policies).toEqual({ items: [], total: 0, limit: 50, offset: 0 });
-			expect(result.events.items).toHaveLength(1);
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/governance/birthright'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles events API failure', async () => {
+		it('fails closed when events API throws', async () => {
 			mockListPolicies.mockResolvedValue({ items: [makePolicy()], total: 1, limit: 50, offset: 0 });
 			mockListEvents.mockRejectedValue(new Error('API error'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/birthright'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.policies.items).toHaveLength(1);
-			expect(result.events).toEqual({ items: [], total: 0, limit: 50, offset: 0 });
-		});
-
-		it('gracefully handles both APIs failing', async () => {
-			mockListPolicies.mockRejectedValue(new Error('fail'));
-			mockListEvents.mockRejectedValue(new Error('fail'));
-
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/birthright'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.policies).toEqual({ items: [], total: 0, limit: 50, offset: 0 });
-			expect(result.events).toEqual({ items: [], total: 0, limit: 50, offset: 0 });
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/governance/birthright'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct token and tenantId', async () => {
