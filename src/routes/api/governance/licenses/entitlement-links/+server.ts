@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listLicenseEntitlementLinks, createLicenseEntitlementLink } from '$lib/api/licenses';
+import type { CreateLicenseEntitlementLinkRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
@@ -50,9 +51,34 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 
 	try {
-		const body = await request.json();
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		if (typeof body.license_pool_id !== 'string' || body.license_pool_id.length === 0) {
+			return json({ error: 'license_pool_id is required' }, { status: 400 });
+		}
+		if (typeof body.entitlement_id !== 'string' || body.entitlement_id.length === 0) {
+			return json({ error: 'entitlement_id is required' }, { status: 400 });
+		}
+		const data: CreateLicenseEntitlementLinkRequest = {
+			license_pool_id: body.license_pool_id,
+			entitlement_id: body.entitlement_id
+		};
+		if (body.priority !== undefined) {
+			if (typeof body.priority !== 'number') {
+				return json({ error: 'priority must be a number' }, { status: 400 });
+			}
+			data.priority = body.priority;
+		}
 		const result = await createLicenseEntitlementLink(
-			body,
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch
