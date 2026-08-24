@@ -5,6 +5,39 @@ import {
 	updateApprovalWorkflow,
 	deleteApprovalWorkflow
 } from '$lib/api/approval-workflows';
+import type { CreateApprovalStepRequest, UpdateApprovalWorkflowRequest } from '$lib/api/types';
+
+function parseSteps(value: unknown): CreateApprovalStepRequest[] {
+	if (!Array.isArray(value)) {
+		error(400, 'steps must be an array');
+	}
+	const steps: CreateApprovalStepRequest[] = [];
+	for (const item of value) {
+		if (!item || typeof item !== 'object' || Array.isArray(item)) {
+			error(400, 'each step must be an object');
+		}
+		const step = item as Record<string, unknown>;
+		if (
+			step.approver_type !== 'manager' &&
+			step.approver_type !== 'entitlement_owner' &&
+			step.approver_type !== 'specific_users'
+		) {
+			error(400, 'approver_type is required');
+		}
+		const parsed: CreateApprovalStepRequest = { approver_type: step.approver_type };
+		if (step.specific_approvers !== undefined) {
+			if (
+				!Array.isArray(step.specific_approvers) ||
+				!step.specific_approvers.every((id) => typeof id === 'string')
+			) {
+				error(400, 'specific_approvers must be an array of strings');
+			}
+			parsed.specific_approvers = step.specific_approvers;
+		}
+		steps.push(parsed);
+	}
+	return steps;
+}
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -21,10 +54,47 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	const data: UpdateApprovalWorkflowRequest = {};
+	if (body.name !== undefined) {
+		if (typeof body.name !== 'string' || body.name.length === 0) {
+			error(400, 'name must be a non-empty string');
+		}
+		data.name = body.name;
+	}
+	if (body.description !== undefined) {
+		if (typeof body.description !== 'string') {
+			error(400, 'description must be a string');
+		}
+		data.description = body.description;
+	}
+	if (body.is_default !== undefined) {
+		if (typeof body.is_default !== 'boolean') {
+			error(400, 'is_default must be a boolean');
+		}
+		data.is_default = body.is_default;
+	}
+	if (body.is_active !== undefined) {
+		if (typeof body.is_active !== 'boolean') {
+			error(400, 'is_active must be a boolean');
+		}
+		data.is_active = body.is_active;
+	}
+	if (body.steps !== undefined) {
+		data.steps = parseSteps(body.steps);
+	}
 	const result = await updateApprovalWorkflow(
 		params.id,
-		body,
+		data,
 		locals.accessToken,
 		locals.tenantId,
 		fetch
