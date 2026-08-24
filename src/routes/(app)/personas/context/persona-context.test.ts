@@ -63,24 +63,28 @@ describe('Persona Context +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('returns null context when no accessToken', async () => {
-			const result = (await load({
-				locals: { accessToken: null, tenantId: 'tid', user: { roles: [] } },
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.context).toBeNull();
-			expect(result.sessions).toEqual([]);
-			expect(result.personas).toEqual([]);
+		it('throws 401 when no accessToken', async () => {
+			try {
+				await load({
+					locals: { accessToken: null, tenantId: 'tid', user: { roles: [] } },
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(401);
+			}
 		});
 
-		it('returns null context when no tenantId', async () => {
-			const result = (await load({
-				locals: { accessToken: 'tok', tenantId: null, user: { roles: [] } },
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.context).toBeNull();
+		it('throws 401 when no tenantId', async () => {
+			try {
+				await load({
+					locals: { accessToken: 'tok', tenantId: null, user: { roles: [] } },
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(401);
+			}
 		});
 
 		it('returns context, sessions, and personas for authenticated user', async () => {
@@ -102,46 +106,52 @@ describe('Persona Context +page.server', () => {
 			expect(result.personas).toHaveLength(1);
 		});
 
-		it('handles context API failure gracefully', async () => {
+		it('fails closed when context API throws', async () => {
 			mockGetContext.mockRejectedValue(new Error('context failed'));
 			mockListSessions.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 			mockListPersonas.mockResolvedValue({ items: [] } as any);
 
-			const result = (await load({
-				locals: mockLocals(),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.context).toBeNull();
-			expect(result.sessions).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('handles sessions API failure gracefully', async () => {
+		it('fails closed when sessions API throws', async () => {
 			mockGetContext.mockResolvedValue(makeContext());
 			mockListSessions.mockRejectedValue(new Error('sessions failed'));
 			mockListPersonas.mockResolvedValue({ items: [] } as any);
 
-			const result = (await load({
-				locals: mockLocals(),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.context).toBeDefined();
-			expect(result.sessions).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('handles personas API failure gracefully', async () => {
+		it('fails closed when personas API throws', async () => {
 			mockGetContext.mockResolvedValue(makeContext());
 			mockListSessions.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 			mockListPersonas.mockRejectedValue(new Error('personas failed'));
 
-			const result = (await load({
-				locals: mockLocals(),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.context).toBeDefined();
-			expect(result.personas).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct accessToken and tenantId', async () => {

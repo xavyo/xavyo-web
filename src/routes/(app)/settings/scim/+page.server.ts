@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { isHttpError } from '@sveltejs/kit';
 import { superValidate, message } from 'sveltekit-superforms';
 import type { ErrorStatus } from 'sveltekit-superforms';
@@ -23,19 +23,16 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	const form = await superValidate(zod(createScimTokenSchema));
 
-	let tokens: Awaited<ReturnType<typeof listScimTokens>> = [];
-	let mappings: Awaited<ReturnType<typeof listScimMappings>> = [];
-
 	try {
-		[tokens, mappings] = await Promise.all([
+		const [tokens, mappings] = await Promise.all([
 			listScimTokens(locals.accessToken!, locals.tenantId!, fetch),
 			listScimMappings(locals.accessToken!, locals.tenantId!, fetch)
 		]);
-	} catch {
-		// Fall back to empty arrays if API fails
+		return { form, tokens, mappings };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load SCIM settings');
 	}
-
-	return { form, tokens, mappings };
 };
 
 export const actions: Actions = {

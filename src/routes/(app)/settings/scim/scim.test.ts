@@ -111,19 +111,20 @@ describe('SCIM Admin +page.server', () => {
 			expect(result.mappings[0].scim_path).toBe('userName');
 		});
 
-		it('returns empty arrays when API throws', async () => {
+		it('fails closed when API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listScimTokens).mockRejectedValue(new Error('Network error'));
 			vi.mocked(listScimMappings).mockRejectedValue(new Error('Network error'));
 
-			const result = await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.tokens).toEqual([]);
-			expect(result.mappings).toEqual([]);
-			expect(result.form).toBeDefined();
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 

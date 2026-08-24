@@ -164,21 +164,22 @@ describe('Import Detail +page.server', () => {
 			}
 		});
 
-		it('returns empty errors when error API fails', async () => {
+		it('fails closed when error API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(getImportJob).mockResolvedValue(makeJobDetail() as any);
 			vi.mocked(listImportErrors).mockRejectedValue(new Error('fail'));
 
-			const result = await load({
-				params: { id: 'job-1' },
-				locals: mockLocals(true),
-				url: new URL('http://localhost/settings/imports/job-1'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.job.id).toBe('job-1');
-			expect(result.errors).toEqual([]);
-			expect(result.errorTotal).toBe(0);
+			try {
+				await load({
+					params: { id: 'job-1' },
+					locals: mockLocals(true),
+					url: new URL('http://localhost/settings/imports/job-1'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('throws 500 for non-ApiError on job load', async () => {

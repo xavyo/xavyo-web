@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listDlqEntries, replayDlqEntry, deleteDlqEntry } from '$lib/api/webhooks';
 import { ApiError } from '$lib/api/client';
@@ -20,8 +20,9 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 			fetch
 		);
 		return { entries: result.entries, total: result.total, limit, offset };
-	} catch {
-		return { entries: [], total: 0, limit, offset };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load webhook DLQ');
 	}
 };
 
