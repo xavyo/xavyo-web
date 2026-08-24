@@ -7,8 +7,26 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
-	const result = await trustDevice(params.id, body, locals.accessToken, locals.tenantId, fetch);
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	const result = await trustDevice(
+		params.id,
+		{
+			trust_duration_days:
+				typeof body.trust_duration_days === 'number' ? body.trust_duration_days : undefined
+		},
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 
 	return json(result);
 };

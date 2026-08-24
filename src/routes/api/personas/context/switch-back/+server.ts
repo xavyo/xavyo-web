@@ -7,8 +7,22 @@ import { isDecodableJwt, omitTokenFields, replaceAccessTokenIfJwt } from '$lib/s
 export const POST: RequestHandler = async ({ locals, request, cookies, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const body = await request.json();
-		const result = await switchBack(body, locals.accessToken, locals.tenantId, fetch);
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		const result = await switchBack(
+			{ reason: typeof body.reason === 'string' ? body.reason : undefined },
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		const cookieOpts = { maxAge: 60 * 60 * 8, sameSite: 'strict' as const, secure: true };
 		const originalToken = cookies.get('original_access_token');
 		if (originalToken && isDecodableJwt(originalToken)) {

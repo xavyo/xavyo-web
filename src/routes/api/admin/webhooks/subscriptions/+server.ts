@@ -25,8 +25,37 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
-	const result = await createWebhookSubscription(body, locals.accessToken, locals.tenantId, fetch);
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.name !== 'string' || body.name.length === 0) {
+		error(400, 'name is required');
+	}
+	if (typeof body.url !== 'string' || body.url.length === 0) {
+		error(400, 'url is required');
+	}
+	if (!Array.isArray(body.event_types) || body.event_types.length === 0) {
+		error(400, 'event_types is required');
+	}
+	const result = await createWebhookSubscription(
+		{
+			name: body.name,
+			url: body.url,
+			event_types: body.event_types as string[],
+			description: typeof body.description === 'string' ? body.description : undefined,
+			secret: typeof body.secret === 'string' ? body.secret : undefined
+		},
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 
 	return json(result, { status: 201 });
 };
