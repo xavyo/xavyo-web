@@ -7,7 +7,25 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
-	const result = await resolveOperation(params.id, body, locals.accessToken, locals.tenantId, fetch);
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	const result = await resolveOperation(
+		params.id,
+		{
+			resolution_notes:
+				typeof body.resolution_notes === 'string' ? body.resolution_notes : undefined
+		},
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 	return json(result);
 };
