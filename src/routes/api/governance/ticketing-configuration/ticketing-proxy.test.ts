@@ -114,7 +114,12 @@ describe('POST /api/governance/ticketing-configuration (create)', () => {
 	});
 
 	it('creates ticketing config and returns 201', async () => {
-		const body = { name: 'Jira Config', provider: 'jira' };
+		const body = {
+			name: 'Jira Config',
+			ticketing_type: 'jira',
+			endpoint_url: 'https://jira.example.com',
+			credentials: 'secret'
+		};
 		const mockResult = { id: 'tc-new', ...body };
 		vi.mocked(createTicketingConfig).mockResolvedValue(mockResult as any);
 
@@ -123,7 +128,43 @@ describe('POST /api/governance/ticketing-configuration (create)', () => {
 		expect(response.status).toBe(201);
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
-		expect(createTicketingConfig).toHaveBeenCalledWith(body, TOKEN, TENANT, expect.any(Function));
+		expect(createTicketingConfig).toHaveBeenCalledWith(
+			{ ...body, polling_interval_seconds: 300 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not create on invalid JSON', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: new Request('http://localhost/api/governance/ticketing-configuration', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: '{not json'
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createTicketingConfig).not.toHaveBeenCalled();
+	});
+
+	it('does not create when ticketing_type is invalid', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: makeJsonRequest({
+						name: 'Jira Config',
+						ticketing_type: 'other',
+						endpoint_url: 'https://jira.example.com',
+						credentials: 'secret'
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createTicketingConfig).not.toHaveBeenCalled();
 	});
 
 	it('returns 401 when unauthorized', async () => {
@@ -189,6 +230,29 @@ describe('PUT /api/governance/ticketing-configuration/[id] (update)', () => {
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
 		expect(updateTicketingConfig).toHaveBeenCalledWith('tc-1', body, TOKEN, TENANT, expect.any(Function));
+	});
+
+	it('does not update on invalid JSON', async () => {
+		await expect(
+			PUT(
+				makeRequestEvent({
+					params: { id: 'tc-1' },
+					request: new Request('http://localhost/api/governance/ticketing-configuration/tc-1', {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: '{not json'
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateTicketingConfig).not.toHaveBeenCalled();
+	});
+
+	it('does not update when name is empty', async () => {
+		await expect(
+			PUT(makeRequestEvent({ params: { id: 'tc-1' }, request: makeJsonRequest({ name: '' }) }))
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateTicketingConfig).not.toHaveBeenCalled();
 	});
 
 	it('returns 403 for non-admin', async () => {

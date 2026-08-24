@@ -396,7 +396,10 @@ describe('governance-operations-client', () => {
 
 	describe('createBulkStateOperation (client)', () => {
 		it('sends POST to /api/governance/bulk-state-operations', async () => {
-			const body = { object_type: 'user', target_state: 'disabled', filter_expression: 'expr' };
+			const body = {
+				transition_id: '11111111-1111-1111-1111-111111111111',
+				object_ids: ['u-1', 'u-2']
+			};
 			const data = { id: 'bso-1', ...body };
 			mockFetch.mockResolvedValueOnce(mockResponse(data));
 			const { createBulkStateOperation } = await import('./governance-operations-client');
@@ -417,7 +420,7 @@ describe('governance-operations-client', () => {
 
 			await expect(
 				createBulkStateOperation(
-					{ object_type: 'user', target_state: 'x', filter_expression: 'y' },
+					{ transition_id: '11111111-1111-1111-1111-111111111111', object_ids: ['u-1'] },
 					mockFetch
 				)
 			).rejects.toThrow('Failed to create bulk state operation');

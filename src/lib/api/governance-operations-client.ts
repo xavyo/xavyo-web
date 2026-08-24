@@ -192,7 +192,7 @@ export async function fetchBulkStateOperations(
 }
 
 export async function createBulkStateOperation(
-	body: { object_type: string; target_state: string; filter_expression: string },
+	body: { transition_id: string; object_ids: string[] },
 	fetchFn: typeof fetch = fetch
 ): Promise<BulkStateOperation> {
 	const res = await fetchFn('/api/governance/bulk-state-operations', {

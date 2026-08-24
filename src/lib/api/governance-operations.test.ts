@@ -461,13 +461,12 @@ describe('governance-operations API', () => {
 	describe('createBulkStateOperation', () => {
 		it('calls POST /governance/lifecycle/bulk-operations with body', async () => {
 			const body = {
-				object_type: 'user',
-				target_state: 'disabled',
-				filter_expression: 'inactive_days > 90'
+				transition_id: '11111111-1111-1111-1111-111111111111',
+				object_ids: ['u-1', 'u-2']
 			};
 			mockApiClient.mockResolvedValue({ id: testId, ...body });
 
-			await createBulkStateOperation(body as any, token, tenantId, mockFetch);
+			await createBulkStateOperation(body, token, tenantId, mockFetch);
 
 			expect(mockApiClient).toHaveBeenCalledWith('/governance/lifecycle/bulk-operations', {
 				method: 'POST',

@@ -13,8 +13,25 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 
 	try {
-		const body = await request.json();
-		const result = await validateBulkActionExpression(body, locals.accessToken, locals.tenantId, fetch);
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		if (typeof body.expression !== 'string' || body.expression.length === 0) {
+			return json({ error: 'expression is required' }, { status: 400 });
+		}
+		const result = await validateBulkActionExpression(
+			{ expression: body.expression },
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) {
