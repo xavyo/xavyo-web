@@ -8,7 +8,19 @@ export const POST: RequestHandler = async ({ locals, params, request, fetch }) =
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 	try {
-		const body = await request.json().catch(() => ({}));
+		const text = await request.text();
+		let body: Record<string, unknown> = {};
+		if (text.trim()) {
+			try {
+				const parsed = JSON.parse(text) as unknown;
+				if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+					return json({ error: 'Invalid JSON body' }, { status: 400 });
+				}
+				body = parsed as Record<string, unknown>;
+			} catch {
+				return json({ error: 'Invalid JSON body' }, { status: 400 });
+			}
+		}
 		const result = await revokeDelegationGrant(params.id, body, locals.accessToken, locals.tenantId, fetch);
 		return json(result);
 	} catch (e) {
