@@ -6,6 +6,7 @@ import {
 	deleteWebauthnCredential
 } from '$lib/api/mfa';
 import { ApiError } from '$lib/api/client';
+import type { UpdateCredentialRequest } from '$lib/api/types';
 
 export const GET: RequestHandler = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -34,10 +35,23 @@ export const PATCH: RequestHandler = async ({ url, request, locals, fetch }) => 
 	}
 
 	try {
-		const body = await request.json();
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		if (typeof body.name !== 'string' || body.name.length === 0) {
+			return json({ error: 'name is required' }, { status: 400 });
+		}
+		const data: UpdateCredentialRequest = { name: body.name };
 		const result = await updateWebauthnCredential(
 			id,
-			body,
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch
