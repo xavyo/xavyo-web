@@ -1,18 +1,26 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listDetectionRules, createDetectionRule } from '$lib/api/detection-rules';
+import type { CreateDetectionRuleRequest } from '$lib/api/types';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const rule_type = url.searchParams.get('rule_type') ?? undefined;
-	const is_enabled = url.searchParams.get('is_enabled') === 'true' ? true : url.searchParams.get('is_enabled') === 'false' ? false : undefined;
+	const is_enabled =
+		url.searchParams.get('is_enabled') === 'true'
+			? true
+			: url.searchParams.get('is_enabled') === 'false'
+				? false
+				: undefined;
 	const limit = Number(url.searchParams.get('limit') ?? '50');
 	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listDetectionRules(
 		{ rule_type, is_enabled, limit, offset },
-		locals.accessToken, locals.tenantId, fetch
+		locals.accessToken,
+		locals.tenantId,
+		fetch
 	);
 	return json(result);
 };
@@ -20,7 +28,51 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
-	const body = await request.json();
-	const result = await createDetectionRule(body, locals.accessToken, locals.tenantId, fetch);
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.name !== 'string' || body.name.length === 0) {
+		error(400, 'name is required');
+	}
+	if (
+		body.rule_type !== 'no_manager' &&
+		body.rule_type !== 'terminated' &&
+		body.rule_type !== 'inactive' &&
+		body.rule_type !== 'custom'
+	) {
+		error(400, 'rule_type is required');
+	}
+	if (typeof body.is_enabled !== 'boolean') {
+		error(400, 'is_enabled is required');
+	}
+	if (typeof body.priority !== 'number') {
+		error(400, 'priority is required');
+	}
+	const data: CreateDetectionRuleRequest = {
+		name: body.name,
+		rule_type: body.rule_type,
+		is_enabled: body.is_enabled,
+		priority: body.priority
+	};
+	if (body.parameters !== undefined) {
+		if (!body.parameters || typeof body.parameters !== 'object' || Array.isArray(body.parameters)) {
+			error(400, 'parameters must be an object');
+		}
+		data.parameters = body.parameters as Record<string, unknown>;
+	}
+	if (body.description !== undefined) {
+		if (typeof body.description !== 'string') {
+			error(400, 'description must be a string');
+		}
+		data.description = body.description;
+	}
+	const result = await createDetectionRule(data, locals.accessToken, locals.tenantId, fetch);
 	return json(result, { status: 201 });
 };
