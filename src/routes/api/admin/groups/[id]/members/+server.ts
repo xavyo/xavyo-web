@@ -7,10 +7,22 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (!Array.isArray(body.member_ids) || body.member_ids.length === 0) {
+		error(400, 'member_ids is required');
+	}
 	const result = await addGroupMembers(
 		params.id,
-		body,
+		{ member_ids: body.member_ids as string[] },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
