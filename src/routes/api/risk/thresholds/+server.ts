@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json, error, isHttpError } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listRiskThresholds, createRiskThreshold } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
@@ -19,6 +19,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		);
 		return json(result);
 	} catch (e) {
+		if (isHttpError(e)) throw e;
 		if (e instanceof ApiError) error(e.status, e.message);
 		error(500, 'Internal error');
 	}
@@ -28,10 +29,38 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	try {
-		const body = await request.json();
-		const result = await createRiskThreshold(body, locals.accessToken, locals.tenantId, fetch);
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			error(400, 'Invalid JSON body');
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			error(400, 'Invalid JSON body');
+		}
+		const body = parsed as Record<string, unknown>;
+		if (typeof body.name !== 'string' || body.name.length === 0) {
+			error(400, 'name is required');
+		}
+		if (typeof body.score_value !== 'number') {
+			error(400, 'score_value is required');
+		}
+		if (body.severity !== 'info' && body.severity !== 'warning' && body.severity !== 'critical') {
+			error(400, 'severity is required');
+		}
+		const result = await createRiskThreshold(
+			{
+				name: body.name,
+				score_value: body.score_value,
+				severity: body.severity
+			},
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result, { status: 201 });
 	} catch (e) {
+		if (isHttpError(e)) throw e;
 		if (e instanceof ApiError) error(e.status, e.message);
 		error(500, 'Internal error');
 	}
