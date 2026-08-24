@@ -8,11 +8,23 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	}
 
 	const versionNumber = parseInt(params.versionNumber);
-	const body = await request.json();
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (body.context === undefined) {
+		error(400, 'context is required');
+	}
 	const result = await dryRunScriptVersion(
 		params.id,
 		versionNumber,
-		body,
+		{ context: body.context },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
