@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
+import { error, fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { createComparisonSchema } from '$lib/schemas/simulations';
 import {
 	listPolicySimulations,
@@ -16,27 +16,32 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		redirect(302, '/dashboard');
 	}
 
-	const [form, policyData, batchData] = await Promise.all([
-		superValidate(zod(createComparisonSchema)),
-		listPolicySimulations(
-			{ limit: 100, offset: 0 },
-			locals.accessToken!,
-			locals.tenantId!,
-			fetch
-		).catch(() => ({ items: [], total: 0, limit: 100, offset: 0 })),
-		listBatchSimulations(
-			{ limit: 100, offset: 0 },
-			locals.accessToken!,
-			locals.tenantId!,
-			fetch
-		).catch(() => ({ items: [], total: 0, limit: 100, offset: 0 }))
-	]);
+	try {
+		const [form, policyData, batchData] = await Promise.all([
+			superValidate(zod(createComparisonSchema)),
+			listPolicySimulations(
+				{ limit: 100, offset: 0 },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			),
+			listBatchSimulations(
+				{ limit: 100, offset: 0 },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			)
+		]);
 
-	return {
-		form,
-		policySimulations: policyData.items,
-		batchSimulations: batchData.items
-	};
+		return {
+			form,
+			policySimulations: policyData.items,
+			batchSimulations: batchData.items
+		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load simulations');
+	}
 };
 
 export const actions: Actions = {

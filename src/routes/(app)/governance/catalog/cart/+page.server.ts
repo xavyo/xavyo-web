@@ -3,20 +3,18 @@ import { getCart, submitCart, removeCartItem, clearCart, validateCart } from '$l
 import { error, redirect } from '@sveltejs/kit';
 import { isRedirect } from '@sveltejs/kit';
 import { isHttpError } from '@sveltejs/kit';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
-	const cart = await getCart(undefined, locals.accessToken, locals.tenantId, fetch).catch(() => ({
-		requester_id: '',
-		beneficiary_id: null,
-		items: [],
-		item_count: 0,
-		created_at: '',
-		updated_at: ''
-	}));
-
-	return { cart };
+	try {
+		const cart = await getCart(undefined, locals.accessToken, locals.tenantId, fetch);
+		return { cart };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load cart');
+	}
 };
 
 export const actions: Actions = {

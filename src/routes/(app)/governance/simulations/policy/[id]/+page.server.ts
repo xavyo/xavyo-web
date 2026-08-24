@@ -7,7 +7,6 @@ import {
 } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
-import type { PolicySimulationResult, StalenessCheck } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -23,17 +22,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
-			).catch(() => ({ items: [] as PolicySimulationResult[], total: 0, limit: 50, offset: 0 })),
-			checkPolicySimulationStaleness(
-				params.id,
-				locals.accessToken!,
-				locals.tenantId!,
-				fetch
-			).catch((): StalenessCheck => ({
-				is_stale: false,
-				data_snapshot_at: '',
-				last_data_change_at: ''
-			}))
+			),
+			checkPolicySimulationStaleness(params.id, locals.accessToken!, locals.tenantId!, fetch)
 		]);
 
 		return { simulation, results: resultsData, staleness };

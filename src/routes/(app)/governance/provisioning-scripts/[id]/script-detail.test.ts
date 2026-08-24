@@ -253,66 +253,69 @@ describe('Script Detail +page.server', () => {
 			);
 		});
 
-		it('gracefully handles versions API failure', async () => {
+		it('fails closed when versions API throws', async () => {
 			mockGetScript.mockResolvedValue(makeScript());
 			mockListVersions.mockRejectedValue(new Error('versions failed'));
 			mockListBindings.mockResolvedValue({ bindings: [makeBinding()], total: 1 });
 			mockListLogs.mockResolvedValue({ logs: [makeLog()], total: 1 });
 
-			const result = (await load({
-				locals: mockLocals(true),
-				params: { id: 'script-1' }
-			} as any)) as any;
-
-			expect(result.versions).toEqual([]);
-			expect(result.versionsTotal).toBe(0);
-			expect(result.bindings).toHaveLength(1);
-			expect(result.logs).toHaveLength(1);
+			try {
+				await load({
+					locals: mockLocals(true),
+					params: { id: 'script-1' }
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles bindings API failure', async () => {
+		it('fails closed when bindings API throws', async () => {
 			mockGetScript.mockResolvedValue(makeScript());
 			mockListVersions.mockResolvedValue({ versions: [makeVersion()], total: 1 });
 			mockListBindings.mockRejectedValue(new Error('bindings failed'));
 			mockListLogs.mockResolvedValue({ logs: [makeLog()], total: 1 });
 
-			const result = (await load({
-				locals: mockLocals(true),
-				params: { id: 'script-1' }
-			} as any)) as any;
-
-			expect(result.versions).toHaveLength(1);
-			expect(result.bindings).toEqual([]);
-			expect(result.bindingsTotal).toBe(0);
-			expect(result.logs).toHaveLength(1);
+			try {
+				await load({
+					locals: mockLocals(true),
+					params: { id: 'script-1' }
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles logs API failure', async () => {
+		it('fails closed when logs API throws', async () => {
 			mockGetScript.mockResolvedValue(makeScript());
 			mockListVersions.mockResolvedValue({ versions: [makeVersion()], total: 1 });
 			mockListBindings.mockResolvedValue({ bindings: [makeBinding()], total: 1 });
 			mockListLogs.mockRejectedValue(new Error('logs failed'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				params: { id: 'script-1' }
-			} as any)) as any;
-
-			expect(result.versions).toHaveLength(1);
-			expect(result.bindings).toHaveLength(1);
-			expect(result.logs).toEqual([]);
-			expect(result.logsTotal).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true),
+					params: { id: 'script-1' }
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('throws when getProvisioningScript fails (not caught)', async () => {
+		it('fails closed when getProvisioningScript throws', async () => {
 			mockGetScript.mockRejectedValue(new Error('not found'));
 
-			await expect(
-				load({
+			try {
+				await load({
 					locals: mockLocals(true),
 					params: { id: 'bad-id' }
-				} as any)
-			).rejects.toThrow('not found');
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 });
