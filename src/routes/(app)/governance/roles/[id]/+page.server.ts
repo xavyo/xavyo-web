@@ -33,18 +33,16 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateRoleSchema)
 	);
 
-	// Load roles for move parent selection (exclude self)
-	let availableRoles: { id: string; name: string }[] = [];
 	try {
 		const result = await listRoles({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch);
-		availableRoles = result.items
+		const availableRoles = result.items
 			.filter((r) => r.id !== params.id)
 			.map((r) => ({ id: r.id, name: r.name }));
-	} catch {
-		// If roles fail to load, move selector will be empty
+		return { role, form, availableRoles };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load roles');
 	}
-
-	return { role, form, availableRoles };
 };
 
 export const actions: Actions = {

@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect, isRedirect } from '@sveltejs/kit';
+import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { createBirthrightPolicySchema, updateBirthrightPolicySchema } from '$lib/schemas/birthright';
 import { getBirthrightPolicy, updateBirthrightPolicy } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
@@ -12,15 +12,22 @@ import type { UpdateBirthrightPolicyRequest } from '$lib/api/types';
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
 
-	const [policy, entitlementResult] = await Promise.all([
-		getBirthrightPolicy(params.id, locals.accessToken!, locals.tenantId!, fetch),
-		listEntitlements(
-			{ status: 'active', limit: 100 },
-			locals.accessToken!,
-			locals.tenantId!,
-			fetch
-		).catch(() => ({ items: [] }))
-	]);
+	let policy;
+	let entitlementResult;
+	try {
+		[policy, entitlementResult] = await Promise.all([
+			getBirthrightPolicy(params.id, locals.accessToken!, locals.tenantId!, fetch),
+			listEntitlements(
+				{ status: 'active', limit: 100 },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			)
+		]);
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load birthright policy');
+	}
 
 	const form = await superValidate(
 		{

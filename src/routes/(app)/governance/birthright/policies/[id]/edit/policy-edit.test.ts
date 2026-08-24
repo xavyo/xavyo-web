@@ -141,15 +141,18 @@ describe('Policy Edit +page.server', () => {
 			expect(result.entitlements[0].name).toBe('VPN Access');
 		});
 
-		it('returns empty entitlements when API fails', async () => {
+		it('fails closed when entitlements API throws', async () => {
 			mockListEntitlements.mockRejectedValue(new Error('fail'));
-			const result: any = await load({
-				params: { id: 'pol-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.entitlements).toEqual([]);
+			try {
+				await load({
+					params: { id: 'pol-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct id to getBirthrightPolicy', async () => {

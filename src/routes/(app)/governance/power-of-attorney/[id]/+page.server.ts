@@ -26,19 +26,33 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		error(500, 'Failed to load Power of Attorney');
 	}
 
-	let audit: PoaAuditListResponse = { items: [], total: 0, limit: 20, offset: 0 };
-	let userNameMap: Record<string, string> = {};
+	let audit: PoaAuditListResponse;
 	try {
-		const [auditResult, usersResult] = await Promise.all([
-			getPoaAudit(params.id, { limit: 50 }, locals.accessToken!, locals.tenantId!, fetch),
-			listUsers({ limit: 200, offset: 0 }, locals.accessToken!, locals.tenantId!, fetch)
-		]);
-		audit = auditResult;
+		audit = await getPoaAudit(
+			params.id,
+			{ limit: 50 },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load PoA audit trail');
+	}
+
+	const userNameMap: Record<string, string> = {};
+	try {
+		const usersResult = await listUsers(
+			{ limit: 200, offset: 0 },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
 		for (const u of usersResult.users ?? []) {
-			userNameMap[u.id] = (u as any).display_name ?? u.email;
+			userNameMap[u.id] = (u as { display_name?: string }).display_name ?? u.email;
 		}
 	} catch {
-		// Audit/users may fail — non-critical
+		// Name map is display-only; a 403 here must not hide the PoA.
 	}
 
 	const revokeForm = await superValidate(zod(revokePoaSchema));

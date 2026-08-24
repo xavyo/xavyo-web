@@ -83,7 +83,7 @@ describe('NHI Certification Campaign detail +page.server', () => {
 		}
 	});
 
-	it('handles items fetch failure gracefully', async () => {
+	it('fails closed when items fetch throws', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		const campaign = {
 			id: 'camp-2',
@@ -95,13 +95,15 @@ describe('NHI Certification Campaign detail +page.server', () => {
 		vi.mocked(getNhiCertCampaign).mockResolvedValue(campaign as any);
 		vi.mocked(listNhiCertCampaignItems).mockRejectedValue(new Error('Items fetch failed'));
 
-		const result: any = await load({
-			params: { id: 'camp-2' },
-			locals: mockLocals(true),
-			fetch: vi.fn()
-		} as any);
-
-		expect(result.campaign).toEqual(campaign);
-		expect(result.campaignItems).toEqual([]);
+		try {
+			await load({
+				params: { id: 'camp-2' },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should throw');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 });

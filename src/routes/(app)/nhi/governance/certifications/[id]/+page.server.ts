@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
-			).catch(() => ({ items: [], total: 0 }))
+			)
 		]);
 
 		return { campaign, campaignItems: itemsResult.items };
