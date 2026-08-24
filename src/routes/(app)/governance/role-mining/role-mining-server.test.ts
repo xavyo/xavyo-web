@@ -166,17 +166,20 @@ describe('Role Mining hub +page.server', () => {
 			);
 		});
 
-		it('returns empty items array when API throws', async () => {
+		it('fails closed when API throws', async () => {
 			mockListJobs.mockRejectedValue(new Error('API error'));
 
 			const { load } = await import('./+page.server');
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/role-mining'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.jobs).toEqual({ items: [], total: 0, page: 1, page_size: 50 });
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/governance/role-mining'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct token and tenantId', async () => {

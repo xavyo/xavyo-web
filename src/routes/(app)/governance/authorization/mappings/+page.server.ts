@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listMappings, deleteMapping } from '$lib/api/authorization';
 import { ApiError } from '$lib/api/client';
@@ -20,8 +20,9 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 			fetch
 		);
 		return { mappings: result.items, total: result.total, limit, offset };
-	} catch {
-		return { mappings: [], total: 0, limit, offset };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load authorization mappings');
 	}
 };
 

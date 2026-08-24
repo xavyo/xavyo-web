@@ -84,17 +84,20 @@ describe('Meta-Roles list +page.server', () => {
 		);
 	});
 
-	it('returns empty items array when listMetaRoles throws', async () => {
+	it('fails closed when listMetaRoles throws', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		vi.mocked(listMetaRoles).mockRejectedValue(new Error('API error'));
 
-		const result = (await load({
-			locals: mockLocals(true),
-			url: new URL('http://localhost/governance/meta-roles'),
-			fetch: vi.fn()
-		} as any)) as any;
-
-		expect(result.metaRoles).toEqual({ items: [], total: 0, limit: 20, offset: 0 });
+		try {
+			await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/governance/meta-roles'),
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 
 	it('calls listMetaRoles with correct token and tenantId', async () => {
