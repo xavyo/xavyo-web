@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { isHttpError } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listImportJobs, uploadImport } from '$lib/api/imports';
@@ -22,8 +22,9 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 			fetch
 		);
 		return { jobs: result.items, total: result.total, limit, offset };
-	} catch {
-		return { jobs: [], total: 0, limit, offset };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load import jobs');
 	}
 };
 

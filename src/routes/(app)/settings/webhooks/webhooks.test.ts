@@ -137,18 +137,20 @@ describe('Webhook List +page.server', () => {
 			);
 		});
 
-		it('returns empty array when API throws', async () => {
+		it('fails closed when API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listWebhookSubscriptions).mockRejectedValue(new Error('Network error'));
 
-			const result = await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/settings/webhooks'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.subscriptions).toEqual([]);
-			expect(result.total).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/settings/webhooks'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 });

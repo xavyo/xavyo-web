@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { listLicensePools } from '$lib/api/licenses';
 import { hasAdminRole } from '$lib/server/auth';
-import type { LicensePoolListResponse } from '$lib/api/types';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -16,12 +16,16 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	const limit = Number(url.searchParams.get('limit')) || 20;
 	const offset = Number(url.searchParams.get('offset')) || 0;
 
-	const pools = await listLicensePools(
-		{ vendor, license_type, status, limit, offset },
-		locals.accessToken!,
-		locals.tenantId!,
-		fetch
-	).catch((): LicensePoolListResponse => ({ items: [], total: 0, limit: 20, offset: 0 }));
-
-	return { pools };
+	try {
+		const pools = await listLicensePools(
+			{ vendor, license_type, status, limit, offset },
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+		return { pools };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load license pools');
+	}
 };

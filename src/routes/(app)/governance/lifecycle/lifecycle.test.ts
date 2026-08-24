@@ -129,17 +129,20 @@ describe('Governance Lifecycle hub +page.server', () => {
 		);
 	});
 
-	it('returns empty items array when listLifecycleConfigs throws', async () => {
+	it('fails closed when listLifecycleConfigs throws', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		vi.mocked(listLifecycleConfigs).mockRejectedValue(new Error('API error'));
 
-		const result = (await load({
-			locals: mockLocals(true),
-			url: new URL('http://localhost/governance/lifecycle'),
-			fetch: vi.fn()
-		} as any)) as any;
-
-		expect(result.configs).toEqual({ items: [], total: 0, limit: 20, offset: 0 });
+		try {
+			await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/governance/lifecycle'),
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 
 	it('calls listLifecycleConfigs with correct token and tenantId', async () => {
