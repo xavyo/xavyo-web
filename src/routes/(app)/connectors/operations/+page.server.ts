@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { redirect, fail } from '@sveltejs/kit';
+import { error, redirect, fail } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listOperations, getOperationStats } from '$lib/api/operations';
 import { listConnectors } from '$lib/api/connectors';
@@ -26,26 +26,18 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 				locals.tenantId!,
 				fetch
 			),
-			getOperationStats(
-				connector_id,
-				locals.accessToken!,
-				locals.tenantId!,
-				fetch
-			).catch(() => null),
+			getOperationStats(connector_id, locals.accessToken!, locals.tenantId!, fetch),
 			listConnectors(
 				{ limit: 100, offset: 0 },
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
-			).catch(() => ({ items: [], total: 0, limit: 100, offset: 0 }))
+			)
 		]);
 
 		return { operations, stats, connectors: connectors.items };
 	} catch (e) {
-		return {
-			operations: { operations: [], total: 0, limit, offset },
-			stats: null,
-			connectors: []
-		};
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load operations');
 	}
 };

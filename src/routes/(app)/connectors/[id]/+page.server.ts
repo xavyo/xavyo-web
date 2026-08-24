@@ -19,29 +19,33 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		redirect(302, '/dashboard');
 	}
 
-	let connector;
-	let health;
 	try {
-		[connector, health] = await Promise.all([
+		const [connector, health, correlationRules, correlationThresholds] = await Promise.all([
 			getConnector(params.id, locals.accessToken!, locals.tenantId!, fetch),
 			getConnectorHealth(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(
 				() => null
-			)
+			),
+			listCorrelationRules(
+				params.id,
+				{ limit: 100, offset: 0 },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			),
+			getCorrelationThresholds(params.id, locals.accessToken!, locals.tenantId!, fetch)
 		]);
+		return {
+			connector,
+			health,
+			correlationRules: correlationRules.items ?? [],
+			correlationThresholds
+		};
 	} catch (e) {
 		if (e instanceof ApiError) {
 			error(e.status, e.message);
 		}
 		error(500, 'Failed to load connector');
 	}
-
-	// Load correlation data in parallel — catch errors gracefully
-	const [correlationRules, correlationThresholds] = await Promise.all([
-		listCorrelationRules(params.id, { limit: 100, offset: 0 }, locals.accessToken!, locals.tenantId!, fetch).catch(() => ({ items: [], total: 0 })),
-		getCorrelationThresholds(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(() => null)
-	]);
-
-	return { connector, health, correlationRules: correlationRules.items ?? [], correlationThresholds };
 };
 
 export const actions: Actions = {

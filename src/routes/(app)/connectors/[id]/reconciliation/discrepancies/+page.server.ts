@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import {
 	listDiscrepancies,
@@ -27,11 +27,9 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 			fetch
 		);
 		return { discrepancies: result, connectorId: params.id };
-	} catch {
-		return {
-			discrepancies: { discrepancies: [], total: 0, limit, offset },
-			connectorId: params.id
-		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load discrepancies');
 	}
 };
 

@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listRuns, triggerRun } from '$lib/api/reconciliation';
 import { getConnector } from '$lib/api/connectors';
@@ -17,12 +17,19 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 
 	try {
 		const [runs, connector] = await Promise.all([
-			listRuns(params.id, { mode, status, limit, offset }, locals.accessToken!, locals.tenantId!, fetch),
-			getConnector(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(() => null)
+			listRuns(
+				params.id,
+				{ mode, status, limit, offset },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			),
+			getConnector(params.id, locals.accessToken!, locals.tenantId!, fetch)
 		]);
 		return { runs, connector, connectorId: params.id };
-	} catch {
-		return { runs: { runs: [], total: 0, limit, offset }, connector: null, connectorId: params.id };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load reconciliation runs');
 	}
 };
 
