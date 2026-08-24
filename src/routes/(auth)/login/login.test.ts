@@ -77,6 +77,21 @@ describe('login page server', () => {
 				} as any)
 			).rejects.toMatchObject({ status: 302, location: '/dashboard' });
 		});
+
+		it('fails closed when available methods API throws', async () => {
+			const { getAvailableMethods } = await import('$lib/api/auth');
+			vi.mocked(getAvailableMethods).mockRejectedValueOnce(new Error('network'));
+			mockSuperValidate.mockResolvedValue({ valid: true, data: {} } as any);
+			const { load } = await import('./+page.server');
+			await expect(
+				load({
+					locals: { user: null },
+					url: new URL('http://localhost/login'),
+					cookies: makeCookies(),
+					fetch: vi.fn()
+				} as any)
+			).rejects.toMatchObject({ status: 500 });
+		});
 	});
 
 	describe('login action', () => {

@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, isRedirect, redirect } from '@sveltejs/kit';
+import { error, fail, isRedirect, redirect } from '@sveltejs/kit';
 import { acceptInvitationSchema } from '$lib/schemas/imports';
 import { validateInvitation, acceptInvitation } from '$lib/api/imports';
 import { ApiError } from '$lib/api/client';
@@ -13,14 +13,20 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 	let validation: InvitationValidationResponse;
 	try {
 		validation = await validateInvitation(params.token, fetch);
-	} catch {
-		validation = {
-			valid: false,
-			email: null,
-			tenant_name: null,
-			reason: 'invalid',
-			message: null
-		};
+	} catch (e) {
+		if (e instanceof ApiError && e.status >= 400 && e.status < 500) {
+			validation = {
+				valid: false,
+				email: null,
+				tenant_name: null,
+				reason: 'invalid',
+				message: null
+			};
+		} else if (e instanceof ApiError) {
+			error(e.status, e.message);
+		} else {
+			error(500, 'Failed to validate invitation');
+		}
 	}
 
 	return { form, validation };

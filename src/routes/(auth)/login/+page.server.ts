@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
 import { login, getAvailableMethods } from '$lib/api/auth';
 import {
@@ -39,8 +39,9 @@ export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 	let availableMethods = { magic_link: false, email_otp: false };
 	try {
 		availableMethods = await getAvailableMethods(requestTenantId(url, cookies), fetch);
-	} catch {
-		// passwordless not available
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load available login methods');
 	}
 
 	return {

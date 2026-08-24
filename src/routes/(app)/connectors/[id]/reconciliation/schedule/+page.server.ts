@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import {
 	getSchedule,
@@ -16,8 +16,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	try {
 		const schedule = await getSchedule(params.id, locals.accessToken!, locals.tenantId!, fetch);
 		return { schedule, connectorId: params.id };
-	} catch {
-		return { schedule: null, connectorId: params.id };
+	} catch (e) {
+		if (e instanceof ApiError && e.status === 404) {
+			return { schedule: null, connectorId: params.id };
+		}
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load reconciliation schedule');
 	}
 };
 

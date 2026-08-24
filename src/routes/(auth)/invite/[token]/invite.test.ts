@@ -78,7 +78,7 @@ describe('Invite [token] +page.server', () => {
 		});
 
 		it('invalid token returns validation result', async () => {
-			vi.mocked(validateInvitation).mockRejectedValue(new Error('not found'));
+			vi.mocked(validateInvitation).mockRejectedValue(new ApiError('not found', 404));
 
 			const result: any = await load({
 				params: { token: 'bad-token' },
@@ -88,6 +88,20 @@ describe('Invite [token] +page.server', () => {
 			expect(result.form).toBeDefined();
 			expect(result.validation.valid).toBe(false);
 			expect(result.validation.reason).toBe('invalid');
+		});
+
+		it('fails closed when validation API throws 500', async () => {
+			vi.mocked(validateInvitation).mockRejectedValue(new ApiError('boom', 500));
+
+			try {
+				await load({
+					params: { token: 'bad-token' },
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 

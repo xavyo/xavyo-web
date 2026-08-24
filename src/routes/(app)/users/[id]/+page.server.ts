@@ -28,12 +28,19 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateUserSchema)
 	);
 
-	// Load lifecycle status (gracefully handle 404/errors)
 	let lifecycleStatus: UserLifecycleStatus | null = null;
 	try {
-		lifecycleStatus = await getUserLifecycleStatus(params.id, locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// User may not have a lifecycle assignment — silently ignore
+		lifecycleStatus = await getUserLifecycleStatus(
+			params.id,
+			locals.accessToken!,
+			locals.tenantId!,
+			fetch
+		);
+	} catch (e) {
+		if (!(e instanceof ApiError && e.status === 404)) {
+			if (e instanceof ApiError) error(e.status, e.message);
+			error(500, 'Failed to load user lifecycle status');
+		}
 	}
 
 	return {
