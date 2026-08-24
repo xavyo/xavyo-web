@@ -8,9 +8,23 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
-	const body = await request.json();
+	let parsed: unknown;
 	try {
-		const result = await simulateTemplate(params.id, { sample_object: body }, locals.accessToken, locals.tenantId, fetch);
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	try {
+		const result = await simulateTemplate(
+			params.id,
+			{ sample_object: parsed },
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);
