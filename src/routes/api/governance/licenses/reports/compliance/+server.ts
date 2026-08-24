@@ -53,9 +53,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 
 	try {
 		const text = await request.text();
-		const body = text ? JSON.parse(text) : undefined;
+		let body: Record<string, unknown> | undefined;
+		if (text.trim()) {
+			let parsed: unknown;
+			try {
+				parsed = JSON.parse(text);
+			} catch {
+				return json({ error: 'Invalid JSON body' }, { status: 400 });
+			}
+			if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+				return json({ error: 'Invalid JSON body' }, { status: 400 });
+			}
+			body = parsed as Record<string, unknown>;
+		}
 		const raw = await generateComplianceReport(
-			body,
+			body as Parameters<typeof generateComplianceReport>[0],
 			locals.accessToken,
 			locals.tenantId,
 			fetch

@@ -14,8 +14,25 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 
 	try {
-		const body = await request.json();
-		const result = await importTools(body.tools ?? [], locals.accessToken, locals.tenantId, fetch);
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			error(400, 'Invalid JSON body');
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			error(400, 'Invalid JSON body');
+		}
+		const body = parsed as Record<string, unknown>;
+		if (!Array.isArray(body.tools)) {
+			error(400, 'tools is required');
+		}
+		const result = await importTools(
+			body.tools as Parameters<typeof importTools>[0],
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result, { status: 201 });
 	} catch (e) {
 		if (e instanceof ApiError) {
