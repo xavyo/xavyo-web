@@ -110,18 +110,20 @@ describe('Invitations +page.server', () => {
 			);
 		});
 
-		it('returns empty array when API throws', async () => {
+		it('fails closed when API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listInvitations).mockRejectedValue(new Error('API error'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/invitations'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.invitations).toEqual([]);
-			expect(result.total).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/invitations'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes status and email filters through to data', async () => {

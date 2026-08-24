@@ -1,7 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listLifecycleConfigs } from '$lib/api/lifecycle';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -14,17 +15,16 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const is_active_raw = url.searchParams.get('is_active');
 	const is_active = is_active_raw !== null ? is_active_raw === 'true' : undefined;
 
-	let configs = { items: [] as any[], total: 0, limit, offset };
 	try {
-		configs = await listLifecycleConfigs(
+		const configs = await listLifecycleConfigs(
 			{ object_type, is_active, limit, offset },
 			locals.accessToken!,
 			locals.tenantId!,
 			fetch
 		);
-	} catch {
-		// If configs fail to load, show empty state
+		return { configs, filters: { object_type, is_active } };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load lifecycle configs');
 	}
-
-	return { configs, filters: { object_type, is_active } };
 };

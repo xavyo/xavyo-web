@@ -74,17 +74,20 @@ describe('Governance Roles list +page.server', () => {
 		);
 	});
 
-	it('returns empty items array when listRoles throws', async () => {
+	it('fails closed when listRoles throws', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		vi.mocked(listRoles).mockRejectedValue(new Error('API error'));
 
-		const result = await load({
-			locals: mockLocals(true),
-			url: new URL('http://localhost/governance/roles'),
-			fetch: vi.fn()
-		} as any) as any;
-
-		expect(result.roles).toEqual({ items: [], total: 0, limit: 20, offset: 0 });
+		try {
+			await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/governance/roles'),
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 
 	it('calls listRoles with correct token and tenantId', async () => {

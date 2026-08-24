@@ -94,17 +94,20 @@ describe('Connectors +page.server', () => {
 			);
 		});
 
-		it('returns empty items array when API throws', async () => {
+		it('fails closed when API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listConnectors).mockRejectedValue(new Error('API error'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/connectors'),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.connectors).toEqual({ items: [], total: 0, limit: 20, offset: 0 });
+			try {
+				await load({
+					locals: mockLocals(true),
+					url: new URL('http://localhost/connectors'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct token and tenantId to listConnectors', async () => {
