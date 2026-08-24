@@ -3,6 +3,20 @@ import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { getSiemDestination, updateSiemDestination, deleteSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
+import type { EventCategory, UpdateSiemDestinationRequest } from '$lib/api/types';
+
+const EXPORT_FORMATS = ['cef', 'syslog_rfc5424', 'json', 'csv'] as const;
+const EVENT_CATEGORIES: EventCategory[] = [
+	'authentication',
+	'user_lifecycle',
+	'group_changes',
+	'access_requests',
+	'provisioning',
+	'administrative',
+	'security',
+	'entitlement',
+	'sod_violation'
+];
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -32,10 +46,59 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 	}
 
 	try {
-		const body = await request.json();
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		const data: UpdateSiemDestinationRequest = {};
+		if (body.name !== undefined) {
+			if (typeof body.name !== 'string' || body.name.length === 0) {
+				return json({ error: 'name must be a non-empty string' }, { status: 400 });
+			}
+			data.name = body.name;
+		}
+		if (body.endpoint_host !== undefined) {
+			if (typeof body.endpoint_host !== 'string' || body.endpoint_host.length === 0) {
+				return json({ error: 'endpoint_host must be a non-empty string' }, { status: 400 });
+			}
+			data.endpoint_host = body.endpoint_host;
+		}
+		if (body.endpoint_port !== undefined) {
+			if (typeof body.endpoint_port !== 'number') {
+				return json({ error: 'endpoint_port must be a number' }, { status: 400 });
+			}
+			data.endpoint_port = body.endpoint_port;
+		}
+		if (body.export_format !== undefined) {
+			if (!EXPORT_FORMATS.includes(body.export_format as (typeof EXPORT_FORMATS)[number])) {
+				return json({ error: 'export_format is invalid' }, { status: 400 });
+			}
+			data.export_format = body.export_format as UpdateSiemDestinationRequest['export_format'];
+		}
+		if (body.event_type_filter !== undefined) {
+			if (
+				!Array.isArray(body.event_type_filter) ||
+				!body.event_type_filter.every((item) => EVENT_CATEGORIES.includes(item as EventCategory))
+			) {
+				return json({ error: 'event_type_filter must be an array of event categories' }, { status: 400 });
+			}
+			data.event_type_filter = body.event_type_filter as EventCategory[];
+		}
+		if (body.enabled !== undefined) {
+			if (typeof body.enabled !== 'boolean') {
+				return json({ error: 'enabled must be a boolean' }, { status: 400 });
+			}
+			data.enabled = body.enabled;
+		}
 		const result = await updateSiemDestination(
 			params.id,
-			body,
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch
