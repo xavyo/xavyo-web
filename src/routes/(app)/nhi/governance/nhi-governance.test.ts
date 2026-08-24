@@ -102,22 +102,21 @@ describe('NHI Governance hub +page.server', () => {
 		});
 	});
 
-	it('handles API failures gracefully with fallback data', async () => {
+	it('fails closed when APIs throw', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		vi.mocked(getNhiRiskSummary).mockRejectedValue(new Error('network'));
 		vi.mocked(getStalenessReport).mockRejectedValue(new Error('network'));
 		vi.mocked(listOrphanDetections).mockRejectedValue(new Error('network'));
 		vi.mocked(listNhi).mockRejectedValue(new Error('network'));
 
-		// Should not throw — page server uses .catch() fallbacks
-		const result: any = await load({
-			locals: mockLocals(true),
-			fetch: vi.fn()
-		} as any);
-
-		expect(result.riskSummary.total_count).toBe(0);
-		expect(result.stalenessReport.total_stale).toBe(0);
-		expect(result.orphanDetections.items).toEqual([]);
-		expect(result.nhiNameMap).toEqual({});
+		try {
+			await load({
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 });

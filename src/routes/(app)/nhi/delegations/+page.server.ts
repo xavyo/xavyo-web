@@ -1,5 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { listDelegationGrants } from '$lib/api/nhi-delegations';
+import { error } from '@sveltejs/kit';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, url, fetch }) => {
 	const principal_id = url.searchParams.get('principal_id') || '';
@@ -7,9 +9,7 @@ export const load: PageServerLoad = async ({ locals, url, fetch }) => {
 	const status = url.searchParams.get('status') || '';
 	const filters = { principal_id, actor_nhi_id, status };
 
-	if (!locals.accessToken || !locals.tenantId) {
-		return { grants: [], hasMore: false, needsFilter: false, filters };
-	}
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	// Backend requires at least principal_id or actor_nhi_id
 	if (!principal_id && !actor_nhi_id) {
@@ -38,7 +38,8 @@ export const load: PageServerLoad = async ({ locals, url, fetch }) => {
 			needsFilter: false,
 			filters
 		};
-	} catch {
-		return { grants: [], hasMore: false, needsFilter: false, filters };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load NHI delegations');
 	}
 };

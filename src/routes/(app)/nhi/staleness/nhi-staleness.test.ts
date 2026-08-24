@@ -118,16 +118,18 @@ describe('NHI Staleness +page.server', () => {
 			);
 		});
 
-		it('handles API failure gracefully', async () => {
+		it('fails closed when API throws', async () => {
 			mockGetReport.mockRejectedValue(new Error('API error'));
 
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.entries).toEqual([]);
-			expect(result.total).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct token and tenantId', async () => {

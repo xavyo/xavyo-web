@@ -209,63 +209,64 @@ describe('Provisioning Scripts hub +page.server', () => {
 			expect(mockGetDashboard).toHaveBeenCalledWith('tok', 'tid');
 		});
 
-		it('gracefully handles scripts API failure', async () => {
+		it('fails closed when scripts API throws', async () => {
 			mockListScripts.mockRejectedValue(new Error('scripts failed'));
 			mockListTemplates.mockResolvedValue({ templates: [makeTemplate()], total: 1 });
 			mockGetDashboard.mockResolvedValue(makeDashboard());
 
-			const result = (await load({
-				locals: mockLocals(true)
-			} as any)) as any;
-
-			expect(result.scripts).toEqual([]);
-			expect(result.scriptsTotal).toBe(0);
-			expect(result.templates).toHaveLength(1);
-			expect(result.dashboard).toBeDefined();
+			try {
+				await load({
+					locals: mockLocals(true)
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles templates API failure', async () => {
+		it('fails closed when templates API throws', async () => {
 			mockListScripts.mockResolvedValue({ scripts: [makeScript()], total: 1 });
 			mockListTemplates.mockRejectedValue(new Error('templates failed'));
 			mockGetDashboard.mockResolvedValue(makeDashboard());
 
-			const result = (await load({
-				locals: mockLocals(true)
-			} as any)) as any;
-
-			expect(result.scripts).toHaveLength(1);
-			expect(result.templates).toEqual([]);
-			expect(result.templatesTotal).toBe(0);
+			try {
+				await load({
+					locals: mockLocals(true)
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles dashboard API failure', async () => {
+		it('fails closed when dashboard API throws', async () => {
 			mockListScripts.mockResolvedValue({ scripts: [makeScript()], total: 1 });
 			mockListTemplates.mockResolvedValue({ templates: [makeTemplate()], total: 1 });
 			mockGetDashboard.mockRejectedValue(new Error('dashboard failed'));
 
-			const result = (await load({
-				locals: mockLocals(true)
-			} as any)) as any;
-
-			expect(result.scripts).toHaveLength(1);
-			expect(result.templates).toHaveLength(1);
-			expect(result.dashboard).toBeNull();
+			try {
+				await load({
+					locals: mockLocals(true)
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles all APIs failing', async () => {
+		it('fails closed when all APIs fail', async () => {
 			mockListScripts.mockRejectedValue(new Error('fail'));
 			mockListTemplates.mockRejectedValue(new Error('fail'));
 			mockGetDashboard.mockRejectedValue(new Error('fail'));
 
-			const result = (await load({
-				locals: mockLocals(true)
-			} as any)) as any;
-
-			expect(result.scripts).toEqual([]);
-			expect(result.scriptsTotal).toBe(0);
-			expect(result.templates).toEqual([]);
-			expect(result.templatesTotal).toBe(0);
-			expect(result.dashboard).toBeNull();
+			try {
+				await load({
+					locals: mockLocals(true)
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('calls hasAdminRole with user roles', async () => {
