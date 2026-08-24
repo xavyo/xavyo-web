@@ -23,7 +23,10 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		const [connector, health, correlationRules, correlationThresholds] = await Promise.all([
 			getConnector(params.id, locals.accessToken!, locals.tenantId!, fetch),
 			getConnectorHealth(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(
-				() => null
+				(healthErr) => {
+					if (healthErr instanceof ApiError && healthErr.status === 404) return null;
+					throw healthErr;
+				}
 			),
 			listCorrelationRules(
 				params.id,

@@ -23,15 +23,13 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		error(500, 'Failed to load service provider');
 	}
 
-	// Fetch IdP info for IdP-initiated SSO URL (non-blocking — fail silently)
+	// IdP info is optional when unconfigured (404); 5xx must not look like missing SSO.
 	let idpInfo: IdPInfo | null = null;
-	try {
-		const idpRes = await fetch('/api/federation/saml/idp-info');
-		if (idpRes.ok) {
-			idpInfo = await idpRes.json();
-		}
-	} catch {
-		// IdP info is optional — don't block the page
+	const idpRes = await fetch('/api/federation/saml/idp-info');
+	if (idpRes.ok) {
+		idpInfo = await idpRes.json();
+	} else if (idpRes.status !== 404) {
+		error(idpRes.status, 'Failed to load IdP info');
 	}
 
 	const form = await superValidate(
