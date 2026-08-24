@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listLicenseIncompatibilities, createLicenseIncompatibility } from '$lib/api/licenses';
+import type { CreateLicenseIncompatibilityRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
@@ -46,9 +47,32 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 
 	try {
-		const body = await request.json();
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			return json({ error: 'Invalid JSON body' }, { status: 400 });
+		}
+		const body = parsed as Record<string, unknown>;
+		if (typeof body.pool_a_id !== 'string' || body.pool_a_id.length === 0) {
+			return json({ error: 'pool_a_id is required' }, { status: 400 });
+		}
+		if (typeof body.pool_b_id !== 'string' || body.pool_b_id.length === 0) {
+			return json({ error: 'pool_b_id is required' }, { status: 400 });
+		}
+		if (typeof body.reason !== 'string' || body.reason.length === 0) {
+			return json({ error: 'reason is required' }, { status: 400 });
+		}
+		const data: CreateLicenseIncompatibilityRequest = {
+			pool_a_id: body.pool_a_id,
+			pool_b_id: body.pool_b_id,
+			reason: body.reason
+		};
 		const result = await createLicenseIncompatibility(
-			body,
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch
