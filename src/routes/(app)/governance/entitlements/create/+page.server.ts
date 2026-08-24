@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createEntitlementSchema } from '$lib/schemas/governance';
 import { createEntitlement, listApplications } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
@@ -15,7 +15,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	const form = await superValidate(zod(createEntitlementSchema));
 
-	let applications: { id: string; name: string }[] = [];
 	try {
 		const result = await listApplications(
 			{ status: 'active', limit: 100 },
@@ -23,12 +22,14 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 			locals.tenantId!,
 			fetch
 		);
-		applications = result.items.map((a) => ({ id: a.id, name: a.name }));
-	} catch {
-		// If applications fail to load, the form will show a warning
+		return {
+			form,
+			applications: result.items.map((a) => ({ id: a.id, name: a.name }))
+		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load applications');
 	}
-
-	return { form, applications };
 };
 
 export const actions: Actions = {

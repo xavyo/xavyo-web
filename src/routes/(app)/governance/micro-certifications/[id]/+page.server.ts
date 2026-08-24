@@ -25,8 +25,9 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
 	try {
 		events = await getMicroCertificationEvents(params.id, locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// Non-critical
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load certification events');
 	}
 
 	return { certification, events };

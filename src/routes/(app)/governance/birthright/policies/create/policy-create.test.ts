@@ -97,13 +97,17 @@ describe('Policy Create +page.server', () => {
 			expect(result.entitlements[0].name).toBe('VPN Access');
 		});
 
-		it('returns empty entitlements when API fails', async () => {
+		it('fails closed when entitlements API throws', async () => {
 			mockListEntitlements.mockRejectedValue(new Error('fail'));
-			const result: any = await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any);
-			expect(result.entitlements).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('calls hasAdminRole with user roles', async () => {

@@ -88,17 +88,19 @@ describe('Governance Roles Create +page.server', () => {
 			]);
 		});
 
-		it('returns empty parentRoles when listRoles throws', async () => {
+		it('fails closed when listRoles throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listRoles).mockRejectedValue(new Error('network error'));
 
-			const result: any = await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.form).toBeDefined();
-			expect(result.parentRoles).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 

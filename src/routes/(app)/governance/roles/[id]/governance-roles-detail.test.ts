@@ -160,19 +160,22 @@ describe('Governance Roles Detail +page.server', () => {
 			expect(getRole).toHaveBeenCalledWith('role-1', 'tok', 'tid', mockFetch);
 		});
 
-		it('returns empty availableRoles when listRoles fails', async () => {
+		it('fails closed when listRoles throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(getRole).mockResolvedValue(mockRole as any);
 			vi.mocked(listRoles).mockRejectedValue(new Error('network'));
 
-			const result: any = await load({
-				params: { id: 'role-1' },
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/roles/role-1'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.availableRoles).toEqual([]);
+			try {
+				await load({
+					params: { id: 'role-1' },
+					locals: mockLocals(true),
+					url: new URL('http://localhost/governance/roles/role-1'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('throws 500 for non-API errors from getRole', async () => {

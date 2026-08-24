@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createRoleSchema } from '$lib/schemas/governance-roles';
 import { createRole, listRoles } from '$lib/api/governance-roles';
 import { ApiError } from '$lib/api/client';
@@ -15,16 +15,16 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	const form = await superValidate(zod(createRoleSchema));
 
-	// Load existing roles for parent selection
-	let parentRoles: { id: string; name: string }[] = [];
 	try {
 		const result = await listRoles({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch);
-		parentRoles = result.items.map((r) => ({ id: r.id, name: r.name }));
-	} catch {
-		// If roles fail to load, parent selector will be empty
+		return {
+			form,
+			parentRoles: result.items.map((r) => ({ id: r.id, name: r.name }))
+		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load roles');
 	}
-
-	return { form, parentRoles };
 };
 
 export const actions: Actions = {

@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect, isRedirect } from '@sveltejs/kit';
+import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { createBirthrightPolicySchema } from '$lib/schemas/birthright';
 import { createBirthrightPolicy } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
@@ -16,7 +16,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	const form = await superValidate(zod(createBirthrightPolicySchema));
 
-	let entitlements: { id: string; name: string }[] = [];
 	try {
 		const result = await listEntitlements(
 			{ status: 'active', limit: 100 },
@@ -24,12 +23,14 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 			locals.tenantId!,
 			fetch
 		);
-		entitlements = result.items.map((e) => ({ id: e.id, name: e.name }));
-	} catch {
-		// If entitlements fail to load, the form will show a warning
+		return {
+			form,
+			entitlements: result.items.map((e) => ({ id: e.id, name: e.name }))
+		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load entitlements');
 	}
-
-	return { form, entitlements };
 };
 
 export const actions: Actions = {
