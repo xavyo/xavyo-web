@@ -13,21 +13,40 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		error(403, 'Forbidden');
 	}
 
-	const body = await request.json();
-	const {
-		common_name,
-		organization = 'xavyo',
-		country = 'FR',
-		validity_days = 365
-	} = body as {
-		common_name: string;
-		organization?: string;
-		country?: string;
-		validity_days?: number;
-	};
-
-	if (!common_name) {
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.common_name !== 'string' || body.common_name.length === 0) {
 		error(400, 'common_name is required');
+	}
+	const common_name = body.common_name;
+	let organization = 'xavyo';
+	if (body.organization !== undefined) {
+		if (typeof body.organization !== 'string' || body.organization.length === 0) {
+			error(400, 'organization must be a non-empty string');
+		}
+		organization = body.organization;
+	}
+	let country = 'FR';
+	if (body.country !== undefined) {
+		if (typeof body.country !== 'string' || body.country.length === 0) {
+			error(400, 'country must be a non-empty string');
+		}
+		country = body.country;
+	}
+	let validity_days = 365;
+	if (body.validity_days !== undefined) {
+		if (typeof body.validity_days !== 'number') {
+			error(400, 'validity_days must be a number');
+		}
+		validity_days = body.validity_days;
 	}
 
 	// Generate RSA-2048 keypair
