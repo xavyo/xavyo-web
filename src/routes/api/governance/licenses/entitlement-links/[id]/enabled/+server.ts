@@ -12,8 +12,20 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		error(403, 'Forbidden');
 	}
 
+	let parsed: unknown;
 	try {
-		const body = await request.json();
+		parsed = await request.json();
+	} catch {
+		return json({ error: 'Invalid JSON body' }, { status: 400 });
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		return json({ error: 'Invalid JSON body' }, { status: 400 });
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.enabled !== 'boolean') {
+		return json({ error: 'enabled is required' }, { status: 400 });
+	}
+	try {
 		const result = await toggleLicenseEntitlementLink(
 			params.id,
 			body.enabled,

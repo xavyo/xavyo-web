@@ -25,14 +25,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		error(403, 'Forbidden');
 	}
 
+	let parsed: unknown;
 	try {
-		const body = await request.json();
-		const result = await createScimToken(
-			body.name,
-			locals.accessToken,
-			locals.tenantId,
-			fetch
-		);
+		parsed = await request.json();
+	} catch {
+		return json({ error: 'Invalid JSON body' }, { status: 400 });
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		return json({ error: 'Invalid JSON body' }, { status: 400 });
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.name !== 'string' || body.name.length === 0) {
+		return json({ error: 'name is required' }, { status: 400 });
+	}
+	try {
+		const result = await createScimToken(body.name, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });
 	} catch (e) {
 		if (e instanceof ApiError) {
