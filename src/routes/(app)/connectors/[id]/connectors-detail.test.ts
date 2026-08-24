@@ -122,11 +122,11 @@ describe('Connector Detail +page.server', () => {
 			expect(result.health).toEqual(health);
 		});
 
-		it('returns null health when health endpoint fails', async () => {
+		it('returns null health when health endpoint is 404', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			const connector = makeConnector();
 			vi.mocked(getConnector).mockResolvedValue(connector);
-			vi.mocked(getConnectorHealth).mockRejectedValue(new Error('not available'));
+			vi.mocked(getConnectorHealth).mockRejectedValue(new ApiError('Not found', 404));
 
 			const result: any = await load({
 				params: { id: 'conn-1' },
@@ -136,6 +136,23 @@ describe('Connector Detail +page.server', () => {
 
 			expect(result.connector).toEqual(connector);
 			expect(result.health).toBeNull();
+		});
+
+		it('fails closed when health endpoint returns 500', async () => {
+			vi.mocked(hasAdminRole).mockReturnValue(true);
+			vi.mocked(getConnector).mockResolvedValue(makeConnector());
+			vi.mocked(getConnectorHealth).mockRejectedValue(new ApiError('boom', 500));
+
+			try {
+				await load({
+					params: { id: 'conn-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('throws API error status when getConnector fails', async () => {

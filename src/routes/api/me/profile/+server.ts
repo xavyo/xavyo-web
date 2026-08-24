@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getProfile, updateProfile } from '$lib/api/me';
+import { ApiError } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,9 +11,9 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 	try {
 		const result = await getProfile(locals.accessToken, locals.tenantId, fetch);
 		return json(result);
-	} catch {
-		// Profile may not exist on current tenant — return JWT-derived fallback
-		if (locals.user) {
+	} catch (e) {
+		// Profile may not exist on current tenant — JWT fallback is only for 404.
+		if (e instanceof ApiError && e.status === 404 && locals.user) {
 			return json({
 				id: locals.user.id,
 				email: locals.user.email,
@@ -24,7 +25,8 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 				created_at: new Date().toISOString()
 			});
 		}
-		error(404, 'Profile not found');
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load profile');
 	}
 };
 
