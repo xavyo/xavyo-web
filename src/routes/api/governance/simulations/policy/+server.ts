@@ -34,9 +34,41 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
+	let parsed: unknown;
 	try {
-		const body = await request.json();
-		const result = await createPolicySimulation(body, locals.accessToken, locals.tenantId, fetch);
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.name !== 'string' || body.name.length === 0) {
+		error(400, 'name is required');
+	}
+	if (body.simulation_type !== 'sod_rule' && body.simulation_type !== 'birthright_policy') {
+		error(400, 'simulation_type is required');
+	}
+	if (!body.policy_config || typeof body.policy_config !== 'object' || Array.isArray(body.policy_config)) {
+		error(400, 'policy_config is required');
+	}
+	const data: Record<string, unknown> = {
+		name: body.name,
+		simulation_type: body.simulation_type,
+		policy_config: body.policy_config
+	};
+	if (body.policy_id !== undefined && body.policy_id !== null) {
+		if (typeof body.policy_id !== 'string') {
+			error(400, 'policy_id must be a string');
+		}
+		data.policy_id = body.policy_id;
+	} else {
+		data.policy_id = null;
+	}
+
+	try {
+		const result = await createPolicySimulation(data, locals.accessToken, locals.tenantId, fetch);
 
 		return json(result, { status: 201 });
 	} catch (e) {
