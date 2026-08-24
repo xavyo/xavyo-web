@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { rotateSecret } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import type { RotateSecretRequest } from '$lib/api/types';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -11,12 +12,27 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (!hasAdminRole(locals.user?.roles)) {
 		error(403, 'Admin role required');
 	}
+
+	let parsed: unknown;
 	try {
-		const body = await request.json();
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.value !== 'string' || body.value.length === 0) {
+		error(400, 'value is required');
+	}
+	const data: RotateSecretRequest = { value: body.value };
+
+	try {
 		const result = await rotateSecret(
 			params.nhiId,
 			params.secretId,
-			body,
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch
