@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { getOperationsDlq, retryOperation, resolveOperation } from '$lib/api/operations';
 import { listConnectors } from '$lib/api/connectors';
@@ -27,15 +27,13 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
-			).catch(() => ({ items: [], total: 0, limit: 100, offset: 0 }))
+			)
 		]);
 
 		return { dlq, connectors: connectors.items };
-	} catch {
-		return {
-			dlq: { operations: [], offset, limit },
-			connectors: []
-		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load operations DLQ');
 	}
 };
 

@@ -1,7 +1,8 @@
 import type { PageServerLoad } from './$types';
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listConflicts } from '$lib/api/operations';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -21,7 +22,8 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 			fetch
 		);
 		return { conflicts: result };
-	} catch {
-		return { conflicts: { conflicts: [], total: 0, limit, offset } };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load conflicts');
 	}
 };

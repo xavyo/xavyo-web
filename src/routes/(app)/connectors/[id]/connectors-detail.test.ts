@@ -7,6 +7,10 @@ vi.mock('$lib/api/connectors', () => ({
 	deactivateConnector: vi.fn(),
 	deleteConnector: vi.fn()
 }));
+vi.mock('$lib/api/correlation', () => ({
+	listCorrelationRules: vi.fn(),
+	getCorrelationThresholds: vi.fn()
+}));
 vi.mock('$lib/api/client', () => ({
 	ApiError: class extends Error {
 		status: number;
@@ -39,6 +43,7 @@ import {
 	deactivateConnector,
 	deleteConnector
 } from '$lib/api/connectors';
+import { listCorrelationRules, getCorrelationThresholds } from '$lib/api/correlation';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
 import type { Connector, ConnectorHealthStatus } from '$lib/api/types';
@@ -80,6 +85,8 @@ function makeHealth(overrides: Partial<ConnectorHealthStatus> = {}): ConnectorHe
 describe('Connector Detail +page.server', () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		vi.mocked(listCorrelationRules).mockResolvedValue({ items: [], total: 0 } as any);
+		vi.mocked(getCorrelationThresholds).mockResolvedValue(null as any);
 	});
 
 	describe('load', () => {

@@ -19,12 +19,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	try {
 		const [operation, attempts, logs] = await Promise.all([
 			getOperation(params.id, locals.accessToken!, locals.tenantId!, fetch),
-			getOperationAttempts(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(
-				() => ({ attempts: [], operation_id: params.id })
-			),
-			getOperationLogs(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(
-				() => ({ logs: [], operation_id: params.id })
-			)
+			getOperationAttempts(params.id, locals.accessToken!, locals.tenantId!, fetch),
+			getOperationLogs(params.id, locals.accessToken!, locals.tenantId!, fetch)
 		]);
 
 		return { operation, attempts: attempts.attempts, logs: logs.logs };

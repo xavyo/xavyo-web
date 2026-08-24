@@ -193,17 +193,20 @@ describe('Connector detail +page.server (correlation data)', () => {
 			expect(result.correlationRules[1].match_type).toBe('fuzzy');
 		});
 
-		it('returns empty array when correlation rules API fails', async () => {
+		it('fails closed when correlation rules API throws', async () => {
 			mockListRules.mockRejectedValue(new Error('rules not available'));
 			mockGetThresholds.mockResolvedValue(makeCorrelationThreshold());
 
-			const result = (await load({
-				params: { id: 'conn-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.correlationRules).toEqual([]);
+			try {
+				await load({
+					params: { id: 'conn-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('calls listCorrelationRules with correct params', async () => {
@@ -243,17 +246,20 @@ describe('Connector detail +page.server (correlation data)', () => {
 			expect(result.correlationThresholds.manual_review_threshold).toBe(0.7);
 		});
 
-		it('returns null when thresholds API fails', async () => {
+		it('fails closed when thresholds API throws', async () => {
 			mockListRules.mockResolvedValue({ items: [], total: 0, limit: 100, offset: 0 });
 			mockGetThresholds.mockRejectedValue(new Error('thresholds not available'));
 
-			const result = (await load({
-				params: { id: 'conn-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.correlationThresholds).toBeNull();
+			try {
+				await load({
+					params: { id: 'conn-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('calls getCorrelationThresholds with correct params', async () => {
@@ -275,22 +281,21 @@ describe('Connector detail +page.server (correlation data)', () => {
 		});
 	});
 
-	describe('load - both correlation APIs fail gracefully', () => {
-		it('still returns connector and health when both correlation APIs fail', async () => {
+	describe('load - correlation APIs fail closed', () => {
+		it('fails closed when both correlation APIs throw', async () => {
 			mockListRules.mockRejectedValue(new Error('fail'));
 			mockGetThresholds.mockRejectedValue(new Error('fail'));
 
-			const result = (await load({
-				params: { id: 'conn-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.connector).toBeDefined();
-			expect(result.connector.id).toBe('conn-1');
-			expect(result.health).toBeDefined();
-			expect(result.correlationRules).toEqual([]);
-			expect(result.correlationThresholds).toBeNull();
+			try {
+				await load({
+					params: { id: 'conn-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 });
