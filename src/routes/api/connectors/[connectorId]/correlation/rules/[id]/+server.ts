@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { getCorrelationRule, updateCorrelationRule, deleteCorrelationRule } from '$lib/api/correlation';
+import type { UpdateCorrelationRuleRequest } from '$lib/api/types';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -12,8 +13,104 @@ export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
-	const body = await request.json();
-	const result = await updateCorrelationRule(params.connectorId, params.id, body, locals.accessToken, locals.tenantId, fetch);
+
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	const data: UpdateCorrelationRuleRequest = {};
+	if (body.name !== undefined) {
+		if (typeof body.name !== 'string' || body.name.length === 0) {
+			error(400, 'name must be a non-empty string');
+		}
+		data.name = body.name;
+	}
+	if (body.source_attribute !== undefined) {
+		if (typeof body.source_attribute !== 'string' || body.source_attribute.length === 0) {
+			error(400, 'source_attribute must be a non-empty string');
+		}
+		data.source_attribute = body.source_attribute;
+	}
+	if (body.target_attribute !== undefined) {
+		if (typeof body.target_attribute !== 'string' || body.target_attribute.length === 0) {
+			error(400, 'target_attribute must be a non-empty string');
+		}
+		data.target_attribute = body.target_attribute;
+	}
+	if (body.match_type !== undefined) {
+		if (body.match_type !== 'exact' && body.match_type !== 'fuzzy' && body.match_type !== 'expression') {
+			error(400, 'match_type must be exact, fuzzy, or expression');
+		}
+		data.match_type = body.match_type;
+	}
+	if (body.algorithm !== undefined) {
+		if (body.algorithm !== null && body.algorithm !== 'levenshtein' && body.algorithm !== 'jaro_winkler') {
+			error(400, 'algorithm must be levenshtein, jaro_winkler, or null');
+		}
+		data.algorithm = body.algorithm;
+	}
+	if (body.threshold !== undefined) {
+		if (typeof body.threshold !== 'number') {
+			error(400, 'threshold must be a number');
+		}
+		data.threshold = body.threshold;
+	}
+	if (body.weight !== undefined) {
+		if (typeof body.weight !== 'number') {
+			error(400, 'weight must be a number');
+		}
+		data.weight = body.weight;
+	}
+	if (body.expression !== undefined) {
+		if (body.expression !== null && typeof body.expression !== 'string') {
+			error(400, 'expression must be a string or null');
+		}
+		data.expression = body.expression;
+	}
+	if (body.tier !== undefined) {
+		if (typeof body.tier !== 'number') {
+			error(400, 'tier must be a number');
+		}
+		data.tier = body.tier;
+	}
+	if (body.is_definitive !== undefined) {
+		if (typeof body.is_definitive !== 'boolean') {
+			error(400, 'is_definitive must be a boolean');
+		}
+		data.is_definitive = body.is_definitive;
+	}
+	if (body.normalize !== undefined) {
+		if (typeof body.normalize !== 'boolean') {
+			error(400, 'normalize must be a boolean');
+		}
+		data.normalize = body.normalize;
+	}
+	if (body.is_active !== undefined) {
+		if (typeof body.is_active !== 'boolean') {
+			error(400, 'is_active must be a boolean');
+		}
+		data.is_active = body.is_active;
+	}
+	if (body.priority !== undefined) {
+		if (typeof body.priority !== 'number') {
+			error(400, 'priority must be a number');
+		}
+		data.priority = body.priority;
+	}
+	const result = await updateCorrelationRule(
+		params.connectorId,
+		params.id,
+		data,
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 	return json(result);
 };
 
