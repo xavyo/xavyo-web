@@ -5,8 +5,19 @@ vi.mock('$lib/api/branding', () => ({
 	getPublicBranding: vi.fn()
 }));
 
+vi.mock('$lib/api/client', () => ({
+	ApiError: class ApiError extends Error {
+		status: number;
+		constructor(message: string, status: number) {
+			super(message);
+			this.status = status;
+		}
+	}
+}));
+
 import { load } from './+layout.server';
 import { getPublicBranding } from '$lib/api/branding';
+import { ApiError } from '$lib/api/client';
 
 const mockGetPublicBranding = vi.mocked(getPublicBranding);
 
@@ -92,8 +103,8 @@ describe('(auth) +layout.server', () => {
 		expect(result.tenantSlug).toBe('system');
 	});
 
-	it('returns null branding when API fails (404)', async () => {
-		mockGetPublicBranding.mockRejectedValue(new Error('Branding not found'));
+	it('returns null branding when API returns 404', async () => {
+		mockGetPublicBranding.mockRejectedValue(new ApiError('Branding not found', 404));
 
 		const result = (await load(makeLoadArgs({ tenant: 'nonexistent' }))) as AuthLayoutData;
 
@@ -101,22 +112,26 @@ describe('(auth) +layout.server', () => {
 		expect(result.tenantSlug).toBe('nonexistent');
 	});
 
-	it('returns null branding when API fails (500)', async () => {
-		mockGetPublicBranding.mockRejectedValue(new Error('Internal Server Error'));
+	it('fails closed when API returns 500', async () => {
+		mockGetPublicBranding.mockRejectedValue(new ApiError('Internal Server Error', 500));
 
-		const result = (await load(makeLoadArgs({ tenant: 'broken' }))) as AuthLayoutData;
-
-		expect(result.branding).toBeNull();
-		expect(result.tenantSlug).toBe('broken');
+		try {
+			await load(makeLoadArgs({ tenant: 'broken' }));
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 
-	it('returns null branding on network error', async () => {
+	it('fails closed on network error', async () => {
 		mockGetPublicBranding.mockRejectedValue(new TypeError('Failed to fetch'));
 
-		const result = (await load(makeLoadArgs())) as AuthLayoutData;
-
-		expect(result.branding).toBeNull();
-		expect(result.tenantSlug).toBe('system');
+		try {
+			await load(makeLoadArgs());
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(500);
+		}
 	});
 
 	it('passes SvelteKit fetch to getPublicBranding', async () => {

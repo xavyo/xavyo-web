@@ -11,9 +11,23 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
 	try {
 		const run = await getRun(params.id, params.runId, locals.accessToken!, locals.tenantId!, fetch);
-		const report = run.status === 'completed'
-			? await getRunReport(params.id, params.runId, locals.accessToken!, locals.tenantId!, fetch).catch(() => null)
-			: null;
+		let report = null;
+		if (run.status === 'completed') {
+			try {
+				report = await getRunReport(
+					params.id,
+					params.runId,
+					locals.accessToken!,
+					locals.tenantId!,
+					fetch
+				);
+			} catch (reportErr) {
+				if (!(reportErr instanceof ApiError && reportErr.status === 404)) {
+					if (reportErr instanceof ApiError) error(reportErr.status, reportErr.message);
+					error(500, 'Failed to load reconciliation report');
+				}
+			}
+		}
 		return { run, report, connectorId: params.id };
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);

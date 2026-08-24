@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { superValidate, message } from 'sveltekit-superforms';
 import type { ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { updateBrandingSchema } from '$lib/schemas/branding';
 import { getBranding, updateBranding } from '$lib/api/branding';
 import { ApiError } from '$lib/api/client';
@@ -11,8 +11,11 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 	let branding = null;
 	try {
 		branding = await getBranding(locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// Branding may not be configured yet; fall back to empty form
+	} catch (e) {
+		if (!(e instanceof ApiError && e.status === 404)) {
+			if (e instanceof ApiError) error(e.status, e.message);
+			error(500, 'Failed to load branding');
+		}
 	}
 
 	const form = await superValidate(
