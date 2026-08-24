@@ -12,8 +12,20 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(403, 'Forbidden');
 	}
 
+	let parsed: unknown;
 	try {
-		const body = await request.json();
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.grace_days !== 'number') {
+		error(400, 'grace_days is required');
+	}
+	try {
 		await grantGracePeriod(params.id, body.grace_days, locals.accessToken, locals.tenantId, fetch);
 		return new Response(null, { status: 204 });
 	} catch (e) {
