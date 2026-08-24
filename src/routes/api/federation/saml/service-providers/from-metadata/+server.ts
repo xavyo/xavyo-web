@@ -13,11 +13,24 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
 		error(403, 'Forbidden');
 	}
 
-	const body = await request.json();
-	const { metadata_url, metadata_xml } = body as {
-		metadata_url?: string;
-		metadata_xml?: string;
-	};
+	let parsedBody: unknown;
+	try {
+		parsedBody = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsedBody || typeof parsedBody !== 'object' || Array.isArray(parsedBody)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsedBody as Record<string, unknown>;
+	if (body.metadata_url !== undefined && typeof body.metadata_url !== 'string') {
+		error(400, 'metadata_url must be a string');
+	}
+	if (body.metadata_xml !== undefined && typeof body.metadata_xml !== 'string') {
+		error(400, 'metadata_xml must be a string');
+	}
+	const metadata_url = typeof body.metadata_url === 'string' ? body.metadata_url : undefined;
+	const metadata_xml = typeof body.metadata_xml === 'string' ? body.metadata_xml : undefined;
 
 	if (!metadata_url && !metadata_xml) {
 		error(400, 'Either metadata_url or metadata_xml is required');
