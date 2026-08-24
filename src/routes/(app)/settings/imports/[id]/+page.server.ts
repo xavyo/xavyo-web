@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
-			).catch(() => ({ items: [], total: 0, limit: errorLimit, offset: errorOffset }))
+			)
 		]);
 		errorTotal = errors.total;
 	} catch (e) {

@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect } from '@sveltejs/kit';
+import { error, fail, redirect } from '@sveltejs/kit';
 import { createWebhookSubscriptionSchema } from '$lib/schemas/webhooks';
 import { listWebhookEventTypes, createWebhookSubscription } from '$lib/api/webhooks';
 import { ApiError } from '$lib/api/client';
@@ -14,15 +14,13 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 	const form = await superValidate(zod(createWebhookSubscriptionSchema));
 
-	let eventTypes: { event_type: string; category: string; description: string }[] = [];
 	try {
 		const result = await listWebhookEventTypes(locals.accessToken!, locals.tenantId!, fetch);
-		eventTypes = result.event_types;
-	} catch {
-		// Fall back to empty list if event types can't be loaded
+		return { form, eventTypes: result.event_types };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load webhook event types');
 	}
-
-	return { form, eventTypes };
 };
 
 export const actions: Actions = {

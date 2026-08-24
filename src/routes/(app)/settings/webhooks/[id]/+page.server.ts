@@ -30,7 +30,7 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 				locals.accessToken!,
 				locals.tenantId!,
 				fetch
-			).catch(() => ({ items: [], total: 0, limit: deliveryLimit, offset: deliveryOffset }))
+			)
 		]);
 		deliveryTotal = deliveries.total;
 	} catch (e) {

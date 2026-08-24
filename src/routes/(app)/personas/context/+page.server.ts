@@ -1,17 +1,17 @@
 import type { PageServerLoad } from './$types';
 import { getCurrentContext, listContextSessions } from '$lib/api/persona-context';
 import { listPersonas } from '$lib/api/personas';
+import { error } from '@sveltejs/kit';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!locals.accessToken || !locals.tenantId) {
-		return { context: null, sessions: [], personas: [] };
-	}
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	try {
 		const [context, sessionsResult, personasResult] = await Promise.all([
-			getCurrentContext(locals.accessToken, locals.tenantId, fetch).catch(() => null),
-			listContextSessions({ limit: 50 }, locals.accessToken, locals.tenantId, fetch).catch(() => ({ items: [], total: 0 })),
-			listPersonas({ limit: 100 }, locals.accessToken, locals.tenantId, fetch).catch(() => ({ items: [] }))
+			getCurrentContext(locals.accessToken, locals.tenantId, fetch),
+			listContextSessions({ limit: 50 }, locals.accessToken, locals.tenantId, fetch),
+			listPersonas({ limit: 100 }, locals.accessToken, locals.tenantId, fetch)
 		]);
 
 		return {
@@ -20,7 +20,8 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 			sessionsTotal: sessionsResult.total,
 			personas: personasResult.items ?? []
 		};
-	} catch {
-		return { context: null, sessions: [], sessionsTotal: 0, personas: [] };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load persona context');
 	}
 };

@@ -31,12 +31,13 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		error(500, 'Failed to load webhook subscription');
 	}
 
-	let eventTypes: { event_type: string; category: string; description: string }[] = [];
+	let eventTypes: { event_type: string; category: string; description: string }[];
 	try {
 		const result = await listWebhookEventTypes(locals.accessToken!, locals.tenantId!, fetch);
 		eventTypes = result.event_types;
-	} catch {
-		// Fall back to empty list
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load webhook event types');
 	}
 
 	const form = await superValidate(

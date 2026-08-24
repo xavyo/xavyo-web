@@ -228,21 +228,22 @@ describe('Webhook Detail +page.server', () => {
 			}
 		});
 
-		it('returns empty deliveries when delivery API fails', async () => {
+		it('fails closed when delivery API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(getWebhookSubscription).mockResolvedValue(makeSub() as any);
 			vi.mocked(listWebhookDeliveries).mockRejectedValue(new Error('fail'));
 
-			const result = await load({
-				params: { id: 'sub-1' },
-				locals: mockLocals(true),
-				url: new URL('http://localhost/settings/webhooks/sub-1'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.subscription.id).toBe('sub-1');
-			expect(result.deliveries).toEqual([]);
-			expect(result.deliveryTotal).toBe(0);
+			try {
+				await load({
+					params: { id: 'sub-1' },
+					locals: mockLocals(true),
+					url: new URL('http://localhost/settings/webhooks/sub-1'),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 
@@ -398,16 +399,19 @@ describe('Webhook Create +page.server', () => {
 			expect(result.eventTypes[0].event_type).toBe('user.created');
 		});
 
-		it('returns empty event types when API fails', async () => {
+		it('fails closed when event types API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listWebhookEventTypes).mockRejectedValue(new Error('fail'));
 
-			const result = await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.eventTypes).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 
@@ -552,6 +556,23 @@ describe('Webhook Edit +page.server', () => {
 				expect.fail('should have thrown');
 			} catch (e: any) {
 				expect(e.status).toBe(404);
+			}
+		});
+
+		it('fails closed when event types API throws', async () => {
+			vi.mocked(hasAdminRole).mockReturnValue(true);
+			vi.mocked(getWebhookSubscription).mockResolvedValue(makeSub() as any);
+			vi.mocked(listWebhookEventTypes).mockRejectedValue(new Error('fail'));
+
+			try {
+				await load({
+					params: { id: 'sub-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
 			}
 		});
 	});
