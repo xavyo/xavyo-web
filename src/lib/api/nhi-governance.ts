@@ -12,7 +12,9 @@ import type {
 	NhiSodCheckRequest,
 	NhiCertificationCampaign,
 	NhiCertificationItem,
-	CreateNhiCertCampaignRequest
+	CreateNhiCertCampaignRequest,
+	CertifyNhiResponse,
+	RevokeNhiCertResponse
 } from './types';
 
 export interface ListNhiSodRulesParams {
@@ -330,5 +332,41 @@ export async function decideNhiCertItem(
 		body: { decision },
 		fetch: fetchFn
 	});
+}
+
+export async function certifyNhi(
+	campaignId: string,
+	nhiId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<CertifyNhiResponse> {
+	return apiClient<CertifyNhiResponse>(
+		`/nhi/certifications/${campaignId}/certify/${nhiId}`,
+		{
+			method: 'POST',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
+}
+
+export async function revokeNhiCertification(
+	campaignId: string,
+	nhiId: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RevokeNhiCertResponse> {
+	return apiClient<RevokeNhiCertResponse>(
+		`/nhi/certifications/${campaignId}/revoke/${nhiId}`,
+		{
+			method: 'POST',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
 }
 

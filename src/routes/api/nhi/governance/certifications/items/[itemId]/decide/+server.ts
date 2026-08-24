@@ -13,11 +13,26 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	}
 
 	try {
-		const { decision } = await request.json();
-		if (decision !== 'certify' && decision !== 'revoke') {
+		let parsed: unknown;
+		try {
+			parsed = await request.json();
+		} catch {
+			error(400, 'Invalid JSON body');
+		}
+		if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+			error(400, 'Invalid JSON body');
+		}
+		const body = parsed as Record<string, unknown>;
+		if (body.decision !== 'certify' && body.decision !== 'revoke') {
 			error(400, 'Invalid decision. Must be "certify" or "revoke".');
 		}
-		const result = await decideNhiCertItem(params.itemId, decision, locals.accessToken, locals.tenantId, fetch);
+		const result = await decideNhiCertItem(
+			params.itemId,
+			body.decision,
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);
