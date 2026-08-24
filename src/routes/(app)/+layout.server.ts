@@ -1,13 +1,18 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
 import { SYSTEM_TENANT_ID, hasAdminRole } from '$lib/server/auth';
 import { fetchAlerts } from '$lib/api/alerts';
 import { getCurrentAssumption } from '$lib/api/power-of-attorney';
 import { getCurrentContext } from '$lib/api/persona-context';
-import type { CurrentAssumptionStatus, CurrentContextResponse } from '$lib/api/types';
+import { ApiError } from '$lib/api/client';
 
-export const load: LayoutServerLoad = async ({ locals, url }) => {
+function loadError(e: unknown, fallback: string): never {
+	if (e instanceof ApiError) error(e.status, e.message);
+	error(500, fallback);
+}
+
+export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
 	if (!locals.user) {
 		const redirectTo = encodeURIComponent(url.pathname + url.search);
 		redirect(302, `/login?redirectTo=${redirectTo}`);
@@ -22,38 +27,27 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
 		redirect(302, '/onboarding');
 	}
 
-	let unacknowledgedAlertCount = 0;
 	try {
-		const alertsResult = await fetchAlerts(
-			{ limit: 1, acknowledged: false },
-			locals.accessToken!,
-			locals.tenantId!
-		);
-		unacknowledgedAlertCount = alertsResult.unacknowledged_count;
-	} catch {
-		// Non-critical; default to 0
-	}
+		const [alertsResult, currentAssumption, personaContext] = await Promise.all([
+			fetchAlerts(
+				{ limit: 1, acknowledged: false },
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			),
+			getCurrentAssumption(locals.accessToken!, locals.tenantId!, fetch),
+			getCurrentContext(locals.accessToken!, locals.tenantId!, fetch)
+		]);
 
-	let currentAssumption: CurrentAssumptionStatus = { is_assuming: false, poa_id: null, donor_id: null, donor_name: null };
-	try {
-		currentAssumption = await getCurrentAssumption(locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// Non-critical; default to not assuming
+		return {
+			user: locals.user,
+			unacknowledgedAlertCount: alertsResult.unacknowledged_count,
+			isAdmin: hasAdminRole(locals.user.roles),
+			currentAssumption,
+			personaContext,
+			appVersion: env.APP_VERSION || 'dev'
+		};
+	} catch (e) {
+		loadError(e, 'Failed to load session context');
 	}
-
-	let personaContext: CurrentContextResponse | null = null;
-	try {
-		personaContext = await getCurrentContext(locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// Non-critical
-	}
-
-	return {
-		user: locals.user,
-		unacknowledgedAlertCount,
-		isAdmin: hasAdminRole(locals.user.roles),
-		currentAssumption,
-		personaContext,
-		appVersion: env.APP_VERSION || 'dev'
-	};
 };

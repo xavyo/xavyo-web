@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { ErrorStatus } from 'sveltekit-superforms';
-import { fail } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { updateProfileSchema } from '$lib/schemas/settings';
 import { getProfile, updateProfile } from '$lib/api/me';
 import { getMfaStatus } from '$lib/api/mfa';
@@ -11,70 +11,42 @@ import { fetchAlerts } from '$lib/api/alerts';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	let profile = null;
-	try {
-		profile = await getProfile(locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// Profile may not exist on current tenant (e.g., after provisioning).
-		// Fall back to JWT-derived user info.
-		if (locals.user) {
-			profile = {
-				id: locals.user.id,
-				email: locals.user.email,
-				display_name: null,
-				first_name: null,
-				last_name: null,
-				avatar_url: null,
-				email_verified: false,
-				created_at: new Date().toISOString()
-			};
-		}
-	}
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
-	let mfaStatus = null;
 	try {
-		mfaStatus = await getMfaStatus(locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// MFA status is non-critical; default to null
-	}
+		const [profile, mfaStatus, securityOverview, alertsResult] = await Promise.all([
+			getProfile(locals.accessToken, locals.tenantId, fetch),
+			getMfaStatus(locals.accessToken, locals.tenantId, fetch),
+			getSecurityOverview(locals.accessToken, locals.tenantId, fetch),
+			fetchAlerts(
+				{ limit: 1, acknowledged: false },
+				locals.accessToken,
+				locals.tenantId,
+				fetch
+			)
+		]);
 
-	let securityOverview = null;
-	try {
-		securityOverview = await getSecurityOverview(locals.accessToken!, locals.tenantId!, fetch);
-	} catch {
-		// Security overview is non-critical; default to null
-	}
-
-	let unacknowledgedAlertCount = 0;
-	try {
-		const alertsResult = await fetchAlerts(
-			{ limit: 1, acknowledged: false },
-			locals.accessToken!,
-			locals.tenantId!,
-			fetch
+		const form = await superValidate(
+			{
+				display_name: profile?.display_name ?? '',
+				first_name: profile?.first_name ?? '',
+				last_name: profile?.last_name ?? '',
+				avatar_url: profile?.avatar_url ?? ''
+			},
+			zod(updateProfileSchema)
 		);
-		unacknowledgedAlertCount = alertsResult.unacknowledged_count;
-	} catch {
-		// Non-critical; default to 0
+
+		return {
+			profile,
+			mfaStatus,
+			securityOverview,
+			unacknowledgedAlertCount: alertsResult.unacknowledged_count,
+			form
+		};
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load settings');
 	}
-
-	const form = await superValidate(
-		{
-			display_name: profile?.display_name ?? '',
-			first_name: profile?.first_name ?? '',
-			last_name: profile?.last_name ?? '',
-			avatar_url: profile?.avatar_url ?? ''
-		},
-		zod(updateProfileSchema)
-	);
-
-	return {
-		profile,
-		mfaStatus,
-		securityOverview,
-		unacknowledgedAlertCount,
-		form
-	};
 };
 
 export const actions: Actions = {
