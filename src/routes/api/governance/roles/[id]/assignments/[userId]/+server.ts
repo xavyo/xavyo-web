@@ -7,11 +7,23 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
 	const result = await assignRole(
 		params.id,
 		params.userId,
-		body,
+		{
+			justification: typeof body.justification === 'string' ? body.justification : undefined,
+			expires_at: typeof body.expires_at === 'string' ? body.expires_at : undefined
+		},
 		locals.accessToken,
 		locals.tenantId,
 		fetch
