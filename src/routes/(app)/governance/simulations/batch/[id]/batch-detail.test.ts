@@ -148,18 +148,20 @@ describe('Batch simulation detail +page.server', () => {
 			expect(result.results.items).toHaveLength(1);
 		});
 
-		it('handles results API failure gracefully', async () => {
+		it('fails closed when results API throws', async () => {
 			mockGetBatchSim.mockResolvedValue(makeBatchSimulation());
 			mockListResults.mockRejectedValue(new Error('results failed'));
 
-			const result = (await load({
-				params: { id: 'bat-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.results.items).toEqual([]);
-			expect(result.results.total).toBe(0);
+			try {
+				await load({
+					params: { id: 'bat-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('throws 500 when simulation fetch fails', async () => {

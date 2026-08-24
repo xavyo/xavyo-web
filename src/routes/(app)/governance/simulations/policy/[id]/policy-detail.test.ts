@@ -154,33 +154,38 @@ describe('Policy simulation detail +page.server', () => {
 			expect(result.staleness.is_stale).toBe(false);
 		});
 
-		it('handles results API failure gracefully', async () => {
+		it('fails closed when results API throws', async () => {
 			mockGetPolicySim.mockResolvedValue(makePolicySimulation());
 			mockListResults.mockRejectedValue(new Error('results failed'));
 			mockCheckStaleness.mockResolvedValue(makeStalenessCheck());
 
-			const result = (await load({
-				params: { id: 'pol-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.results.items).toEqual([]);
-			expect(result.results.total).toBe(0);
+			try {
+				await load({
+					params: { id: 'pol-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('handles staleness API failure gracefully', async () => {
+		it('fails closed when staleness API throws', async () => {
 			mockGetPolicySim.mockResolvedValue(makePolicySimulation());
 			mockListResults.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 			mockCheckStaleness.mockRejectedValue(new Error('staleness failed'));
 
-			const result = (await load({
-				params: { id: 'pol-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.staleness.is_stale).toBe(false);
+			try {
+				await load({
+					params: { id: 'pol-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('throws 500 when simulation fetch fails', async () => {

@@ -2,6 +2,7 @@ import type { PageServerLoad } from './$types';
 import { redirect, error } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { getMiningJob, listCandidates } from '$lib/api/role-mining';
+import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -14,7 +15,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	try {
 		const job = await getMiningJob(params.id, locals.accessToken, locals.tenantId, fetch);
 
-		let candidates = { items: [] as Awaited<ReturnType<typeof listCandidates>>['items'], total: 0, page: 1, page_size: 50 };
+		let candidates = {
+			items: [] as Awaited<ReturnType<typeof listCandidates>>['items'],
+			total: 0,
+			page: 1,
+			page_size: 50
+		};
 		if (job.status === 'completed') {
 			candidates = await listCandidates(
 				params.id,
@@ -22,11 +28,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 				locals.accessToken,
 				locals.tenantId,
 				fetch
-			).catch(() => ({ items: [], total: 0, page: 1, page_size: 50 }));
+			);
 		}
 
 		return { job, candidates };
-	} catch {
-		error(404, 'Mining job not found');
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load mining job');
 	}
 };

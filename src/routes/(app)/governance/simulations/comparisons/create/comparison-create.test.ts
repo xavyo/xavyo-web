@@ -104,18 +104,20 @@ describe('Comparison create +page.server', () => {
 			expect(result.batchSimulations).toHaveLength(1);
 		});
 
-		it('returns empty arrays when APIs fail', async () => {
+		it('fails closed when APIs throw', async () => {
 			mockListPolicy.mockRejectedValue(new Error('fail'));
 			mockListBatch.mockRejectedValue(new Error('fail'));
 
 			const { load } = await import('./+page.server');
-			const result = (await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.policySimulations).toEqual([]);
-			expect(result.batchSimulations).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 });

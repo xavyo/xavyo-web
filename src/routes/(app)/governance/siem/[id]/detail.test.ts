@@ -191,37 +191,38 @@ describe('SIEM Detail +page.server', () => {
 			expect(result.destination.name).toBe('Splunk Prod');
 		});
 
-		it('gracefully handles health API failure', async () => {
+		it('fails closed when health API throws', async () => {
 			mockGetDestination.mockResolvedValue(makeDestination());
 			mockGetHealthSummary.mockRejectedValue(new Error('health failed'));
 			mockListDeadLetter.mockResolvedValue(makeDeadLetterResponse());
 
-			const result = (await load({
-				params: { id: 'dest-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.destination).toBeDefined();
-			expect(result.health).toBeNull();
-			expect(result.deadLetter).toBeDefined();
+			try {
+				await load({
+					params: { id: 'dest-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
-		it('gracefully handles dead letter API failure', async () => {
+		it('fails closed when dead letter API throws', async () => {
 			mockGetDestination.mockResolvedValue(makeDestination());
 			mockGetHealthSummary.mockResolvedValue(makeHealthSummary());
 			mockListDeadLetter.mockRejectedValue(new Error('dead letter failed'));
 
-			const result = (await load({
-				params: { id: 'dest-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.destination).toBeDefined();
-			expect(result.health).toBeDefined();
-			expect(result.deadLetter.items).toEqual([]);
-			expect(result.deadLetter.total).toBe(0);
+			try {
+				await load({
+					params: { id: 'dest-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('throws when destination not found', async () => {

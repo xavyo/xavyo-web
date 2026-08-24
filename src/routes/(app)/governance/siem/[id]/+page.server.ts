@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
-import { redirect, fail, isRedirect } from '@sveltejs/kit';
+import { error, redirect, fail, isRedirect } from '@sveltejs/kit';
 import {
 	getSiemDestination,
 	getSiemHealthSummary,
@@ -19,30 +19,23 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		redirect(302, '/');
 	}
 
-	const destination = await getSiemDestination(
-		params.id,
-		locals.accessToken,
-		locals.tenantId,
-		fetch
-	);
-
-	const [health, deadLetter] = await Promise.all([
-		getSiemHealthSummary(params.id, locals.accessToken, locals.tenantId, fetch).catch(() => null),
-		listSiemDeadLetter(
-			params.id,
-			{ limit: 20, offset: 0 },
-			locals.accessToken,
-			locals.tenantId,
-			fetch
-		).catch(() => ({
-			items: [],
-			total: 0,
-			limit: 20,
-			offset: 0
-		}))
-	]);
-
-	return { destination, health, deadLetter };
+	try {
+		const [destination, health, deadLetter] = await Promise.all([
+			getSiemDestination(params.id, locals.accessToken, locals.tenantId, fetch),
+			getSiemHealthSummary(params.id, locals.accessToken, locals.tenantId, fetch),
+			listSiemDeadLetter(
+				params.id,
+				{ limit: 20, offset: 0 },
+				locals.accessToken,
+				locals.tenantId,
+				fetch
+			)
+		]);
+		return { destination, health, deadLetter };
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load SIEM destination');
+	}
 };
 
 export const actions: Actions = {
