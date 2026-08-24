@@ -8,15 +8,27 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json().catch(() => ({})) as Record<string, unknown>;
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.permission_type !== 'string' || body.permission_type.length === 0) {
+		error(400, 'permission_type is required');
+	}
 
 	try {
 		const result = await grantUserPermission(
 			params.id,
 			params.userId,
 			{
-				permission_type: (body.permission_type as string) || 'use',
-				expires_at: body.expires_at as string | undefined
+				permission_type: body.permission_type,
+				expires_at: typeof body.expires_at === 'string' ? body.expires_at : undefined
 			},
 			locals.accessToken,
 			locals.tenantId,
