@@ -80,7 +80,10 @@ describe('POST /api/governance/bulk-state-operations (create)', () => {
 	});
 
 	it('creates bulk state operation and returns 201', async () => {
-		const body = { target_state: 'disabled', entity_ids: ['u-1', 'u-2'] };
+		const body = {
+			transition_id: '11111111-1111-1111-1111-111111111111',
+			object_ids: ['u-1', 'u-2']
+		};
 		const mockResult = { id: 'bso-new', ...body, status: 'pending' };
 		vi.mocked(createBulkStateOperation).mockResolvedValue(mockResult as any);
 
@@ -90,6 +93,32 @@ describe('POST /api/governance/bulk-state-operations (create)', () => {
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
 		expect(createBulkStateOperation).toHaveBeenCalledWith(body, TOKEN, TENANT, expect.any(Function));
+	});
+
+	it('does not create on invalid JSON', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: new Request('http://localhost/api/governance/bulk-state-operations', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: '{not json'
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createBulkStateOperation).not.toHaveBeenCalled();
+	});
+
+	it('does not create when object_ids is missing', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: makeJsonRequest({ transition_id: '11111111-1111-1111-1111-111111111111' })
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createBulkStateOperation).not.toHaveBeenCalled();
 	});
 
 	it('returns 401 without token', async () => {
@@ -109,7 +138,14 @@ describe('POST /api/governance/bulk-state-operations (create)', () => {
 		vi.mocked(createBulkStateOperation).mockRejectedValue(new Error('Invalid target state'));
 
 		await expect(
-			POST(makeRequestEvent({ request: makeJsonRequest({}) }))
+			POST(
+				makeRequestEvent({
+					request: makeJsonRequest({
+						transition_id: '11111111-1111-1111-1111-111111111111',
+						object_ids: ['u-1']
+					})
+				})
+			)
 		).rejects.toThrow('Invalid target state');
 	});
 });

@@ -114,7 +114,7 @@ describe('POST /api/governance/sla-policies (create)', () => {
 	});
 
 	it('creates SLA policy and returns 201', async () => {
-		const body = { name: 'Gold SLA', category: 'identity' };
+		const body = { name: 'Gold SLA', target_duration_seconds: 3600 };
 		const mockResult = { id: 'sla-new', ...body };
 		vi.mocked(createSlaPolicy).mockResolvedValue(mockResult as any);
 
@@ -123,7 +123,39 @@ describe('POST /api/governance/sla-policies (create)', () => {
 		expect(response.status).toBe(201);
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
-		expect(createSlaPolicy).toHaveBeenCalledWith(body, TOKEN, TENANT, expect.any(Function));
+		expect(createSlaPolicy).toHaveBeenCalledWith(
+			{
+				name: 'Gold SLA',
+				target_duration_seconds: 3600,
+				warning_threshold_percent: 75,
+				breach_notification_enabled: true
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not create on invalid JSON', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: new Request('http://localhost/api/governance/sla-policies', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: '{not json'
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createSlaPolicy).not.toHaveBeenCalled();
+	});
+
+	it('does not create when name is missing', async () => {
+		await expect(
+			POST(makeRequestEvent({ request: makeJsonRequest({ target_duration_seconds: 3600 }) }))
+		).rejects.toMatchObject({ status: 400 });
+		expect(createSlaPolicy).not.toHaveBeenCalled();
 	});
 
 	it('returns 401 when unauthorized', async () => {
@@ -189,6 +221,29 @@ describe('PUT /api/governance/sla-policies/[id] (update)', () => {
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
 		expect(updateSlaPolicy).toHaveBeenCalledWith('sla-1', body, TOKEN, TENANT, expect.any(Function));
+	});
+
+	it('does not update on invalid JSON', async () => {
+		await expect(
+			PUT(
+				makeRequestEvent({
+					params: { id: 'sla-1' },
+					request: new Request('http://localhost/api/governance/sla-policies/sla-1', {
+						method: 'PUT',
+						headers: { 'Content-Type': 'application/json' },
+						body: '{not json'
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateSlaPolicy).not.toHaveBeenCalled();
+	});
+
+	it('does not update when name is empty', async () => {
+		await expect(
+			PUT(makeRequestEvent({ params: { id: 'sla-1' }, request: makeJsonRequest({ name: '' }) }))
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateSlaPolicy).not.toHaveBeenCalled();
 	});
 
 	it('returns 403 for non-admin', async () => {

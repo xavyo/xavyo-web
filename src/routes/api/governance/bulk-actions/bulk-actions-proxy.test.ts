@@ -131,7 +131,11 @@ describe('POST /api/governance/bulk-actions (create)', () => {
 	});
 
 	it('creates bulk action and returns 201', async () => {
-		const body = { action_type: 'disable', filter_expression: 'status=inactive' };
+		const body = {
+			action_type: 'disable',
+			filter_expression: 'status=inactive',
+			justification: 'offboarding inactive users'
+		};
 		const mockResult = { id: 'ba-new', ...body, status: 'pending' };
 		vi.mocked(createBulkAction).mockResolvedValue(mockResult as any);
 
@@ -140,7 +144,17 @@ describe('POST /api/governance/bulk-actions (create)', () => {
 		expect(response.status).toBe(201);
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
-		expect(createBulkAction).toHaveBeenCalledWith(body, TOKEN, TENANT, expect.any(Function));
+		expect(createBulkAction).toHaveBeenCalledWith(
+			{
+				filter_expression: body.filter_expression,
+				action_type: body.action_type,
+				action_params: undefined,
+				justification: body.justification
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('returns 401 when unauthorized', async () => {
@@ -339,6 +353,26 @@ describe('POST /api/governance/bulk-actions/validate', () => {
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
 		expect(validateBulkActionExpression).toHaveBeenCalledWith(body, TOKEN, TENANT, expect.any(Function));
+	});
+
+	it('does not validate on invalid JSON', async () => {
+		const response = await POST(
+			makeRequestEvent({
+				request: new Request('http://localhost/api/governance/bulk-actions/validate', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: '{not json'
+				})
+			})
+		);
+		expect(response.status).toBe(400);
+		expect(validateBulkActionExpression).not.toHaveBeenCalled();
+	});
+
+	it('does not validate when expression is missing', async () => {
+		const response = await POST(makeRequestEvent({ request: makeJsonRequest({}) }));
+		expect(response.status).toBe(400);
+		expect(validateBulkActionExpression).not.toHaveBeenCalled();
 	});
 
 	it('returns 401 when unauthorized', async () => {

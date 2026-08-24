@@ -6104,6 +6104,7 @@ export interface UpdateSlaPolicyRequest {
 	warning_threshold_percent?: number;
 	breach_notification_enabled?: boolean;
 	escalation_contacts?: unknown;
+	is_active?: boolean;
 }
 
 export interface SlaPolicyListResponse {
