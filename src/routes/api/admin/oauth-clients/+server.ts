@@ -17,8 +17,45 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const body = await request.json();
-	const result = await createOAuthClient(body, locals.accessToken, locals.tenantId, fetch);
+	let parsed: unknown;
+	try {
+		parsed = await request.json();
+	} catch {
+		error(400, 'Invalid JSON body');
+	}
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+		error(400, 'Invalid JSON body');
+	}
+	const body = parsed as Record<string, unknown>;
+	if (typeof body.name !== 'string' || body.name.length === 0) {
+		error(400, 'name is required');
+	}
+	if (body.client_type !== 'confidential' && body.client_type !== 'public') {
+		error(400, 'client_type is required');
+	}
+	if (!Array.isArray(body.redirect_uris) || body.redirect_uris.length === 0) {
+		error(400, 'redirect_uris is required');
+	}
+	if (!Array.isArray(body.grant_types) || body.grant_types.length === 0) {
+		error(400, 'grant_types is required');
+	}
+	if (!Array.isArray(body.scopes) || body.scopes.length === 0) {
+		error(400, 'scopes is required');
+	}
+	const result = await createOAuthClient(
+		{
+			name: body.name,
+			client_type: body.client_type,
+			redirect_uris: body.redirect_uris as string[],
+			grant_types: body.grant_types as string[],
+			scopes: body.scopes as string[],
+			logo_url: typeof body.logo_url === 'string' ? body.logo_url : undefined,
+			description: typeof body.description === 'string' ? body.description : undefined
+		},
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 
 	return json(result, { status: 201 });
 };
