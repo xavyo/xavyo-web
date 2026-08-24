@@ -1,0 +1,55 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('$lib/server/auth', () => ({
+	hasAdminRole: vi.fn().mockReturnValue(true)
+}));
+
+vi.mock('$lib/api/power-of-attorney', () => ({
+	adminRevokePoa: vi.fn()
+}));
+
+import { POST } from './+server';
+import { adminRevokePoa } from '$lib/api/power-of-attorney';
+import { hasAdminRole } from '$lib/server/auth';
+
+const TOKEN = 'tok';
+const TENANT = 'tid';
+
+function makeEvent(body: string) {
+	return {
+		params: { id: 'p1' },
+		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+		fetch: vi.fn(),
+		request: new Request('http://localhost/api/governance/power-of-attorney/admin/p1/revoke', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body
+		})
+	};
+}
+
+describe('POST /api/governance/power-of-attorney/admin/:id/revoke', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('revokes with known fields', async () => {
+		vi.mocked(adminRevokePoa).mockResolvedValue({ id: 'p1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ reason: 'policy' })) as any);
+		expect(response.status).toBe(200);
+		expect(adminRevokePoa).toHaveBeenCalled();
+	});
+
+	it('does not revoke on invalid JSON', async () => {
+		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
+		expect(adminRevokePoa).not.toHaveBeenCalled();
+	});
+
+	it('does not revoke when reason is not a string', async () => {
+		await expect(POST(makeEvent(JSON.stringify({ reason: 1 })) as any)).rejects.toMatchObject({
+			status: 400
+		});
+		expect(adminRevokePoa).not.toHaveBeenCalled();
+	});
+});
