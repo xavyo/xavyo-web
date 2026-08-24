@@ -250,16 +250,19 @@ describe('Mapping Create +page.server', () => {
 			expect(result.entitlements[0].name).toBe('Admin Access');
 		});
 
-		it('returns empty entitlements when API fails', async () => {
+		it('fails closed when entitlements API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listEntitlements).mockRejectedValue(new Error('fail'));
 
-			const result = await load({
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any);
-
-			expect(result.entitlements).toEqual([]);
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 	});
 

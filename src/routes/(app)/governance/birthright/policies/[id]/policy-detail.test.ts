@@ -135,17 +135,20 @@ describe('Policy Detail +page.server', () => {
 			).rejects.toThrow();
 		});
 
-		it('returns empty entitlementMap when entitlements API fails', async () => {
+		it('fails closed when entitlements API throws', async () => {
 			mockGetPolicy.mockResolvedValue(makePolicy());
 			mockListEntitlements.mockRejectedValue(new Error('fail'));
 
-			const result = (await load({
-				params: { id: 'pol-1' },
-				locals: mockLocals(true),
-				fetch: vi.fn()
-			} as any)) as any;
-
-			expect(result.entitlementMap).toEqual({});
+			try {
+				await load({
+					params: { id: 'pol-1' },
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown');
+			} catch (e: any) {
+				expect(e.status).toBe(500);
+			}
 		});
 
 		it('passes correct id to getBirthrightPolicy', async () => {
