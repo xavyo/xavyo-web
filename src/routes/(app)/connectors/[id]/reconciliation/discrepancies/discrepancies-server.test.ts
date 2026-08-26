@@ -21,8 +21,8 @@ vi.mock('$lib/server/auth', () => ({
 	hasAdminRole: vi.fn()
 }));
 
-import { load } from './+page.server';
-import { listDiscrepancies } from '$lib/api/reconciliation';
+import { load, actions } from './+page.server';
+import { listDiscrepancies, bulkRemediate } from '$lib/api/reconciliation';
 import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
@@ -87,5 +87,20 @@ describe('Connector discrepancies +page.server', () => {
 		} catch (e: any) {
 			expect(e.status).toBe(403);
 		}
+	});
+
+	it('rejects invalid JSON selected_ids on bulk_remediate', async () => {
+		const fd = new FormData();
+		fd.set('selected_ids', 'not-json');
+		fd.set('action', 'create');
+		fd.set('direction', 'xavyo_to_target');
+		const result: any = await actions.bulk_remediate({
+			params: { id: 'conn-1' },
+			request: new Request('http://localhost', { method: 'POST', body: fd }),
+			locals: mockLocals(true),
+			fetch: vi.fn()
+		} as any);
+		expect(result.status).toBe(400);
+		expect(bulkRemediate).not.toHaveBeenCalled();
 	});
 });

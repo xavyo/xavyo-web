@@ -81,7 +81,20 @@ export const actions: Actions = {
 
 	bulk_remediate: async ({ params, request, locals, fetch }) => {
 		const fd = await request.formData();
-		const selected_ids = JSON.parse(fd.get('selected_ids') as string) as string[];
+		let selected_ids: string[];
+		try {
+			const raw = fd.get('selected_ids');
+			if (typeof raw !== 'string' || !raw.trim()) {
+				return fail(400, { error: 'Invalid JSON in selected_ids' });
+			}
+			const parsed: unknown = JSON.parse(raw);
+			if (!Array.isArray(parsed)) {
+				return fail(400, { error: 'Invalid JSON in selected_ids' });
+			}
+			selected_ids = parsed.map(String);
+		} catch {
+			return fail(400, { error: 'Invalid JSON in selected_ids' });
+		}
 		const action = fd.get('action') as string;
 		const direction = fd.get('direction') as string;
 
