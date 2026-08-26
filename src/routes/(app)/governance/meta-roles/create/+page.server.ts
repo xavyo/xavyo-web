@@ -41,7 +41,9 @@ export const actions: Actions = {
 					try {
 						value = JSON.parse(criteriaValues[i]);
 					} catch {
-						// Keep as string if not valid JSON
+						return message(form, 'Criteria values for in/not_in must be valid JSON', {
+							status: 400 as ErrorStatus
+						});
 					}
 				}
 				criteria.push({

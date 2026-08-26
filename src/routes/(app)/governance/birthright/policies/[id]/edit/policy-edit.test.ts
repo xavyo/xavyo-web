@@ -220,6 +220,23 @@ describe('Policy Edit +page.server', () => {
 			mockUpdatePolicy.mockRejectedValue(new ApiError('Update failed', 400));
 			expect(typeof actions.default).toBe('function');
 		});
+
+		it('returns 400 for invalid conditions JSON', async () => {
+			const result: any = await actions.default({
+				params: { id: 'pol-1' },
+				request: makeFormData({
+					name: 'Updated Policy',
+					priority: '10',
+					evaluation_mode: 'all_match',
+					conditions_json: '{not json',
+					entitlement_ids_json: JSON.stringify(['550e8400-e29b-41d4-a716-446655440000'])
+				}),
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(mockUpdatePolicy).not.toHaveBeenCalled();
+		});
 	});
 });
 
