@@ -18,8 +18,9 @@ vi.mock('$lib/server/auth', () => ({
 	hasAdminRole: vi.fn()
 }));
 
-import { load } from './+page.server';
+import { load, actions } from './+page.server';
 import { hasAdminRole } from '$lib/server/auth';
+import { createScriptTemplate } from '$lib/api/provisioning-scripts';
 
 const mockHasAdminRole = vi.mocked(hasAdminRole);
 
@@ -98,6 +99,22 @@ describe('Create Template +page.server', () => {
 			} as any);
 
 			expect(mockHasAdminRole).toHaveBeenCalledWith(['admin']);
+		});
+	});
+
+	describe('default action', () => {
+		it('rejects invalid JSON placeholder annotations', async () => {
+			const fd = new FormData();
+			fd.set('name', 'T');
+			fd.set('category', 'custom');
+			fd.set('template_body', 'body');
+			fd.set('placeholder_annotations', 'not-json');
+			const result: any = await actions.default({
+				request: new Request('http://localhost', { method: 'POST', body: fd }),
+				locals: mockLocals(true)
+			} as any);
+			expect(result.status).toBe(400);
+			expect(createScriptTemplate).not.toHaveBeenCalled();
 		});
 	});
 });

@@ -23,11 +23,24 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const conditionsRaw = formData.get('conditions_json') as string;
 		const entitlementIds = formData.getAll('entitlement_ids') as string[];
+		let conditions: unknown[] = [];
+		if (conditionsRaw) {
+			try {
+				const parsed: unknown = JSON.parse(conditionsRaw);
+				if (!Array.isArray(parsed)) {
+					error(400, 'Invalid JSON in conditions');
+				}
+				conditions = parsed;
+			} catch (e) {
+				if (isHttpError(e)) throw e;
+				error(400, 'Invalid JSON in conditions');
+			}
+		}
 		const body = {
 			name: formData.get('name') as string,
 			description: (formData.get('description') as string) || undefined,
 			priority: Number(formData.get('priority') ?? '0'),
-			conditions: conditionsRaw ? JSON.parse(conditionsRaw) : [],
+			conditions,
 			entitlement_ids: entitlementIds,
 			evaluation_mode: (formData.get('evaluation_mode') as string) || 'all_match',
 			grace_period_days: Number(formData.get('grace_period_days') ?? '0') || undefined

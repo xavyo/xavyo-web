@@ -40,6 +40,11 @@ export const actions: Actions = {
 			throw redirect(302, `/governance/provisioning-scripts/templates/${result.id}`);
 		} catch (e) {
 			if (isRedirect(e)) throw e;
+			if (e instanceof SyntaxError) {
+				return message(form, 'Placeholder annotations must be valid JSON', {
+					status: 400 as ErrorStatus
+				});
+			}
 			if (isHttpError(e)) return message(form, e.body?.message || 'Failed to create template', { status: e.status as ErrorStatus });
 			if (e instanceof ApiError) return message(form, e.message, { status: (e.status || 500) as ErrorStatus });
 			return message(form, 'An unexpected error occurred', { status: 500 as ErrorStatus });
