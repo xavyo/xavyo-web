@@ -180,5 +180,22 @@ describe('Meta-Roles Create +page.server', () => {
 			} as any);
 			expect(result.status).toBe(500);
 		});
+
+		it('returns 400 for invalid JSON in in/not_in criteria values', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Finance Admin',
+					priority: '10',
+					criteria_logic: 'and',
+					criteria_field: ['department'],
+					criteria_operator: ['in'],
+					criteria_value: ['{not json']
+				}),
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(createMetaRole).not.toHaveBeenCalled();
+		});
 	});
 });

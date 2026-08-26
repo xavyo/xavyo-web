@@ -47,7 +47,7 @@ export const actions: Actions = {
 			conditions = JSON.parse(conditionsJson || '[]');
 			entitlement_ids = JSON.parse(entitlementIdsJson || '[]');
 		} catch {
-			// will fail validation below
+			return fail(400, { error: 'Invalid JSON in conditions or entitlements' });
 		}
 
 		// Build raw data for superValidate
