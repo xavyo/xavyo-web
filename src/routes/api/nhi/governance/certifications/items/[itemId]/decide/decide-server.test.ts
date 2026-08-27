@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('$lib/server/auth', () => ({
-	hasAdminRole: vi.fn().mockReturnValue(true)
-}));
-
 vi.mock('$lib/api/nhi-governance', () => ({
 	decideNhiCertItem: vi.fn()
 }));
@@ -20,14 +16,13 @@ vi.mock('$lib/api/client', () => ({
 
 import { POST } from './+server';
 import { decideNhiCertItem } from '$lib/api/nhi-governance';
-import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
 
-function makeEvent(body: string) {
+function makeEvent(body: string, roles: string[] = ['admin']) {
 	return {
-		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles } },
 		params: { itemId: 'item-1' },
 		fetch: vi.fn(),
 		request: new Request('http://localhost/api/nhi/governance/certifications/items/item-1/decide', {
@@ -41,7 +36,6 @@ function makeEvent(body: string) {
 describe('POST /api/nhi/governance/certifications/items/:itemId/decide', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
 	});
 
 	it('decides with a valid decision', async () => {
@@ -55,6 +49,13 @@ describe('POST /api/nhi/governance/certifications/items/:itemId/decide', () => {
 			TENANT,
 			expect.any(Function)
 		);
+	});
+
+	it('does not 403 a non-admin reviewer', async () => {
+		vi.mocked(decideNhiCertItem).mockResolvedValue({ id: 'item-1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ decision: 'certify' }), ['user']) as any);
+		expect(response.status).toBe(200);
+		expect(decideNhiCertItem).toHaveBeenCalled();
 	});
 
 	it('does not decide on invalid JSON', async () => {

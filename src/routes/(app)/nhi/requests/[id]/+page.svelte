@@ -11,7 +11,6 @@
 	let { data }: { data: PageData } = $props();
 
 	let request = $derived(data.request as NhiAccessRequest);
-	let isAdmin = $derived(data.isAdmin as boolean);
 	let currentUserId = $derived(data.currentUserId as string);
 
 	let showApproveForm = $state(false);
@@ -64,7 +63,7 @@
 		<Card>
 			<CardHeader><h3 class="text-lg font-semibold">Actions</h3></CardHeader>
 			<CardContent class="space-y-4">
-				{#if isAdmin}
+				{#if request.requester_id !== currentUserId}
 					{#if showApproveForm}
 						<form method="POST" action="?/approve" use:enhance={() => { return async ({ update }) => { addToast('success', 'Request approved'); await update(); }; }}>
 							<div class="space-y-2">

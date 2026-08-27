@@ -13,6 +13,9 @@ import {
 	createNhiCertCampaign,
 	listNhiCertCampaigns,
 	getNhiCertCampaign,
+	launchNhiCertCampaign,
+	cancelNhiCertCampaign,
+	listNhiCertCampaignItems,
 	decideNhiCertItem
 } from './nhi-governance';
 
@@ -73,13 +76,13 @@ describe('NHI Governance API', () => {
 	// --- Staleness ---
 
 	describe('getStalenessReport', () => {
-		it('calls GET /nhi/staleness-report', async () => {
+		it('calls GET /governance/nhis/staleness-report', async () => {
 			const mockResponse = { generated_at: '2026-01-15', min_inactive_days: 30, total_stale: 2, critical_count: 1, warning_count: 1, stale_nhis: [] };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await getStalenessReport(token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/staleness-report', {
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/staleness-report', {
 				method: 'GET', token, tenantId, fetch: mockFetch
 			});
 			expect(result.total_stale).toBe(2);
@@ -90,32 +93,32 @@ describe('NHI Governance API', () => {
 
 			await getStalenessReport(token, tenantId, mockFetch, 60);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/staleness-report?min_inactive_days=60', {
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/staleness-report?min_inactive_days=60', {
 				method: 'GET', token, tenantId, fetch: mockFetch
 			});
 		});
 	});
 
 	describe('grantGracePeriod', () => {
-		it('calls POST /governance/nhis/:id/grace-period', async () => {
+		it('calls POST /nhi/inactivity/grace-period/:id', async () => {
 			mockApiClient.mockResolvedValue(undefined);
 
 			await grantGracePeriod('nhi-1', 30, token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/nhi-1/grace-period', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/inactivity/grace-period/nhi-1', {
 				method: 'POST', token, tenantId, body: { grace_days: 30 }, fetch: mockFetch
 			});
 		});
 	});
 
 	describe('autoSuspendExpired', () => {
-		it('calls POST /governance/nhis/auto-suspend', async () => {
+		it('calls POST /nhi/inactivity/auto-suspend', async () => {
 			const mockResponse = { suspended: ['nhi-1'], failed: [] };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await autoSuspendExpired(token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/auto-suspend', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/inactivity/auto-suspend', {
 				method: 'POST', token, tenantId, fetch: mockFetch
 			});
 			expect(result.suspended).toEqual(['nhi-1']);
@@ -232,14 +235,53 @@ describe('NHI Governance API', () => {
 		});
 	});
 
+	describe('launchNhiCertCampaign', () => {
+		it('calls POST /governance/nhis/certification/campaigns/:id/launch', async () => {
+			mockApiClient.mockResolvedValue({ id: 'camp-1', status: 'active' });
+
+			await launchNhiCertCampaign('camp-1', token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/nhis/certification/campaigns/camp-1/launch',
+				{ method: 'POST', token, tenantId, fetch: mockFetch }
+			);
+		});
+	});
+
+	describe('cancelNhiCertCampaign', () => {
+		it('calls POST /governance/nhis/certification/campaigns/:id/cancel', async () => {
+			mockApiClient.mockResolvedValue({ id: 'camp-1', status: 'cancelled' });
+
+			await cancelNhiCertCampaign('camp-1', token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/nhis/certification/campaigns/camp-1/cancel',
+				{ method: 'POST', token, tenantId, fetch: mockFetch }
+			);
+		});
+	});
+
+	describe('listNhiCertCampaignItems', () => {
+		it('calls GET /governance/nhis/certification/campaigns/:id/items', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0 });
+
+			await listNhiCertCampaignItems('camp-1', { limit: 10, offset: 0 }, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/nhis/certification/campaigns/camp-1/items?limit=10&offset=0',
+				{ method: 'GET', token, tenantId, fetch: mockFetch }
+			);
+		});
+	});
+
 	describe('getNhiCertCampaign', () => {
-		it('calls GET /nhi/certifications/:id', async () => {
+		it('calls GET /governance/nhis/certification/campaigns/:id', async () => {
 			const mockResponse = { id: 'camp-1', name: 'Q1 Cert', status: 'active' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await getNhiCertCampaign('camp-1', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications/camp-1', {
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/certification/campaigns/camp-1', {
 				method: 'GET', token, tenantId, fetch: mockFetch
 			});
 			expect(result.id).toBe('camp-1');
@@ -247,25 +289,25 @@ describe('NHI Governance API', () => {
 	});
 
 	describe('decideNhiCertItem', () => {
-		it('calls POST /nhi/certifications/items/:itemId/decide with certify', async () => {
+		it('calls POST /governance/nhis/certification/items/:itemId/decide with certify', async () => {
 			const mockResponse = { id: 'item-1', campaign_id: 'camp-1', nhi_id: 'nhi-1', decision: 'certify' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await decideNhiCertItem('item-1', 'certify', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications/items/item-1/decide', {
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/certification/items/item-1/decide', {
 				method: 'POST', token, tenantId, body: { decision: 'certify' }, fetch: mockFetch
 			});
 			expect(result.decision).toBe('certify');
 		});
 
-		it('calls POST /nhi/certifications/items/:itemId/decide with revoke', async () => {
+		it('calls POST /governance/nhis/certification/items/:itemId/decide with revoke', async () => {
 			const mockResponse = { id: 'item-1', campaign_id: 'camp-1', nhi_id: 'nhi-1', decision: 'revoke' };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await decideNhiCertItem('item-1', 'revoke', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/nhi/certifications/items/item-1/decide', {
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/certification/items/item-1/decide', {
 				method: 'POST', token, tenantId, body: { decision: 'revoke' }, fetch: mockFetch
 			});
 			expect(result.decision).toBe('revoke');

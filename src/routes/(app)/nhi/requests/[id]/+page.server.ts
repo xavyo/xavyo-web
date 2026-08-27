@@ -23,7 +23,6 @@ export const load: PageServerLoad = async ({ locals, params, fetch }) => {
 export const actions: Actions = {
 	approve: async ({ locals, params, request, fetch }) => {
 		if (!locals.accessToken || !locals.tenantId) throw error(401);
-		if (!hasAdminRole(locals.user?.roles)) throw error(403);
 		try {
 			const formData = await request.formData();
 			const comments = formData.get('comments')?.toString() || undefined;
@@ -37,7 +36,6 @@ export const actions: Actions = {
 	},
 	reject: async ({ locals, params, request, fetch }) => {
 		if (!locals.accessToken || !locals.tenantId) throw error(401);
-		if (!hasAdminRole(locals.user?.roles)) throw error(403);
 		try {
 			const formData = await request.formData();
 			const reason = formData.get('reason')?.toString() || '';

@@ -79,7 +79,7 @@ export async function getStalenessReport(
 	const qs = minInactiveDays !== undefined
 		? `?min_inactive_days=${minInactiveDays}`
 		: '';
-	return apiClient<StalenessReportResponse>(`/nhi/staleness-report${qs}`, {
+	return apiClient<StalenessReportResponse>(`/governance/nhis/staleness-report${qs}`, {
 		method: 'GET',
 		token,
 		tenantId,
@@ -90,7 +90,7 @@ export async function getStalenessReport(
 // Legacy alias
 export const detectInactiveNhis = getStalenessReport;
 
-// --- Grace Period & Suspend (via governance NHI endpoints) ---
+// --- Grace Period & Suspend ---
 
 export async function grantGracePeriod(
 	id: string,
@@ -99,8 +99,7 @@ export async function grantGracePeriod(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<void> {
-	// Backend manages grace periods via governance NHI suspend flow
-	await apiClient<void>(`/governance/nhis/${id}/grace-period`, {
+	await apiClient<void>(`/nhi/inactivity/grace-period/${id}`, {
 		method: 'POST',
 		token,
 		tenantId,
@@ -114,7 +113,7 @@ export async function autoSuspendExpired(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<AutoSuspendResult> {
-	return apiClient<AutoSuspendResult>('/governance/nhis/auto-suspend', {
+	return apiClient<AutoSuspendResult>('/nhi/inactivity/auto-suspend', {
 		method: 'POST',
 		token,
 		tenantId,
@@ -268,12 +267,15 @@ export async function getNhiCertCampaign(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiCertificationCampaign> {
-	return apiClient<NhiCertificationCampaign>(`/nhi/certifications/${campaignId}`, {
-		method: 'GET',
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
+	return apiClient<NhiCertificationCampaign>(
+		`/governance/nhis/certification/campaigns/${campaignId}`,
+		{
+			method: 'GET',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
 }
 
 export async function launchNhiCertCampaign(
@@ -282,12 +284,15 @@ export async function launchNhiCertCampaign(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiCertificationCampaign> {
-	return apiClient<NhiCertificationCampaign>(`/nhi/certifications/${campaignId}/launch`, {
-		method: 'POST',
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
+	return apiClient<NhiCertificationCampaign>(
+		`/governance/nhis/certification/campaigns/${campaignId}/launch`,
+		{
+			method: 'POST',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
 }
 
 export async function cancelNhiCertCampaign(
@@ -296,12 +301,15 @@ export async function cancelNhiCertCampaign(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiCertificationCampaign> {
-	return apiClient<NhiCertificationCampaign>(`/nhi/certifications/${campaignId}/cancel`, {
-		method: 'POST',
-		token,
-		tenantId,
-		fetch: fetchFn
-	});
+	return apiClient<NhiCertificationCampaign>(
+		`/governance/nhis/certification/campaigns/${campaignId}/cancel`,
+		{
+			method: 'POST',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
 }
 
 export async function listNhiCertCampaignItems(
@@ -313,7 +321,7 @@ export async function listNhiCertCampaignItems(
 ): Promise<{ items: NhiCertificationItem[]; total: number }> {
 	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
 	return apiClient<{ items: NhiCertificationItem[]; total: number }>(
-		`/nhi/certifications/${campaignId}/items${qs}`,
+		`/governance/nhis/certification/campaigns/${campaignId}/items${qs}`,
 		{ method: 'GET', token, tenantId, fetch: fetchFn }
 	);
 }
@@ -325,13 +333,16 @@ export async function decideNhiCertItem(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiCertificationItem> {
-	return apiClient<NhiCertificationItem>(`/nhi/certifications/items/${itemId}/decide`, {
-		method: 'POST',
-		token,
-		tenantId,
-		body: { decision },
-		fetch: fetchFn
-	});
+	return apiClient<NhiCertificationItem>(
+		`/governance/nhis/certification/items/${itemId}/decide`,
+		{
+			method: 'POST',
+			token,
+			tenantId,
+			body: { decision },
+			fetch: fetchFn
+		}
+	);
 }
 
 export async function certifyNhi(
