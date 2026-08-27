@@ -1,5 +1,11 @@
 import type { Handle } from '@sveltejs/kit';
-import { decodeAccessToken, isTokenExpired, setCookies, clearAuthCookies } from '$lib/server/auth';
+import {
+	decodeAccessToken,
+	isTokenExpired,
+	setCookies,
+	clearAuthCookies,
+	tenantIdFromJwt
+} from '$lib/server/auth';
 import { refresh } from '$lib/api/auth';
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -29,7 +35,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 				roles: claims.roles ?? []
 			};
 			event.locals.accessToken = accessToken;
-			event.locals.tenantId = claims.tid ?? tenantId;
+			event.locals.tenantId = tenantIdFromJwt(accessToken);
 		}
 	} else if (refreshToken) {
 		// Token missing or expired — try to refresh
@@ -45,7 +51,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 					roles: claims.roles ?? []
 				};
 				event.locals.accessToken = tokens.access_token;
-				event.locals.tenantId = claims.tid ?? tenantId;
+				event.locals.tenantId = tenantIdFromJwt(tokens.access_token);
 			}
 		} catch {
 			// Refresh failed — clear everything

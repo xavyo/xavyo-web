@@ -12,6 +12,7 @@ describe('MFA page tenant', () => {
 		const totp = src.includes('verifyMfaTotp');
 		const recovery = src.includes('verifyMfaRecovery');
 		expect(totp && recovery).toBe(true);
-		expect(src).toContain("cookies.get('tenant_id') || tenantIdFromJwt(partialToken)");
+		expect(src).toContain('tenantIdFromJwt(partialToken)');
+		expect(src).not.toContain("cookies.get('tenant_id') || tenantIdFromJwt");
 	});
 });

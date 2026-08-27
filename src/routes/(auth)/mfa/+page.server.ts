@@ -41,7 +41,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const tenantId = cookies.get('tenant_id') || tenantIdFromJwt(partialToken);
+			const tenantId = tenantIdFromJwt(partialToken);
 			if (!tenantId) {
 				redirect(302, '/login');
 			}
@@ -70,7 +70,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const tenantId = cookies.get('tenant_id') || tenantIdFromJwt(partialToken);
+			const tenantId = tenantIdFromJwt(partialToken);
 			if (!tenantId) {
 				redirect(302, '/login');
 			}
