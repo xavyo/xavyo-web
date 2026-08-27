@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { redirect, isRedirect } from '@sveltejs/kit';
+import { redirect, isRedirect, fail } from '@sveltejs/kit';
 import { getLifecycleEvent, processLifecycleEvent } from '$lib/api/birthright';
 import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
@@ -37,8 +37,11 @@ export const actions: Actions = {
 			return { success: true, summary: result.summary };
 		} catch (e) {
 			if (isRedirect(e)) throw e;
-			if (e instanceof ApiError) return { error: e.message };
-			return { error: 'Failed to process event' };
+			if (e instanceof ApiError) {
+				const status = e.status >= 400 && e.status < 600 ? e.status : 400;
+				return fail(status, { error: e.message });
+			}
+			return fail(500, { error: 'Failed to process event' });
 		}
 	}
 };
