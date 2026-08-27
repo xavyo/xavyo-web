@@ -1,9 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('$lib/server/auth', () => ({
-	hasAdminRole: vi.fn().mockReturnValue(true)
-}));
-
 vi.mock('$lib/api/nhi-requests', () => ({
 	approveNhiRequest: vi.fn()
 }));
@@ -20,14 +16,13 @@ vi.mock('$lib/api/client', () => ({
 
 import { POST } from './+server';
 import { approveNhiRequest } from '$lib/api/nhi-requests';
-import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
 
-function makeEvent(body: string) {
+function makeEvent(body: string, roles: string[] = ['admin']) {
 	return {
-		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles } },
 		params: { id: 'req-1' },
 		fetch: vi.fn(),
 		request: new Request('http://localhost/api/nhi/requests/req-1/approve', {
@@ -41,7 +36,6 @@ function makeEvent(body: string) {
 describe('POST /api/nhi/requests/:id/approve', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
 	});
 
 	it('approves with a valid body', async () => {
@@ -55,6 +49,13 @@ describe('POST /api/nhi/requests/:id/approve', () => {
 			TENANT,
 			expect.any(Function)
 		);
+	});
+
+	it('does not 403 a non-admin reviewer', async () => {
+		vi.mocked(approveNhiRequest).mockResolvedValue({ id: 'req-1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ comments: 'ok' }), ['user']) as any);
+		expect(response.status).toBe(200);
+		expect(approveNhiRequest).toHaveBeenCalled();
 	});
 
 	it('does not approve on invalid JSON', async () => {
