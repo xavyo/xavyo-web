@@ -156,8 +156,8 @@
 								if (result.type === 'redirect') {
 									addToast('success', 'Policy enabled');
 									await update();
-								} else if (result.type === 'success' && result.data?.error) {
-									addToast('error', String(result.data.error));
+								} else if (result.type === 'failure' && result.data) {
+									addToast('error', String((result.data as { error?: string }).error ?? 'Failed to enable policy'));
 								}
 							};
 						}}
@@ -174,8 +174,8 @@
 								if (result.type === 'redirect') {
 									addToast('success', 'Policy disabled');
 									await update();
-								} else if (result.type === 'success' && result.data?.error) {
-									addToast('error', String(result.data.error));
+								} else if (result.type === 'failure' && result.data) {
+									addToast('error', String((result.data as { error?: string }).error ?? 'Failed to disable policy'));
 								}
 							};
 						}}
@@ -205,8 +205,8 @@
 			if (result.type === 'redirect') {
 				addToast('success', 'Policy archived');
 				await update();
-			} else if (result.type === 'success' && result.data?.error) {
-				addToast('error', String(result.data.error));
+			} else if (result.type === 'failure' && result.data) {
+				addToast('error', String((result.data as { error?: string }).error ?? 'Failed to archive policy'));
 			}
 		};
 	}}

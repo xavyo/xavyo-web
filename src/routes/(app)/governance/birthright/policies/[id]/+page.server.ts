@@ -1,5 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { error, redirect, isRedirect } from '@sveltejs/kit';
+import { error, redirect, isRedirect, fail } from '@sveltejs/kit';
 import {
 	getBirthrightPolicy,
 	enableBirthrightPolicy,
@@ -46,8 +46,11 @@ export const actions: Actions = {
 			await enableBirthrightPolicy(params.id, locals.accessToken!, locals.tenantId!, fetch);
 		} catch (e) {
 			if (isRedirect(e)) throw e;
-			if (e instanceof ApiError) return { error: e.message };
-			return { error: 'Failed to enable policy' };
+			if (e instanceof ApiError) {
+				const status = e.status >= 400 && e.status < 600 ? e.status : 400;
+				return fail(status, { error: e.message });
+			}
+			return fail(500, { error: 'Failed to enable policy' });
 		}
 		redirect(302, `/governance/birthright/policies/${params.id}`);
 	},
@@ -57,8 +60,11 @@ export const actions: Actions = {
 			await disableBirthrightPolicy(params.id, locals.accessToken!, locals.tenantId!, fetch);
 		} catch (e) {
 			if (isRedirect(e)) throw e;
-			if (e instanceof ApiError) return { error: e.message };
-			return { error: 'Failed to disable policy' };
+			if (e instanceof ApiError) {
+				const status = e.status >= 400 && e.status < 600 ? e.status : 400;
+				return fail(status, { error: e.message });
+			}
+			return fail(500, { error: 'Failed to disable policy' });
 		}
 		redirect(302, `/governance/birthright/policies/${params.id}`);
 	},
@@ -68,8 +74,11 @@ export const actions: Actions = {
 			await archiveBirthrightPolicy(params.id, locals.accessToken!, locals.tenantId!, fetch);
 		} catch (e) {
 			if (isRedirect(e)) throw e;
-			if (e instanceof ApiError) return { error: e.message };
-			return { error: 'Failed to archive policy' };
+			if (e instanceof ApiError) {
+				const status = e.status >= 400 && e.status < 600 ? e.status : 400;
+				return fail(status, { error: e.message });
+			}
+			return fail(500, { error: 'Failed to archive policy' });
 		}
 		redirect(302, '/governance/birthright');
 	}
