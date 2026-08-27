@@ -92,6 +92,20 @@ describe('login page server', () => {
 				} as any)
 			).rejects.toMatchObject({ status: 500 });
 		});
+
+		it('defaults to system tenant for getAvailableMethods when no tenant param', async () => {
+			const { getAvailableMethods } = await import('$lib/api/auth');
+			const { SYSTEM_TENANT_ID } = await import('$lib/server/auth');
+			mockSuperValidate.mockResolvedValue({ valid: true, data: {} } as any);
+			const { load } = await import('./+page.server');
+			await load({
+				locals: { user: null },
+				url: new URL('http://localhost/login'),
+				cookies: makeCookies(),
+				fetch: vi.fn()
+			} as any);
+			expect(getAvailableMethods).toHaveBeenCalledWith(SYSTEM_TENANT_ID, expect.any(Function));
+		});
 	});
 
 	describe('login action', () => {
