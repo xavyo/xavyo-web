@@ -28,11 +28,12 @@ export async function listMyCertifications(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<MyCertificationListResponse> {
+	const pageSize = params.page_size ?? 50;
+	const page = params.page ?? 1;
 	const qs = buildSearchParams({
 		campaign_id: params.campaign_id,
-		status: params.status,
-		page: params.page,
-		page_size: params.page_size
+		limit: pageSize,
+		offset: Math.max(0, (page - 1) * pageSize)
 	});
 	return apiClient<MyCertificationListResponse>(`/governance/my-certifications${qs}`, {
 		method: 'GET',
@@ -48,9 +49,9 @@ export async function certifyItem(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<MyCertificationItem> {
-	return apiClient<MyCertificationItem>(`/governance/my-certifications/${itemId}/certify`, {
+	return apiClient<MyCertificationItem>(`/governance/certification-items/${itemId}/decide`, {
 		method: 'POST',
-		body: {},
+		body: { decision_type: 'approved' },
 		token,
 		tenantId,
 		fetch: fetchFn
@@ -59,13 +60,14 @@ export async function certifyItem(
 
 export async function revokeItem(
 	itemId: string,
+	justification: string,
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<MyCertificationItem> {
-	return apiClient<MyCertificationItem>(`/governance/my-certifications/${itemId}/revoke`, {
+	return apiClient<MyCertificationItem>(`/governance/certification-items/${itemId}/decide`, {
 		method: 'POST',
-		body: {},
+		body: { decision_type: 'revoked', justification },
 		token,
 		tenantId,
 		fetch: fetchFn

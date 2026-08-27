@@ -147,15 +147,13 @@ export const detectOrphanNhis = listOrphanDetections;
 
 // --- NHI SoD Rules ---
 
-// NHI SoD uses the governance SoD rules at /governance/sod-rules
-
 export async function createNhiSodRule(
 	body: CreateNhiSodRuleRequest,
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiSodRule> {
-	return apiClient<NhiSodRule>('/governance/sod-rules', {
+	return apiClient<NhiSodRule>('/nhi/sod/rules', {
 		method: 'POST',
 		token,
 		tenantId,
@@ -174,12 +172,25 @@ export async function listNhiSodRules(
 		limit: params.limit,
 		offset: params.offset
 	});
-	return apiClient<NhiSodRuleListResponse>(`/governance/sod-rules${qs}`, {
+	const raw = await apiClient<{
+		items?: NhiSodRule[];
+		data?: NhiSodRule[];
+		total?: number;
+		limit?: number;
+		offset?: number;
+	}>(`/nhi/sod/rules${qs}`, {
 		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	const items = Array.isArray(raw.items) ? raw.items : Array.isArray(raw.data) ? raw.data : [];
+	return {
+		items,
+		total: typeof raw.total === 'number' ? raw.total : items.length,
+		limit: typeof raw.limit === 'number' ? raw.limit : (params.limit ?? items.length),
+		offset: typeof raw.offset === 'number' ? raw.offset : (params.offset ?? 0)
+	};
 }
 
 export async function getNhiSodRule(
@@ -188,7 +199,7 @@ export async function getNhiSodRule(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiSodRule> {
-	return apiClient<NhiSodRule>(`/governance/sod-rules/${id}`, {
+	return apiClient<NhiSodRule>(`/nhi/sod/rules/${id}`, {
 		method: 'GET',
 		token,
 		tenantId,
@@ -202,7 +213,7 @@ export async function deleteNhiSodRule(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<void> {
-	await apiClient<void>(`/governance/sod-rules/${id}`, {
+	await apiClient<void>(`/nhi/sod/rules/${id}`, {
 		method: 'DELETE',
 		token,
 		tenantId,
@@ -216,7 +227,7 @@ export async function checkNhiSod(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiSodCheckResult> {
-	return apiClient<NhiSodCheckResult>('/governance/sod-check', {
+	return apiClient<NhiSodCheckResult>('/nhi/sod/check', {
 		method: 'POST',
 		token,
 		tenantId,
