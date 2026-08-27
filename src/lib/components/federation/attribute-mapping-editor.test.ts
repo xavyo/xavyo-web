@@ -54,9 +54,20 @@ describe('attribute-mapping utility', () => {
 			expect(result.attributes).toEqual([]);
 		});
 
-		it('defaults name_id_source to email when null', () => {
-			const result = parseMapping(JSON.stringify({ name_id_source: null, attributes: [] }))!;
-			expect(result.name_id_source).toBe('email');
+		it('returns null when name_id_source is null', () => {
+			expect(parseMapping(JSON.stringify({ name_id_source: null, attributes: [] }))).toBeNull();
+		});
+
+		it('returns null for unknown name_id_source', () => {
+			expect(
+				parseMapping(JSON.stringify({ name_id_source: 'groups', attributes: [] }))
+			).toBeNull();
+		});
+
+		it('returns null when attributes is not an array', () => {
+			expect(
+				parseMapping(JSON.stringify({ name_id_source: 'email', attributes: { foo: 1 } }))
+			).toBeNull();
 		});
 	});
 
@@ -87,6 +98,16 @@ describe('attribute-mapping utility', () => {
 		it('handles missing attributes as empty array', () => {
 			const result = parseMappingObject({ name_id_source: 'email' })!;
 			expect(result.attributes).toEqual([]);
+		});
+
+		it('returns null for null or unknown name_id_source', () => {
+			expect(parseMappingObject({ name_id_source: null, attributes: [] })).toBeNull();
+			expect(parseMappingObject({ name_id_source: 'groups', attributes: [] })).toBeNull();
+			expect(parseMappingObject({ name_id_source: 1, attributes: [] })).toBeNull();
+		});
+
+		it('returns null when attributes is not an array', () => {
+			expect(parseMappingObject({ name_id_source: 'email', attributes: 'nope' })).toBeNull();
 		});
 	});
 
