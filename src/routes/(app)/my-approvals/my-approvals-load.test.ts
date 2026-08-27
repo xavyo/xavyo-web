@@ -35,11 +35,11 @@ describe('My Approvals SSR load', () => {
 			total: 1
 		} as any);
 
-		const result = await load({
+		const result = (await load({
 			locals: { accessToken: 'user-jwt', tenantId: 'tenant-aaa' },
 			fetch: fetchFn,
 			url: new URL('http://localhost/my-approvals?status=pending&limit=20&offset=0')
-		} as any);
+		} as any)) as { items: unknown[]; total: number };
 
 		expect(listMyApprovals).toHaveBeenCalledWith(
 			{ status: 'pending', limit: 20, offset: 0 },

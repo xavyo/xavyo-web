@@ -35,11 +35,11 @@ describe('My Requests SSR load', () => {
 			total: 1
 		} as any);
 
-		const result = await load({
+		const result = (await load({
 			locals: { accessToken: 'user-jwt', tenantId: 'tenant-aaa' },
 			fetch: fetchFn,
 			url: new URL('http://localhost/my-requests')
-		} as any);
+		} as any)) as { items: { id: string }[]; total: number };
 
 		expect(listAccessRequests).toHaveBeenCalledWith(
 			{ status: undefined, limit: 20, offset: 0 },

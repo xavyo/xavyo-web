@@ -13,7 +13,13 @@
 	let context = $derived(data.context as CurrentContextResponse | null);
 	let sessions = $derived(data.sessions as ContextSessionSummary[]);
 	let sessionsTotal = $derived((data.sessionsTotal as number) ?? 0);
-	let personas = $derived((data.personas as { id: string; name: string; status: string }[]) ?? []);
+	let personas = $derived(
+		(data.personas ?? []).map((persona) => ({
+			id: persona.id,
+			name: persona.display_name ?? persona.persona_name,
+			status: persona.status
+		}))
+	);
 
 	let switching = $state(false);
 
