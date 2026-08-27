@@ -36,9 +36,10 @@ export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 	const form = await superValidate(zod(loginSchema));
 
 	stampTenantCookieFromQuery(cookies, url);
+	const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
 	let availableMethods = { magic_link: false, email_otp: false };
 	try {
-		availableMethods = await getAvailableMethods(requestTenantId(url, cookies), fetch);
+		availableMethods = await getAvailableMethods(tenantId, fetch);
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);
 		error(500, 'Failed to load available login methods');
