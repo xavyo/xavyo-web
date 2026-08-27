@@ -81,10 +81,17 @@
 
 	async function handleRevoke(itemId: string) {
 		if (isActioning) return;
+		const justification = window.prompt('Justification for revocation (min 20 characters)');
+		if (!justification || justification.trim().length < 20) {
+			addToast('error', 'Justification must be at least 20 characters');
+			return;
+		}
 		isActioning = itemId;
 		try {
 			const res = await fetch(`/api/governance/my-certifications/${itemId}/revoke`, {
-				method: 'POST'
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ justification: justification.trim() })
 			});
 			if (!res.ok) {
 				throw new Error('Failed to revoke');

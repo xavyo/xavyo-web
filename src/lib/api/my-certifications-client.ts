@@ -42,10 +42,13 @@ export async function certifyItemClient(
 
 export async function revokeItemClient(
 	itemId: string,
+	justification: string,
 	fetchFn: typeof fetch = fetch
 ): Promise<MyCertificationItem> {
 	const res = await fetchFn(`/api/governance/my-certifications/${itemId}/revoke`, {
-		method: 'POST'
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ justification })
 	});
 	if (!res.ok) throw new Error(`Failed to revoke item: ${res.status}`);
 	return res.json();

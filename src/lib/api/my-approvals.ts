@@ -49,9 +49,9 @@ export async function approveApproval(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<ApprovalItem> {
-	return apiClient<ApprovalItem>(`/governance/my-approvals/${id}/approve`, {
+	return apiClient<ApprovalItem>(`/governance/access-requests/${id}/approve`, {
 		method: 'POST',
-		body,
+		body: { comments: body.comment },
 		token,
 		tenantId,
 		fetch: fetchFn
@@ -65,9 +65,9 @@ export async function rejectApproval(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<ApprovalItem> {
-	return apiClient<ApprovalItem>(`/governance/my-approvals/${id}/reject`, {
+	return apiClient<ApprovalItem>(`/governance/access-requests/${id}/reject`, {
 		method: 'POST',
-		body,
+		body: { comments: body.comment },
 		token,
 		tenantId,
 		fetch: fetchFn

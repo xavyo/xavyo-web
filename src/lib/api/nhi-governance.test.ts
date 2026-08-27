@@ -143,14 +143,14 @@ describe('NHI Governance API', () => {
 	// --- SoD Rules ---
 
 	describe('createNhiSodRule', () => {
-		it('calls POST /governance/sod-rules with body', async () => {
+		it('calls POST /nhi/sod/rules with body', async () => {
 			const body = { tool_id_a: 'tool-1', tool_id_b: 'tool-2', enforcement: 'prevent' as const };
 			const mockResponse = { id: 'rule-1', tenant_id: 'test-tenant', ...body, description: null, created_at: '2026-01-01', created_by: null };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await createNhiSodRule(body, token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/sod-rules', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/sod/rules', {
 				method: 'POST', token, tenantId, body, fetch: mockFetch
 			});
 			expect(result.id).toBe('rule-1');
@@ -158,39 +158,39 @@ describe('NHI Governance API', () => {
 	});
 
 	describe('listNhiSodRules', () => {
-		it('calls GET /governance/sod-rules with pagination', async () => {
-			const mockResponse = { items: [], total: 0, limit: 20, offset: 0 };
-			mockApiClient.mockResolvedValue(mockResponse);
+		it('calls GET /nhi/sod/rules and maps data to items', async () => {
+			mockApiClient.mockResolvedValue({ data: [{ id: 'r1' }], total: 1, limit: 20, offset: 0 });
 
 			const result = await listNhiSodRules({ limit: 20, offset: 0 }, token, tenantId, mockFetch);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			expect(calledPath).toContain('/governance/sod-rules');
-			expect(result).toEqual(mockResponse);
+			expect(calledPath).toContain('/nhi/sod/rules');
+			expect(result.items).toEqual([{ id: 'r1' }]);
+			expect(result.total).toBe(1);
 		});
 	});
 
 	describe('deleteNhiSodRule', () => {
-		it('calls DELETE /governance/sod-rules/:id', async () => {
+		it('calls DELETE /nhi/sod/rules/:id', async () => {
 			mockApiClient.mockResolvedValue(undefined);
 
 			await deleteNhiSodRule('rule-1', token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/sod-rules/rule-1', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/sod/rules/rule-1', {
 				method: 'DELETE', token, tenantId, fetch: mockFetch
 			});
 		});
 	});
 
 	describe('checkNhiSod', () => {
-		it('calls POST /governance/sod-check with body', async () => {
+		it('calls POST /nhi/sod/check with body', async () => {
 			const body = { agent_id: 'agent-1', tool_id: 'tool-1' };
 			const mockResponse = { violations: [], is_allowed: true };
 			mockApiClient.mockResolvedValue(mockResponse);
 
 			const result = await checkNhiSod(body, token, tenantId, mockFetch);
 
-			expect(mockApiClient).toHaveBeenCalledWith('/governance/sod-check', {
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi/sod/check', {
 				method: 'POST', token, tenantId, body, fetch: mockFetch
 			});
 			expect(result.is_allowed).toBe(true);
