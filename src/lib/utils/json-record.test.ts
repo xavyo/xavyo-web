@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { JsonObjectError, parseJsonRecord, parseJsonStringRecord } from './json-record';
+import {
+	JsonObjectError,
+	isJsonParseError,
+	parseJsonRecord,
+	parseJsonStringRecord
+} from './json-record';
 
 describe('parseJsonRecord', () => {
 	it('parses a JSON object', () => {
@@ -29,5 +34,13 @@ describe('parseJsonStringRecord', () => {
 
 	it('rejects non-string values', () => {
 		expect(() => parseJsonStringRecord('{"a": 1}')).toThrow(JsonObjectError);
+	});
+});
+
+describe('isJsonParseError', () => {
+	it('matches SyntaxError and JsonObjectError', () => {
+		expect(isJsonParseError(new SyntaxError('bad'))).toBe(true);
+		expect(isJsonParseError(new JsonObjectError())).toBe(true);
+		expect(isJsonParseError(new Error('other'))).toBe(false);
 	});
 });

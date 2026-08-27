@@ -6,6 +6,7 @@ import { updateBulkActionSchema } from '$lib/schemas/governance-operations';
 import { getBulkAction, updateBulkAction } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -57,11 +58,11 @@ export const actions: Actions = {
 		}
 
 		try {
-			let parsedParams: unknown;
+			let parsedParams: Record<string, unknown>;
 			try {
-				parsedParams = JSON.parse(form.data.action_params) as Record<string, unknown>;
+				parsedParams = parseJsonRecord(form.data.action_params);
 			} catch {
-				return message(form, 'Invalid JSON in action params', { status: 400 as ErrorStatus });
+				return message(form, 'Action params must be a JSON object', { status: 400 as ErrorStatus });
 			}
 
 			await updateBulkAction(

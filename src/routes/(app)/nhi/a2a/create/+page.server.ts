@@ -5,6 +5,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { createA2aTaskSchema } from '$lib/schemas/nhi-protocols';
 import { createA2aTask } from '$lib/api/a2a';
 import { ApiError } from '$lib/api/client';
+import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async () => {
 	const form = await superValidate(zod(createA2aTaskSchema));
@@ -17,7 +18,7 @@ export const actions: Actions = {
 		if (!form.valid) return fail(400, { form });
 
 		try {
-			const input = JSON.parse(form.data.input) as Record<string, unknown>;
+			const input = parseJsonRecord(form.data.input);
 			await createA2aTask(
 				{
 					target_agent_id: form.data.target_agent_id,
@@ -31,8 +32,8 @@ export const actions: Actions = {
 				fetch
 			);
 		} catch (e) {
-			if (e instanceof SyntaxError) {
-				return message(form, 'Invalid JSON input', { status: 400 as ErrorStatus });
+			if (isJsonParseError(e)) {
+				return message(form, 'Task input must be a JSON object', { status: 400 as ErrorStatus });
 			}
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

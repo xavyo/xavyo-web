@@ -24,3 +24,7 @@ export function parseJsonStringRecord(text: string): Record<string, string> {
 	}
 	return obj as Record<string, string>;
 }
+
+export function isJsonParseError(e: unknown): boolean {
+	return e instanceof SyntaxError || e instanceof JsonObjectError;
+}
