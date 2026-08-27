@@ -7,6 +7,7 @@ import { updateServiceProviderSchema } from '$lib/schemas/federation';
 import { getServiceProvider, updateServiceProvider, deleteServiceProvider } from '$lib/api/federation';
 import { ApiError } from '$lib/api/client';
 import type { UpdateServiceProviderRequest, IdPInfo } from '$lib/api/types';
+import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -76,9 +77,9 @@ export const actions: Actions = {
 		let attribute_mapping: Record<string, unknown> | undefined;
 		if (form.data.attribute_mapping) {
 			try {
-				attribute_mapping = JSON.parse(form.data.attribute_mapping) as Record<string, unknown>;
+				attribute_mapping = parseJsonRecord(form.data.attribute_mapping);
 			} catch {
-				return message(form, 'Attribute mapping must be valid JSON', {
+				return message(form, 'Attribute mapping must be a JSON object', {
 					status: 400 as ErrorStatus
 				});
 			}

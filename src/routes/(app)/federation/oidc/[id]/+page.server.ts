@@ -13,6 +13,7 @@ import {
 	listDomains
 } from '$lib/api/federation';
 import { ApiError } from '$lib/api/client';
+import { parseJsonStringRecord } from '$lib/utils/json-record';
 import type { UpdateIdentityProviderRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
@@ -63,9 +64,9 @@ export const actions: Actions = {
 		let claim_mapping: Record<string, string> | undefined;
 		if (form.data.claim_mapping) {
 			try {
-				claim_mapping = JSON.parse(form.data.claim_mapping) as Record<string, string>;
+				claim_mapping = parseJsonStringRecord(form.data.claim_mapping);
 			} catch {
-				return message(form, 'Claim mapping must be valid JSON', { status: 400 as ErrorStatus });
+				return message(form, 'Claim mapping must be a JSON object', { status: 400 as ErrorStatus });
 			}
 		}
 

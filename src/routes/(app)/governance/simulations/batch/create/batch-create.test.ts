@@ -299,14 +299,11 @@ describe('Batch simulation create form logic', () => {
 	});
 
 	describe('filter metadata JSON parsing', () => {
-		it('parses valid JSON metadata', () => {
-			const input = '{"location": "US"}';
-			const parsed = JSON.parse(input);
-			expect(parsed.location).toBe('US');
-		});
-
-		it('throws on invalid JSON metadata', () => {
-			expect(() => JSON.parse('not json')).toThrow();
+		it('uses parseJsonStringRecord instead of JSON.parse', async () => {
+			const { readFileSync } = await import('node:fs');
+			const src = readFileSync(new URL('./+page.server.ts', import.meta.url), 'utf8');
+			expect(src).toContain('parseJsonStringRecord(');
+			expect(src).not.toContain('JSON.parse(data.filter_metadata)');
 		});
 	});
 });

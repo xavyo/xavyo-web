@@ -6,6 +6,7 @@ import { createBatchSimulationSchema } from '$lib/schemas/simulations';
 import { createBatchSimulation } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { parseJsonStringRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -29,9 +30,11 @@ export const actions: Actions = {
 		let filterMetadataParsed: Record<string, string> | null = null;
 		if (data.selection_mode === 'filter' && data.filter_metadata) {
 			try {
-				filterMetadataParsed = JSON.parse(data.filter_metadata) as Record<string, string>;
+				filterMetadataParsed = parseJsonStringRecord(data.filter_metadata);
 			} catch {
-				return message(form, 'Invalid JSON in filter metadata', { status: 400 as ErrorStatus });
+				return message(form, 'Filter metadata must be a JSON object', {
+					status: 400 as ErrorStatus
+				});
 			}
 		}
 
