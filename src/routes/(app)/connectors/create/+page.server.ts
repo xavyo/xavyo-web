@@ -6,6 +6,7 @@ import { createConnectorSchema } from '$lib/schemas/connectors';
 import { createConnector } from '$lib/api/connectors';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 import type { ConnectorType, CreateConnectorRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -58,13 +59,13 @@ function buildRestApiConfigAndCredentials(data: Record<string, unknown>): { conf
 	};
 
 	if (headersRaw && headersRaw.trim()) {
-		config.headers = JSON.parse(headersRaw) as Record<string, unknown>;
+		config.headers = parseJsonRecord(headersRaw);
 	}
 
 	return {
 		config,
 		credentials: {
-			auth_config: JSON.parse(authConfigRaw) as Record<string, unknown>
+			auth_config: parseJsonRecord(authConfigRaw)
 		}
 	};
 }
@@ -105,8 +106,8 @@ export const actions: Actions = {
 					return message(form, 'Invalid connector type', { status: 400 as ErrorStatus });
 			}
 		} catch (e) {
-			if (e instanceof SyntaxError) {
-				return message(form, 'Invalid JSON in configuration field', {
+			if (isJsonParseError(e)) {
+				return message(form, 'Configuration JSON must be an object', {
 					status: 400 as ErrorStatus
 				});
 			}

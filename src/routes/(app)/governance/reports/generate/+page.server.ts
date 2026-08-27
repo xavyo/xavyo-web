@@ -6,6 +6,7 @@ import { generateReportSchema } from '$lib/schemas/governance-reporting';
 import { generateReport } from '$lib/api/governance-reporting';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
@@ -33,7 +34,7 @@ export const actions: Actions = {
 
 		try {
 			const params = form.data.parameters
-				? (JSON.parse(form.data.parameters) as Record<string, unknown>)
+				? parseJsonRecord(form.data.parameters)
 				: undefined;
 
 			await generateReport(
@@ -50,8 +51,8 @@ export const actions: Actions = {
 
 			redirect(303, '/governance/reports');
 		} catch (e) {
-			if (e instanceof SyntaxError) {
-				return message(form, 'Invalid JSON in parameters', { status: 400 as ErrorStatus });
+			if (isJsonParseError(e)) {
+				return message(form, 'Parameters must be a JSON object', { status: 400 as ErrorStatus });
 			}
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

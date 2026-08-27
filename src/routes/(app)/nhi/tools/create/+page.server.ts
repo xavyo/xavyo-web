@@ -6,6 +6,7 @@ import { createToolSchema } from '$lib/schemas/nhi';
 import { createTool } from '$lib/api/nhi';
 import { ApiError } from '$lib/api/client';
 import type { CreateToolRequest } from '$lib/api/types';
+import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async () => {
 	const form = await superValidate(zod(createToolSchema));
@@ -23,17 +24,17 @@ export const actions: Actions = {
 		// Parse JSON strings for schemas
 		let inputSchema: Record<string, unknown>;
 		try {
-			inputSchema = JSON.parse(form.data.input_schema) as Record<string, unknown>;
+			inputSchema = parseJsonRecord(form.data.input_schema);
 		} catch {
-			return message(form, 'Input schema must be valid JSON', { status: 400 as ErrorStatus });
+			return message(form, 'Input schema must be a JSON object', { status: 400 as ErrorStatus });
 		}
 
 		let outputSchema: Record<string, unknown> | undefined;
 		if (form.data.output_schema) {
 			try {
-				outputSchema = JSON.parse(form.data.output_schema) as Record<string, unknown>;
+				outputSchema = parseJsonRecord(form.data.output_schema);
 			} catch {
-				return message(form, 'Output schema must be valid JSON', { status: 400 as ErrorStatus });
+				return message(form, 'Output schema must be a JSON object', { status: 400 as ErrorStatus });
 			}
 		}
 
