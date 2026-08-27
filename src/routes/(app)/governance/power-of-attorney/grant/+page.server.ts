@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect, isRedirect } from '@sveltejs/kit';
+import { error, fail, redirect, isRedirect } from '@sveltejs/kit';
 import { grantPoaSchema } from '$lib/schemas/power-of-attorney';
 import { grantPoa } from '$lib/api/power-of-attorney';
 import { listUsers } from '$lib/api/users';
@@ -11,12 +11,14 @@ import type { GrantPoaRequest } from '$lib/api/types';
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	const form = await superValidate(zod(grantPoaSchema));
 
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
+
 	let users: { id: string; email: string; name: string }[] = [];
 	try {
 		const result = await listUsers(
 			{ limit: 100, offset: 0 },
-			locals.accessToken!,
-			locals.tenantId!,
+			locals.accessToken,
+			locals.tenantId,
 			fetch
 		);
 		users = (result.users ?? []).map((u: any) => ({
@@ -24,8 +26,9 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 			email: u.email,
 			name: (u as any).display_name ?? u.email
 		}));
-	} catch {
-		// Users list may fail; form will still work with manual UUID entry
+	} catch (e) {
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(502, 'Failed to load users');
 	}
 
 	return { form, users, currentUserId: locals.user?.id };
