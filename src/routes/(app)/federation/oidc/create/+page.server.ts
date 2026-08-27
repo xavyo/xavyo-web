@@ -7,6 +7,7 @@ import { createIdentityProviderSchema } from '$lib/schemas/federation';
 import { createIdentityProvider } from '$lib/api/federation';
 import { ApiError } from '$lib/api/client';
 import type { CreateIdentityProviderRequest } from '$lib/api/types';
+import { parseJsonStringRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -30,9 +31,9 @@ export const actions: Actions = {
 		let claim_mapping: Record<string, string> | undefined;
 		if (form.data.claim_mapping) {
 			try {
-				claim_mapping = JSON.parse(form.data.claim_mapping) as Record<string, string>;
+				claim_mapping = parseJsonStringRecord(form.data.claim_mapping);
 			} catch {
-				return message(form, 'Claim mapping must be valid JSON', { status: 400 as ErrorStatus });
+				return message(form, 'Claim mapping must be a JSON object', { status: 400 as ErrorStatus });
 			}
 		}
 

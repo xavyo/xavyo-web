@@ -6,6 +6,7 @@ import { createPolicySimulationSchema } from '$lib/schemas/simulations';
 import { createPolicySimulation } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -26,9 +27,11 @@ export const actions: Actions = {
 
 		let parsedConfig: Record<string, unknown>;
 		try {
-			parsedConfig = JSON.parse(form.data.policy_config) as Record<string, unknown>;
+			parsedConfig = parseJsonRecord(form.data.policy_config);
 		} catch {
-			return message(form, 'Invalid JSON in policy configuration', { status: 400 as ErrorStatus });
+			return message(form, 'Policy configuration must be a JSON object', {
+				status: 400 as ErrorStatus
+			});
 		}
 
 		try {

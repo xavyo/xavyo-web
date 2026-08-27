@@ -191,15 +191,11 @@ describe('Policy simulation create form logic', () => {
 	});
 
 	describe('JSON parsing for policy_config', () => {
-		it('parses valid JSON', () => {
-			const input = '{"rules": [], "scope": "all_users"}';
-			const parsed = JSON.parse(input);
-			expect(parsed.rules).toEqual([]);
-			expect(parsed.scope).toBe('all_users');
-		});
-
-		it('throws on invalid JSON', () => {
-			expect(() => JSON.parse('not json')).toThrow();
+		it('uses parseJsonRecord instead of JSON.parse', async () => {
+			const { readFileSync } = await import('node:fs');
+			const src = readFileSync(new URL('./+page.server.ts', import.meta.url), 'utf8');
+			expect(src).toContain('parseJsonRecord(');
+			expect(src).not.toContain('JSON.parse(form.data.policy_config)');
 		});
 	});
 
