@@ -70,11 +70,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		]);
 
 		const nhiNameMap: Record<string, string> = {};
-		const entities =
-			((nhiList as Record<string, unknown>).items as { id: string; name: string }[]) ??
-			((nhiList as Record<string, unknown>).data as { id: string; name: string }[]) ??
-			[];
-		for (const entity of entities) {
+		for (const entity of nhiList.data) {
 			nhiNameMap[entity.id] = entity.name;
 		}
 

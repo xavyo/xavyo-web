@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { ApiError } from '$lib/api/client';
 
 vi.mock('$lib/api/role-mining', () => ({
 	listMiningJobs: vi.fn(),
@@ -291,7 +292,7 @@ describe('Job detail +page.server', () => {
 	});
 
 	it('throws 404 when job not found', async () => {
-		mockGetJob.mockRejectedValue(new Error('not found'));
+		mockGetJob.mockRejectedValue(new ApiError('not found', 404));
 
 		const { load } = await import('./jobs/[id]/+page.server');
 		try {
@@ -358,7 +359,7 @@ describe('Simulation detail +page.server', () => {
 	});
 
 	it('throws 404 when simulation not found', async () => {
-		mockGetSimulation.mockRejectedValue(new Error('not found'));
+		mockGetSimulation.mockRejectedValue(new ApiError('not found', 404));
 
 		const { load } = await import('./simulations/[id]/+page.server');
 		try {

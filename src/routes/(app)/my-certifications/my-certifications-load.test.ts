@@ -34,11 +34,11 @@ describe('My Certifications SSR load', () => {
 			total: 1
 		} as any);
 
-		const result = await load({
+		const result = (await load({
 			locals: { accessToken: 'user-jwt', tenantId: 'tenant-aaa' },
 			fetch: fetchFn,
 			url: new URL('http://localhost/my-certifications')
-		} as any);
+		} as any)) as { items: unknown[]; total: number };
 
 		expect(listMyCertifications).toHaveBeenCalledWith(
 			{ status: 'pending', page: 1, page_size: 20 },

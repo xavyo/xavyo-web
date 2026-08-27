@@ -73,14 +73,13 @@ describe('NHI Governance hub +page.server', () => {
 			offset: 0
 		};
 		const nhiList = {
-			items: [
+			data: [
 				{ id: 'i1', name: 'stale-tool' },
 				{ id: 'o1', name: 'orphan-agent' }
 			],
 			total: 2,
-			page: 1,
-			per_page: 200,
-			total_pages: 1
+			limit: 200,
+			offset: 0
 		};
 
 		vi.mocked(getNhiRiskSummary).mockResolvedValue(summary as any);

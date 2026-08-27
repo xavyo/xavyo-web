@@ -192,7 +192,7 @@ describe('POST /api/provisioning-scripts (create)', () => {
 	});
 
 	it('creates a script and returns 201', async () => {
-		const body = { name: 'New Script', script_body: 'console.log("hello")' };
+		const body = { name: 'New Script' };
 		const mockResult = { id: 's-new', ...body, status: 'draft' };
 		vi.mocked(createProvisioningScript).mockResolvedValue(mockResult as any);
 
@@ -201,7 +201,12 @@ describe('POST /api/provisioning-scripts (create)', () => {
 		expect(response.status).toBe(201);
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
-		expect(createProvisioningScript).toHaveBeenCalledWith(body, TOKEN, TENANT, expect.any(Function));
+		expect(createProvisioningScript).toHaveBeenCalledWith(
+			{ name: 'New Script' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('throws 401 when unauthorized', async () => {
@@ -212,12 +217,19 @@ describe('POST /api/provisioning-scripts (create)', () => {
 	});
 
 	it('propagates API errors', async () => {
-		const body = { name: '' };
+		const body = { name: 'Test' };
 		vi.mocked(createProvisioningScript).mockRejectedValue(new Error('Validation failed'));
 
 		await expect(
 			POST(makeRequestEvent({ request: makeJsonRequest(body) }))
 		).rejects.toThrow('Validation failed');
+	});
+
+	it('rejects empty name with 400', async () => {
+		await expect(
+			POST(makeRequestEvent({ request: makeJsonRequest({ name: '' }) }))
+		).rejects.toMatchObject({ status: 400 });
+		expect(createProvisioningScript).not.toHaveBeenCalled();
 	});
 });
 
@@ -462,7 +474,7 @@ describe('POST /api/provisioning-scripts/[id]/versions (create version)', () => 
 	});
 
 	it('creates version and returns 201', async () => {
-		const body = { script_body: 'console.log("v2")', changelog: 'Updated logic' };
+		const body = { script_body: 'console.log("v2")', change_description: 'Updated logic' };
 		const mockResult = { version_number: 2, ...body };
 		vi.mocked(createScriptVersion).mockResolvedValue(mockResult as any);
 
@@ -473,7 +485,13 @@ describe('POST /api/provisioning-scripts/[id]/versions (create version)', () => 
 		expect(response.status).toBe(201);
 		const data = await response.json();
 		expect(data).toEqual(mockResult);
-		expect(createScriptVersion).toHaveBeenCalledWith('s-1', body, TOKEN, TENANT, expect.any(Function));
+		expect(createScriptVersion).toHaveBeenCalledWith(
+			's-1',
+			{ script_body: body.script_body, change_description: body.change_description },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('throws 401 when unauthorized', async () => {
@@ -489,10 +507,11 @@ describe('POST /api/provisioning-scripts/[id]/versions (create version)', () => 
 	});
 
 	it('propagates version creation errors', async () => {
+		const body = { script_body: 'console.log("v2")' };
 		vi.mocked(createScriptVersion).mockRejectedValue(new Error('Script body required'));
 
 		await expect(
-			POST(makeRequestEvent({ params: { id: 's-1' }, request: makeJsonRequest({}) }))
+			POST(makeRequestEvent({ params: { id: 's-1' }, request: makeJsonRequest(body) }))
 		).rejects.toThrow('Script body required');
 	});
 });
@@ -797,7 +816,13 @@ describe('POST /api/provisioning-scripts/bindings (create)', () => {
 	});
 
 	it('creates binding and returns 201', async () => {
-		const body = { connector_id: 'c-1', script_id: 's-1', hook_phase: 'pre_create' };
+		const body = {
+			connector_id: 'c-1',
+			script_id: 's-1',
+			hook_phase: 'before',
+			operation_type: 'create',
+			execution_order: 1
+		};
 		const mockResult = { id: 'b-new', ...body };
 		vi.mocked(createHookBinding).mockResolvedValue(mockResult as any);
 
@@ -821,10 +846,17 @@ describe('POST /api/provisioning-scripts/bindings (create)', () => {
 	});
 
 	it('propagates binding creation errors', async () => {
+		const body = {
+			connector_id: 'c-1',
+			script_id: 's-1',
+			hook_phase: 'before',
+			operation_type: 'create',
+			execution_order: 1
+		};
 		vi.mocked(createHookBinding).mockRejectedValue(new Error('Duplicate binding'));
 
 		await expect(
-			POST(makeRequestEvent({ request: makeJsonRequest({}) }))
+			POST(makeRequestEvent({ request: makeJsonRequest(body) }))
 		).rejects.toThrow('Duplicate binding');
 	});
 });
@@ -871,8 +903,8 @@ describe('PUT /api/provisioning-scripts/bindings/[bindingId] (update)', () => {
 	});
 
 	it('updates binding and returns result', async () => {
-		const body = { hook_phase: 'post_create' };
-		const mockResult = { id: 'b-1', hook_phase: 'post_create' };
+		const body = { execution_order: 2 };
+		const mockResult = { id: 'b-1', execution_order: 2 };
 		vi.mocked(updateHookBinding).mockResolvedValue(mockResult as any);
 
 		const response = await PUT(
@@ -1071,7 +1103,7 @@ describe('POST /api/provisioning-scripts/templates (create)', () => {
 	});
 
 	it('creates template and returns 201', async () => {
-		const body = { name: 'New Template', category: 'reconciliation', script_body: 'code' };
+		const body = { name: 'New Template', category: 'custom', template_body: 'code' };
 		const mockResult = { id: 't-new', ...body };
 		vi.mocked(createScriptTemplate).mockResolvedValue(mockResult as any);
 
@@ -1095,10 +1127,11 @@ describe('POST /api/provisioning-scripts/templates (create)', () => {
 	});
 
 	it('propagates template creation errors', async () => {
+		const body = { name: 'New Template', category: 'custom', template_body: 'code' };
 		vi.mocked(createScriptTemplate).mockRejectedValue(new Error('Template name required'));
 
 		await expect(
-			POST(makeRequestEvent({ request: makeJsonRequest({}) }))
+			POST(makeRequestEvent({ request: makeJsonRequest(body) }))
 		).rejects.toThrow('Template name required');
 	});
 });
@@ -1235,7 +1268,7 @@ describe('POST /api/provisioning-scripts/templates/[templateId]/instantiate', ()
 	});
 
 	it('instantiates template and returns 201', async () => {
-		const body = { name: 'My Custom Script', variables: { org: 'acme' } };
+		const body = { name: 'My Custom Script' };
 		const mockResult = { id: 's-inst', name: 'My Custom Script', status: 'draft' };
 		vi.mocked(instantiateTemplate).mockResolvedValue(mockResult as any);
 
@@ -1248,7 +1281,7 @@ describe('POST /api/provisioning-scripts/templates/[templateId]/instantiate', ()
 		expect(data).toEqual(mockResult);
 		expect(instantiateTemplate).toHaveBeenCalledWith(
 			't-1',
-			body,
+			{ name: 'My Custom Script' },
 			TOKEN,
 			TENANT,
 			expect.any(Function)
@@ -1268,13 +1301,14 @@ describe('POST /api/provisioning-scripts/templates/[templateId]/instantiate', ()
 	});
 
 	it('propagates instantiation errors', async () => {
+		const body = { name: 'My Custom Script' };
 		vi.mocked(instantiateTemplate).mockRejectedValue(new Error('Missing required variables'));
 
 		await expect(
 			POST(
 				makeRequestEvent({
 					params: { templateId: 't-1' },
-					request: makeJsonRequest({})
+					request: makeJsonRequest(body)
 				})
 			)
 		).rejects.toThrow('Missing required variables');
@@ -1335,10 +1369,11 @@ describe('POST /api/provisioning-scripts/validate', () => {
 	});
 
 	it('propagates validation API errors', async () => {
+		const body = { script_body: 'console.log("test")' };
 		vi.mocked(validateScript).mockRejectedValue(new Error('Server error'));
 
 		await expect(
-			POST(makeRequestEvent({ request: makeJsonRequest({}) }))
+			POST(makeRequestEvent({ request: makeJsonRequest(body) }))
 		).rejects.toThrow('Server error');
 	});
 });
@@ -1381,10 +1416,11 @@ describe('POST /api/provisioning-scripts/dry-run', () => {
 	});
 
 	it('propagates dry-run errors', async () => {
+		const body = { context: { operation: 'create' } };
 		vi.mocked(dryRunScript).mockRejectedValue(new Error('Execution timeout'));
 
 		await expect(
-			POST(makeRequestEvent({ request: makeJsonRequest({}) }))
+			POST(makeRequestEvent({ request: makeJsonRequest(body) }))
 		).rejects.toThrow('Execution timeout');
 	});
 });
