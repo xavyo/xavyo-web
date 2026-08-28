@@ -105,4 +105,14 @@ describe('POST /api/governance/licenses/assignments', () => {
 		expect(response.status).toBe(400);
 		expect(createLicenseAssignment).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createLicenseAssignment).mockResolvedValue({ id: 'a1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ license_pool_id: 'p1', user_id: 'u1' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createLicenseAssignment).toHaveBeenCalled();
+	});
 });

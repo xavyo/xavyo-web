@@ -52,4 +52,12 @@ describe('POST /api/nhi/governance/certifications/:campaignId/certify/:nhiId', (
 			expect.any(Function)
 		);
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(certifyNhi).mockResolvedValue({ nhi_id: 'nhi-1' } as any);
+		const response = await POST(makeEvent() as any);
+		expect(response.status).toBe(200);
+		expect(certifyNhi).toHaveBeenCalled();
+	});
 });

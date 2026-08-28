@@ -107,4 +107,21 @@ describe('POST /api/governance/siem/destinations', () => {
 		expect(response.status).toBe(400);
 		expect(createSiemDestination).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createSiemDestination).mockResolvedValue({ id: 'd1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'splunk',
+					destination_type: 'splunk_hec',
+					endpoint_host: 'siem.example',
+					export_format: 'json'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSiemDestination).toHaveBeenCalled();
+	});
 });
