@@ -10,10 +10,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
-
 	const enabledParam = url.searchParams.get('enabled');
 	const enabled = enabledParam !== null ? enabledParam === 'true' : undefined;
 

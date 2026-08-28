@@ -9,10 +9,6 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
-
 	const result = await listCertificates(locals.accessToken, locals.tenantId, fetch);
 
 	return json(result);

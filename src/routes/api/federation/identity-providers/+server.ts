@@ -8,9 +8,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
 
 	const isEnabledParam = url.searchParams.get('is_enabled');
 	const is_enabled = isEnabledParam !== null ? isEnabledParam === 'true' : undefined;

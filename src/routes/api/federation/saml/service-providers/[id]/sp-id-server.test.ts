@@ -10,8 +10,8 @@ vi.mock('$lib/api/federation', () => ({
 	deleteServiceProvider: vi.fn()
 }));
 
-import { PUT } from './+server';
-import { updateServiceProvider } from '$lib/api/federation';
+import { GET, PUT } from './+server';
+import { getServiceProvider, updateServiceProvider } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -29,6 +29,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/federation/saml/service-providers/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(getServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const response = await GET({
+			params: { id: 'sp1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(getServiceProvider).toHaveBeenCalledWith('sp1', TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('PUT /api/federation/saml/service-providers/:id', () => {
 	beforeEach(() => {
