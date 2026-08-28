@@ -59,19 +59,20 @@ describe('DLQ +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/settings/webhooks/dlq'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(listDlqEntries).mockResolvedValue({
+				entries: [makeDlqEntry()],
+				total: 1,
+				has_more: false
+			} as any);
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/settings/webhooks/dlq'),
+				fetch: vi.fn()
+			} as any);
+			expect(result.entries).toHaveLength(1);
+			expect(listDlqEntries).toHaveBeenCalled();
 		});
 
 		it('returns DLQ entries for admin users', async () => {

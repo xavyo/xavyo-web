@@ -5,13 +5,8 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { createWebhookSubscriptionSchema } from '$lib/schemas/webhooks';
 import { listWebhookEventTypes, createWebhookSubscription } from '$lib/api/webhooks';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const form = await superValidate(zod(createWebhookSubscriptionSchema));
 
 	try {
