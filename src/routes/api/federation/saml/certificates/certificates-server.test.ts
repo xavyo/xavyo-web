@@ -71,4 +71,14 @@ describe('POST /api/federation/saml/certificates', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(uploadCertificate).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(uploadCertificate).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ certificate: 'cert', private_key: 'key', key_id: 'k1' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(uploadCertificate).toHaveBeenCalled();
+	});
 });

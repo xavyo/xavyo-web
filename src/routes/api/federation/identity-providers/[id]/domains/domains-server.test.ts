@@ -71,4 +71,12 @@ describe('POST /api/federation/identity-providers/:id/domains', () => {
 		});
 		expect(addDomain).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(addDomain).mockResolvedValue({ id: 'd1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ domain: 'ex.com', priority: 1 })) as any);
+		expect(response.status).toBe(201);
+		expect(addDomain).toHaveBeenCalled();
+	});
 });
