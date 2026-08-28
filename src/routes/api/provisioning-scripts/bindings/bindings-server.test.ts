@@ -5,8 +5,8 @@ vi.mock('$lib/api/provisioning-scripts', () => ({
 	createHookBinding: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createHookBinding } from '$lib/api/provisioning-scripts';
+import { GET, POST } from './+server';
+import { createHookBinding, listHookBindings } from '$lib/api/provisioning-scripts';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,34 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/provisioning-scripts/bindings', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listHookBindings).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/provisioning-scripts/bindings?page=abc&page_size=nope')
+		} as any);
+		expect(listHookBindings).toHaveBeenCalledWith(
+			{
+				connector_id: undefined,
+				script_id: undefined,
+				hook_phase: undefined,
+				operation_type: undefined,
+				page: undefined,
+				page_size: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/provisioning-scripts/bindings', () => {
 	beforeEach(() => {

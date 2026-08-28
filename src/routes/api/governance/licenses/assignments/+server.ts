@@ -4,6 +4,7 @@ import { listLicenseAssignments, createLicenseAssignment } from '$lib/api/licens
 import type { AssignLicenseRequest, LicenseAssignmentSource } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 const ASSIGNMENT_SOURCES = ['manual', 'automatic', 'entitlement'] as const;
 
@@ -19,8 +20,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const user_id = url.searchParams.get('user_id');
 	const status = url.searchParams.get('status');
 	const source = url.searchParams.get('source');
-	const limit = url.searchParams.get('limit');
-	const offset = url.searchParams.get('offset');
 
 	try {
 		const result = await listLicenseAssignments(
@@ -29,8 +28,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 				user_id: user_id ?? undefined,
 				status: status ?? undefined,
 				source: source ?? undefined,
-				limit: limit ? parseInt(limit, 10) : undefined,
-				offset: offset ? parseInt(offset, 10) : undefined
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

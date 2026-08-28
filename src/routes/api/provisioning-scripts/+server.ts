@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listProvisioningScripts, createProvisioningScript } from '$lib/api/provisioning-scripts';
 import type { CreateProvisioningScriptRequest } from '$lib/api/types';
+import { pagePagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,13 +11,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const status = url.searchParams.get('status') ?? undefined;
 	const search = url.searchParams.get('search') ?? undefined;
-	const page = url.searchParams.get('page') ? Number(url.searchParams.get('page')) : undefined;
-	const page_size = url.searchParams.get('page_size')
-		? Number(url.searchParams.get('page_size'))
-		: undefined;
 
 	const result = await listProvisioningScripts(
-		{ status, search, page, page_size },
+		{ status, search, ...pagePagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

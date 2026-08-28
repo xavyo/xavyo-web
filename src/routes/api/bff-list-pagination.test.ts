@@ -98,7 +98,10 @@ describe('BFF list endpoints honor finite pagination', () => {
 		'connectors/[connectorId]/correlation/rules/+server.ts',
 		'governance/semi-manual/applications/+server.ts',
 		'risk/events/user/[userId]/+server.ts',
-		'nhi/governance/sod/rules/+server.ts'
+		'nhi/governance/sod/rules/+server.ts',
+		'provisioning-scripts/audit-events/+server.ts',
+		'governance/licenses/assignments/+server.ts',
+		'governance/licenses/pools/+server.ts'
 	];
 
 	it.each(files)('%s uses listPagination instead of Number()', (rel) => {
@@ -106,5 +109,20 @@ describe('BFF list endpoints honor finite pagination', () => {
 		expect(s).toContain('listPagination(');
 		expect(s).not.toContain("Number(url.searchParams.get('limit')");
 		expect(s).not.toContain("Number(url.searchParams.get('offset')");
+	});
+
+	const pageFiles = [
+		'provisioning-scripts/+server.ts',
+		'provisioning-scripts/templates/+server.ts',
+		'provisioning-scripts/bindings/+server.ts',
+		'provisioning-scripts/execution-logs/+server.ts',
+		'governance/my-certifications/+server.ts'
+	];
+
+	it.each(pageFiles)('%s uses pagePagination instead of Number()/parseInt()', (rel) => {
+		const s = src(rel);
+		expect(s).toContain('pagePagination(');
+		expect(s).not.toContain("Number(url.searchParams.get('page')");
+		expect(s).not.toContain("parseInt(url.searchParams.get('page')");
 	});
 });
