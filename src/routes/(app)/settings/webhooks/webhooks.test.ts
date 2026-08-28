@@ -77,19 +77,21 @@ describe('Webhook List +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/settings/webhooks'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(listWebhookSubscriptions).mockResolvedValue({
+				items: [makeSub()],
+				total: 1,
+				limit: 20,
+				offset: 0
+			} as any);
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/settings/webhooks'),
+				fetch: vi.fn()
+			} as any);
+			expect(result.subscriptions).toEqual([makeSub()]);
+			expect(listWebhookSubscriptions).toHaveBeenCalled();
 		});
 
 		it('returns subscriptions for admin users', async () => {
@@ -195,19 +197,23 @@ describe('Webhook Detail +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'sub-1' },
-					locals: mockLocals(false),
-					url: new URL('http://localhost/settings/webhooks/sub-1'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-			}
+			vi.mocked(getWebhookSubscription).mockResolvedValue(makeSub() as any);
+			vi.mocked(listWebhookDeliveries).mockResolvedValue({
+				items: [],
+				total: 0,
+				limit: 20,
+				offset: 0
+			} as any);
+			const result = await load({
+				params: { id: 'sub-1' },
+				locals: mockLocals(false),
+				url: new URL('http://localhost/settings/webhooks/sub-1'),
+				fetch: vi.fn()
+			} as any);
+			expect(result.subscription).toBeDefined();
+			expect(getWebhookSubscription).toHaveBeenCalled();
 		});
 
 		it('returns subscription with deliveries for admin', async () => {
@@ -391,17 +397,19 @@ describe('Webhook Create +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-			}
+			vi.mocked(listWebhookEventTypes).mockResolvedValue({
+				event_types: [
+					{ event_type: 'user.created', category: 'user', description: 'User created' }
+				]
+			} as any);
+			const result = await load({
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result.form).toBeDefined();
+			expect(listWebhookEventTypes).toHaveBeenCalled();
 		});
 
 		it('returns form and event types for admin', async () => {
@@ -531,18 +539,19 @@ describe('Webhook Edit +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'sub-1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-			}
+			vi.mocked(getWebhookSubscription).mockResolvedValue(makeSub() as any);
+			vi.mocked(listWebhookEventTypes).mockResolvedValue({
+				event_types: [{ event_type: 'user.created', category: 'user', description: 'test' }]
+			} as any);
+			const result = await load({
+				params: { id: 'sub-1' },
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result.subscription).toBeDefined();
+			expect(getWebhookSubscription).toHaveBeenCalled();
 		});
 
 		it('pre-fills form with subscription data', async () => {

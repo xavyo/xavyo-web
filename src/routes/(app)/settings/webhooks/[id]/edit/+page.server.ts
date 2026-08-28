@@ -9,13 +9,8 @@ import {
 	updateWebhookSubscription
 } from '$lib/api/webhooks';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	let subscription;
 	try {
 		subscription = await getWebhookSubscription(

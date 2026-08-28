@@ -1,6 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
 import {
 	getWebhookSubscription,
 	updateWebhookSubscription,
@@ -11,10 +10,6 @@ import { ApiError } from '$lib/api/client';
 import { finiteNumber } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const deliveryLimit = finiteNumber(url.searchParams.get('dlimit')) ?? 20;
 	const deliveryOffset = finiteNumber(url.searchParams.get('doffset')) ?? 0;
 
