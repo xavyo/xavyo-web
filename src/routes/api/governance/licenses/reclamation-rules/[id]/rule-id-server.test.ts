@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { PUT } from './+server';
-import { updateReclamationRule } from '$lib/api/licenses';
+import { DELETE, PUT } from './+server';
+import { deleteReclamationRule, updateReclamationRule } from '$lib/api/licenses';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -63,5 +63,23 @@ describe('PUT /api/governance/licenses/reclamation-rules/:id', () => {
 		const response = await PUT(makeEvent(JSON.stringify({ enabled: 'no' })) as any);
 		expect(response.status).toBe(400);
 		expect(updateReclamationRule).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/licenses/reclamation-rules/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteReclamationRule).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'r1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteReclamationRule).toHaveBeenCalledWith('r1', TOKEN, TENANT, expect.any(Function));
 	});
 });

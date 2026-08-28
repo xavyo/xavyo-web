@@ -7,7 +7,6 @@ import type {
 	UpdateReportScheduleRequest
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 const SCHEDULE_FREQUENCIES = ['daily', 'weekly', 'monthly'] as const;
 const OUTPUT_FORMATS = ['json', 'csv'] as const;
@@ -100,7 +99,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		await deleteSchedule(params.id, locals.accessToken, locals.tenantId, fetch);

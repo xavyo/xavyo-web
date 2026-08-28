@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { PUT } from './+server';
-import { updateTemplate } from '$lib/api/governance-reporting';
+import { DELETE, PUT } from './+server';
+import { archiveTemplate, updateTemplate } from '$lib/api/governance-reporting';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -63,5 +63,23 @@ describe('PUT /api/governance/reports/templates/:id', () => {
 			status: 400
 		});
 		expect(updateTemplate).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/reports/templates/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(archiveTemplate).mockResolvedValue({ id: 't1' } as any);
+		const response = await DELETE({
+			params: { id: 't1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(archiveTemplate).toHaveBeenCalledWith('t1', TOKEN, TENANT, expect.any(Function));
 	});
 });
