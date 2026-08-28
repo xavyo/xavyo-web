@@ -4,13 +4,11 @@ import { hasAdminRole } from '$lib/server/auth';
 import { listLicenseEntitlementLinks, createLicenseEntitlementLink } from '$lib/api/licenses';
 import type { CreateLicenseEntitlementLinkRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {
@@ -18,14 +16,13 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		const license_pool_id = url.searchParams.get('license_pool_id');
 		const entitlement_id = url.searchParams.get('entitlement_id');
 		const enabled = url.searchParams.get('enabled');
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
 		if (license_pool_id) params.license_pool_id = license_pool_id;
 		if (entitlement_id) params.entitlement_id = entitlement_id;
 		if (enabled) params.enabled = enabled === 'true';
-		if (limit) params.limit = Number(limit);
-		if (offset) params.offset = Number(offset);
+		if (limit != null) params.limit = limit;
+		if (offset != null) params.offset = offset;
 
 		const result = await listLicenseEntitlementLinks(
 			params,

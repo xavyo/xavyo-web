@@ -2,13 +2,13 @@ import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { listMyApprovals } from '$lib/api/my-approvals';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const status = url.searchParams.get('status') ?? 'pending';
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const result = await listMyApprovals(

@@ -117,9 +117,12 @@ describe('GET /api/governance/sla-policies (list)', () => {
 		).rejects.toMatchObject({ status: 401 });
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(GET(makeRequestEvent())).rejects.toMatchObject({ status: 403 });
+		vi.mocked(listSlaPolicies).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET(makeRequestEvent());
+		expect(response.status).toBe(200);
+		expect(listSlaPolicies).toHaveBeenCalled();
 	});
 });
 
@@ -215,6 +218,14 @@ describe('GET /api/governance/sla-policies/[id] (detail)', () => {
 		await expect(
 			GET(makeRequestEvent({ locals: makeLocals({ noTenant: true }), params: { id: 'sla-1' } }))
 		).rejects.toMatchObject({ status: 401 });
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(getSlaPolicy).mockResolvedValue({ id: 'sla-1' } as any);
+		const response = await GET(makeRequestEvent({ params: { id: 'sla-1' } }));
+		expect(response.status).toBe(200);
+		expect(getSlaPolicy).toHaveBeenCalled();
 	});
 });
 

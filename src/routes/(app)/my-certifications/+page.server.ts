@@ -2,13 +2,15 @@ import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { listMyCertifications } from '$lib/api/my-certifications';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const status = url.searchParams.get('status') ?? 'pending';
-	const page = Number(url.searchParams.get('page') ?? '1');
-	const page_size = Number(url.searchParams.get('page_size') ?? '20');
+	const { limit = 20, offset = 0 } = listPagination(url);
+	const page_size = limit;
+	const page = Math.floor(offset / page_size) + 1;
 
 	try {
 		const result = await listMyCertifications(

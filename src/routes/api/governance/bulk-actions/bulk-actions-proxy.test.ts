@@ -124,9 +124,12 @@ describe('GET /api/governance/bulk-actions (list)', () => {
 		).rejects.toMatchObject({ status: 401 });
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(GET(makeRequestEvent())).rejects.toMatchObject({ status: 403 });
+		vi.mocked(listBulkActions).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET(makeRequestEvent());
+		expect(response.status).toBe(200);
+		expect(listBulkActions).toHaveBeenCalled();
 	});
 
 	it('returns error JSON on ApiError', async () => {
@@ -218,6 +221,14 @@ describe('GET /api/governance/bulk-actions/[id] (detail)', () => {
 		expect(response.status).toBe(404);
 		const data = await response.json();
 		expect(data.error).toBe('Not found');
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(getBulkAction).mockResolvedValue({ id: 'ba-1' } as any);
+		const response = await GET(makeRequestEvent({ params: { id: 'ba-1' } }));
+		expect(response.status).toBe(200);
+		expect(getBulkAction).toHaveBeenCalled();
 	});
 });
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('$lib/server/auth', () => ({
-	hasAdminRole: vi.fn().mockReturnValue(true)
+	hasAdminRole: vi.fn().mockReturnValue(false)
 }));
 
 vi.mock('$lib/api/licenses', () => ({
@@ -41,15 +41,27 @@ function makeEvent(body: string) {
 describe('GET /api/governance/licenses/assignments', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listLicenseAssignments).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/licenses/assignments')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listLicenseAssignments).toHaveBeenCalled();
 	});
 
 	it('does not forward NaN pagination', async () => {
 		vi.mocked(listLicenseAssignments).mockResolvedValue({ items: [], total: 0 } as any);
 		await GET({
-			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
 			fetch: vi.fn(),
-			url: new URL('http://localhost/api/governance/licenses/assignments?limit=abc&offset=nope')
+			url: new URL(
+				'http://localhost/api/governance/licenses/assignments?limit=abc&offset=nope'
+			)
 		} as any);
 		expect(listLicenseAssignments).toHaveBeenCalledWith(
 			{

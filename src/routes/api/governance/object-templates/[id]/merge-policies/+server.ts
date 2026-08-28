@@ -6,7 +6,6 @@ import { ApiError } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const result = await listTemplateMergePolicies(params.id, locals.accessToken, locals.tenantId, fetch);
