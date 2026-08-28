@@ -58,4 +58,14 @@ describe('PUT /api/governance/lifecycle/configs/:configId/states/:stateId/action
 		});
 		expect(updateStateActions).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(updateStateActions).mockResolvedValue({ entry_actions: [] } as any);
+		const response = await PUT(
+			makeEvent(JSON.stringify({ entry_actions: [{ action_type: 'notify', parameters: {} }] })) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateStateActions).toHaveBeenCalled();
+	});
 });

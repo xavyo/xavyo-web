@@ -2,7 +2,6 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getNhiSodRule, deleteNhiSodRule } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -21,9 +20,6 @@ export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

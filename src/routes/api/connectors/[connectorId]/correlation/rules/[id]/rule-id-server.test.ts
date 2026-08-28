@@ -10,8 +10,8 @@ vi.mock('$lib/api/correlation', () => ({
 	deleteCorrelationRule: vi.fn()
 }));
 
-import { PATCH } from './+server';
-import { updateCorrelationRule } from '$lib/api/correlation';
+import { PATCH, DELETE } from './+server';
+import { updateCorrelationRule, deleteCorrelationRule } from '$lib/api/correlation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -53,5 +53,23 @@ describe('PATCH /api/connectors/:connectorId/correlation/rules/:id', () => {
 			status: 400
 		});
 		expect(updateCorrelationRule).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/connectors/:connectorId/correlation/rules/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteCorrelationRule).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { connectorId: 'conn-1', id: 'r1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteCorrelationRule).toHaveBeenCalledWith('conn-1', 'r1', TOKEN, TENANT, expect.any(Function));
 	});
 });

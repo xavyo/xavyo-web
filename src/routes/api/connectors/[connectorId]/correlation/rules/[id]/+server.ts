@@ -1,6 +1,5 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { getCorrelationRule, updateCorrelationRule, deleteCorrelationRule } from '$lib/api/correlation';
 import type { UpdateCorrelationRuleRequest } from '$lib/api/types';
 
@@ -115,7 +114,6 @@ export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) 
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	await deleteCorrelationRule(params.connectorId, params.id, locals.accessToken, locals.tenantId, fetch);
 	return new Response(null, { status: 204 });
 };

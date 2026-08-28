@@ -62,4 +62,12 @@ describe('POST /api/nhi/mcp-discovery/import', () => {
 		});
 		expect(importTools).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(importTools).mockResolvedValue({ imported: 1 } as any);
+		const response = await POST(makeEvent(JSON.stringify({ tools: [{ name: 'search' }] })) as any);
+		expect(response.status).toBe(201);
+		expect(importTools).toHaveBeenCalled();
+	});
 });

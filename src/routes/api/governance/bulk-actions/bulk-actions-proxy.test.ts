@@ -267,11 +267,12 @@ describe('DELETE /api/governance/bulk-actions/[id]', () => {
 		expect(deleteBulkAction).toHaveBeenCalledWith('ba-1', TOKEN, TENANT, expect.any(Function));
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(
-			DELETE(makeRequestEvent({ params: { id: 'ba-1' } }))
-		).rejects.toMatchObject({ status: 403 });
+		vi.mocked(deleteBulkAction).mockResolvedValue(undefined as any);
+		const response = await DELETE(makeRequestEvent({ params: { id: 'ba-1' } }));
+		expect(response.status).toBe(204);
+		expect(deleteBulkAction).toHaveBeenCalled();
 	});
 });
 

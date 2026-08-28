@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { PUT } from './+server';
-import { updateTemplateMergePolicy } from '$lib/api/object-templates';
+import { PUT, DELETE } from './+server';
+import { updateTemplateMergePolicy, deleteTemplateMergePolicy } from '$lib/api/object-templates';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -62,5 +62,23 @@ describe('PUT /api/governance/object-templates/:id/merge-policies/:policyId', ()
 			{ status: 400 }
 		);
 		expect(updateTemplateMergePolicy).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/object-templates/:id/merge-policies/:policyId', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteTemplateMergePolicy).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 't1', policyId: 'p1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteTemplateMergePolicy).toHaveBeenCalledWith('t1', 'p1', TOKEN, TENANT, expect.any(Function));
 	});
 });

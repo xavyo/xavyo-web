@@ -5,7 +5,6 @@ import {
 	updateTriggerRule,
 	deleteTriggerRule
 } from '$lib/api/micro-certifications';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ReviewerType, ScopeType, TriggerType, UpdateTriggerRuleRequest } from '$lib/api/types';
 
 const TRIGGER_TYPES = [
@@ -140,7 +139,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Admin access required');
 
 	await deleteTriggerRule(params.id, locals.accessToken, locals.tenantId, fetch);
 	return new Response(null, { status: 204 });
