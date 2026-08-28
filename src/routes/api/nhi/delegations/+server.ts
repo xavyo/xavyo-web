@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listDelegationGrants, createDelegationGrant } from '$lib/api/nhi-delegations';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 import type { CreateDelegationGrantRequest } from '$lib/api/types';
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
@@ -12,10 +13,8 @@ export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 		const principal_id = url.searchParams.get('principal_id') || undefined;
 		const actor_nhi_id = url.searchParams.get('actor_nhi_id') || undefined;
 		const status = url.searchParams.get('status') || undefined;
-		const limit = url.searchParams.get('limit') ? Number(url.searchParams.get('limit')) : undefined;
-		const offset = url.searchParams.get('offset') ? Number(url.searchParams.get('offset')) : undefined;
 		const result = await listDelegationGrants(
-			{ principal_id, actor_nhi_id, status, limit, offset },
+			{ principal_id, actor_nhi_id, status, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch

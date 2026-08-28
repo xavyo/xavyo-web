@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listOutlierAnalyses, triggerOutlierAnalysis } from '$lib/api/outliers';
 import type { OutlierTriggerType, TriggerAnalysisRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const TRIGGER_TYPES = ['scheduled', 'manual', 'api'] as const;
 
@@ -9,9 +10,12 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 	const status = url.searchParams.get('status') ?? undefined;
 	const triggered_by = url.searchParams.get('triggered_by') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const result = await listOutlierAnalyses({ status, triggered_by, limit, offset }, locals.accessToken, locals.tenantId, fetch);
+	const result = await listOutlierAnalyses(
+		{ status, triggered_by, ...listPagination(url) },
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 	return json(result);
 };
 

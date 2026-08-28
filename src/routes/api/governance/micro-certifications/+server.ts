@@ -2,13 +2,13 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listMicroCertifications, bulkDecideMicroCertifications } from '$lib/api/micro-certifications';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 import type { BulkDecisionRequest, CertDecision } from '$lib/api/types';
 
 const DECISIONS = ['approve', 'revoke', 'reduce', 'delegate'] as const;
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Admin access required');
 
 	const status = url.searchParams.get('status') ?? undefined;
 	const user_id = url.searchParams.get('user_id') ?? undefined;
@@ -22,11 +22,17 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		url.searchParams.get('past_deadline') !== null
 			? url.searchParams.get('past_deadline') === 'true'
 			: undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listMicroCertifications(
-		{ status, user_id, reviewer_id, entitlement_id, escalated, past_deadline, limit, offset },
+		{
+			status,
+			user_id,
+			reviewer_id,
+			entitlement_id,
+			escalated,
+			past_deadline,
+			...listPagination(url)
+		},
 		locals.accessToken,
 		locals.tenantId,
 		fetch

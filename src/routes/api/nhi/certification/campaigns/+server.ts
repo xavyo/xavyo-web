@@ -3,18 +3,21 @@ import type { RequestHandler } from './$types';
 import { listNhiCertCampaignsV2, createNhiCertCampaignV2 } from '$lib/api/nhi-cert-campaigns';
 import type { CreateNhiCertCampaignRequest } from '$lib/api/types';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 import { ApiError } from '$lib/api/client';
 
 const CERT_SCOPES = ['all', 'by_type', 'specific'] as const;
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!hasAdminRole(locals.user?.roles)) return json({ error: 'Forbidden' }, { status: 403 });
 	try {
 		const status = url.searchParams.get('status') || undefined;
-		const limit = url.searchParams.get('limit') ? Number(url.searchParams.get('limit')) : undefined;
-		const offset = url.searchParams.get('offset') ? Number(url.searchParams.get('offset')) : undefined;
-		const result = await listNhiCertCampaignsV2({ status, limit, offset }, locals.accessToken, locals.tenantId, fetch);
+		const result = await listNhiCertCampaignsV2(
+			{ status, ...listPagination(url) },
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) return json({ error: e.message }, { status: e.status });

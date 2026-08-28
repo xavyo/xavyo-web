@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listMyApprovals } from '$lib/api/my-approvals';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -8,11 +9,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listMyApprovals(
-		{ status, limit, offset },
+		{ status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

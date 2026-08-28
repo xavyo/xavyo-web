@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createNhiCertCampaignV2 } from '$lib/api/nhi-cert-campaigns';
+import { GET, POST } from './+server';
+import { createNhiCertCampaignV2, listNhiCertCampaignsV2 } from '$lib/api/nhi-cert-campaigns';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,38 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/nhi/certification/campaigns', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not 403 a non-admin reviewer', async () => {
+		vi.mocked(listNhiCertCampaignsV2).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/nhi/certification/campaigns')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listNhiCertCampaignsV2).toHaveBeenCalled();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listNhiCertCampaignsV2).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/nhi/certification/campaigns?page=3&page_size=10')
+		} as any);
+		expect(listNhiCertCampaignsV2).toHaveBeenCalledWith(
+			{ status: undefined, limit: 10, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/nhi/certification/campaigns', () => {
 	beforeEach(() => {
