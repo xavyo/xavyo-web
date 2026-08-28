@@ -1,14 +1,10 @@
 import type { PageServerLoad, Actions } from './$types';
-import { error, isHttpError, redirect } from '@sveltejs/kit';
+import { error, isHttpError } from '@sveltejs/kit';
 import { listDuplicates, previewBatchMerge, executeBatchMerge } from '$lib/api/dedup';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	try {
 		const pendingDuplicates = await listDuplicates(
@@ -30,9 +26,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 
 export const actions = {
 	preview: async ({ request, locals, fetch }) => {
-		if (!hasAdminRole(locals.user?.roles)) {
-			redirect(302, '/dashboard');
-		}
 
 		try {
 			const formData = await request.formData();
@@ -66,9 +59,6 @@ export const actions = {
 	},
 
 	execute: async ({ request, locals, fetch }) => {
-		if (!hasAdminRole(locals.user?.roles)) {
-			redirect(302, '/dashboard');
-		}
 
 		try {
 			const formData = await request.formData();

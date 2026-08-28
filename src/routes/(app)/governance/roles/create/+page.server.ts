@@ -6,12 +6,8 @@ import { createRoleSchema } from '$lib/schemas/governance-roles';
 import { createRole, listRoles } from '$lib/api/governance-roles';
 import { ApiError } from '$lib/api/client';
 import type { CreateGovernanceRoleRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createRoleSchema));
 

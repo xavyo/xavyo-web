@@ -7,13 +7,9 @@ import {
 	archiveBirthrightPolicy
 } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
-import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let policy;
 	try {

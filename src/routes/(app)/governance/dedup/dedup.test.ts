@@ -42,17 +42,17 @@ describe('dedup hub page server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admins', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
+			mockListDuplicates.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 			const { load } = await import('./+page.server');
-
-			await expect(
-				load({
-					url: new URL('http://localhost/governance/dedup'),
-					locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
-					fetch: vi.fn()
-				} as any)
-			).rejects.toThrow();
+			const result = await load({
+				url: new URL('http://localhost/governance/dedup'),
+				locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
+			expect(mockListDuplicates).toHaveBeenCalled();
 		});
 
 		it('returns duplicates with pagination', async () => {

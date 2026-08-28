@@ -71,17 +71,17 @@ describe('merge page server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admins', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
+			mockGetDuplicate.mockResolvedValue(mockDuplicate);
+			mockPreviewMerge.mockResolvedValue(mockPreview);
 			const { load } = await import('./+page.server');
-
-			await expect(
-				load({
-					params: { id: 'dup-1' },
-					locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
-					fetch: vi.fn()
-				} as any)
-			).rejects.toThrow();
+			const result = await load({
+				params: { id: 'dup-1' },
+				locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
 		});
 
 		it('returns preview data', async () => {

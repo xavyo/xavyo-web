@@ -1,7 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { createBirthrightPolicy } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
-import { hasAdminRole } from '$lib/server/auth';
 import { error, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -10,7 +9,6 @@ import { parseJsonArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	const entRes = await listEntitlements({ limit: 100, offset: 0 }, locals.accessToken, locals.tenantId, fetch);
 	const form = await superValidate(zod(createBirthrightPolicySchema));
@@ -20,7 +18,6 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 export const actions: Actions = {
 	default: async ({ request, locals, fetch }) => {
 		if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-		if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 		const formData = await request.formData();
 		const conditionsRaw = formData.get('conditions_json') as string;
 		const entitlementIds = formData.getAll('entitlement_ids') as string[];

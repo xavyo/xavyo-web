@@ -2,16 +2,12 @@ import type { PageServerLoad, Actions } from './$types';
 import { error, isHttpError, isRedirect, redirect } from '@sveltejs/kit';
 import { getDuplicate, dismissDuplicate } from '$lib/api/dedup';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { dismissDuplicateSchema } from '$lib/schemas/dedup';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	try {
 		const duplicate = await getDuplicate(params.id, locals.accessToken!, locals.tenantId!, fetch);
@@ -32,9 +28,6 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
 export const actions = {
 	dismiss: async ({ params, request, locals, fetch }) => {
-		if (!hasAdminRole(locals.user?.roles)) {
-			redirect(302, '/dashboard');
-		}
 
 		const form = await superValidate(request, zod(dismissDuplicateSchema));
 		if (!form.valid) {

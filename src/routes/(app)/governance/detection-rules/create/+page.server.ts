@@ -5,12 +5,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { createDetectionRuleSchema } from '$lib/schemas/manual-tasks-detection-rules';
 import { createDetectionRule } from '$lib/api/detection-rules';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createDetectionRuleSchema));
 	return { form };
 };

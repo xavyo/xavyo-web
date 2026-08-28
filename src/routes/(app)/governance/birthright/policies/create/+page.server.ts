@@ -6,14 +6,10 @@ import { createBirthrightPolicySchema } from '$lib/schemas/birthright';
 import { createBirthrightPolicy } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { CreateBirthrightPolicyRequest } from '$lib/api/types';
 import { parseJsonArray, parseJsonStringArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createBirthrightPolicySchema));
 

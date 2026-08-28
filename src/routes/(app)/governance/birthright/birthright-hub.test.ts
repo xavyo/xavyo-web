@@ -65,19 +65,16 @@ describe('Birthright hub +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/birthright'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			mockListPolicies.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			mockListEvents.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/governance/birthright'),
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
 		});
 
 		it('returns policies and events for admin', async () => {
@@ -173,18 +170,6 @@ describe('Birthright hub +page.server', () => {
 			);
 		});
 
-		it('calls hasAdminRole with user roles', async () => {
-			mockListPolicies.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
-			mockListEvents.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
-
-			await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/birthright'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(mockHasAdminRole).toHaveBeenCalledWith(['admin']);
-		});
 	});
 });
 
