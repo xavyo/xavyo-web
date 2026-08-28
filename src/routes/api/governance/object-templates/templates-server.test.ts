@@ -64,4 +64,14 @@ describe('POST /api/governance/object-templates', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createObjectTemplate).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createObjectTemplate).mockResolvedValue({ id: 't1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'User Template', object_type: 'user' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createObjectTemplate).toHaveBeenCalled();
+	});
 });

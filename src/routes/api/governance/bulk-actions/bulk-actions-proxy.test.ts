@@ -185,6 +185,22 @@ describe('POST /api/governance/bulk-actions (create)', () => {
 			POST(makeRequestEvent({ locals: makeLocals({ noToken: true }), request: makeJsonRequest({}) }))
 		).rejects.toMatchObject({ status: 401 });
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createBulkAction).mockResolvedValue({ id: 'ba-new', status: 'pending' } as any);
+		const response = await POST(
+			makeRequestEvent({
+				request: makeJsonRequest({
+					action_type: 'disable',
+					filter_expression: 'status=inactive',
+					justification: 'offboarding inactive users'
+				})
+			})
+		);
+		expect(response.status).toBe(201);
+		expect(createBulkAction).toHaveBeenCalled();
+	});
 });
 
 // =============================================================================
@@ -421,6 +437,19 @@ describe('POST /api/governance/bulk-actions/validate', () => {
 		const response = await POST(makeRequestEvent({ request: makeJsonRequest({}) }));
 		expect(response.status).toBe(400);
 		expect(validateBulkActionExpression).not.toHaveBeenCalled();
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(validateBulkActionExpression).mockResolvedValue({
+			valid: true,
+			matched_count: 1
+		} as any);
+		const response = await POST(
+			makeRequestEvent({ request: makeJsonRequest({ expression: 'status=inactive' }) })
+		);
+		expect(response.status).toBe(200);
+		expect(validateBulkActionExpression).toHaveBeenCalled();
 	});
 
 	it('returns 401 when unauthorized', async () => {

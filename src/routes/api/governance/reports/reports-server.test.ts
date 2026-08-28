@@ -103,4 +103,14 @@ describe('POST /api/governance/reports', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(generateReport).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(generateReport).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ template_id: 't1', output_format: 'json' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(generateReport).toHaveBeenCalled();
+	});
 });
