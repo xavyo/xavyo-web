@@ -8,6 +8,7 @@ import {
 	bulkRemediate
 } from '$lib/api/reconciliation';
 import { ApiError } from '$lib/api/client';
+import { parseJsonStringArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
@@ -87,11 +88,7 @@ export const actions: Actions = {
 			if (typeof raw !== 'string' || !raw.trim()) {
 				return fail(400, { error: 'Invalid JSON in selected_ids' });
 			}
-			const parsed: unknown = JSON.parse(raw);
-			if (!Array.isArray(parsed)) {
-				return fail(400, { error: 'Invalid JSON in selected_ids' });
-			}
-			selected_ids = parsed.map(String);
+			selected_ids = parseJsonStringArray(raw);
 		} catch {
 			return fail(400, { error: 'Invalid JSON in selected_ids' });
 		}

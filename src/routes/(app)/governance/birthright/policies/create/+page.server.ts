@@ -8,6 +8,7 @@ import { listEntitlements } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
 import type { CreateBirthrightPolicyRequest } from '$lib/api/types';
+import { parseJsonArray, parseJsonStringArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -44,10 +45,10 @@ export const actions: Actions = {
 		let conditions: unknown[] = [];
 		let entitlement_ids: string[] = [];
 		try {
-			conditions = JSON.parse(conditionsJson || '[]');
-			entitlement_ids = JSON.parse(entitlementIdsJson || '[]');
+			conditions = parseJsonArray(conditionsJson || '[]');
+			entitlement_ids = parseJsonStringArray(entitlementIdsJson || '[]');
 		} catch {
-			return fail(400, { error: 'Invalid JSON in conditions or entitlements' });
+			return fail(400, { error: 'Conditions and entitlements must be JSON arrays' });
 		}
 
 		// Build raw data for superValidate

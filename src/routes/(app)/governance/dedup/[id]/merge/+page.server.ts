@@ -7,6 +7,7 @@ import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { mergeExecuteSchema } from '$lib/schemas/dedup';
 import type { ErrorStatus } from 'sveltekit-superforms';
+import { isJsonParseError, parseJsonRecord, parseJsonStringArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -61,14 +62,15 @@ export const actions = {
 		}
 
 		try {
-			// Parse attribute_selections from JSON string
 			const attributeSelections = form.data.attribute_selections
-				? (JSON.parse(form.data.attribute_selections) as Record<string, { source: 'source' | 'target' }>)
+				? (parseJsonRecord(form.data.attribute_selections) as Record<
+						string,
+						{ source: 'source' | 'target' }
+					>)
 				: undefined;
 
-			// Parse entitlement_selections from JSON string
 			const entitlementSelections = form.data.entitlement_selections
-				? (JSON.parse(form.data.entitlement_selections) as string[])
+				? parseJsonStringArray(form.data.entitlement_selections)
 				: null;
 
 			await executeMerge(
@@ -89,8 +91,10 @@ export const actions = {
 		} catch (e) {
 			if (isRedirect(e)) throw e;
 			if (isHttpError(e)) throw e;
-			if (e instanceof SyntaxError) {
-				return message(form, 'Invalid selection data', { status: 400 as ErrorStatus });
+			if (isJsonParseError(e)) {
+				return message(form, 'Selection data must be valid JSON of the expected shape', {
+					status: 400 as ErrorStatus
+				});
 			}
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });

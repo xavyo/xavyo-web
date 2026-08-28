@@ -197,5 +197,51 @@ describe('Meta-Roles Create +page.server', () => {
 			expect(result.status).toBe(400);
 			expect(createMetaRole).not.toHaveBeenCalled();
 		});
+
+		it('returns 400 when in/not_in criteria values are a JSON object', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Finance Admin',
+					priority: '10',
+					criteria_logic: 'and',
+					criteria_field: ['department'],
+					criteria_operator: ['in'],
+					criteria_value: ['{"dept":"finance"}']
+				}),
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(createMetaRole).not.toHaveBeenCalled();
+		});
+
+		it('parses in/not_in criteria values as JSON arrays', async () => {
+			vi.mocked(createMetaRole).mockResolvedValue({ id: 'new-id', name: 'Finance Admin' } as any);
+			try {
+				await actions.default({
+					request: makeFormData({
+						name: 'Finance Admin',
+						priority: '10',
+						criteria_logic: 'and',
+						criteria_field: ['department'],
+						criteria_operator: ['in'],
+						criteria_value: ['["finance","legal"]']
+					}),
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown redirect');
+			} catch (e: any) {
+				expect(e.status).toBe(302);
+			}
+			expect(createMetaRole).toHaveBeenCalledWith(
+				expect.objectContaining({
+					criteria: [{ field: 'department', operator: 'in', value: ['finance', 'legal'] }]
+				}),
+				'tok',
+				'tid',
+				expect.any(Function)
+			);
+		});
 	});
 });

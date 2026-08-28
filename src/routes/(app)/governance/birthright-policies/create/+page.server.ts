@@ -6,6 +6,7 @@ import { error, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createBirthrightPolicySchema } from '$lib/schemas/birthright';
+import { parseJsonArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -26,14 +27,10 @@ export const actions: Actions = {
 		let conditions: unknown[] = [];
 		if (conditionsRaw) {
 			try {
-				const parsed: unknown = JSON.parse(conditionsRaw);
-				if (!Array.isArray(parsed)) {
-					error(400, 'Invalid JSON in conditions');
-				}
-				conditions = parsed;
+				conditions = parseJsonArray(conditionsRaw);
 			} catch (e) {
 				if (isHttpError(e)) throw e;
-				error(400, 'Invalid JSON in conditions');
+				error(400, 'Conditions must be a JSON array');
 			}
 		}
 		const body = {
