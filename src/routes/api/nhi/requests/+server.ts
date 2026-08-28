@@ -64,11 +64,15 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 			}
 			data.requested_expiration = body.requested_expiration;
 		}
-		if (body.rotation_interval_days !== undefined) {
-			if (typeof body.rotation_interval_days !== 'number') {
-				return json({ error: 'rotation_interval_days must be a number' }, { status: 400 });
+		const rotation =
+			body.requested_rotation_days !== undefined
+				? body.requested_rotation_days
+				: body.rotation_interval_days;
+		if (rotation !== undefined) {
+			if (typeof rotation !== 'number') {
+				return json({ error: 'requested_rotation_days must be a number' }, { status: 400 });
 			}
-			data.rotation_interval_days = body.rotation_interval_days;
+			data.requested_rotation_days = rotation;
 		}
 		const result = await submitNhiRequest(data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });

@@ -6347,14 +6347,19 @@ export interface NhiAccessRequest {
 	purpose: string;
 	requested_permissions: string[];
 	requested_expiration: string | null;
-	rotation_interval_days: number | null;
-	nhi_type: string;
+	requested_rotation_days?: number | null;
+	rotation_interval_days?: number | null;
+	nhi_type?: string;
 	status: NhiRequestStatus;
-	reviewer_id: string | null;
-	review_comments: string | null;
+	approver_id?: string | null;
+	reviewer_id?: string | null;
+	decision_comments?: string | null;
+	review_comments?: string | null;
 	created_at: string;
-	reviewed_at: string | null;
-	nhi_id: string | null;
+	decision_at?: string | null;
+	reviewed_at?: string | null;
+	created_nhi_id?: string | null;
+	nhi_id?: string | null;
 }
 
 export interface NhiAccessRequestListResponse {
@@ -6369,6 +6374,7 @@ export interface SubmitNhiRequestBody {
 	purpose: string;
 	requested_permissions?: string[];
 	requested_expiration?: string;
+	requested_rotation_days?: number;
 	rotation_interval_days?: number;
 }
 
