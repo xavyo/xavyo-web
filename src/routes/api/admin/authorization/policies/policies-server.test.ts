@@ -5,8 +5,8 @@ vi.mock('$lib/api/authorization', () => ({
 	createPolicy: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createPolicy } from '$lib/api/authorization';
+import { GET, POST } from './+server';
+import { createPolicy, listPolicies } from '$lib/api/authorization';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/admin/authorization/policies', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listPolicies).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/authorization/policies?limit=abc&offset=nope')
+		} as any);
+		expect(listPolicies).toHaveBeenCalledWith(
+			{ limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/admin/authorization/policies', () => {
 	beforeEach(() => {

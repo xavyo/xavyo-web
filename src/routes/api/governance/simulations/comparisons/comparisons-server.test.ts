@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createSimulationComparison } from '$lib/api/simulations';
+import { GET, POST } from './+server';
+import { createSimulationComparison, listSimulationComparisons } from '$lib/api/simulations';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,35 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/simulations/comparisons', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listSimulationComparisons).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/simulations/comparisons?limit=abc&offset=nope'
+			)
+		} as any);
+		expect(listSimulationComparisons).toHaveBeenCalledWith(
+			{
+				comparison_type: undefined,
+				created_by: undefined,
+				limit: undefined,
+				offset: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/simulations/comparisons', () => {
 	beforeEach(() => {

@@ -16,4 +16,9 @@ describe('listPagination', () => {
 		const url = new URL('http://localhost/x?page=2&page_size=10&offset=7');
 		expect(listPagination(url)).toEqual({ limit: 10, offset: 7 });
 	});
+
+	it('drops non-finite limit and offset instead of forwarding NaN', () => {
+		const url = new URL('http://localhost/x?limit=abc&offset=nope');
+		expect(listPagination(url)).toEqual({ limit: undefined, offset: undefined });
+	});
 });
