@@ -110,6 +110,29 @@ describe('Invitations +page.server', () => {
 			);
 		});
 
+		it('does not forward NaN pagination', async () => {
+			vi.mocked(hasAdminRole).mockReturnValue(true);
+			vi.mocked(listInvitations).mockResolvedValue({
+				invitations: [],
+				total: 0,
+				limit: 20,
+				offset: 0
+			} as any);
+
+			await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/invitations?limit=abc&offset=nope'),
+				fetch: vi.fn()
+			} as any);
+
+			expect(listInvitations).toHaveBeenCalledWith(
+				{ status: undefined, email: undefined, limit: 20, offset: 0 },
+				'tok',
+				'tid',
+				expect.any(Function)
+			);
+		});
+
 		it('fails closed when API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listInvitations).mockRejectedValue(new Error('API error'));

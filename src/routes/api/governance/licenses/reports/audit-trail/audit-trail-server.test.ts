@@ -27,15 +27,33 @@ describe('GET /api/governance/licenses/reports/audit-trail', () => {
 
 	it('does not forward NaN pagination', async () => {
 		vi.mocked(getLicenseAuditTrail).mockResolvedValue({ items: [], total: 0 } as any);
-		await GET({
+		const response = await GET({
 			locals: { accessToken: TOKEN, tenantId: TENANT },
 			fetch: vi.fn(),
 			url: new URL(
 				'http://localhost/api/governance/licenses/reports/audit-trail?limit=abc&offset=nope'
 			)
 		} as any);
+		expect(response.status).toBe(200);
 		expect(getLicenseAuditTrail).toHaveBeenCalledWith(
 			{},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(getLicenseAuditTrail).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/licenses/reports/audit-trail?page=3&page_size=10'
+			)
+		} as any);
+		expect(getLicenseAuditTrail).toHaveBeenCalledWith(
+			{ limit: 10, offset: 20 },
 			TOKEN,
 			TENANT,
 			expect.any(Function)

@@ -2,14 +2,14 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listCorrelationRules, createCorrelationRule } from '$lib/api/correlation';
-import { listPagination } from '$lib/server/list-pagination';
+import { finiteNumber, listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const match_type = url.searchParams.get('match_type') ?? undefined;
 	const is_active = url.searchParams.has('is_active') ? url.searchParams.get('is_active') === 'true' : undefined;
-	const tier = url.searchParams.has('tier') ? Number(url.searchParams.get('tier')) : undefined;
+	const tier = finiteNumber(url.searchParams.get('tier'));
 
 	const result = await listCorrelationRules(
 		params.connectorId, { match_type, is_active, tier, ...listPagination(url) },

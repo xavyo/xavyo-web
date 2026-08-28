@@ -9,8 +9,8 @@ vi.mock('$lib/api/governance-roles', () => ({
 	createRoleInducement: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createRoleInducement } from '$lib/api/governance-roles';
+import { GET, POST } from './+server';
+import { createRoleInducement, listRoleInducements } from '$lib/api/governance-roles';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -28,6 +28,25 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/roles/:id/inducements', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listRoleInducements).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			params: { id: 'r1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/roles/r1/inducements')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listRoleInducements).toHaveBeenCalled();
+	});
+});
 
 describe('POST /api/governance/roles/:id/inducements', () => {
 	beforeEach(() => {

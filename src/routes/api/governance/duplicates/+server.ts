@@ -1,7 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listDuplicates, detectDuplicates } from '$lib/api/dedup';
-import { listPagination } from '$lib/server/list-pagination';
+import { finiteNumber, listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -9,12 +9,8 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') ?? undefined;
-	const min_confidence = url.searchParams.get('min_confidence')
-		? Number(url.searchParams.get('min_confidence'))
-		: undefined;
-	const max_confidence = url.searchParams.get('max_confidence')
-		? Number(url.searchParams.get('max_confidence'))
-		: undefined;
+	const min_confidence = finiteNumber(url.searchParams.get('min_confidence'));
+	const max_confidence = finiteNumber(url.searchParams.get('max_confidence'));
 	const identity_id = url.searchParams.get('identity_id') ?? undefined;
 
 	const result = await listDuplicates(

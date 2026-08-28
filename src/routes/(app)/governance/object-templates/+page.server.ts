@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listObjectTemplates } from '$lib/api/object-templates';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -11,8 +12,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	const object_type = url.searchParams.get('object_type') || undefined;
 	const status = url.searchParams.get('status') || undefined;
-	const offset = Number(url.searchParams.get('offset') || '0');
-	const limit = Number(url.searchParams.get('limit') || '20');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const result = await listObjectTemplates(

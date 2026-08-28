@@ -5,8 +5,8 @@ vi.mock('$lib/api/dedup', () => ({
 	detectDuplicates: vi.fn()
 }));
 
-import { POST } from './+server';
-import { detectDuplicates } from '$lib/api/dedup';
+import { GET, POST } from './+server';
+import { detectDuplicates, listDuplicates } from '$lib/api/dedup';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,36 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/duplicates', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN confidence filters', async () => {
+		vi.mocked(listDuplicates).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/duplicates?min_confidence=abc&max_confidence=nope'
+			)
+		} as any);
+		expect(listDuplicates).toHaveBeenCalledWith(
+			{
+				status: undefined,
+				min_confidence: undefined,
+				max_confidence: undefined,
+				identity_id: undefined,
+				limit: undefined,
+				offset: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/duplicates', () => {
 	beforeEach(() => {

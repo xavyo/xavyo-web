@@ -41,13 +41,24 @@ function makeEvent(body: string) {
 describe('GET /api/governance/siem/destinations', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listSiemDestinations).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/siem/destinations')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listSiemDestinations).toHaveBeenCalled();
 	});
 
 	it('does not forward NaN pagination', async () => {
 		vi.mocked(listSiemDestinations).mockResolvedValue({ items: [], total: 0 } as any);
 		await GET({
-			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
 			fetch: vi.fn(),
 			url: new URL('http://localhost/api/governance/siem/destinations?limit=abc&offset=nope')
 		} as any);

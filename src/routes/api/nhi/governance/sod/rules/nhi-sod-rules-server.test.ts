@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createNhiSodRule } from '$lib/api/nhi-governance';
+import { GET, POST } from './+server';
+import { createNhiSodRule, listNhiSodRules } from '$lib/api/nhi-governance';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/nhi/governance/sod/rules', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listNhiSodRules).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/nhi/governance/sod/rules')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listNhiSodRules).toHaveBeenCalled();
+	});
+});
 
 describe('POST /api/nhi/governance/sod/rules', () => {
 	beforeEach(() => {

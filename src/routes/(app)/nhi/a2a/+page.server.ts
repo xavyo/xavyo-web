@@ -2,11 +2,11 @@ import type { PageServerLoad } from './$types';
 import { listA2aTasks } from '$lib/api/a2a';
 import { error } from '@sveltejs/kit';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const state = url.searchParams.get('state') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const result = await listA2aTasks(

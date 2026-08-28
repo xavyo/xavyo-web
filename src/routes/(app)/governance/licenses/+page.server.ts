@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { listLicensePools } from '$lib/api/licenses';
 import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -13,8 +14,7 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 	const vendor = url.searchParams.get('vendor') || undefined;
 	const license_type = url.searchParams.get('license_type') || undefined;
 	const status = url.searchParams.get('status') || undefined;
-	const limit = Number(url.searchParams.get('limit')) || 20;
-	const offset = Number(url.searchParams.get('offset')) || 0;
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const pools = await listLicensePools(
