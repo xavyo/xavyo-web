@@ -551,6 +551,13 @@ describe('GET /api/provisioning-scripts/[id]/versions/[versionNumber]', () => {
 		expect(getScriptVersion).toHaveBeenCalledWith('s-1', 5, TOKEN, TENANT, expect.any(Function));
 	});
 
+	it('rejects a non-integer versionNumber instead of forwarding NaN', async () => {
+		await expect(
+			GET(makeRequestEvent({ params: { id: 's-1', versionNumber: 'abc' } }))
+		).rejects.toMatchObject({ status: 400 });
+		expect(getScriptVersion).not.toHaveBeenCalled();
+	});
+
 	it('throws 401 when unauthorized', async () => {
 		await expect(
 			GET(

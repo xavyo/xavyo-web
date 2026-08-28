@@ -1,6 +1,5 @@
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
 import {
 	listCorrelationCases,
 	listIdentityCorrelationRules,
@@ -10,7 +9,6 @@ import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Admin role required');
 
 	try {
 		const [casesResult, identityRulesResult, auditResult] = await Promise.all([

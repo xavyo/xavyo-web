@@ -44,4 +44,13 @@ describe('POST /api/provisioning-scripts/:id/versions/:versionNumber/dry-run', (
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(dryRunScriptVersion).not.toHaveBeenCalled();
 	});
+
+	it('rejects a non-integer versionNumber instead of forwarding NaN', async () => {
+		const event = {
+			...makeEvent(JSON.stringify({ context: { user: 'u1' } })),
+			params: { id: 's1', versionNumber: 'not-a-version' }
+		};
+		await expect(POST(event as any)).rejects.toMatchObject({ status: 400 });
+		expect(dryRunScriptVersion).not.toHaveBeenCalled();
+	});
 });

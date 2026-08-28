@@ -135,17 +135,17 @@ describe('Correlation hub +page.server', () => {
 			}
 		});
 
-		it('throws 403 for non-admin users', async () => {
+		it('does not 403 a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown');
-			} catch (e: any) {
-				expect(e.status).toBe(403);
-			}
+			mockListCases.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			mockListRules.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			mockListAudit.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			const result = await load({
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
+			expect(mockListCases).toHaveBeenCalled();
 		});
 
 		it('returns cases, identityRules, and auditEvents for admin', async () => {

@@ -1,12 +1,10 @@
 import type { PageServerLoad } from './$types';
 import { error, isHttpError } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
 import { getCorrelationCase } from '$lib/api/correlation';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Admin role required');
 
 	try {
 		const caseDetail = await getCorrelationCase(

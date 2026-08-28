@@ -113,18 +113,16 @@ describe('Correlation case detail +page.server', () => {
 			}
 		});
 
-		it('throws 403 for non-admin users', async () => {
+		it('does not 403 a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					params: { caseId: 'case-1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown');
-			} catch (e: any) {
-				expect(e.status).toBe(403);
-			}
+			mockGetCase.mockResolvedValue(makeCaseDetail());
+			const result = await load({
+				params: { caseId: 'case-1' },
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result.caseDetail).toBeDefined();
+			expect(mockGetCase).toHaveBeenCalled();
 		});
 
 		it('returns caseDetail for admin', async () => {
