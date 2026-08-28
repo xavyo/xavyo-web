@@ -1,16 +1,11 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { env } from '$env/dynamic/private';
 import { XMLParser } from 'fast-xml-parser';
 
 export const GET: RequestHandler = async ({ locals, fetch, url }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	const baseUrl = env.API_BASE_URL;

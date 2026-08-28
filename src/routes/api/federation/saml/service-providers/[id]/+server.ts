@@ -13,10 +13,6 @@ export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
-
 	const result = await getServiceProvider(params.id, locals.accessToken, locals.tenantId, fetch);
 
 	return json(result);

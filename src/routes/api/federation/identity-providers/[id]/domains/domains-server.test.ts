@@ -9,8 +9,8 @@ vi.mock('$lib/api/federation', () => ({
 	addDomain: vi.fn()
 }));
 
-import { POST } from './+server';
-import { addDomain } from '$lib/api/federation';
+import { GET, POST } from './+server';
+import { addDomain, listDomains } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -28,6 +28,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/federation/identity-providers/:id/domains', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listDomains).mockResolvedValue({ items: [] } as any);
+		const response = await GET({
+			params: { id: 'idp-1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listDomains).toHaveBeenCalledWith('idp-1', TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('POST /api/federation/identity-providers/:id/domains', () => {
 	beforeEach(() => {

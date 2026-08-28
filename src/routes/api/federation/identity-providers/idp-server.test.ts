@@ -63,6 +63,18 @@ describe('GET /api/federation/identity-providers', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(listIdentityProviders).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/federation/identity-providers')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listIdentityProviders).toHaveBeenCalled();
+	});
 });
 
 describe('POST /api/federation/identity-providers', () => {

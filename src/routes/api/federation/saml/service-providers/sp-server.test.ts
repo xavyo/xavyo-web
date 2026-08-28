@@ -9,8 +9,8 @@ vi.mock('$lib/api/federation', () => ({
 	createServiceProvider: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createServiceProvider } from '$lib/api/federation';
+import { GET, POST } from './+server';
+import { createServiceProvider, listServiceProviders } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -27,6 +27,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/federation/saml/service-providers', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listServiceProviders).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/federation/saml/service-providers')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listServiceProviders).toHaveBeenCalled();
+	});
+});
 
 describe('POST /api/federation/saml/service-providers', () => {
 	beforeEach(() => {

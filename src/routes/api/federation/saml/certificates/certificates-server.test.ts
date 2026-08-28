@@ -9,8 +9,8 @@ vi.mock('$lib/api/federation', () => ({
 	uploadCertificate: vi.fn()
 }));
 
-import { POST } from './+server';
-import { uploadCertificate } from '$lib/api/federation';
+import { GET, POST } from './+server';
+import { listCertificates, uploadCertificate } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -27,6 +27,23 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/federation/saml/certificates', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listCertificates).mockResolvedValue({ items: [] } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listCertificates).toHaveBeenCalledWith(TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('POST /api/federation/saml/certificates', () => {
 	beforeEach(() => {
