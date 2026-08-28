@@ -1,7 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { updateState, deleteState } from '$lib/api/lifecycle';
-import { hasAdminRole } from '$lib/server/auth';
 import type { EntitlementAction, UpdateLifecycleStateRequest } from '$lib/api/types';
 
 const ENTITLEMENT_ACTIONS = ['none', 'pause', 'revoke'] as const;
@@ -61,7 +60,6 @@ export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) 
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	await deleteState(params.configId, params.stateId, locals.accessToken, locals.tenantId, fetch);
 	return new Response(null, { status: 204 });
 };

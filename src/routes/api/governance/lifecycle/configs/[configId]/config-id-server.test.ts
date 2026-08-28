@@ -10,8 +10,8 @@ vi.mock('$lib/api/lifecycle', () => ({
 	deleteLifecycleConfig: vi.fn()
 }));
 
-import { PATCH } from './+server';
-import { updateLifecycleConfig } from '$lib/api/lifecycle';
+import { PATCH, DELETE } from './+server';
+import { updateLifecycleConfig, deleteLifecycleConfig } from '$lib/api/lifecycle';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -53,5 +53,23 @@ describe('PATCH /api/governance/lifecycle/configs/:configId', () => {
 			status: 400
 		});
 		expect(updateLifecycleConfig).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/lifecycle/configs/:configId', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteLifecycleConfig).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { configId: 'cfg1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteLifecycleConfig).toHaveBeenCalledWith('cfg1', TOKEN, TENANT, expect.any(Function));
 	});
 });

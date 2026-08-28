@@ -19,8 +19,9 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { GET } from './+server';
-import { getNhiSodRule } from '$lib/api/nhi-governance';
+import { GET, DELETE } from './+server';
+import { getNhiSodRule, deleteNhiSodRule } from '$lib/api/nhi-governance';
+import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -39,5 +40,23 @@ describe('GET /api/nhi/governance/sod/rules/:id', () => {
 		} as any);
 		expect(response.status).toBe(200);
 		expect(getNhiSodRule).toHaveBeenCalledWith('r1', TOKEN, TENANT, expect.any(Function));
+	});
+});
+
+describe('DELETE /api/nhi/governance/sod/rules/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteNhiSodRule).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'r1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteNhiSodRule).toHaveBeenCalledWith('r1', TOKEN, TENANT, expect.any(Function));
 	});
 });

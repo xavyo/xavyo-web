@@ -10,8 +10,8 @@ vi.mock('$lib/api/micro-certifications', () => ({
 	deleteTriggerRule: vi.fn()
 }));
 
-import { GET, PUT } from './+server';
-import { getTriggerRule, updateTriggerRule } from '$lib/api/micro-certifications';
+import { GET, PUT, DELETE } from './+server';
+import { getTriggerRule, updateTriggerRule, deleteTriggerRule } from '$lib/api/micro-certifications';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -70,5 +70,23 @@ describe('PUT /api/governance/micro-certifications/triggers/:id', () => {
 			status: 400
 		});
 		expect(updateTriggerRule).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/micro-certifications/triggers/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteTriggerRule).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'tr1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteTriggerRule).toHaveBeenCalledWith('tr1', TOKEN, TENANT, expect.any(Function));
 	});
 });
