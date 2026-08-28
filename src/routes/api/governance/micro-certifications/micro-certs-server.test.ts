@@ -9,8 +9,8 @@ vi.mock('$lib/api/micro-certifications', () => ({
 	bulkDecideMicroCertifications: vi.fn()
 }));
 
-import { POST } from './+server';
-import { bulkDecideMicroCertifications } from '$lib/api/micro-certifications';
+import { GET, POST } from './+server';
+import { bulkDecideMicroCertifications, listMicroCertifications } from '$lib/api/micro-certifications';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -27,6 +27,38 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/micro-certifications', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not 403 a non-admin reviewer', async () => {
+		vi.mocked(listMicroCertifications).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/micro-certifications')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listMicroCertifications).toHaveBeenCalled();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listMicroCertifications).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/micro-certifications?page=4&page_size=5')
+		} as any);
+		expect(listMicroCertifications).toHaveBeenCalledWith(
+			expect.objectContaining({ limit: 5, offset: 15 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/micro-certifications', () => {
 	beforeEach(() => {

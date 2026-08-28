@@ -1,12 +1,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getNhiCertCampaignSummary } from '$lib/api/nhi-cert-campaigns';
-import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const GET: RequestHandler = async ({ locals, params, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!hasAdminRole(locals.user?.roles)) return json({ error: 'Forbidden' }, { status: 403 });
 	try {
 		const result = await getNhiCertCampaignSummary(params.campaignId, locals.accessToken, locals.tenantId, fetch);
 		return json(result);

@@ -5,8 +5,8 @@ vi.mock('$lib/api/outliers', () => ({
 	triggerOutlierAnalysis: vi.fn()
 }));
 
-import { POST } from './+server';
-import { triggerOutlierAnalysis } from '$lib/api/outliers';
+import { GET, POST } from './+server';
+import { listOutlierAnalyses, triggerOutlierAnalysis } from '$lib/api/outliers';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/outliers/analyses', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listOutlierAnalyses).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/outliers/analyses?page=2&page_size=20')
+		} as any);
+		expect(listOutlierAnalyses).toHaveBeenCalledWith(
+			{ status: undefined, triggered_by: undefined, limit: 20, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/outliers/analyses', () => {
 	beforeEach(() => {
