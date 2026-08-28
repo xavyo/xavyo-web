@@ -8,14 +8,15 @@ import {
 	listWebhookDeliveries
 } from '$lib/api/webhooks';
 import { ApiError } from '$lib/api/client';
+import { finiteNumber } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
 
-	const deliveryLimit = Number(url.searchParams.get('dlimit') ?? '20');
-	const deliveryOffset = Number(url.searchParams.get('doffset') ?? '0');
+	const deliveryLimit = finiteNumber(url.searchParams.get('dlimit')) ?? 20;
+	const deliveryOffset = finiteNumber(url.searchParams.get('doffset')) ?? 0;
 
 	let subscription;
 	let deliveries;

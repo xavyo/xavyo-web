@@ -3,6 +3,7 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listDetectionRules, deleteDetectionRule, enableDetectionRule, disableDetectionRule, seedDefaultRules } from '$lib/api/detection-rules';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -12,8 +13,7 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const rule_type = url.searchParams.get('rule_type') ?? undefined;
 	const is_enabled_str = url.searchParams.get('is_enabled');
 	const is_enabled = is_enabled_str === 'true' ? true : is_enabled_str === 'false' ? false : undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 50, offset = 0 } = listPagination(url);
 
 	try {
 		const rules = await listDetectionRules(

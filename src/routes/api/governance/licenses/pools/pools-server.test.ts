@@ -102,4 +102,21 @@ describe('POST /api/governance/licenses/pools', () => {
 		expect(response.status).toBe(400);
 		expect(createLicensePool).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createLicensePool).mockResolvedValue({ id: 'p1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'Office',
+					vendor: 'Microsoft',
+					total_capacity: 100,
+					billing_period: 'annual'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createLicensePool).toHaveBeenCalled();
+	});
 });

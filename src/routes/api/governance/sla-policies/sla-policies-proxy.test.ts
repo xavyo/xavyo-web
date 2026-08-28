@@ -186,6 +186,16 @@ describe('POST /api/governance/sla-policies (create)', () => {
 			POST(makeRequestEvent({ locals: makeLocals({ noToken: true }), request: makeJsonRequest({}) }))
 		).rejects.toMatchObject({ status: 401 });
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createSlaPolicy).mockResolvedValue({ id: 'sla-new' } as any);
+		const response = await POST(
+			makeRequestEvent({ request: makeJsonRequest({ name: 'Gold SLA', target_duration_seconds: 3600 }) })
+		);
+		expect(response.status).toBe(201);
+		expect(createSlaPolicy).toHaveBeenCalled();
+	});
 });
 
 // =============================================================================
@@ -277,11 +287,14 @@ describe('PUT /api/governance/sla-policies/[id] (update)', () => {
 		expect(updateSlaPolicy).not.toHaveBeenCalled();
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(
-			PUT(makeRequestEvent({ params: { id: 'sla-1' }, request: makeJsonRequest({}) }))
-		).rejects.toMatchObject({ status: 403 });
+		vi.mocked(updateSlaPolicy).mockResolvedValue({ id: 'sla-1' } as any);
+		const response = await PUT(
+			makeRequestEvent({ params: { id: 'sla-1' }, request: makeJsonRequest({ name: 'Platinum SLA' }) })
+		);
+		expect(response.status).toBe(200);
+		expect(updateSlaPolicy).toHaveBeenCalled();
 	});
 });
 

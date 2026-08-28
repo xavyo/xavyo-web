@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { storeSecret } from '$lib/api/nhi-vault';
+import { GET, POST } from './+server';
+import { listSecrets, storeSecret } from '$lib/api/nhi-vault';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -38,6 +38,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/nhi/vault/:nhiId/secrets', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listSecrets).mockResolvedValue({ items: [] } as any);
+		const response = await GET({
+			params: { nhiId: 'n1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listSecrets).toHaveBeenCalledWith('n1', TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('POST /api/nhi/:nhiId/vault/secrets', () => {
 	beforeEach(() => {

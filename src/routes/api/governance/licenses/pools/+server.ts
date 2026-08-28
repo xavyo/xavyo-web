@@ -1,6 +1,5 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { listLicensePools, createLicensePool } from '$lib/api/licenses';
 import type {
 	CreateLicensePoolRequest,
@@ -46,9 +45,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

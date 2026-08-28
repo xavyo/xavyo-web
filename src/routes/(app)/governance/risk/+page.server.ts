@@ -3,6 +3,7 @@ import { error, fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listRiskAlerts, getRiskAlertSummary, acknowledgeRiskAlert, deleteRiskAlert } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -12,8 +13,7 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const severity = url.searchParams.get('severity') ?? undefined;
 	const acknowledged_str = url.searchParams.get('acknowledged');
 	const acknowledged = acknowledged_str === 'true' ? true : acknowledged_str === 'false' ? false : undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 50, offset = 0 } = listPagination(url);
 
 	try {
 		const [alerts, summary] = await Promise.all([

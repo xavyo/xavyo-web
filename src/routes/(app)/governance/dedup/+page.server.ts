@@ -7,6 +7,7 @@ import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { runDetectionSchema } from '$lib/schemas/dedup';
 import type { ErrorStatus } from 'sveltekit-superforms';
+import { finiteNumber, listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -14,11 +15,8 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') ?? undefined;
-	const min_confidence = url.searchParams.get('min_confidence')
-		? Number(url.searchParams.get('min_confidence'))
-		: undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const min_confidence = finiteNumber(url.searchParams.get('min_confidence'));
+	const { limit = 50, offset = 0 } = listPagination(url);
 
 	try {
 		const duplicates = await listDuplicates(
