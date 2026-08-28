@@ -2,12 +2,8 @@ import type { PageServerLoad } from './$types';
 import { error, redirect } from '@sveltejs/kit';
 import { getOutlierResult } from '$lib/api/outliers';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	if (!locals.accessToken || !locals.tenantId) {
 		redirect(302, '/login');
 	}

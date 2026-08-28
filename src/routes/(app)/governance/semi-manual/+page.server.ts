@@ -1,18 +1,13 @@
 import type { Actions, PageServerLoad } from './$types';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { error, fail } from '@sveltejs/kit';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { hasAdminRole } from '$lib/server/auth';
 import { listSemiManualApplications, configureSemiManual, removeSemiManualConfig } from '$lib/api/semi-manual';
 import { configureSemiManualSchema } from '$lib/schemas/manual-tasks-detection-rules';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const { limit = 50, offset = 0 } = listPagination(url);
 
 	try {

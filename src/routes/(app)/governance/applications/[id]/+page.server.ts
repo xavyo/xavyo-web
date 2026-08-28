@@ -6,13 +6,8 @@ import { updateApplicationSchema } from '$lib/schemas/governance';
 import { getApplication, updateApplication, deleteApplication } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { UpdateApplicationRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	let application;
 	try {
 		application = await getApplication(params.id, locals.accessToken!, locals.tenantId!, fetch);
