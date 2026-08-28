@@ -14,13 +14,7 @@ import {
 } from '$lib/api/approval-workflows';
 import { ApiError } from '$lib/api/client';
 import type { UpdateApprovalGroupRequest, ModifyMembersRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
-
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	let group;
 	try {
 		group = await getApprovalGroup(params.id, locals.accessToken!, locals.tenantId!, fetch);

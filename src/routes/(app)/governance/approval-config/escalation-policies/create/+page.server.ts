@@ -6,12 +6,8 @@ import { createEscalationPolicySchema } from '$lib/schemas/approval-workflows';
 import { createEscalationPolicy } from '$lib/api/approval-workflows';
 import { ApiError } from '$lib/api/client';
 import type { CreateEscalationPolicyRequest, FinalFallbackAction } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createEscalationPolicySchema));
 	return { form };
 };
