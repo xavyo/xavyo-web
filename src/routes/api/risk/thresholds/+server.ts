@@ -2,6 +2,7 @@ import { json, error, isHttpError } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listRiskThresholds, createRiskThreshold } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -9,12 +10,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const severity = url.searchParams.get('severity') ?? undefined;
 	const action = url.searchParams.get('action') ?? undefined;
 	const is_enabled = url.searchParams.get('is_enabled') === 'true' ? true : url.searchParams.get('is_enabled') === 'false' ? false : undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	try {
 		const result = await listRiskThresholds(
-			{ severity, action, is_enabled, limit, offset },
+			{ severity, action, is_enabled, ...listPagination(url) },
 			locals.accessToken, locals.tenantId, fetch
 		);
 		return json(result);

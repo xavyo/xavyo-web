@@ -55,4 +55,16 @@ describe('POST /api/governance/micro-certifications/trigger', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(manualTriggerCertification).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin reviewer', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(manualTriggerCertification).mockResolvedValue({ id: 'mc-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({ user_id: 'u1', entitlement_id: 'e1', reason: 'review' })
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(manualTriggerCertification).toHaveBeenCalled();
+	});
 });

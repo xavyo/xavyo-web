@@ -2,19 +2,17 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listNhiUsers } from '$lib/api/nhi-permissions';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-
 	try {
 		const result = await listNhiUsers(
 			params.id,
-			{ limit, offset },
+			listPagination(url),
 			locals.accessToken,
 			locals.tenantId,
 			fetch
