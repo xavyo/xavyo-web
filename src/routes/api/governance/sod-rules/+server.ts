@@ -1,20 +1,19 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listSodRules, createSodRule } from '$lib/api/governance';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
 	const status = url.searchParams.get('status') ?? undefined;
 	const severity = url.searchParams.get('severity') ?? undefined;
 	const entitlement_id = url.searchParams.get('entitlement_id') ?? undefined;
 
 	const result = await listSodRules(
-		{ status, severity, entitlement_id, limit, offset },
+		{ status, severity, entitlement_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

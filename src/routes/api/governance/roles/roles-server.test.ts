@@ -5,8 +5,8 @@ vi.mock('$lib/api/governance-roles', () => ({
 	createRole: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createRole } from '$lib/api/governance-roles';
+import { GET, POST } from './+server';
+import { createRole, listRoles } from '$lib/api/governance-roles';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/roles', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listRoles).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/roles?page=2&page_size=25')
+		} as any);
+		expect(listRoles).toHaveBeenCalledWith(
+			{ limit: 25, offset: 25 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/roles', () => {
 	beforeEach(() => {

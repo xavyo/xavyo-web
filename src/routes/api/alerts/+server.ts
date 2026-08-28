@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { fetchAlerts } from '$lib/api/alerts';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -8,9 +9,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const cursor = url.searchParams.get('cursor') ?? undefined;
-	const limit = url.searchParams.get('limit')
-		? Number(url.searchParams.get('limit'))
-		: undefined;
+	const { limit } = listPagination(url);
 	const type = url.searchParams.get('type') ?? undefined;
 	const severity = url.searchParams.get('severity') ?? undefined;
 	const acknowledgedParam = url.searchParams.get('acknowledged');

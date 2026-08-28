@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listServiceProviders, createServiceProvider } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 import type { CreateServiceProviderRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -13,13 +14,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(403, 'Forbidden');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
 	const enabledParam = url.searchParams.get('enabled');
 	const enabled = enabledParam !== null ? enabledParam === 'true' : undefined;
 
 	const result = await listServiceProviders(
-		{ offset, limit, enabled },
+		{ enabled, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

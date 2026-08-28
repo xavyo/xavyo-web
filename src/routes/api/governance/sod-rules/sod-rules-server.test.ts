@@ -5,8 +5,8 @@ vi.mock('$lib/api/governance', () => ({
 	createSodRule: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createSodRule } from '$lib/api/governance';
+import { GET, POST } from './+server';
+import { createSodRule, listSodRules } from '$lib/api/governance';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,33 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/sod-rules', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listSodRules).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/sod-rules?page=2&page_size=10')
+		} as any);
+		expect(listSodRules).toHaveBeenCalledWith(
+			{
+				status: undefined,
+				severity: undefined,
+				entitlement_id: undefined,
+				limit: 10,
+				offset: 10
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/sod-rules', () => {
 	beforeEach(() => {

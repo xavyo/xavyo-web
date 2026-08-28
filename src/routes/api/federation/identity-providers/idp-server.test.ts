@@ -9,8 +9,8 @@ vi.mock('$lib/api/federation', () => ({
 	createIdentityProvider: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createIdentityProvider } from '$lib/api/federation';
+import { GET, POST } from './+server';
+import { createIdentityProvider, listIdentityProviders } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -27,6 +27,43 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/federation/identity-providers', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listIdentityProviders).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/federation/identity-providers?page=3&page_size=10')
+		} as any);
+		expect(listIdentityProviders).toHaveBeenCalledWith(
+			{ is_enabled: undefined, limit: 10, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listIdentityProviders).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/federation/identity-providers?limit=abc&offset=nope')
+		} as any);
+		expect(listIdentityProviders).toHaveBeenCalledWith(
+			{ is_enabled: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/federation/identity-providers', () => {
 	beforeEach(() => {
