@@ -1,14 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createState } from '$lib/api/lifecycle';
-import { hasAdminRole } from '$lib/server/auth';
 import type { CreateLifecycleStateRequest, EntitlementAction } from '$lib/api/types';
 
 const ENTITLEMENT_ACTIONS = ['none', 'pause', 'revoke'] as const;
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	let parsed: unknown;
 	try {
 		parsed = await request.json();

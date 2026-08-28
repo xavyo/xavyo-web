@@ -72,4 +72,12 @@ describe('POST /api/governance/roles/:id/inducements', () => {
 		});
 		expect(createRoleInducement).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createRoleInducement).mockResolvedValue({ id: 'i1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ induced_role_id: 'r2' })) as any);
+		expect(response.status).toBe(201);
+		expect(createRoleInducement).toHaveBeenCalled();
+	});
 });

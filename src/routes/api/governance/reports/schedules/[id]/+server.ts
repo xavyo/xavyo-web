@@ -26,7 +26,6 @@ export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 
 export const PUT: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	let parsed: unknown;
 	try {

@@ -3,16 +3,12 @@ import type { RequestHandler } from './$types';
 import { bulkAssignLicenses } from '$lib/api/licenses';
 import type { BulkAssignLicenseRequest, LicenseAssignmentSource } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 const ASSIGNMENT_SOURCES = ['manual', 'automatic', 'entitlement'] as const;
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

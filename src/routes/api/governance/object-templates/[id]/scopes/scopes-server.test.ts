@@ -65,4 +65,14 @@ describe('POST /api/governance/object-templates/:id/scopes', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createTemplateScope).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createTemplateScope).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ scope_type: 'organization', scope_value: 'Engineering' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTemplateScope).toHaveBeenCalled();
+	});
 });
