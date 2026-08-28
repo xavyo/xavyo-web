@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createSiemDestination } from '$lib/api/siem';
+import { GET, POST } from './+server';
+import { createSiemDestination, listSiemDestinations } from '$lib/api/siem';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,23 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/siem/destinations', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listSiemDestinations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/siem/destinations?limit=abc&offset=nope')
+		} as any);
+		expect(listSiemDestinations).toHaveBeenCalledWith({}, TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('POST /api/governance/siem/destinations', () => {
 	beforeEach(() => {

@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getExpiringLicensePools } from '$lib/api/licenses';
 import { ApiError } from '$lib/api/client';
+import { finiteNumber } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -9,8 +10,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	try {
-		const withinDaysParam = url.searchParams.get('within_days');
-		const withinDays = withinDaysParam ? Number(withinDaysParam) : undefined;
+		const withinDays = finiteNumber(url.searchParams.get('within_days'));
 
 		const result = await getExpiringLicensePools(
 			withinDays,

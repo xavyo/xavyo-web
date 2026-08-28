@@ -2,12 +2,12 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listExpiringPersonas } from '$lib/api/persona-expiry';
 import { ApiError } from '$lib/api/client';
-import { listPagination } from '$lib/server/list-pagination';
+import { finiteNumber, listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const days_ahead = url.searchParams.get('days_ahead') ? Number(url.searchParams.get('days_ahead')) : undefined;
+		const days_ahead = finiteNumber(url.searchParams.get('days_ahead'));
 		const result = await listExpiringPersonas(
 			{ days_ahead, ...listPagination(url) },
 			locals.accessToken,

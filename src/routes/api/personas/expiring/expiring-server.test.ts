@@ -40,6 +40,17 @@ describe('GET /api/personas/expiring', () => {
 		expect(listExpiringPersonas).toHaveBeenCalled();
 	});
 
+	it('does not forward NaN days_ahead', async () => {
+		vi.mocked(listExpiringPersonas).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(makeEvent('http://localhost/api/personas/expiring?days_ahead=abc') as any);
+		expect(listExpiringPersonas).toHaveBeenCalledWith(
+			{ days_ahead: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('maps page/page_size onto limit/offset', async () => {
 		vi.mocked(listExpiringPersonas).mockResolvedValue({ items: [], total: 0 } as any);
 		await GET(makeEvent('http://localhost/api/personas/expiring?page=2&page_size=10') as any);
