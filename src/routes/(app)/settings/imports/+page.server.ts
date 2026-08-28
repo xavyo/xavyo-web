@@ -7,10 +7,6 @@ import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const { limit = 20, offset = 0 } = listPagination(url);
 	const status = url.searchParams.get('status') ?? undefined;
 
