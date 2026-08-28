@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listOperations, triggerOperation } from '$lib/api/operations';
 import type { OperationType, TriggerOperationRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const OPERATION_TYPES = ['create', 'update', 'delete'] as const;
 
@@ -16,11 +17,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const operation_type = url.searchParams.get('operation_type') ?? undefined;
 	const from_date = url.searchParams.get('from_date') ?? undefined;
 	const to_date = url.searchParams.get('to_date') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listOperations(
-		{ connector_id, user_id, status, operation_type, from_date, to_date, limit, offset },
+		{ connector_id, user_id, status, operation_type, from_date, to_date, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

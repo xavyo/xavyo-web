@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { generateReport } from '$lib/api/governance-reporting';
+import { GET, POST } from './+server';
+import { generateReport, listReports } from '$lib/api/governance-reporting';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,35 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/reports', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listReports).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/reports?limit=abc&offset=nope')
+		} as any);
+		expect(listReports).toHaveBeenCalledWith(
+			{
+				template_id: undefined,
+				status: undefined,
+				from_date: undefined,
+				to_date: undefined,
+				limit: undefined,
+				offset: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/reports', () => {
 	beforeEach(() => {

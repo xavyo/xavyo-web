@@ -7,6 +7,7 @@ import type {
 	CorrelationMatchType,
 	CreateIdentityCorrelationRuleRequest
 } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const MATCH_TYPES = ['exact', 'fuzzy', 'expression'] as const;
 const ALGORITHMS = ['levenshtein', 'jaro_winkler'] as const;
@@ -17,11 +18,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const match_type = url.searchParams.get('match_type') ?? undefined;
 	const is_active = url.searchParams.has('is_active') ? url.searchParams.get('is_active') === 'true' : undefined;
 	const attribute = url.searchParams.get('attribute') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listIdentityCorrelationRules(
-		{ match_type, is_active, attribute, limit, offset },
+		{ match_type, is_active, attribute, ...listPagination(url) },
 		locals.accessToken, locals.tenantId, fetch
 	);
 	return json(result);

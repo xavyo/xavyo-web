@@ -4,6 +4,7 @@ import { listReports, generateReport } from '$lib/api/governance-reporting';
 import type { GenerateReportRequest, OutputFormat } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 const OUTPUT_FORMATS = ['json', 'csv'] as const;
 
@@ -18,8 +19,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 				status: url.searchParams.get('status') ?? undefined,
 				from_date: url.searchParams.get('from_date') ?? undefined,
 				to_date: url.searchParams.get('to_date') ?? undefined,
-				limit: Number(url.searchParams.get('limit') ?? '50'),
-				offset: Number(url.searchParams.get('offset') ?? '0')
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

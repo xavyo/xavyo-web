@@ -5,8 +5,8 @@ vi.mock('$lib/api/operations', () => ({
 	triggerOperation: vi.fn()
 }));
 
-import { POST } from './+server';
-import { triggerOperation } from '$lib/api/operations';
+import { GET, POST } from './+server';
+import { listOperations, triggerOperation } from '$lib/api/operations';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,36 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/operations', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listOperations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/operations?limit=abc&offset=nope')
+		} as any);
+		expect(listOperations).toHaveBeenCalledWith(
+			{
+				connector_id: undefined,
+				user_id: undefined,
+				status: undefined,
+				operation_type: undefined,
+				from_date: undefined,
+				to_date: undefined,
+				limit: undefined,
+				offset: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/operations', () => {
 	beforeEach(() => {

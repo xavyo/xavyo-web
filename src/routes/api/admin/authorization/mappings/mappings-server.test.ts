@@ -5,8 +5,8 @@ vi.mock('$lib/api/authorization', () => ({
 	createMapping: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createMapping } from '$lib/api/authorization';
+import { GET, POST } from './+server';
+import { createMapping, listMappings } from '$lib/api/authorization';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/admin/authorization/mappings', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listMappings).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/authorization/mappings?limit=abc&offset=nope')
+		} as any);
+		expect(listMappings).toHaveBeenCalledWith(
+			{ limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/admin/authorization/mappings', () => {
 	beforeEach(() => {
