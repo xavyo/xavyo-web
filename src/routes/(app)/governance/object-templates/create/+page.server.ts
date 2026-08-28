@@ -5,13 +5,8 @@ import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { createObjectTemplateSchema } from '$lib/schemas/object-templates';
 import { createObjectTemplate } from '$lib/api/object-templates';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const form = await superValidate(zod(createObjectTemplateSchema));
 	return { form };
 };

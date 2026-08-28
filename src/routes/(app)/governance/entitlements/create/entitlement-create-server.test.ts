@@ -36,6 +36,21 @@ describe('Entitlement create +page.server', () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 	});
 
+	it('does not redirect a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(listApplications).mockResolvedValue({
+			items: [{ id: 'app-1', name: 'VPN' }]
+		} as any);
+
+		const result = (await load({
+			locals: mockLocals(false),
+			fetch: vi.fn()
+		} as any)) as any;
+
+		expect(result.applications).toEqual([{ id: 'app-1', name: 'VPN' }]);
+		expect(result.form).toBeDefined();
+	});
+
 	it('returns applications for admin', async () => {
 		vi.mocked(listApplications).mockResolvedValue({
 			items: [{ id: 'app-1', name: 'VPN' }]

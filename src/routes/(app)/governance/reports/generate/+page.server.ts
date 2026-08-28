@@ -5,15 +5,10 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { generateReportSchema } from '$lib/schemas/governance-reporting';
 import { generateReport } from '$lib/api/governance-reporting';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const templateId = url.searchParams.get('template_id') ?? '';
 
 	const form = await superValidate(

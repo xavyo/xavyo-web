@@ -34,22 +34,30 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('NHI Governance hub +page.server', () => {
-	it('redirects non-admin users', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		try {
-			await load({
-				locals: mockLocals(false),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should have thrown redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-			expect(e.location).toBe('/dashboard');
-		}
+		const summary = {
+			total_count: 0,
+			by_type: { service_account: 0, ai_agent: 0 },
+			by_risk_level: { critical: 0, high: 0, medium: 0, low: 0 },
+			pending_certification: 0,
+			inactive_30_days: 0,
+			expiring_7_days: 0
+		};
+		vi.mocked(getNhiRiskSummary).mockResolvedValue(summary as any);
+		vi.mocked(getStalenessReport).mockResolvedValue({ stale_nhis: [] } as any);
+		vi.mocked(listOrphanDetections).mockResolvedValue({ items: [] } as any);
+		vi.mocked(listNhi).mockResolvedValue({ data: [] } as any);
+		const result: any = await load({
+			locals: mockLocals(false),
+			fetch: vi.fn()
+		} as any);
+		expect(result.riskSummary).toBeDefined();
+		expect(result.nhiNameMap).toEqual({});
 	});
 
 	it('loads risk summary, staleness report, orphan detections, and nhiNameMap', async () => {
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(hasAdminRole).mockReturnValue(false);
 		const summary = {
 			total_count: 5,
 			by_type: { service_account: 2, ai_agent: 3 },
@@ -102,7 +110,7 @@ describe('NHI Governance hub +page.server', () => {
 	});
 
 	it('fails closed when APIs throw', async () => {
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(getNhiRiskSummary).mockRejectedValue(new Error('network'));
 		vi.mocked(getStalenessReport).mockRejectedValue(new Error('network'));
 		vi.mocked(listOrphanDetections).mockRejectedValue(new Error('network'));

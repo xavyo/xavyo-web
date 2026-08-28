@@ -5,12 +5,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { createPeerGroupSchema } from '$lib/schemas/peer-groups';
 import { createPeerGroup } from '$lib/api/peer-groups';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createPeerGroupSchema));
 	return { form };
 };

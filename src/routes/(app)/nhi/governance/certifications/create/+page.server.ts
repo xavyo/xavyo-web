@@ -6,13 +6,8 @@ import { createNhiCertCampaignSchema } from '$lib/schemas/nhi-governance';
 import { createNhiCertCampaign } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateNhiCertCampaignRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const form = await superValidate(zod(createNhiCertCampaignSchema));
 	return { form };
 };

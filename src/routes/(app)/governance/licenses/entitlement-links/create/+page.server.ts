@@ -7,13 +7,8 @@ import { listLicensePools, createLicenseEntitlementLink } from '$lib/api/license
 import { listEntitlements } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateLicenseEntitlementLinkRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const [form, poolsResponse, entitlementsResponse] = await Promise.all([
 		superValidate(zod(createEntitlementLinkSchema)),
 		listLicensePools({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch),

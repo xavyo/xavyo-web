@@ -36,6 +36,24 @@ describe('Object template edit +page.server', () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 	});
 
+	it('does not redirect a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(getObjectTemplate).mockResolvedValue({
+			id: 'tpl-1',
+			name: 'User',
+			description: 'd',
+			priority: 1
+		} as any);
+
+		const result = (await load({
+			params: { id: 'tpl-1' },
+			locals: mockLocals(false)
+		} as any)) as any;
+
+		expect(result.template.name).toBe('User');
+		expect(result.form).toBeDefined();
+	});
+
 	it('returns form and template', async () => {
 		vi.mocked(getObjectTemplate).mockResolvedValue({
 			id: 'tpl-1',

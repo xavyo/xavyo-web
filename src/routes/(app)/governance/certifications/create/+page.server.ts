@@ -6,13 +6,8 @@ import { createCampaignSchema } from '$lib/schemas/governance';
 import { createCampaign } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateCampaignRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const form = await superValidate(zod(createCampaignSchema));
 	return { form };
 };

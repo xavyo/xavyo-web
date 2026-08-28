@@ -9,13 +9,8 @@ import {
 	createSimulationComparison
 } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	try {
 		const [form, policyData, batchData] = await Promise.all([
 			superValidate(zod(createComparisonSchema)),

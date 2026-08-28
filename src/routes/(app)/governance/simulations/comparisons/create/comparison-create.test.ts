@@ -64,19 +64,16 @@ describe('Comparison create +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
+			mockListPolicy.mockResolvedValue({ items: [], total: 0 } as any);
+			mockListBatch.mockResolvedValue({ items: [], total: 0 } as any);
 			const { load } = await import('./+page.server');
-			try {
-				await load({
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			const result = await load({
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
 		});
 
 		it('returns form, policy simulations, and batch simulations for admin', async () => {

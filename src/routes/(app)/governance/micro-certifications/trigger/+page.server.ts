@@ -6,12 +6,8 @@ import { isRedirect } from '@sveltejs/kit';
 import { manualTriggerSchema } from '$lib/schemas/micro-certifications';
 import { manualTriggerCertification } from '$lib/api/micro-certifications';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(manualTriggerSchema));
 	return { form };
 };
