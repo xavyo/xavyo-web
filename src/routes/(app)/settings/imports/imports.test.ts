@@ -61,19 +61,21 @@ describe('Import List +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/settings/imports'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(listImportJobs).mockResolvedValue({
+				items: [makeJob()],
+				total: 1,
+				limit: 20,
+				offset: 0
+			} as any);
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/settings/imports'),
+				fetch: vi.fn()
+			} as any);
+			expect(result.jobs).toHaveLength(1);
+			expect(listImportJobs).toHaveBeenCalled();
 		});
 
 		it('returns jobs for admin users', async () => {

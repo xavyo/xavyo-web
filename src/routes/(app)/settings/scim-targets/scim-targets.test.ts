@@ -40,19 +40,22 @@ describe('SCIM targets +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/settings/scim-targets'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			const mockResponse = {
+				items: [{ id: 'tgt-1', name: 'Okta', status: 'active' }],
+				total: 1,
+				limit: 20,
+				offset: 0
+			};
+			vi.mocked(listScimTargets).mockResolvedValue(mockResponse as any);
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/settings/scim-targets'),
+				fetch: vi.fn()
+			} as any);
+			expect(result.targets).toEqual(mockResponse);
+			expect(listScimTargets).toHaveBeenCalled();
 		});
 
 		it('returns targets for admin users', async () => {

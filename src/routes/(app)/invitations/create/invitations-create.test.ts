@@ -47,17 +47,12 @@ describe('Invitations Create +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false)
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			const result: any = await load({
+				locals: mockLocals(false)
+			} as any);
+			expect(result.form).toBeDefined();
 		});
 
 		it('returns form for admin users', async () => {

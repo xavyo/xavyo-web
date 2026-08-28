@@ -5,13 +5,9 @@ import { fail, isRedirect, isHttpError, redirect } from '@sveltejs/kit';
 import { createScimTargetSchema } from '$lib/schemas/scim-targets';
 import { createScimTarget } from '$lib/api/scim-targets';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { CreateScimTargetRequest, ScimCredentials } from '$lib/api/types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
+export const load: PageServerLoad = async () => {
 	const form = await superValidate(zod(createScimTargetSchema));
 	return { form };
 };
