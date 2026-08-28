@@ -9,6 +9,7 @@ import type {
 	LicenseType
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 const BILLING_PERIODS = ['monthly', 'annual', 'perpetual'] as const;
 const LICENSE_TYPES = ['named', 'concurrent'] as const;
@@ -27,14 +28,13 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		const vendor = url.searchParams.get('vendor');
 		const license_type = url.searchParams.get('license_type');
 		const status = url.searchParams.get('status');
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
 		if (vendor) params.vendor = vendor;
 		if (license_type) params.license_type = license_type;
 		if (status) params.status = status;
-		if (limit) params.limit = Number(limit);
-		if (offset) params.offset = Number(offset);
+		if (limit != null) params.limit = limit;
+		if (offset != null) params.offset = offset;
 
 		const result = await listLicensePools(params, locals.accessToken, locals.tenantId, fetch);
 		return json(result);

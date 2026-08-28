@@ -1,23 +1,34 @@
+function finiteNumber(raw: string | null): number | undefined {
+	if (raw == null || raw === '') return undefined;
+	const parsed = Number(raw);
+	return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 /** Map UI `page`/`page_size` onto the API `limit`/`offset` contract. */
 export function listPagination(url: URL): { limit?: number; offset?: number } {
-	const rawLimit = url.searchParams.get('limit') ?? url.searchParams.get('page_size');
-	const parsedLimit = rawLimit != null && rawLimit !== '' ? Number(rawLimit) : undefined;
-	const limit = parsedLimit != null && Number.isFinite(parsedLimit) ? parsedLimit : undefined;
+	const limit = finiteNumber(url.searchParams.get('limit') ?? url.searchParams.get('page_size'));
 
 	if (url.searchParams.has('offset')) {
-		const parsedOffset = Number(url.searchParams.get('offset'));
 		return {
 			limit,
-			offset: Number.isFinite(parsedOffset) ? parsedOffset : undefined
+			offset: finiteNumber(url.searchParams.get('offset'))
 		};
 	}
 
 	if (url.searchParams.has('page') && limit != null) {
-		const parsedPage = Number(url.searchParams.get('page'));
-		if (Number.isFinite(parsedPage)) {
+		const parsedPage = finiteNumber(url.searchParams.get('page'));
+		if (parsedPage != null) {
 			return { limit, offset: Math.max(0, (Math.max(1, parsedPage) - 1) * limit) };
 		}
 	}
 
 	return { limit, offset: undefined };
+}
+
+/** Drop non-finite `page`/`page_size` instead of forwarding NaN. */
+export function pagePagination(url: URL): { page?: number; page_size?: number } {
+	return {
+		page: finiteNumber(url.searchParams.get('page')),
+		page_size: finiteNumber(url.searchParams.get('page_size') ?? url.searchParams.get('limit'))
+	};
 }

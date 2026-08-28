@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createLicenseAssignment } from '$lib/api/licenses';
+import { GET, POST } from './+server';
+import { createLicenseAssignment, listLicenseAssignments } from '$lib/api/licenses';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,35 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/licenses/assignments', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listLicenseAssignments).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/licenses/assignments?limit=abc&offset=nope')
+		} as any);
+		expect(listLicenseAssignments).toHaveBeenCalledWith(
+			{
+				license_pool_id: undefined,
+				user_id: undefined,
+				status: undefined,
+				source: undefined,
+				limit: undefined,
+				offset: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/licenses/assignments', () => {
 	beforeEach(() => {

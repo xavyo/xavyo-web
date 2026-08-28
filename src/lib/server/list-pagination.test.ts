@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { listPagination } from './list-pagination';
+import { listPagination, pagePagination } from './list-pagination';
 
 describe('listPagination', () => {
 	it('passes through limit and offset', () => {
@@ -20,5 +20,17 @@ describe('listPagination', () => {
 	it('drops non-finite limit and offset instead of forwarding NaN', () => {
 		const url = new URL('http://localhost/x?limit=abc&offset=nope');
 		expect(listPagination(url)).toEqual({ limit: undefined, offset: undefined });
+	});
+});
+
+describe('pagePagination', () => {
+	it('passes through finite page and page_size', () => {
+		const url = new URL('http://localhost/x?page=3&page_size=10');
+		expect(pagePagination(url)).toEqual({ page: 3, page_size: 10 });
+	});
+
+	it('drops non-finite page and page_size instead of forwarding NaN', () => {
+		const url = new URL('http://localhost/x?page=abc&page_size=nope');
+		expect(pagePagination(url)).toEqual({ page: undefined, page_size: undefined });
 	});
 });

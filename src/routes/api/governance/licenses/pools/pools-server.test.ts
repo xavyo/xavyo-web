@@ -19,12 +19,34 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createLicensePool } from '$lib/api/licenses';
+import { GET, POST } from './+server';
+import { createLicensePool, listLicensePools } from '$lib/api/licenses';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
+
+describe('GET /api/governance/licenses/pools', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listLicensePools).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/licenses/pools?limit=abc&offset=nope')
+		} as any);
+		expect(listLicensePools).toHaveBeenCalledWith(
+			{},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 function makeEvent(body: string) {
 	return {

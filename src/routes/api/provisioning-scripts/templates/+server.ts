@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listScriptTemplates, createScriptTemplate } from '$lib/api/provisioning-scripts';
 import type { CreateScriptTemplateRequest } from '$lib/api/types';
+import { pagePagination } from '$lib/server/list-pagination';
 
 const CATEGORIES = [
 	'attribute_mapping',
@@ -16,13 +17,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const category = url.searchParams.get('category') ?? undefined;
 	const search = url.searchParams.get('search') ?? undefined;
-	const page = url.searchParams.get('page') ? parseInt(url.searchParams.get('page')!) : undefined;
-	const page_size = url.searchParams.get('page_size')
-		? parseInt(url.searchParams.get('page_size')!)
-		: undefined;
 
 	const result = await listScriptTemplates(
-		{ category, search, page, page_size },
+		{ category, search, ...pagePagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

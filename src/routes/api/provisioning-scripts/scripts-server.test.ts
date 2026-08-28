@@ -5,8 +5,8 @@ vi.mock('$lib/api/provisioning-scripts', () => ({
 	createProvisioningScript: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createProvisioningScript } from '$lib/api/provisioning-scripts';
+import { GET, POST } from './+server';
+import { createProvisioningScript, listProvisioningScripts } from '$lib/api/provisioning-scripts';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/provisioning-scripts', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listProvisioningScripts).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/provisioning-scripts?page=abc&page_size=nope')
+		} as any);
+		expect(listProvisioningScripts).toHaveBeenCalledWith(
+			{ status: undefined, search: undefined, page: undefined, page_size: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/provisioning-scripts', () => {
 	beforeEach(() => {
