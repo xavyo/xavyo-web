@@ -5,7 +5,6 @@ import {
 	updateServiceProvider,
 	deleteServiceProvider
 } from '$lib/api/federation';
-import { hasAdminRole } from '$lib/server/auth';
 import type { UpdateServiceProviderRequest } from '$lib/api/types';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
@@ -21,10 +20,6 @@ export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 export const PUT: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	let parsed: unknown;
@@ -138,10 +133,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	await deleteServiceProvider(params.id, locals.accessToken, locals.tenantId, fetch);

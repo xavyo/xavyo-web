@@ -10,8 +10,8 @@ vi.mock('$lib/api/birthright', () => ({
 	archiveBirthrightPolicy: vi.fn()
 }));
 
-import { PUT } from './+server';
-import { updateBirthrightPolicy } from '$lib/api/birthright';
+import { PUT, DELETE } from './+server';
+import { updateBirthrightPolicy, archiveBirthrightPolicy } from '$lib/api/birthright';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -61,5 +61,23 @@ describe('PUT /api/governance/birthright-policies/:id', () => {
 			PUT(makeEvent(JSON.stringify({ evaluation_mode: 'any' })) as any)
 		).rejects.toMatchObject({ status: 400 });
 		expect(updateBirthrightPolicy).not.toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/birthright-policies/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(archiveBirthrightPolicy).mockResolvedValue({ id: 'b1' } as any);
+		const response = await DELETE({
+			params: { id: 'b1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(archiveBirthrightPolicy).toHaveBeenCalledWith('b1', TOKEN, TENANT, expect.any(Function));
 	});
 });

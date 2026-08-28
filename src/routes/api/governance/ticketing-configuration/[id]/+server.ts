@@ -7,7 +7,6 @@ import {
 } from '$lib/api/governance-operations';
 import type { UpdateTicketingConfigRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -113,9 +112,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

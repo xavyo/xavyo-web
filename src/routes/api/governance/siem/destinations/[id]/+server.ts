@@ -1,6 +1,5 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { getSiemDestination, updateSiemDestination, deleteSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
 import type { EventCategory, UpdateSiemDestinationRequest } from '$lib/api/types';
@@ -109,9 +108,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

@@ -71,4 +71,23 @@ describe('POST /api/governance/licenses/reports/compliance', () => {
 		expect(response.status).toBe(400);
 		expect(generateComplianceReport).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(generateComplianceReport).mockResolvedValue({
+			generated_at: 'now',
+			pools: [],
+			summary: {
+				total_pools_reviewed: 0,
+				compliant_pools: 0,
+				non_compliant_pools: 0,
+				total_capacity: 0,
+				total_allocated: 0,
+				overall_utilization: 0
+			}
+		} as any);
+		const response = await POST(makeEvent(JSON.stringify({})) as any);
+		expect(response.status).toBe(200);
+		expect(generateComplianceReport).toHaveBeenCalled();
+	});
 });

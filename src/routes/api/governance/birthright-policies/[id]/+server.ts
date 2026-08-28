@@ -1,7 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getBirthrightPolicy, updateBirthrightPolicy, archiveBirthrightPolicy } from '$lib/api/birthright';
-import { hasAdminRole } from '$lib/server/auth';
 import type { BirthrightCondition, UpdateBirthrightPolicyRequest } from '$lib/api/types';
 
 const OPERATORS = ['equals', 'not_equals', 'in', 'not_in', 'starts_with', 'contains'] as const;
@@ -111,7 +110,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	const result = await archiveBirthrightPolicy(params.id, locals.accessToken, locals.tenantId, fetch);
 	return json(result);
 };

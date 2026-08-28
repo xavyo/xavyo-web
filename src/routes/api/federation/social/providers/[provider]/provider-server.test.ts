@@ -9,8 +9,8 @@ vi.mock('$lib/api/social', () => ({
 	deleteSocialProvider: vi.fn()
 }));
 
-import { PUT } from './+server';
-import { updateSocialProvider } from '$lib/api/social';
+import { PUT, DELETE } from './+server';
+import { updateSocialProvider, deleteSocialProvider } from '$lib/api/social';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -52,5 +52,31 @@ describe('PUT /api/federation/social/providers/:provider', () => {
 			status: 400
 		});
 		expect(updateSocialProvider).not.toHaveBeenCalled();
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(updateSocialProvider).mockResolvedValue({ provider: 'google' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ enabled: true })) as any);
+		expect(response.status).toBe(200);
+		expect(updateSocialProvider).toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/federation/social/providers/:provider', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteSocialProvider).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { provider: 'google' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteSocialProvider).toHaveBeenCalledWith('google', TOKEN, TENANT, expect.any(Function));
 	});
 });

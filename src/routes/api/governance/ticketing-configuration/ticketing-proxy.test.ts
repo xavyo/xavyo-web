@@ -315,4 +315,12 @@ describe('DELETE /api/governance/ticketing-configuration/[id]', () => {
 			DELETE(makeRequestEvent({ params: { id: 'tc-1' } }))
 		).rejects.toThrow('Config in use');
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(deleteTicketingConfig).mockResolvedValue(undefined as any);
+		const response = await DELETE(makeRequestEvent({ params: { id: 'tc-1' } }));
+		expect(response.status).toBe(204);
+		expect(deleteTicketingConfig).toHaveBeenCalled();
+	});
 });
