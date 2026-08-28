@@ -14,35 +14,36 @@ import {
 	resetEscalation
 } from '$lib/api/approval-workflows';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { EscalationHistoryResponse } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
+	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	let request;
 	try {
-		request = await getAccessRequest(params.id, locals.accessToken!, locals.tenantId!, fetch);
+		request = await getAccessRequest(params.id, locals.accessToken, locals.tenantId, fetch);
 	} catch (e) {
 		if (e instanceof ApiError && e.status === 404) {
 			redirect(302, '/governance');
 		}
-		throw e;
+		if (e instanceof ApiError) error(e.status, e.message);
+		error(500, 'Failed to load access request');
 	}
 
-	let escalationHistory: EscalationHistoryResponse;
+	let escalationHistory: EscalationHistoryResponse = { events: [] };
 	try {
 		escalationHistory = await getEscalationHistory(
 			params.id,
-			locals.accessToken!,
-			locals.tenantId!,
+			locals.accessToken,
+			locals.tenantId,
 			fetch
 		);
 	} catch (e) {
-		if (e instanceof ApiError) error(e.status, e.message);
-		error(500, 'Failed to load escalation history');
+		// Escalation history is admin-facing; a 403 must not hide the request.
+		if (!(e instanceof ApiError && (e.status === 403 || e.status === 404))) {
+			if (e instanceof ApiError) error(e.status, e.message);
+			error(500, 'Failed to load escalation history');
+		}
 	}
 
 	const approveForm = await superValidate(zod(approveRequestSchema));

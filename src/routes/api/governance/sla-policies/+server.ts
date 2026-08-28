@@ -4,6 +4,7 @@ import { listSlaPolicies, createSlaPolicy } from '$lib/api/governance-operations
 import type { CreateSlaPolicyRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -14,10 +15,14 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	try {
+		const status = url.searchParams.get('status');
+		const isActiveParam = url.searchParams.get('is_active');
+		const is_active =
+			isActiveParam === 'true' ? true : isActiveParam === 'false' ? false : status === 'active' ? true : status === 'inactive' ? false : undefined;
 		const result = await listSlaPolicies(
 			{
-				limit: url.searchParams.has('limit') ? Number(url.searchParams.get('limit')) : undefined,
-				offset: url.searchParams.has('offset') ? Number(url.searchParams.get('offset')) : undefined
+				is_active,
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

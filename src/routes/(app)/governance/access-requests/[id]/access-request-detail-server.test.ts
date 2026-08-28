@@ -57,6 +57,18 @@ describe('Access request detail +page.server', () => {
 		expect(result.escalationHistory.events).toHaveLength(1);
 	});
 
+	it('does not redirect a non-admin requester or approver', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(getEscalationHistory).mockRejectedValue(new ApiError('Forbidden', 403));
+		const result = (await load({
+			params: { id: 'req-1' },
+			locals: mockLocals(false),
+			fetch: vi.fn()
+		} as any)) as any;
+		expect(result.request.id).toBe('req-1');
+		expect(result.escalationHistory.events).toEqual([]);
+	});
+
 	it('fails closed when escalation history throws', async () => {
 		vi.mocked(getEscalationHistory).mockRejectedValue(new Error('network'));
 
@@ -72,8 +84,8 @@ describe('Access request detail +page.server', () => {
 		}
 	});
 
-	it('propagates ApiError status from escalation history', async () => {
-		vi.mocked(getEscalationHistory).mockRejectedValue(new ApiError('Forbidden', 403));
+	it('propagates non-403 ApiError status from escalation history', async () => {
+		vi.mocked(getEscalationHistory).mockRejectedValue(new ApiError('Unavailable', 502));
 
 		try {
 			await load({
@@ -83,7 +95,7 @@ describe('Access request detail +page.server', () => {
 			} as any);
 			expect.fail('should have thrown');
 		} catch (e: any) {
-			expect(e.status).toBe(403);
+			expect(e.status).toBe(502);
 		}
 	});
 });
