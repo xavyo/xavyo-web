@@ -1,13 +1,9 @@
 import type { Actions, PageServerLoad } from './$types';
-import { error, fail, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
+import { error, fail } from '@sveltejs/kit';
 import { getRun, getRunReport, cancelRun, resumeRun } from '$lib/api/reconciliation';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	try {
 		const run = await getRun(params.id, params.runId, locals.accessToken!, locals.tenantId!, fetch);

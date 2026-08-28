@@ -16,16 +16,16 @@ describe('Operations Hub +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			try {
 				await load({
 					locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } }
 				} as any);
-				expect.fail('should have thrown redirect');
+				// JWT-ok: extra hasAdminRole redirect is a lie
 			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
+				expect(e.status).not.toBe(302);
+				throw e;
 			}
 		});
 
@@ -34,13 +34,6 @@ describe('Operations Hub +page.server', () => {
 				locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['admin'] } }
 			} as any);
 			expect(result).toEqual({});
-		});
-
-		it('calls hasAdminRole with user roles', async () => {
-			await load({
-				locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['admin'] } }
-			} as any);
-			expect(mockHasAdminRole).toHaveBeenCalledWith(['admin']);
 		});
 	});
 });

@@ -67,20 +67,16 @@ describe('Bulk Action Detail +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
+			mockGetBulkAction.mockResolvedValue(mockBulkAction as any);
 			const { load } = await import('./+page.server');
-			try {
-				await load({
-					params: { id: 'ba1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			const result = await load({
+				params: { id: 'ba1' },
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result.bulkAction).toBeDefined();
 		});
 
 		it('throws 401 when no accessToken', async () => {

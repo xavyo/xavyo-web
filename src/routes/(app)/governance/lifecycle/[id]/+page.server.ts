@@ -6,12 +6,8 @@ import { updateLifecycleConfigSchema } from '$lib/schemas/lifecycle';
 import { getLifecycleConfig, updateLifecycleConfig, deleteLifecycleConfig } from '$lib/api/lifecycle';
 import { ApiError } from '$lib/api/client';
 import type { UpdateLifecycleConfigRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let config;
 	try {

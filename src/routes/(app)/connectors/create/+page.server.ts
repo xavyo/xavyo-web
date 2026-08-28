@@ -5,14 +5,10 @@ import { fail, redirect } from '@sveltejs/kit';
 import { createConnectorSchema } from '$lib/schemas/connectors';
 import { createConnector } from '$lib/api/connectors';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 import type { ConnectorType, CreateConnectorRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createConnectorSchema));
 	return { form };
 };

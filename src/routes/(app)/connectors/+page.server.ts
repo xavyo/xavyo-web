@@ -1,14 +1,10 @@
 import type { PageServerLoad } from './$types';
-import { error, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
+import { error } from '@sveltejs/kit';
 import { listConnectors } from '$lib/api/connectors';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const name_contains = url.searchParams.get('name_contains') ?? undefined;
 	const connector_type = url.searchParams.get('connector_type') ?? undefined;

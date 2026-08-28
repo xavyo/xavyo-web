@@ -1,11 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { error, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
+import { error } from '@sveltejs/kit';
 import { listAllSchedules, getDiscrepancyTrend } from '$lib/api/reconciliation';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
 
 	try {
 		const [schedules, trend] = await Promise.all([

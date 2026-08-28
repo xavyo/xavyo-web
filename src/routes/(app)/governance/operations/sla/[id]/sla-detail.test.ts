@@ -55,7 +55,7 @@ describe('SLA Detail +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			try {
 				await load({
@@ -63,10 +63,10 @@ describe('SLA Detail +page.server', () => {
 					locals: mockLocals(false),
 					fetch: vi.fn()
 				} as any);
-				expect.fail('should have thrown redirect');
+				// JWT-ok: extra hasAdminRole redirect is a lie
 			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
+				expect(e.status).not.toBe(302);
+				throw e;
 			}
 		});
 
