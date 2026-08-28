@@ -4,24 +4,21 @@ import { hasAdminRole } from '$lib/server/auth';
 import { listLicenseIncompatibilities, createLicenseIncompatibility } from '$lib/api/licenses';
 import type { CreateLicenseIncompatibilityRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
 
 	try {
 		const params: Record<string, string | number> = {};
 		const pool_id = url.searchParams.get('pool_id');
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
 		if (pool_id) params.pool_id = pool_id;
-		if (limit) params.limit = Number(limit);
-		if (offset) params.offset = Number(offset);
+		if (limit != null) params.limit = limit;
+		if (offset != null) params.offset = offset;
 
 		const result = await listLicenseIncompatibilities(
 			params,

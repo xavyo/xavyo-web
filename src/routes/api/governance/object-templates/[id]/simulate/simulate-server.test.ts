@@ -41,7 +41,14 @@ function makeEvent(body: string) {
 describe('POST /api/governance/object-templates/:id/simulate', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(simulateTemplate).mockResolvedValue({ matches: true } as any);
+		const response = await POST(makeEvent(JSON.stringify({ department: 'Engineering' })) as any);
+		expect(response.status).toBe(200);
+		expect(simulateTemplate).toHaveBeenCalled();
 	});
 
 	it('simulates with a sample object', async () => {

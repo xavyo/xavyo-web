@@ -12,9 +12,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
 
 	const license_pool_id = url.searchParams.get('license_pool_id');
 	const user_id = url.searchParams.get('user_id');

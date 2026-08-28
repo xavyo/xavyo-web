@@ -41,7 +41,14 @@ function makeEvent(body: string | undefined) {
 describe('POST /api/governance/simulations/policy/:id/execute', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(executePolicySimulation).mockResolvedValue({ id: 'sim-1' } as any);
+		const response = await POST(makeEvent('') as any);
+		expect(response.status).toBe(200);
+		expect(executePolicySimulation).toHaveBeenCalled();
 	});
 
 	it('executes with user_ids when JSON is valid', async () => {

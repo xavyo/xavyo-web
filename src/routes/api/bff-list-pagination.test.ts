@@ -101,7 +101,10 @@ describe('BFF list endpoints honor finite pagination', () => {
 		'nhi/governance/sod/rules/+server.ts',
 		'provisioning-scripts/audit-events/+server.ts',
 		'governance/licenses/assignments/+server.ts',
-		'governance/licenses/pools/+server.ts'
+		'governance/licenses/pools/+server.ts',
+		'governance/licenses/entitlement-links/+server.ts',
+		'governance/licenses/reclamation-rules/+server.ts',
+		'governance/licenses/incompatibilities/+server.ts'
 	];
 
 	it.each(files)('%s uses listPagination instead of Number()', (rel) => {

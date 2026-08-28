@@ -99,9 +99,12 @@ describe('GET /api/governance/failed-operations (list)', () => {
 		).rejects.toMatchObject({ status: 401 });
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(GET(makeRequestEvent())).rejects.toMatchObject({ status: 403 });
+		vi.mocked(listFailedOperations).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET(makeRequestEvent());
+		expect(response.status).toBe(200);
+		expect(listFailedOperations).toHaveBeenCalled();
 	});
 });
 
