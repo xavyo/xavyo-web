@@ -1,6 +1,5 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { listCorrelationRules, createCorrelationRule } from '$lib/api/correlation';
 import { finiteNumber, listPagination } from '$lib/server/list-pagination';
 
@@ -20,7 +19,6 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	let parsed: unknown;
 	try {

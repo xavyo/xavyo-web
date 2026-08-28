@@ -70,4 +70,20 @@ describe('POST /api/governance/reports/templates', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createTemplate).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createTemplate).mockResolvedValue({ id: 't1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'Access review',
+					template_type: 'access_review',
+					definition: { data_sources: ['users'], filters: [], columns: [], grouping: [] }
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTemplate).toHaveBeenCalled();
+	});
 });

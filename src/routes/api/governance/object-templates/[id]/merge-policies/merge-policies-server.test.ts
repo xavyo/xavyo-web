@@ -65,4 +65,14 @@ describe('POST /api/governance/object-templates/:id/merge-policies', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createTemplateMergePolicy).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createTemplateMergePolicy).mockResolvedValue({ id: 'm1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ attribute: 'email', strategy: 'first_wins' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTemplateMergePolicy).toHaveBeenCalled();
+	});
 });

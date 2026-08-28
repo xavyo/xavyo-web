@@ -82,4 +82,14 @@ describe('POST /api/nhi/governance/sod/rules', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createNhiSodRule).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createNhiSodRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ tool_id_a: 'a', tool_id_b: 'b', enforcement: 'prevent' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createNhiSodRule).toHaveBeenCalled();
+	});
 });

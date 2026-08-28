@@ -103,4 +103,21 @@ describe('POST /api/governance/micro-certifications/triggers', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createTriggerRule).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createTriggerRule).mockResolvedValue({ id: 'tr1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'high risk',
+					trigger_type: 'high_risk_assignment',
+					scope_type: 'tenant',
+					reviewer_type: 'user_manager'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTriggerRule).toHaveBeenCalled();
+	});
 });

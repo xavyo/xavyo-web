@@ -91,4 +91,20 @@ describe('POST /api/governance/object-templates/:id/rules', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createTemplateRule).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createTemplateRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					rule_type: 'default',
+					target_attribute: 'department',
+					expression: "'Engineering'"
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTemplateRule).toHaveBeenCalled();
+	});
 });

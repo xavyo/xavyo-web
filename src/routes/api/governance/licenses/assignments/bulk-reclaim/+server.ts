@@ -3,14 +3,10 @@ import type { RequestHandler } from './$types';
 import { bulkReclaimLicenses } from '$lib/api/licenses';
 import type { BulkReclaimLicenseRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

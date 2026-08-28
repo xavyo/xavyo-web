@@ -71,4 +71,22 @@ describe('POST /api/governance/lifecycle/configs/:configId/states', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createState).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createState).mockResolvedValue({ id: 'st1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'active',
+					is_initial: true,
+					is_terminal: false,
+					entitlement_action: 'none',
+					position: 0
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createState).toHaveBeenCalled();
+	});
 });

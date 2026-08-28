@@ -8,7 +8,6 @@ const ENTITLEMENT_ACTIONS = ['none', 'pause', 'revoke'] as const;
 
 export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	let parsed: unknown;
 	try {
 		parsed = await request.json();

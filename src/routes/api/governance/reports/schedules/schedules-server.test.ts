@@ -83,4 +83,23 @@ describe('POST /api/governance/reports/schedules', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createSchedule).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createSchedule).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					template_id: 't1',
+					name: 'Nightly',
+					frequency: 'daily',
+					schedule_hour: 2,
+					recipients: ['ops@example.com'],
+					output_format: 'csv'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSchedule).toHaveBeenCalled();
+	});
 });
