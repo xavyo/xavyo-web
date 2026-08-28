@@ -42,18 +42,18 @@
 				{#if request.requested_expiration}
 					<div><p class="text-sm text-muted-foreground">Requested Expiration</p><p>{new Date(request.requested_expiration).toLocaleString()}</p></div>
 				{/if}
-				{#if request.rotation_interval_days}
-					<div><p class="text-sm text-muted-foreground">Rotation Interval</p><p>{request.rotation_interval_days} days</p></div>
+				{#if request.requested_rotation_days ?? request.rotation_interval_days}
+					<div><p class="text-sm text-muted-foreground">Rotation Interval</p><p>{request.requested_rotation_days ?? request.rotation_interval_days} days</p></div>
 				{/if}
 				<div><p class="text-sm text-muted-foreground">Created</p><p>{new Date(request.created_at).toLocaleString()}</p></div>
-				{#if request.reviewed_at}
-					<div><p class="text-sm text-muted-foreground">Reviewed</p><p>{new Date(request.reviewed_at).toLocaleString()}</p></div>
+				{#if request.decision_at ?? request.reviewed_at}
+					<div><p class="text-sm text-muted-foreground">Reviewed</p><p>{new Date((request.decision_at ?? request.reviewed_at)!).toLocaleString()}</p></div>
 				{/if}
-				{#if request.review_comments}
-					<div class="sm:col-span-2"><p class="text-sm text-muted-foreground">Reviewer Comments</p><p>{request.review_comments}</p></div>
+				{#if request.decision_comments ?? request.review_comments}
+					<div class="sm:col-span-2"><p class="text-sm text-muted-foreground">Reviewer Comments</p><p>{request.decision_comments ?? request.review_comments}</p></div>
 				{/if}
-				{#if request.nhi_id}
-					<div><p class="text-sm text-muted-foreground">Created NHI</p><a href="/nhi" class="text-primary hover:underline">{request.nhi_id}</a></div>
+				{#if request.created_nhi_id ?? request.nhi_id}
+					<div><p class="text-sm text-muted-foreground">Created NHI</p><a href="/nhi" class="text-primary hover:underline">{request.created_nhi_id ?? request.nhi_id}</a></div>
 				{/if}
 			</div>
 		</CardContent>

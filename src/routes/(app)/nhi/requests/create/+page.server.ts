@@ -29,7 +29,9 @@ export const actions: Actions = {
 				if (perms.length > 0) body.requested_permissions = perms;
 			}
 			if (form.data.requested_expiration) body.requested_expiration = form.data.requested_expiration;
-			if (form.data.rotation_interval_days) body.rotation_interval_days = form.data.rotation_interval_days;
+			if (form.data.rotation_interval_days) {
+				body.requested_rotation_days = form.data.rotation_interval_days;
+			}
 
 			await submitNhiRequest(body as any, locals.accessToken, locals.tenantId, fetch);
 			redirect(303, '/nhi/requests');

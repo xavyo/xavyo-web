@@ -56,4 +56,24 @@ describe('POST /api/nhi/requests', () => {
 		expect(response.status).toBe(400);
 		expect(submitNhiRequest).not.toHaveBeenCalled();
 	});
+
+	it('maps rotation_interval_days onto requested_rotation_days', async () => {
+		vi.mocked(submitNhiRequest).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'bot',
+					purpose: 'ci pipeline bot',
+					rotation_interval_days: 30
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(submitNhiRequest).toHaveBeenCalledWith(
+			{ name: 'bot', purpose: 'ci pipeline bot', requested_rotation_days: 30 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
