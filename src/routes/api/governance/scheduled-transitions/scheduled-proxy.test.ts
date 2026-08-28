@@ -148,6 +148,14 @@ describe('GET /api/governance/scheduled-transitions/[id] (detail)', () => {
 			GET(makeRequestEvent({ locals: makeLocals({ noTenant: true }), params: { id: 'st-1' } }))
 		).rejects.toMatchObject({ status: 401 });
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(getScheduledTransition).mockResolvedValue({ id: 'st-1' } as any);
+		const response = await GET(makeRequestEvent({ params: { id: 'st-1' } }));
+		expect(response.status).toBe(200);
+		expect(getScheduledTransition).toHaveBeenCalled();
+	});
 });
 
 // =============================================================================
@@ -188,5 +196,13 @@ describe('POST /api/governance/scheduled-transitions/[id]/cancel', () => {
 		await expect(
 			POST(makeRequestEvent({ params: { id: 'st-1' } }))
 		).rejects.toThrow('Already executed');
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(cancelScheduledTransition).mockResolvedValue({ id: 'st-1', status: 'cancelled' } as any);
+		const response = await POST(makeRequestEvent({ params: { id: 'st-1' } }));
+		expect(response.status).toBe(200);
+		expect(cancelScheduledTransition).toHaveBeenCalled();
 	});
 });

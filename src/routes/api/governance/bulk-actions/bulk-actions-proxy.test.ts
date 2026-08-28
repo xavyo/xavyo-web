@@ -290,6 +290,14 @@ describe('POST /api/governance/bulk-actions/[id]/cancel', () => {
 			POST(makeRequestEvent({ locals: makeLocals({ noToken: true }), params: { id: 'ba-1' } }))
 		).rejects.toMatchObject({ status: 401 });
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(cancelBulkAction).mockResolvedValue({ id: 'ba-1', status: 'cancelled' } as any);
+		const response = await POST(makeRequestEvent({ params: { id: 'ba-1' } }));
+		expect(response.status).toBe(200);
+		expect(cancelBulkAction).toHaveBeenCalled();
+	});
 });
 
 // =============================================================================
@@ -323,6 +331,14 @@ describe('POST /api/governance/bulk-actions/[id]/preview', () => {
 			POST(makeRequestEvent({ locals: makeLocals({ noToken: true }), params: { id: 'ba-1' } }))
 		).rejects.toMatchObject({ status: 401 });
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(previewBulkAction).mockResolvedValue({ affected_count: 15 } as any);
+		const response = await POST(makeRequestEvent({ params: { id: 'ba-1' } }));
+		expect(response.status).toBe(200);
+		expect(previewBulkAction).toHaveBeenCalled();
+	});
 });
 
 // =============================================================================
@@ -351,11 +367,12 @@ describe('POST /api/governance/bulk-actions/[id]/execute', () => {
 		expect(executeBulkAction).toHaveBeenCalledWith('ba-1', TOKEN, TENANT, expect.any(Function));
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(
-			POST(makeRequestEvent({ params: { id: 'ba-1' } }))
-		).rejects.toMatchObject({ status: 403 });
+		vi.mocked(executeBulkAction).mockResolvedValue({ id: 'ba-1', status: 'executing' } as any);
+		const response = await POST(makeRequestEvent({ params: { id: 'ba-1' } }));
+		expect(response.status).toBe(200);
+		expect(executeBulkAction).toHaveBeenCalledWith('ba-1', TOKEN, TENANT, expect.any(Function));
 	});
 });
 

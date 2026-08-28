@@ -3,14 +3,14 @@ import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listMetaRoles } from '$lib/api/meta-roles';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
+	const { limit = 20, offset = 0 } = listPagination(url);
 	const status = url.searchParams.get('status') || undefined;
 	const name = url.searchParams.get('name') || undefined;
 

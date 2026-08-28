@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { PUT } from './+server';
-import { updateSchedule } from '$lib/api/governance-reporting';
+import { GET, PUT } from './+server';
+import { getSchedule, updateSchedule } from '$lib/api/governance-reporting';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -39,6 +39,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/reports/schedules/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(getSchedule).mockResolvedValue({ id: 's1' } as any);
+		const response = await GET({
+			params: { id: 's1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(getSchedule).toHaveBeenCalledWith('s1', TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('PUT /api/governance/reports/schedules/:id', () => {
 	beforeEach(() => {

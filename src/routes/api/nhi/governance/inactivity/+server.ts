@@ -2,20 +2,21 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getStalenessReport } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
+import { finiteNumber } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ locals, fetch, url }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const minDays = url.searchParams.get('min_inactive_days');
+	const minDays = finiteNumber(url.searchParams.get('min_inactive_days'));
 
 	try {
 		const result = await getStalenessReport(
 			locals.accessToken,
 			locals.tenantId,
 			fetch,
-			minDays ? parseInt(minDays, 10) : undefined
+			minDays
 		);
 		return json(result);
 	} catch (e) {

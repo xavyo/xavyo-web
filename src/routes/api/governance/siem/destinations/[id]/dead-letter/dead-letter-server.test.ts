@@ -31,6 +31,19 @@ describe('GET /api/governance/siem/destinations/:id/dead-letter', () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 	});
 
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(listSiemDeadLetter).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			params: { id: 'd1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/siem/destinations/d1/dead-letter')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listSiemDeadLetter).toHaveBeenCalled();
+	});
+
 	it('does not forward NaN pagination', async () => {
 		vi.mocked(listSiemDeadLetter).mockResolvedValue({ items: [], total: 0 } as any);
 		await GET({

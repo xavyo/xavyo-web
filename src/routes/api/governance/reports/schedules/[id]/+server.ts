@@ -14,7 +14,6 @@ const OUTPUT_FORMATS = ['json', 'csv'] as const;
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const result = await getSchedule(params.id, locals.accessToken, locals.tenantId, fetch);

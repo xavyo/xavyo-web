@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { PUT } from './+server';
-import { updateSiemDestination } from '$lib/api/siem';
+import { GET, PUT } from './+server';
+import { getSiemDestination, updateSiemDestination } from '$lib/api/siem';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -39,6 +39,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/siem/destinations/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(getSiemDestination).mockResolvedValue({ id: 'd1' } as any);
+		const response = await GET({
+			params: { id: 'd1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(getSiemDestination).toHaveBeenCalledWith('d1', TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('PUT /api/governance/siem/destinations/:id', () => {
 	beforeEach(() => {

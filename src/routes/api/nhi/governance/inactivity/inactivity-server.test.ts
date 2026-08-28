@@ -35,4 +35,19 @@ describe('GET /api/nhi/governance/inactivity', () => {
 		expect(response.status).toBe(200);
 		expect(getStalenessReport).toHaveBeenCalled();
 	});
+
+	it('does not forward NaN min_inactive_days', async () => {
+		vi.mocked(getStalenessReport).mockResolvedValue({ items: [] } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/nhi/governance/inactivity?min_inactive_days=abc')
+		} as any);
+		expect(getStalenessReport).toHaveBeenCalledWith(
+			TOKEN,
+			TENANT,
+			expect.any(Function),
+			undefined
+		);
+	});
 });

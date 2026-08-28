@@ -2,10 +2,10 @@ import type { PageServerLoad } from './$types';
 import { listGroups } from '$lib/api/groups';
 import { ApiError } from '$lib/api/client';
 import { error } from '@sveltejs/kit';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const result = await listGroups({ limit, offset }, locals.accessToken!, locals.tenantId!, fetch);

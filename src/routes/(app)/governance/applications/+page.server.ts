@@ -2,14 +2,14 @@ import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
 import { listApplications } from '$lib/api/governance';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
 
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 	const status = url.searchParams.get('status') ?? undefined;
 	const app_type = url.searchParams.get('app_type') ?? undefined;
 
