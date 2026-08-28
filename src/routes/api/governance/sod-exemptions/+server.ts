@@ -1,18 +1,17 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listSodExemptions, createSodExemption } from '$lib/api/approval-workflows';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
 	const status = url.searchParams.get('status') ?? undefined;
 
 	const result = await listSodExemptions(
-		{ status, limit, offset },
+		{ status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
