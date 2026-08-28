@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { fetchLoginHistory } from '$lib/api/audit';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -8,9 +9,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const cursor = url.searchParams.get('cursor') ?? undefined;
-	const limit = url.searchParams.get('limit')
-		? Number(url.searchParams.get('limit'))
-		: undefined;
+	const { limit } = listPagination(url);
 	const start_date = url.searchParams.get('start_date') ?? undefined;
 	const end_date = url.searchParams.get('end_date') ?? undefined;
 	const successParam = url.searchParams.get('success');
