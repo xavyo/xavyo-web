@@ -5,12 +5,8 @@ import { error, fail, redirect } from '@sveltejs/kit';
 import { updateDetectionRuleSchema } from '$lib/schemas/manual-tasks-detection-rules';
 import { getDetectionRule, updateDetectionRule } from '$lib/api/detection-rules';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let rule;
 	try {

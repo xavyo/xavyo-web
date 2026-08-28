@@ -6,13 +6,9 @@ import { createMetaRoleSchema } from '$lib/schemas/meta-roles';
 import { createMetaRole } from '$lib/api/meta-roles';
 import { ApiError } from '$lib/api/client';
 import type { CreateMetaRoleRequest, CriteriaOperator } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 import { isJsonParseError, parseJsonArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createMetaRoleSchema));
 	return { form };

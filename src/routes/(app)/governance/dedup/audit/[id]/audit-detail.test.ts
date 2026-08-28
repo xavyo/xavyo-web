@@ -52,17 +52,16 @@ describe('audit detail page server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admins', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
+			mockGetMergeAudit.mockResolvedValue(mockAudit);
 			const { load } = await import('./+page.server');
-
-			await expect(
-				load({
-					params: { id: 'audit-1' },
-					locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
-					fetch: vi.fn()
-				} as any)
-			).rejects.toThrow();
+			const result = await load({
+				params: { id: 'audit-1' },
+				locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
 		});
 
 		it('returns audit detail with snapshots', async () => {

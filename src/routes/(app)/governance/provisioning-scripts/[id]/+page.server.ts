@@ -1,6 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { getProvisioningScript, listScriptVersions, listHookBindings } from '$lib/api/provisioning-scripts';
 import { listScriptExecutionLogs } from '$lib/api/script-analytics';
 import { ApiError } from '$lib/api/client';
@@ -8,7 +7,6 @@ import { ApiError } from '$lib/api/client';
 export const load: PageServerLoad = async ({ locals, params }) => {
 	const { accessToken, tenantId, user } = locals;
 	if (!accessToken || !tenantId) throw redirect(302, '/login');
-	if (!hasAdminRole(user?.roles)) throw redirect(302, '/');
 
 	try {
 		const [script, versionsResult, bindingsResult, logsResult] = await Promise.all([

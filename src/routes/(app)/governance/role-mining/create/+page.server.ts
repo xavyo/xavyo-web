@@ -5,12 +5,8 @@ import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { createMiningJobSchema } from '$lib/schemas/role-mining';
 import { createMiningJob } from '$lib/api/role-mining';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createMiningJobSchema));
 	return { form };

@@ -1,11 +1,9 @@
 import type { Actions, PageServerLoad } from './$types';
 import { redirect, isRedirect, fail } from '@sveltejs/kit';
 import { getLifecycleEvent, processLifecycleEvent } from '$lib/api/birthright';
-import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
 
 	// Backend returns flattened response: event fields at top level + actions + snapshot
 	const detail = await getLifecycleEvent(params.id, locals.accessToken!, locals.tenantId!, fetch);

@@ -60,20 +60,17 @@ describe('Governance Roles Detail +page.server', () => {
 	// --- Load function ---
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'role-1' },
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/roles/role-1'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(getRole).mockResolvedValue(mockRole as any);
+			vi.mocked(listRoles).mockResolvedValue(mockRolesList as any);
+			const result: any = await load({
+				params: { id: 'role-1' },
+				locals: mockLocals(false),
+				url: new URL('http://localhost/governance/roles/role-1'),
+				fetch: vi.fn()
+			} as any);
+			expect(result.role).toBeDefined();
 		});
 
 		it('returns role, form, and availableRoles for admin users', async () => {

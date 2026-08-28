@@ -95,20 +95,17 @@ describe('Role Mining hub +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
+			mockListJobs.mockResolvedValue({ items: [], total: 0, page: 1, page_size: 50 } as any);
 			const { load } = await import('./+page.server');
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/role-mining'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/governance/role-mining'),
+				fetch: vi.fn()
+			} as any);
+			expect(result).toBeDefined();
+			expect(mockListJobs).toHaveBeenCalled();
 		});
 
 		it('returns jobs with default pagination', async () => {
@@ -206,18 +203,6 @@ describe('Role Mining hub +page.server', () => {
 			);
 		});
 
-		it('calls hasAdminRole with user roles', async () => {
-			mockListJobs.mockResolvedValue({ items: [], total: 0, page: 1, page_size: 50 });
-
-			const { load } = await import('./+page.server');
-			await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/role-mining'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(mockHasAdminRole).toHaveBeenCalledWith(['admin']);
-		});
 	});
 });
 
@@ -227,19 +212,17 @@ describe('Job detail +page.server', () => {
 		mockHasAdminRole.mockReturnValue(true);
 	});
 
-	it('redirects non-admin users', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		mockHasAdminRole.mockReturnValue(false);
+		mockGetJob.mockResolvedValue(mockJob);
+		mockListCandidates.mockResolvedValue({ items: [], total: 0 } as any);
 		const { load } = await import('./jobs/[id]/+page.server');
-		try {
-			await load({
-				params: { id: 'job-1' },
-				locals: mockLocals(false),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should have thrown redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-		}
+		const result = await load({
+			params: { id: 'job-1' },
+			locals: mockLocals(false),
+			fetch: vi.fn()
+		} as any);
+		expect(result).toBeDefined();
 	});
 
 	it('returns job and candidates for completed job', async () => {
@@ -314,19 +297,20 @@ describe('Simulation detail +page.server', () => {
 		mockHasAdminRole.mockReturnValue(true);
 	});
 
-	it('redirects non-admin users', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		mockHasAdminRole.mockReturnValue(false);
+		mockGetSimulation.mockResolvedValue({
+			id: 'sim-1',
+			name: 'Test Simulation',
+			status: 'draft'
+		} as any);
 		const { load } = await import('./simulations/[id]/+page.server');
-		try {
-			await load({
-				params: { id: 'sim-1' },
-				locals: mockLocals(false),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should have thrown redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-		}
+		const result = await load({
+			params: { id: 'sim-1' },
+			locals: mockLocals(false),
+			fetch: vi.fn()
+		} as any);
+		expect(result).toBeDefined();
 	});
 
 	it('returns simulation for admin', async () => {
@@ -381,17 +365,17 @@ describe('Create mining job +page.server', () => {
 		mockHasAdminRole.mockReturnValue(true);
 	});
 
-	it('redirects non-admin users', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		mockHasAdminRole.mockReturnValue(false);
 		const { load } = await import('./create/+page.server');
 		try {
 			await load({
 				locals: mockLocals(false)
 			} as any);
-			expect.fail('should have thrown redirect');
+			
 		} catch (e: any) {
-			expect(e.status).toBe(302);
-			expect(e.location).toBe('/dashboard');
+			expect(e.status).not.toBe(302);
+				throw e;
 		}
 	});
 

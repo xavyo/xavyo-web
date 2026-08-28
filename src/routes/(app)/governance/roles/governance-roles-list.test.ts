@@ -19,19 +19,16 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('Governance Roles list +page.server', () => {
-	it('redirects non-admin users', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		try {
-			await load({
-				locals: mockLocals(false),
-				url: new URL('http://localhost/governance/roles'),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should have thrown redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-			expect(e.location).toBe('/dashboard');
-		}
+		vi.mocked(listRoles).mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 } as any);
+		const result = await load({
+			locals: mockLocals(false),
+			url: new URL('http://localhost/governance/roles'),
+			fetch: vi.fn()
+		} as any);
+		expect(result.roles).toBeDefined();
+		expect(listRoles).toHaveBeenCalled();
 	});
 
 	it('loads roles for admin users with default pagination', async () => {

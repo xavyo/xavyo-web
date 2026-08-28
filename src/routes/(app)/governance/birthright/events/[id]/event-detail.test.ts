@@ -106,19 +106,15 @@ describe('Event Detail +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'evt-1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			mockGetEvent.mockResolvedValue(makeEventDetail());
+			const result = await load({
+				params: { id: 'evt-1' },
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result.event).toBeDefined();
 		});
 
 		it('returns normalized event data for admin', async () => {
@@ -222,7 +218,7 @@ describe('Event Detail +page.server', () => {
 				locals: mockLocals(true),
 				fetch: vi.fn()
 			} as any);
-			expect(result.error).toBe('Event already processed');
+			expect(result.data?.error ?? result.error).toBe('Event already processed');
 		});
 
 		it('returns generic error on non-API failure', async () => {
@@ -232,7 +228,7 @@ describe('Event Detail +page.server', () => {
 				locals: mockLocals(true),
 				fetch: vi.fn()
 			} as any);
-			expect(result.error).toBe('Failed to process event');
+			expect(result.data?.error ?? result.error).toBe('Failed to process event');
 		});
 	});
 });

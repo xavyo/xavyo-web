@@ -6,12 +6,8 @@ import { updateRoleSchema } from '$lib/schemas/governance-roles';
 import { getRole, updateRole, deleteRole, listRoles } from '$lib/api/governance-roles';
 import { ApiError } from '$lib/api/client';
 import type { UpdateGovernanceRoleRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let role;
 	try {

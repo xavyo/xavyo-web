@@ -1,8 +1,7 @@
 import type { PageServerLoad, Actions } from './$types';
-import { error, isHttpError, redirect } from '@sveltejs/kit';
+import { error, isHttpError } from '@sveltejs/kit';
 import { listDuplicates, detectDuplicates } from '$lib/api/dedup';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { runDetectionSchema } from '$lib/schemas/dedup';
@@ -10,9 +9,6 @@ import type { ErrorStatus } from 'sveltekit-superforms';
 import { finiteNumber, listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const status = url.searchParams.get('status') ?? undefined;
 	const min_confidence = finiteNumber(url.searchParams.get('min_confidence'));
@@ -45,9 +41,6 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 
 export const actions = {
 	detect: async ({ request, locals, fetch }) => {
-		if (!hasAdminRole(locals.user?.roles)) {
-			redirect(302, '/dashboard');
-		}
 
 		const form = await superValidate(request, zod(runDetectionSchema));
 		if (!form.valid) {

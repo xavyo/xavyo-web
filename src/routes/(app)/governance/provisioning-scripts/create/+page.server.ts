@@ -4,14 +4,12 @@ import { superValidate, message } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import type { ErrorStatus } from 'sveltekit-superforms';
 import { createProvisioningScriptSchema } from '$lib/schemas/provisioning-scripts';
-import { hasAdminRole } from '$lib/server/auth';
 import { createProvisioningScript } from '$lib/api/provisioning-scripts';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { accessToken, tenantId, user } = locals;
 	if (!accessToken || !tenantId) throw redirect(302, '/login');
-	if (!hasAdminRole(user?.roles ?? [])) throw redirect(302, '/');
 
 	const form = await superValidate(zod(createProvisioningScriptSchema));
 	return { form };

@@ -6,12 +6,10 @@ import { createBirthrightPolicySchema, updateBirthrightPolicySchema } from '$lib
 import { getBirthrightPolicy, updateBirthrightPolicy } from '$lib/api/birthright';
 import { listEntitlements } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { UpdateBirthrightPolicyRequest } from '$lib/api/types';
 import { parseJsonArray, parseJsonStringArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
 
 	let policy;
 	let entitlementResult;
