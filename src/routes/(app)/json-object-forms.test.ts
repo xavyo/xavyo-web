@@ -160,4 +160,16 @@ describe('client JSON posts reject non-object JSON', () => {
 		expect(s).toContain('parseJsonRecord(');
 		expect(s).not.toContain('JSON.parse(contextStr)');
 	});
+
+	it('correlation rule form uses parseJsonRecord for test input', () => {
+		const s = src('../../lib/components/correlation/rule-form.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(testInput)');
+	});
+
+	it('birthright simulation panel uses parseJsonRecord', () => {
+		const s = src('../../lib/components/birthright/simulation-panel.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(attributesJson)');
+	});
 });

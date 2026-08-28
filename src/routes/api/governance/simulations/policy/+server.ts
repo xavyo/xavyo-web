@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listPolicySimulations, createPolicySimulation } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -13,11 +14,8 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		const status = url.searchParams.get('status') ?? undefined;
 		const created_by = url.searchParams.get('created_by') ?? undefined;
 		const include_archived = url.searchParams.get('include_archived') === 'true' ? true : undefined;
-		const offset = Number(url.searchParams.get('offset') ?? '0');
-		const limit = Number(url.searchParams.get('limit') ?? '20');
-
 		const result = await listPolicySimulations(
-			{ simulation_type, status, created_by, include_archived, offset, limit },
+			{ simulation_type, status, created_by, include_archived, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch

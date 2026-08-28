@@ -13,6 +13,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 	import { FlaskConical } from 'lucide-svelte';
 
 	interface Props {
@@ -107,9 +108,28 @@
 			let testInputParsed: { source: Record<string, unknown>; target: Record<string, unknown> } | undefined;
 			if (testInput.trim()) {
 				try {
-					testInputParsed = JSON.parse(testInput) as { source: Record<string, unknown>; target: Record<string, unknown> };
-				} catch {
-					addToast('error', 'Invalid JSON test input. Expected {"source": {...}, "target": {...}}');
+					const parsed = parseJsonRecord(testInput);
+					const source = parsed.source;
+					const target = parsed.target;
+					if (
+						!source ||
+						typeof source !== 'object' ||
+						Array.isArray(source) ||
+						!target ||
+						typeof target !== 'object' ||
+						Array.isArray(target)
+					) {
+						addToast('error', 'Test input must be {"source": {...}, "target": {...}}');
+						testingExpression = false;
+						return;
+					}
+					testInputParsed = {
+						source: source as Record<string, unknown>,
+						target: target as Record<string, unknown>
+					};
+				} catch (e) {
+					if (!isJsonParseError(e)) throw e;
+					addToast('error', 'Test input must be a JSON object {"source": {...}, "target": {...}}');
 					testingExpression = false;
 					return;
 				}
