@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listConnectors, createConnector } from '$lib/api/connectors';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,11 +11,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const name_contains = url.searchParams.get('name_contains') ?? undefined;
 	const connector_type = url.searchParams.get('connector_type') ?? undefined;
 	const status = url.searchParams.get('status') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listConnectors(
-		{ name_contains, connector_type, status, limit, offset },
+		{ name_contains, connector_type, status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

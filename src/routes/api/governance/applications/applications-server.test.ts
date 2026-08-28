@@ -5,8 +5,8 @@ vi.mock('$lib/api/governance', () => ({
 	createApplication: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createApplication } from '$lib/api/governance';
+import { GET, POST } from './+server';
+import { createApplication, listApplications } from '$lib/api/governance';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,28 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/applications', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listApplications).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/applications?page=4&page_size=5')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listApplications).toHaveBeenCalledWith(
+			expect.objectContaining({ limit: 5, offset: 15 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/applications', () => {
 	beforeEach(() => {
