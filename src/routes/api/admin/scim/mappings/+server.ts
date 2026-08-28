@@ -11,9 +11,6 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
 
 	const result = await listScimMappings(locals.accessToken, locals.tenantId, fetch);
 

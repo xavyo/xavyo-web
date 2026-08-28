@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createScimTarget } from '$lib/api/scim-targets';
+import { GET, POST } from './+server';
+import { createScimTarget, listScimTargets } from '$lib/api/scim-targets';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,24 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/admin/scim-targets', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(listScimTargets).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/scim-targets')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listScimTargets).toHaveBeenCalled();
+	});
+});
 
 describe('POST /api/admin/scim-targets', () => {
 	beforeEach(() => {
