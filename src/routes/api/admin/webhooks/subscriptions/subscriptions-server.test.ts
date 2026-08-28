@@ -5,8 +5,8 @@ vi.mock('$lib/api/webhooks', () => ({
 	createWebhookSubscription: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createWebhookSubscription } from '$lib/api/webhooks';
+import { GET, POST } from './+server';
+import { createWebhookSubscription, listWebhookSubscriptions } from '$lib/api/webhooks';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/admin/webhooks/subscriptions', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listWebhookSubscriptions).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/webhooks/subscriptions?page=2&page_size=20')
+		} as any);
+		expect(listWebhookSubscriptions).toHaveBeenCalledWith(
+			{ limit: 20, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/admin/webhooks/subscriptions', () => {
 	beforeEach(() => {

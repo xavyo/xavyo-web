@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listObjectTemplates, createObjectTemplate } from '$lib/api/object-templates';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 const OBJECT_TYPES = ['user', 'role', 'entitlement', 'application'] as const;
 
@@ -14,8 +15,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		object_type: url.searchParams.get('object_type') ?? undefined,
 		status: url.searchParams.get('status') ?? undefined,
 		name: url.searchParams.get('name') ?? undefined,
-		offset: Number(url.searchParams.get('offset') ?? '0'),
-		limit: Number(url.searchParams.get('limit') ?? '20')
+		...listPagination(url)
 	};
 
 	try {

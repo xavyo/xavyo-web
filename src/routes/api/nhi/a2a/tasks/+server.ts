@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listA2aTasks, createA2aTask } from '$lib/api/a2a';
 import type { CreateA2aTaskRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,11 +11,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const state = url.searchParams.get('state') ?? undefined;
 	const target_agent_id = url.searchParams.get('target_agent_id') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listA2aTasks(
-		{ state, target_agent_id, limit, offset },
+		{ state, target_agent_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
