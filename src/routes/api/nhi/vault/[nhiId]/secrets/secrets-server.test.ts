@@ -81,4 +81,12 @@ describe('POST /api/nhi/:nhiId/vault/secrets', () => {
 		});
 		expect(storeSecret).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(storeSecret).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'k', value: 'v' })) as any);
+		expect(response.status).toBe(200);
+		expect(storeSecret).toHaveBeenCalled();
+	});
 });

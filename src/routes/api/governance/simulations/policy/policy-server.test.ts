@@ -110,4 +110,20 @@ describe('POST /api/governance/simulations/policy', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createPolicySimulation).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createPolicySimulation).mockResolvedValue({ id: 'p1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					simulation_type: 'sod_rule',
+					policy_config: { k: 'v' }
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createPolicySimulation).toHaveBeenCalled();
+	});
 });

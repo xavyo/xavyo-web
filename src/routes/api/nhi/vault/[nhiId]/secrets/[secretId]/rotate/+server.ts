@@ -2,15 +2,11 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { rotateSecret } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { RotateSecretRequest } from '$lib/api/types';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Admin role required');
 	}
 
 	let parsed: unknown;

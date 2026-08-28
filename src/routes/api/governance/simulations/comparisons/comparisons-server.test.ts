@@ -119,4 +119,21 @@ describe('POST /api/governance/simulations/comparisons', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createSimulationComparison).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createSimulationComparison).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					comparison_type: 'simulation_vs_current',
+					simulation_a_id: 'a1',
+					simulation_a_type: 'policy'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSimulationComparison).toHaveBeenCalled();
+	});
 });

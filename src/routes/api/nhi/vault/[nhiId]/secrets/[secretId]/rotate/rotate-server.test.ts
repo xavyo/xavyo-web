@@ -60,4 +60,12 @@ describe('POST /api/nhi/:nhiId/vault/secrets/:secretId/rotate', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(rotateSecret).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(rotateSecret).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ value: 'new' })) as any);
+		expect(response.status).toBe(200);
+		expect(rotateSecret).toHaveBeenCalled();
+	});
 });

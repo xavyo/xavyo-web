@@ -50,6 +50,14 @@ describe('POST /api/nhi/governance/sod/check', () => {
 		expect(checkNhiSod).toHaveBeenCalled();
 	});
 
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(checkNhiSod).mockResolvedValue({ is_allowed: true, violations: [] } as any);
+		const response = await POST(makeEvent(JSON.stringify({ agent_id: 'a1', tool_id: 't1' })) as any);
+		expect(response.status).toBe(200);
+		expect(checkNhiSod).toHaveBeenCalled();
+	});
+
 	it('does not check on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(checkNhiSod).not.toHaveBeenCalled();

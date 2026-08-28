@@ -2,15 +2,11 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { checkNhiSod } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { NhiSodCheckRequest } from '$lib/api/types';
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	let parsed: unknown;

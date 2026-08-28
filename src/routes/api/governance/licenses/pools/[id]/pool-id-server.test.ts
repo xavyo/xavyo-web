@@ -64,4 +64,12 @@ describe('PUT /api/governance/licenses/pools/:id', () => {
 		expect(response.status).toBe(400);
 		expect(updateLicensePool).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(updateLicensePool).mockResolvedValue({ id: 'p1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ name: 'Office 365' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateLicensePool).toHaveBeenCalled();
+	});
 });

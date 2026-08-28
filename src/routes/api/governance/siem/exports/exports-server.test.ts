@@ -100,4 +100,20 @@ describe('POST /api/governance/siem/exports', () => {
 		expect(response.status).toBe(400);
 		expect(createSiemExport).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createSiemExport).mockResolvedValue({ id: 'e1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					date_range_start: '2026-01-01',
+					date_range_end: '2026-01-31',
+					output_format: 'json'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSiemExport).toHaveBeenCalled();
+	});
 });
