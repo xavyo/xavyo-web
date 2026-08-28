@@ -6,12 +6,8 @@ import { createGroupSchema } from '$lib/schemas/approval-workflows';
 import { createApprovalGroup } from '$lib/api/approval-workflows';
 import { ApiError } from '$lib/api/client';
 import type { CreateApprovalGroupRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createGroupSchema));
 	return { form };

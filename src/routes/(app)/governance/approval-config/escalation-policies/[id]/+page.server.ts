@@ -17,12 +17,7 @@ import type {
 	AddEscalationLevelRequest,
 	EscalationTargetType
 } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
-
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	let policy;
 	try {
 		policy = await getEscalationPolicy(params.id, locals.accessToken!, locals.tenantId!, fetch);
