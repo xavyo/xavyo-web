@@ -184,12 +184,6 @@
 	</a>
 </div>
 
-{#if data.gatewayError}
-	<div class="mb-4 rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive">
-		Failed to load gateways: {data.gatewayError}
-	</div>
-{/if}
-
 <div class="mb-6 flex items-end gap-3">
 	<div class="flex flex-col gap-1">
 		<label for="gateway-select" class="text-sm font-medium">Gateway</label>

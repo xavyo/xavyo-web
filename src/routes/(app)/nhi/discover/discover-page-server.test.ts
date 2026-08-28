@@ -11,6 +11,7 @@ vi.mock('$lib/api/nhi-discovery', () => ({
 import { load } from './+page.server';
 import { listGateways } from '$lib/api/nhi-discovery';
 import { hasAdminRole } from '$lib/server/auth';
+import { ApiError } from '$lib/api/client';
 
 describe('NHI discover +page.server', () => {
 	beforeEach(() => {
@@ -26,5 +27,15 @@ describe('NHI discover +page.server', () => {
 		} as any);
 		expect(result.gateways).toEqual([]);
 		expect(listGateways).toHaveBeenCalled();
+	});
+
+	it('does not return an empty gateway list when the API errors', async () => {
+		vi.mocked(listGateways).mockRejectedValue(new ApiError('Forbidden', 403));
+		await expect(
+			load({
+				locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
+				fetch: vi.fn()
+			} as any)
+		).rejects.toMatchObject({ status: 403 });
 	});
 });

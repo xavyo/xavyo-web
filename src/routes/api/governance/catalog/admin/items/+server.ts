@@ -9,7 +9,6 @@ const ITEM_TYPES = ['role', 'entitlement', 'resource'] as const;
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	const category_id = url.searchParams.get('category_id') ?? undefined;
 	const item_type = url.searchParams.get('item_type') ?? undefined;
 	const enabled = url.searchParams.get('enabled') !== null ? url.searchParams.get('enabled') === 'true' : undefined;
