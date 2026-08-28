@@ -6,12 +6,8 @@ import { createSodRuleSchema } from '$lib/schemas/governance';
 import { createSodRule } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateSodRuleRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createSodRuleSchema));
 	return { form };

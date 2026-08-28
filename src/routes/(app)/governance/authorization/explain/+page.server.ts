@@ -5,13 +5,9 @@ import { fail, redirect } from '@sveltejs/kit';
 import { explainNhiSchema } from '$lib/schemas/authorization';
 import { explainNhi } from '$lib/api/authorization';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ExplainNhiResponse } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(explainNhiSchema));
 	return { form, result: null as ExplainNhiResponse | null };

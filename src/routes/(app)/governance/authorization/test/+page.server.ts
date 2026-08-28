@@ -5,13 +5,9 @@ import { fail, redirect } from '@sveltejs/kit';
 import { authCheckSchema } from '$lib/schemas/authorization';
 import { checkAuthorization } from '$lib/api/authorization';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { AuthorizationDecision } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(authCheckSchema));
 	return { form, result: null as AuthorizationDecision | null };

@@ -5,13 +5,9 @@ import { error, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { updateBulkActionSchema } from '$lib/schemas/governance-operations';
 import { getBulkAction, updateBulkAction } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}

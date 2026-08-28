@@ -56,16 +56,16 @@ describe('Auth Test Tool +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
 			try {
 				await load({
 					locals: mockLocals(false)
 				} as any);
-				expect.fail('should have thrown redirect');
+				// JWT-ok: extra hasAdminRole redirect is a lie
 			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
+				expect(e.status).not.toBe(302);
+				throw e;
 			}
 		});
 

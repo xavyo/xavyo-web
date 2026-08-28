@@ -1,6 +1,5 @@
 import type { Actions, PageServerLoad } from './$types';
-import { error, fail, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
+import { error, fail } from '@sveltejs/kit';
 import {
 	listDiscrepancies,
 	remediateDiscrepancy,
@@ -12,7 +11,6 @@ import { parseJsonStringArray } from '$lib/utils/json-record';
 import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
 
 	const run_id = url.searchParams.get('run_id') ?? undefined;
 	const discrepancy_type = url.searchParams.get('discrepancy_type') ?? undefined;

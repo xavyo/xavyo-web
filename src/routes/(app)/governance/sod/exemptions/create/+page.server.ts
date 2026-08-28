@@ -7,12 +7,8 @@ import { createSodExemption } from '$lib/api/approval-workflows';
 import { listSodRules } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateSodExemptionRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createExemptionSchema));
 	try {

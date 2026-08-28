@@ -6,12 +6,8 @@ import { createMappingSchema } from '$lib/schemas/authorization';
 import { createMapping } from '$lib/api/authorization';
 import { listEntitlements } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createMappingSchema));
 

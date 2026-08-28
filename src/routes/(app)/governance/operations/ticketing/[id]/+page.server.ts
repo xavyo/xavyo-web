@@ -2,13 +2,9 @@ import type { PageServerLoad, Actions } from './$types';
 import { redirect, error, isHttpError, isRedirect } from '@sveltejs/kit';
 import { getTicketingConfig, deleteTicketingConfig } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}

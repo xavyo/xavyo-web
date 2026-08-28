@@ -5,13 +5,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { createTicketingConfigSchema } from '$lib/schemas/governance-operations';
 import { createTicketingConfig } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createTicketingConfigSchema));
 	return { form };
 };

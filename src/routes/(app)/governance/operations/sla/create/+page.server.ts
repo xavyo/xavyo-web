@@ -5,13 +5,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { createSlaPolicySchema } from '$lib/schemas/governance-operations';
 import { createSlaPolicy } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createSlaPolicySchema));
 	return { form };
 };

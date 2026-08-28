@@ -19,7 +19,7 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('Governance Lifecycle hub +page.server', () => {
-	it('redirects non-admin users', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		try {
 			await load({
@@ -27,10 +27,9 @@ describe('Governance Lifecycle hub +page.server', () => {
 				url: new URL('http://localhost/governance/lifecycle'),
 				fetch: vi.fn()
 			} as any);
-			expect.fail('should have thrown redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-			expect(e.location).toBe('/dashboard');
+			} catch (e: any) {
+			expect(e.status).not.toBe(302);
+			throw e;
 		}
 	});
 

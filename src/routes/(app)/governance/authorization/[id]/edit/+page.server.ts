@@ -5,13 +5,9 @@ import { error, fail, isHttpError, isRedirect, redirect } from '@sveltejs/kit';
 import { updatePolicySchema } from '$lib/schemas/authorization';
 import { getPolicy, updatePolicy } from '$lib/api/authorization';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { UpdatePolicyRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let policy;
 	try {

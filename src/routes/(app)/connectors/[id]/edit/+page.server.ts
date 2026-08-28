@@ -5,7 +5,6 @@ import { error, fail, isHttpError, isRedirect, redirect } from '@sveltejs/kit';
 import { editConnectorSchema } from '$lib/schemas/connectors';
 import { getConnector, updateConnector } from '$lib/api/connectors';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 import type { ConnectorType, UpdateConnectorRequest } from '$lib/api/types';
 
@@ -63,9 +62,6 @@ function buildRestApiConfigAndCredentials(data: Record<string, unknown>): { conf
 }
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let connector;
 	try {

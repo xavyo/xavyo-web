@@ -6,12 +6,8 @@ import { createApplicationSchema } from '$lib/schemas/governance';
 import { createApplication } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateApplicationRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createApplicationSchema));
 	return { form };
