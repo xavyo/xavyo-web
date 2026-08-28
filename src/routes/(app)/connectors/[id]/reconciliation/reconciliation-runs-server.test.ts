@@ -61,6 +61,24 @@ describe('Connector reconciliation runs +page.server', () => {
 		expect(result.connector.id).toBe('conn-1');
 	});
 
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listRuns).mockResolvedValue({ runs: [], total: 0 } as any);
+		vi.mocked(getConnector).mockResolvedValue({ id: 'conn-1' } as any);
+		await load({
+			params: { id: 'conn-1' },
+			locals: mockLocals(true),
+			url: new URL('http://localhost/connectors/conn-1/reconciliation?limit=abc&offset=nope'),
+			fetch: vi.fn()
+		} as any);
+		expect(listRuns).toHaveBeenCalledWith(
+			'conn-1',
+			{ mode: undefined, status: undefined, limit: 20, offset: 0 },
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
+
 	it('fails closed when runs API throws', async () => {
 		vi.mocked(listRuns).mockRejectedValue(new Error('network'));
 		vi.mocked(getConnector).mockResolvedValue({ id: 'conn-1' } as any);

@@ -187,6 +187,22 @@ describe('SIEM hub +page.server', () => {
 			);
 		});
 
+		it('does not forward NaN pagination', async () => {
+			mockListDestinations.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+			mockListExports.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+			await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/governance/siem?limit=abc&offset=nope'),
+				fetch: vi.fn()
+			} as any);
+			expect(mockListDestinations).toHaveBeenCalledWith(
+				{ limit: 20, offset: 0 },
+				'tok',
+				'tid',
+				expect.any(Function)
+			);
+		});
+
 		it('fails closed when destinations API throws', async () => {
 			mockListDestinations.mockRejectedValue(new Error('API error'));
 			mockListExports.mockResolvedValue({

@@ -120,6 +120,29 @@ describe('Import List +page.server', () => {
 			);
 		});
 
+		it('does not forward NaN pagination', async () => {
+			vi.mocked(hasAdminRole).mockReturnValue(true);
+			vi.mocked(listImportJobs).mockResolvedValue({
+				items: [],
+				total: 0,
+				limit: 20,
+				offset: 0
+			} as any);
+			const result = await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/settings/imports?limit=abc&offset=nope'),
+				fetch: vi.fn()
+			} as any);
+			expect(listImportJobs).toHaveBeenCalledWith(
+				{ status: undefined, limit: 20, offset: 0 },
+				'tok',
+				'tid',
+				expect.any(Function)
+			);
+			expect(result.limit).toBe(20);
+			expect(result.offset).toBe(0);
+		});
+
 		it('reads status filter from URL searchParams', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listImportJobs).mockResolvedValue({

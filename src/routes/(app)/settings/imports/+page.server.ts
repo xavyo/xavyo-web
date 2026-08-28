@@ -4,14 +4,14 @@ import { isHttpError } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { listImportJobs, uploadImport } from '$lib/api/imports';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
 
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 	const status = url.searchParams.get('status') ?? undefined;
 
 	try {

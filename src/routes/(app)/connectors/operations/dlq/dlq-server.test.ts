@@ -65,6 +65,22 @@ describe('Operations DLQ +page.server', () => {
 		expect(result.connectors).toHaveLength(1);
 	});
 
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(getOperationsDlq).mockResolvedValue({ operations: [] } as any);
+		vi.mocked(listConnectors).mockResolvedValue({ items: [] } as any);
+		await load({
+			locals: mockLocals(true),
+			url: new URL('http://localhost/connectors/operations/dlq?limit=abc&offset=nope'),
+			fetch: vi.fn()
+		} as any);
+		expect(getOperationsDlq).toHaveBeenCalledWith(
+			{ connector_id: undefined, limit: 20, offset: 0 },
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
+
 	it('fails closed when DLQ API throws', async () => {
 		vi.mocked(getOperationsDlq).mockRejectedValue(new Error('network'));
 		vi.mocked(listConnectors).mockResolvedValue({ items: [] } as any);
