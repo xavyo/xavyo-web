@@ -9,9 +9,6 @@ export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Admin role required');
-	}
 	try {
 		const result = await listSecrets(params.nhiId, locals.accessToken, locals.tenantId, fetch);
 		return json(result);

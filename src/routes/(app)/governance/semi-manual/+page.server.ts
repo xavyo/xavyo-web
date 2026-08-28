@@ -6,14 +6,14 @@ import { hasAdminRole } from '$lib/server/auth';
 import { listSemiManualApplications, configureSemiManual, removeSemiManualConfig } from '$lib/api/semi-manual';
 import { configureSemiManualSchema } from '$lib/schemas/manual-tasks-detection-rules';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
 
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 50, offset = 0 } = listPagination(url);
 
 	try {
 		const applications = await listSemiManualApplications(

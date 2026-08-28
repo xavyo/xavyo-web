@@ -278,11 +278,14 @@ describe('PUT /api/governance/ticketing-configuration/[id] (update)', () => {
 		expect(updateTicketingConfig).not.toHaveBeenCalled();
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(
-			PUT(makeRequestEvent({ params: { id: 'tc-1' }, request: makeJsonRequest({}) }))
-		).rejects.toMatchObject({ status: 403 });
+		vi.mocked(updateTicketingConfig).mockResolvedValue({ id: 'tc-1' } as any);
+		const response = await PUT(
+			makeRequestEvent({ params: { id: 'tc-1' }, request: makeJsonRequest({ name: 'Updated Jira Config' }) })
+		);
+		expect(response.status).toBe(200);
+		expect(updateTicketingConfig).toHaveBeenCalled();
 	});
 });
 

@@ -9,6 +9,7 @@ import {
 } from '$lib/api/reconciliation';
 import { ApiError } from '$lib/api/client';
 import { parseJsonStringArray } from '$lib/utils/json-record';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) redirect(302, '/dashboard');
@@ -16,8 +17,7 @@ export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	const run_id = url.searchParams.get('run_id') ?? undefined;
 	const discrepancy_type = url.searchParams.get('discrepancy_type') ?? undefined;
 	const resolution_status = url.searchParams.get('resolution_status') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const result = await listDiscrepancies(

@@ -4,14 +4,15 @@ import { isHttpError } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { getImportJob, listImportErrors, resendInvitations } from '$lib/api/imports';
 import { ApiError } from '$lib/api/client';
+import { finiteNumber } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ params, url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
 		redirect(302, '/dashboard');
 	}
 
-	const errorLimit = Number(url.searchParams.get('elimit') ?? '20');
-	const errorOffset = Number(url.searchParams.get('eoffset') ?? '0');
+	const errorLimit = finiteNumber(url.searchParams.get('elimit')) ?? 20;
+	const errorOffset = finiteNumber(url.searchParams.get('eoffset')) ?? 0;
 
 	let job;
 	let errors;

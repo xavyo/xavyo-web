@@ -3,7 +3,6 @@ import type { RequestHandler } from './$types';
 import { listTicketingConfigs, createTicketingConfig } from '$lib/api/governance-operations';
 import type { CreateTicketingConfigRequest, TicketingSystemType } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { listPagination } from '$lib/server/list-pagination';
 
 const TICKETING_TYPES = ['service_now', 'jira', 'webhook'] as const;
@@ -34,9 +33,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {

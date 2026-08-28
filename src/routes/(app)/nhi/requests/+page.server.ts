@@ -3,13 +3,13 @@ import { listNhiRequests, getNhiRequestSummary } from '$lib/api/nhi-requests';
 import { hasAdminRole } from '$lib/server/auth';
 import { error } from '@sveltejs/kit';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const status = url.searchParams.get('status') || undefined;
-	const limit = 20;
-	const offset = Number(url.searchParams.get('offset') || '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 	const isAdmin = hasAdminRole(locals.user?.roles);
 
 	try {
