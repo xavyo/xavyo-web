@@ -48,6 +48,14 @@ describe('PUT /api/governance/birthright-policies/:id', () => {
 		expect(updateBirthrightPolicy).not.toHaveBeenCalled();
 	});
 
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(updateBirthrightPolicy).mockResolvedValue({ id: 'b1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ name: 'n', priority: 2 })) as any);
+		expect(response.status).toBe(200);
+		expect(updateBirthrightPolicy).toHaveBeenCalled();
+	});
+
 	it('does not update when evaluation_mode is invalid', async () => {
 		await expect(
 			PUT(makeEvent(JSON.stringify({ evaluation_mode: 'any' })) as any)

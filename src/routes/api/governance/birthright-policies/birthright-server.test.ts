@@ -69,4 +69,21 @@ describe('POST /api/governance/birthright-policies', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createBirthrightPolicy).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createBirthrightPolicy).mockResolvedValue({ id: 'b1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					priority: 1,
+					conditions: [{ attribute: 'dept', operator: 'equals', value: 'eng' }],
+					entitlement_ids: ['e1']
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createBirthrightPolicy).toHaveBeenCalled();
+	});
 });
