@@ -4,6 +4,7 @@ import { listTicketingConfigs, createTicketingConfig } from '$lib/api/governance
 import type { CreateTicketingConfigRequest, TicketingSystemType } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 const TICKETING_TYPES = ['service_now', 'jira', 'webhook'] as const;
 
@@ -20,8 +21,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			{
 				ticketing_type: url.searchParams.get('ticketing_type') ?? undefined,
 				is_active: url.searchParams.has('is_active') ? url.searchParams.get('is_active') === 'true' : undefined,
-				limit: url.searchParams.has('limit') ? Number(url.searchParams.get('limit')) : undefined,
-				offset: url.searchParams.has('offset') ? Number(url.searchParams.get('offset')) : undefined
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

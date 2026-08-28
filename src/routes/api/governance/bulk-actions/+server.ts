@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listBulkActions, createBulkAction } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -17,8 +18,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			{
 				status: url.searchParams.get('status') ?? undefined,
 				action_type: url.searchParams.get('action_type') ?? undefined,
-				limit: url.searchParams.has('limit') ? Number(url.searchParams.get('limit')) : undefined,
-				offset: url.searchParams.has('offset') ? Number(url.searchParams.get('offset')) : undefined
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

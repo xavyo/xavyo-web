@@ -95,7 +95,27 @@ describe('GET /api/governance/bulk-actions (list)', () => {
 		expect(response.status).toBe(200);
 		const data = await response.json();
 		expect(data).toEqual(mockData);
-		expect(listBulkActions).toHaveBeenCalledWith({}, TOKEN, TENANT, expect.any(Function));
+		expect(listBulkActions).toHaveBeenCalledWith(
+			{ status: undefined, action_type: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listBulkActions).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/bulk-actions?page=2&page_size=10')
+			})
+		);
+		expect(listBulkActions).toHaveBeenCalledWith(
+			{ status: undefined, action_type: undefined, limit: 10, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('returns 401 without token', async () => {

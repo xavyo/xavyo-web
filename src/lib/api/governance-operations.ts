@@ -24,6 +24,7 @@ import type {
 
 export async function listSlaPolicies(
 	params: {
+		is_active?: boolean;
 		limit?: number;
 		offset?: number;
 	},
@@ -32,6 +33,7 @@ export async function listSlaPolicies(
 	fetchFn?: typeof fetch
 ): Promise<SlaPolicyListResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.is_active !== undefined) searchParams.set('is_active', String(params.is_active));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

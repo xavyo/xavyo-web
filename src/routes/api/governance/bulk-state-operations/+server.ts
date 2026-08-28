@@ -4,6 +4,7 @@ import { createBulkStateOperation, listBulkStateOperations } from '$lib/api/gove
 import type { CreateBulkStateOperationRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -14,8 +15,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			{
 				status: url.searchParams.get('status') ?? undefined,
 				transition_id: url.searchParams.get('transition_id') ?? undefined,
-				limit: url.searchParams.has('limit') ? Number(url.searchParams.get('limit')) : undefined,
-				offset: url.searchParams.has('offset') ? Number(url.searchParams.get('offset')) : undefined
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

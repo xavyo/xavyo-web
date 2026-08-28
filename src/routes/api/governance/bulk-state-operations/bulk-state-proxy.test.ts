@@ -171,6 +171,21 @@ describe('GET /api/governance/bulk-state-operations (list)', () => {
 		expect(data).toEqual(mockData);
 	});
 
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listBulkStateOperations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/bulk-state-operations?page=2&page_size=8')
+			})
+		);
+		expect(listBulkStateOperations).toHaveBeenCalledWith(
+			{ status: undefined, transition_id: undefined, limit: 8, offset: 8 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('returns 401 when unauthorized', async () => {
 		await expect(
 			GET(makeRequestEvent({ locals: makeLocals({ noTenant: true }) }))

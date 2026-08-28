@@ -81,6 +81,27 @@ describe('GET /api/governance/scheduled-transitions (list)', () => {
 		expect(data).toEqual(mockData);
 	});
 
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listScheduledTransitions).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/scheduled-transitions?page=4&page_size=15')
+			})
+		);
+		expect(listScheduledTransitions).toHaveBeenCalledWith(
+			{
+				status: undefined,
+				scheduled_before: undefined,
+				scheduled_after: undefined,
+				limit: 15,
+				offset: 45
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('returns 401 without token', async () => {
 		await expect(
 			GET(makeRequestEvent({ locals: makeLocals({ noToken: true }) }))

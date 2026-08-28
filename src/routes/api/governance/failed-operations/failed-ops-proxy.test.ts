@@ -78,6 +78,21 @@ describe('GET /api/governance/failed-operations (list)', () => {
 		expect(data).toEqual(mockData);
 	});
 
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listFailedOperations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/failed-operations?page=2&page_size=20')
+			})
+		);
+		expect(listFailedOperations).toHaveBeenCalledWith(
+			{ limit: 20, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('returns 401 without token', async () => {
 		await expect(
 			GET(makeRequestEvent({ locals: makeLocals({ noToken: true }) }))

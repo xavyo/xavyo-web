@@ -88,7 +88,27 @@ describe('GET /api/governance/sla-policies (list)', () => {
 		expect(response.status).toBe(200);
 		const data = await response.json();
 		expect(data).toEqual(mockData);
-		expect(listSlaPolicies).toHaveBeenCalledWith({}, TOKEN, TENANT, expect.any(Function));
+		expect(listSlaPolicies).toHaveBeenCalledWith(
+			{ is_active: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('maps page/page_size and status onto limit/offset/is_active', async () => {
+		vi.mocked(listSlaPolicies).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/sla-policies?page=2&page_size=10&status=active')
+			})
+		);
+		expect(listSlaPolicies).toHaveBeenCalledWith(
+			{ is_active: true, limit: 10, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('returns 401 without token', async () => {

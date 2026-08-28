@@ -88,7 +88,27 @@ describe('GET /api/governance/ticketing-configuration (list)', () => {
 		expect(response.status).toBe(200);
 		const data = await response.json();
 		expect(data).toEqual(mockData);
-		expect(listTicketingConfigs).toHaveBeenCalledWith({}, TOKEN, TENANT, expect.any(Function));
+		expect(listTicketingConfigs).toHaveBeenCalledWith(
+			{ ticketing_type: undefined, is_active: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listTicketingConfigs).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/ticketing-configuration?page=3&page_size=5')
+			})
+		);
+		expect(listTicketingConfigs).toHaveBeenCalledWith(
+			{ ticketing_type: undefined, is_active: undefined, limit: 5, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('returns 401 without token', async () => {
