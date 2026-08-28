@@ -35,7 +35,8 @@ describe('User risk events +page.server', () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 	});
 
-	it('returns events for admin', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(listUserRiskEvents).mockResolvedValue({
 			items: [{ id: 'ev-1' }],
 			total: 1,
@@ -45,13 +46,14 @@ describe('User risk events +page.server', () => {
 
 		const result = (await load({
 			params: { userId: 'user-1' },
-			locals: mockLocals(true),
+			locals: mockLocals(false),
 			url: new URL('http://localhost/governance/risk/events/user-1'),
 			fetch: vi.fn()
 		} as any)) as any;
 
 		expect(result.events.items).toHaveLength(1);
 		expect(result.userId).toBe('user-1');
+		expect(listUserRiskEvents).toHaveBeenCalled();
 	});
 
 	it('fails closed when list API throws', async () => {

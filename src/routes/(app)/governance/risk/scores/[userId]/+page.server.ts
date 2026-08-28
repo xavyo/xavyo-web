@@ -1,14 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { redirect, error } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
+import { error } from '@sveltejs/kit';
 import { getUserRiskScore } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	try {
 		const score = await getUserRiskScore(
 			params.userId,

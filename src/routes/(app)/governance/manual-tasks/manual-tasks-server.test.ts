@@ -41,19 +41,27 @@ describe('Manual tasks +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/manual-tasks'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(getManualTaskDashboard).mockResolvedValue({
+				pending_count: 5,
+				in_progress_count: 1
+			} as any);
+			vi.mocked(listManualTasks).mockResolvedValue({
+				items: [{ id: 'task-1' }],
+				total: 1,
+				limit: 20,
+				offset: 0
+			} as any);
+
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/governance/manual-tasks'),
+				fetch: vi.fn()
+			} as any);
+
+			expect(result.tasks.items).toHaveLength(1);
+			expect(listManualTasks).toHaveBeenCalled();
 		});
 
 		it('returns dashboard and tasks for admin users', async () => {
