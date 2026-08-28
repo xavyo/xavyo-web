@@ -1,13 +1,17 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { dryRunScriptVersion } from '$lib/api/provisioning-scripts';
+import { finiteInteger } from '$lib/server/list-pagination';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const versionNumber = parseInt(params.versionNumber);
+	const versionNumber = finiteInteger(params.versionNumber);
+	if (versionNumber == null || versionNumber < 1) {
+		error(400, 'Invalid version number');
+	}
 	let parsed: unknown;
 	try {
 		parsed = await request.json();

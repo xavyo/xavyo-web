@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { finiteNumber, listPagination, pagePagination } from './list-pagination';
+import { finiteInteger, finiteNumber, listPagination, pagePagination } from './list-pagination';
 
 describe('listPagination', () => {
 	it('passes through limit and offset', () => {
@@ -46,5 +46,19 @@ describe('finiteNumber', () => {
 		expect(finiteNumber('')).toBeUndefined();
 		expect(finiteNumber('abc')).toBeUndefined();
 		expect(finiteNumber('Infinity')).toBeUndefined();
+	});
+});
+
+describe('finiteInteger', () => {
+	it('parses integer strings', () => {
+		expect(finiteInteger('5')).toBe(5);
+		expect(finiteInteger('0')).toBe(0);
+	});
+
+	it('drops NaN, floats, and parseInt-style prefixes', () => {
+		expect(finiteInteger(undefined)).toBeUndefined();
+		expect(finiteInteger('abc')).toBeUndefined();
+		expect(finiteInteger('3.5')).toBeUndefined();
+		expect(finiteInteger('3abc')).toBeUndefined();
 	});
 });
