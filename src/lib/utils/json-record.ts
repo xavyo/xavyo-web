@@ -28,3 +28,21 @@ export function parseJsonStringRecord(text: string): Record<string, string> {
 export function isJsonParseError(e: unknown): boolean {
 	return e instanceof SyntaxError || e instanceof JsonObjectError;
 }
+
+/** Parse JSON that must be an array. Objects/null/scalars are rejected. */
+export function parseJsonArray(text: string): unknown[] {
+	const parsed: unknown = JSON.parse(text);
+	if (!Array.isArray(parsed)) {
+		throw new JsonObjectError('Value must be a JSON array');
+	}
+	return parsed;
+}
+
+/** Parse JSON that must be an array of strings. */
+export function parseJsonStringArray(text: string): string[] {
+	const arr = parseJsonArray(text);
+	if (!arr.every((v) => typeof v === 'string')) {
+		throw new JsonObjectError('JSON array values must be strings');
+	}
+	return arr as string[];
+}

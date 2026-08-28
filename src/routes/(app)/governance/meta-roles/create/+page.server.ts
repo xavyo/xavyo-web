@@ -7,6 +7,7 @@ import { createMetaRole } from '$lib/api/meta-roles';
 import { ApiError } from '$lib/api/client';
 import type { CreateMetaRoleRequest, CriteriaOperator } from '$lib/api/types';
 import { hasAdminRole } from '$lib/server/auth';
+import { isJsonParseError, parseJsonArray } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -36,12 +37,12 @@ export const actions: Actions = {
 		for (let i = 0; i < criteriaFields.length; i++) {
 			if (criteriaFields[i] && criteriaOperators[i] && criteriaValues[i]) {
 				let value: unknown = criteriaValues[i];
-				// Try parsing as JSON for array operators (in, not_in)
 				if (criteriaOperators[i] === 'in' || criteriaOperators[i] === 'not_in') {
 					try {
-						value = JSON.parse(criteriaValues[i]);
-					} catch {
-						return message(form, 'Criteria values for in/not_in must be valid JSON', {
+						value = parseJsonArray(criteriaValues[i]);
+					} catch (e) {
+						if (!isJsonParseError(e)) throw e;
+						return message(form, 'Criteria values for in/not_in must be a JSON array', {
 							status: 400 as ErrorStatus
 						});
 					}

@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 vi.mock('$lib/api/persona-expiry', () => ({
 	listExpiringPersonas: vi.fn()
@@ -14,17 +17,11 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-vi.mock('$lib/server/auth', () => ({
-	hasAdminRole: vi.fn()
-}));
-
 import { load } from './+page.server';
 import { listExpiringPersonas } from '$lib/api/persona-expiry';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ExpiringPersona } from '$lib/api/types';
 
 const mockListExpiring = vi.mocked(listExpiringPersonas);
-const mockHasAdminRole = vi.mocked(hasAdminRole);
 
 function makePersona(overrides: Partial<ExpiringPersona> = {}): ExpiringPersona {
 	return {
@@ -45,9 +42,16 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('Persona Expiring +page.server', () => {
+	it('does not 403 non-admin users before calling the API', () => {
+		const src = readFileSync(
+			join(dirname(fileURLToPath(import.meta.url)), '+page.server.ts'),
+			'utf8'
+		);
+		expect(src).not.toContain('hasAdminRole');
+	});
+
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockHasAdminRole.mockReturnValue(true);
 	});
 
 	describe('load', () => {
@@ -75,17 +79,14 @@ describe('Persona Expiring +page.server', () => {
 			}
 		});
 
-		it('throws 403 for non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown');
-			} catch (e: any) {
-				expect(e.status).toBe(403);
-			}
+		it('loads for non-admin authenticated users (API has no admin gate)', async () => {
+			mockListExpiring.mockResolvedValue({ items: [makePersona()], total: 1, limit: 50, offset: 0 });
+			const result = (await load({
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any)) as any;
+			expect(result.personas).toHaveLength(1);
+			expect(mockListExpiring).toHaveBeenCalled();
 		});
 
 		it('returns expiring personas for admin', async () => {

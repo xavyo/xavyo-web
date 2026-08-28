@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
 	JsonObjectError,
 	isJsonParseError,
+	parseJsonArray,
 	parseJsonRecord,
+	parseJsonStringArray,
 	parseJsonStringRecord
 } from './json-record';
 
@@ -42,5 +44,27 @@ describe('isJsonParseError', () => {
 		expect(isJsonParseError(new SyntaxError('bad'))).toBe(true);
 		expect(isJsonParseError(new JsonObjectError())).toBe(true);
 		expect(isJsonParseError(new Error('other'))).toBe(false);
+	});
+});
+
+describe('parseJsonArray', () => {
+	it('parses a JSON array', () => {
+		expect(parseJsonArray('[1, "a"]')).toEqual([1, 'a']);
+	});
+
+	it('rejects objects and scalars', () => {
+		expect(() => parseJsonArray('{}')).toThrow(JsonObjectError);
+		expect(() => parseJsonArray('null')).toThrow(JsonObjectError);
+		expect(() => parseJsonArray('"x"')).toThrow(JsonObjectError);
+	});
+});
+
+describe('parseJsonStringArray', () => {
+	it('parses string arrays', () => {
+		expect(parseJsonStringArray('["a","b"]')).toEqual(['a', 'b']);
+	});
+
+	it('rejects non-string items', () => {
+		expect(() => parseJsonStringArray('[1]')).toThrow(JsonObjectError);
 	});
 });

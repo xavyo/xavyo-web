@@ -7,6 +7,7 @@ import { createScriptTemplateSchema } from '$lib/schemas/provisioning-scripts';
 import { hasAdminRole } from '$lib/server/auth';
 import { createScriptTemplate } from '$lib/api/provisioning-scripts';
 import { ApiError } from '$lib/api/client';
+import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const { accessToken, tenantId, user } = locals;
@@ -32,7 +33,9 @@ export const actions: Actions = {
 					description: form.data.description || undefined,
 					category: form.data.category,
 					template_body: form.data.template_body,
-					placeholder_annotations: form.data.placeholder_annotations ? JSON.parse(form.data.placeholder_annotations) : undefined
+					placeholder_annotations: form.data.placeholder_annotations
+						? parseJsonRecord(form.data.placeholder_annotations)
+						: undefined
 				},
 				accessToken,
 				tenantId
@@ -40,8 +43,8 @@ export const actions: Actions = {
 			throw redirect(302, `/governance/provisioning-scripts/templates/${result.id}`);
 		} catch (e) {
 			if (isRedirect(e)) throw e;
-			if (e instanceof SyntaxError) {
-				return message(form, 'Placeholder annotations must be valid JSON', {
+			if (isJsonParseError(e)) {
+				return message(form, 'Placeholder annotations must be a JSON object', {
 					status: 400 as ErrorStatus
 				});
 			}

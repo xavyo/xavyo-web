@@ -60,3 +60,51 @@ describe('remaining forms reject non-object JSON', () => {
 		expect(s).not.toContain('JSON.parse(form.data.action_params)');
 	});
 });
+
+describe('remaining forms reject non-array JSON', () => {
+	it('birthright policy create uses parseJsonArray', () => {
+		const s = src('governance/birthright/policies/create/+page.server.ts');
+		expect(s).toContain('parseJsonArray(');
+		expect(s).toContain('parseJsonStringArray(');
+		expect(s).not.toContain('JSON.parse(conditionsJson');
+	});
+
+	it('birthright policy edit uses parseJsonArray', () => {
+		const s = src('governance/birthright/policies/[id]/edit/+page.server.ts');
+		expect(s).toContain('parseJsonArray(');
+		expect(s).toContain('parseJsonStringArray(');
+		expect(s).not.toContain('JSON.parse(conditionsJson');
+	});
+
+	it('dedup merge uses typed JSON parsers', () => {
+		const s = src('governance/dedup/[id]/merge/+page.server.ts');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).toContain('parseJsonStringArray(');
+		expect(s).not.toContain('JSON.parse(form.data.attribute_selections)');
+		expect(s).not.toContain('JSON.parse(form.data.entitlement_selections)');
+	});
+
+	it('script template create uses parseJsonRecord', () => {
+		const s = src('governance/provisioning-scripts/templates/create/+page.server.ts');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(form.data.placeholder_annotations)');
+	});
+
+	it('meta-role create uses parseJsonArray for in/not_in', () => {
+		const s = src('governance/meta-roles/create/+page.server.ts');
+		expect(s).toContain('parseJsonArray(');
+		expect(s).not.toContain('JSON.parse(criteriaValues');
+	});
+
+	it('birthright-policies create uses parseJsonArray', () => {
+		const s = src('governance/birthright-policies/create/+page.server.ts');
+		expect(s).toContain('parseJsonArray(');
+		expect(s).not.toContain('JSON.parse(conditionsRaw)');
+	});
+
+	it('discrepancy bulk remediate uses parseJsonStringArray', () => {
+		const s = src('connectors/[id]/reconciliation/discrepancies/+page.server.ts');
+		expect(s).toContain('parseJsonStringArray(');
+		expect(s).not.toContain('JSON.parse(raw)');
+	});
+});
