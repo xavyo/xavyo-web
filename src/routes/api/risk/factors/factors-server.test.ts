@@ -15,8 +15,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createRiskFactor } from '$lib/api/risk';
+import { GET, POST } from './+server';
+import { createRiskFactor, listRiskFactors } from '$lib/api/risk';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -32,6 +32,33 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/risk/factors', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listRiskFactors).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/risk/factors?page=2&page_size=10')
+		} as any);
+		expect(listRiskFactors).toHaveBeenCalledWith(
+			{
+				category: undefined,
+				is_enabled: undefined,
+				factor_type: undefined,
+				limit: 10,
+				offset: 10
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/risk/factors', () => {
 	beforeEach(() => {

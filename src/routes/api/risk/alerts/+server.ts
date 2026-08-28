@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listRiskAlerts } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -10,12 +11,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const severity = url.searchParams.get('severity') ?? undefined;
 	const acknowledged = url.searchParams.get('acknowledged') === 'true' ? true : url.searchParams.get('acknowledged') === 'false' ? false : undefined;
 	const sort_by = url.searchParams.get('sort_by') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+
 
 	try {
 		const result = await listRiskAlerts(
-			{ user_id, severity, acknowledged, sort_by, limit, offset },
+			{ user_id, severity, acknowledged, sort_by, ...listPagination(url) },
 			locals.accessToken, locals.tenantId, fetch
 		);
 		return json(result);

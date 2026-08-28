@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listLifecycleConfigs, createLifecycleConfig } from '$lib/api/lifecycle';
 import { hasAdminRole } from '$lib/server/auth';
 import type { CreateLifecycleConfigRequest, LifecycleObjectType } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const OBJECT_TYPES = ['user', 'entitlement', 'role'] as const;
 
@@ -11,9 +12,12 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const object_type = url.searchParams.get('object_type') ?? undefined;
 	const is_active_raw = url.searchParams.get('is_active');
 	const is_active = is_active_raw !== null ? is_active_raw === 'true' : undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const result = await listLifecycleConfigs({ object_type, is_active, limit, offset }, locals.accessToken, locals.tenantId, fetch);
+	const result = await listLifecycleConfigs(
+		{ object_type, is_active, ...listPagination(url) },
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 	return json(result);
 };
 

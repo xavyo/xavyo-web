@@ -5,8 +5,8 @@ vi.mock('$lib/api/detection-rules', () => ({
 	createDetectionRule: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createDetectionRule } from '$lib/api/detection-rules';
+import { GET, POST } from './+server';
+import { createDetectionRule, listDetectionRules } from '$lib/api/detection-rules';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/detection-rules', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listDetectionRules).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/detection-rules?page=3&page_size=5')
+		} as any);
+		expect(listDetectionRules).toHaveBeenCalledWith(
+			{ rule_type: undefined, is_enabled: undefined, limit: 5, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/detection-rules', () => {
 	beforeEach(() => {

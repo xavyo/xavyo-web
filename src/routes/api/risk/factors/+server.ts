@@ -2,6 +2,7 @@ import { json, error, isHttpError } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listRiskFactors, createRiskFactor } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -9,12 +10,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const category = url.searchParams.get('category') ?? undefined;
 	const is_enabled = url.searchParams.get('is_enabled') === 'true' ? true : url.searchParams.get('is_enabled') === 'false' ? false : undefined;
 	const factor_type = url.searchParams.get('factor_type') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	try {
 		const result = await listRiskFactors(
-			{ category, is_enabled, factor_type, limit, offset },
+			{ category, is_enabled, factor_type, ...listPagination(url) },
 			locals.accessToken, locals.tenantId, fetch
 		);
 		return json(result);

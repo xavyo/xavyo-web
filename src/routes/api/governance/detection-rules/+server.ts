@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listDetectionRules, createDetectionRule } from '$lib/api/detection-rules';
 import type { CreateDetectionRuleRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -13,11 +14,8 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			: url.searchParams.get('is_enabled') === 'false'
 				? false
 				: undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-
 	const result = await listDetectionRules(
-		{ rule_type, is_enabled, limit, offset },
+		{ rule_type, is_enabled, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
