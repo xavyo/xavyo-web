@@ -1,4 +1,4 @@
-function finiteNumber(raw: string | null): number | undefined {
+export function finiteNumber(raw: string | null): number | undefined {
 	if (raw == null || raw === '') return undefined;
 	const parsed = Number(raw);
 	return Number.isFinite(parsed) ? parsed : undefined;

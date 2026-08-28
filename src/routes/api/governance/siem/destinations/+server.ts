@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listSiemDestinations, createSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 import type { CreateSiemDestinationRequest, EventCategory } from '$lib/api/types';
 
 const DESTINATION_TYPES = ['syslog_tcp_tls', 'syslog_udp', 'webhook', 'splunk_hec'] as const;
@@ -31,13 +32,12 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		const params: Record<string, string | number | boolean> = {};
 		const enabled = url.searchParams.get('enabled');
 		const destination_type = url.searchParams.get('destination_type');
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
 		if (enabled) params.enabled = enabled === 'true';
 		if (destination_type) params.destination_type = destination_type;
-		if (limit) params.limit = Number(limit);
-		if (offset) params.offset = Number(offset);
+		if (limit != null) params.limit = limit;
+		if (offset != null) params.offset = offset;
 
 		const result = await listSiemDestinations(params, locals.accessToken, locals.tenantId, fetch);
 		return json(result);

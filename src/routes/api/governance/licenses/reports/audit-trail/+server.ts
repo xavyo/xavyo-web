@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getLicenseAuditTrail } from '$lib/api/licenses';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -15,16 +16,15 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		const action = url.searchParams.get('action');
 		const from_date = url.searchParams.get('from_date');
 		const to_date = url.searchParams.get('to_date');
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
 		if (pool_id) params.pool_id = pool_id;
 		if (user_id) params.user_id = user_id;
 		if (action) params.action = action;
 		if (from_date) params.from_date = from_date;
 		if (to_date) params.to_date = to_date;
-		if (limit) params.limit = Number(limit);
-		if (offset) params.offset = Number(offset);
+		if (limit != null) params.limit = limit;
+		if (offset != null) params.offset = offset;
 
 		const result = await getLicenseAuditTrail(
 			params,

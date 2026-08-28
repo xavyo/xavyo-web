@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { listPagination, pagePagination } from './list-pagination';
+import { finiteNumber, listPagination, pagePagination } from './list-pagination';
 
 describe('listPagination', () => {
 	it('passes through limit and offset', () => {
@@ -32,5 +32,19 @@ describe('pagePagination', () => {
 	it('drops non-finite page and page_size instead of forwarding NaN', () => {
 		const url = new URL('http://localhost/x?page=abc&page_size=nope');
 		expect(pagePagination(url)).toEqual({ page: undefined, page_size: undefined });
+	});
+});
+
+describe('finiteNumber', () => {
+	it('parses finite numeric strings', () => {
+		expect(finiteNumber('42')).toBe(42);
+		expect(finiteNumber('0')).toBe(0);
+	});
+
+	it('drops empty, non-numeric, and non-finite values', () => {
+		expect(finiteNumber(null)).toBeUndefined();
+		expect(finiteNumber('')).toBeUndefined();
+		expect(finiteNumber('abc')).toBeUndefined();
+		expect(finiteNumber('Infinity')).toBeUndefined();
 	});
 });

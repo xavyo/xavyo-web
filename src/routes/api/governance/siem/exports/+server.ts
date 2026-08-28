@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listSiemExports, createSiemExport } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 import type { CreateSiemExportRequest, EventCategory } from '$lib/api/types';
 
 const EXPORT_FORMATS = ['cef', 'syslog_rfc5424', 'json', 'csv'] as const;
@@ -30,13 +31,12 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		const params: Record<string, string | number> = {};
 		const status = url.searchParams.get('status');
 		const output_format = url.searchParams.get('output_format');
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
 		if (status) params.status = status;
 		if (output_format) params.output_format = output_format;
-		if (limit) params.limit = Number(limit);
-		if (offset) params.offset = Number(offset);
+		if (limit != null) params.limit = limit;
+		if (offset != null) params.offset = offset;
 
 		const result = await listSiemExports(params, locals.accessToken, locals.tenantId, fetch);
 		return json(result);

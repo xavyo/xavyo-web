@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { getSiemHealthHistory } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -14,11 +15,10 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 
 	try {
 		const queryParams: Record<string, string | number> = {};
-		const limit = url.searchParams.get('limit');
-		const offset = url.searchParams.get('offset');
+		const { limit, offset } = listPagination(url);
 
-		if (limit) queryParams.limit = Number(limit);
-		if (offset) queryParams.offset = Number(offset);
+		if (limit != null) queryParams.limit = limit;
+		if (offset != null) queryParams.offset = offset;
 
 		const result = await getSiemHealthHistory(
 			params.id,

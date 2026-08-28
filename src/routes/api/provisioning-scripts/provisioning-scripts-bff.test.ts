@@ -668,6 +668,16 @@ describe('GET /api/provisioning-scripts/[id]/versions/compare', () => {
 		);
 	});
 
+	it('does not forward NaN version numbers', async () => {
+		const url = new URL(
+			'http://localhost/api/provisioning-scripts/s-1/versions/compare?from=abc&to=nope'
+		);
+		await expect(GET(makeRequestEvent({ params: { id: 's-1' }, url }))).rejects.toMatchObject({
+			status: 400
+		});
+		expect(compareScriptVersions).not.toHaveBeenCalled();
+	});
+
 	it('throws 401 when unauthorized', async () => {
 		const url = new URL('http://localhost/api/provisioning-scripts/s-1/versions/compare?from=1&to=2');
 		await expect(
