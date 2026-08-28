@@ -5,13 +5,9 @@ import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { createPolicySimulationSchema } from '$lib/schemas/simulations';
 import { createPolicySimulation } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	const form = await superValidate(zod(createPolicySimulationSchema));
 	return { form };

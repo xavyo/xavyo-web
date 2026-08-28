@@ -1,5 +1,4 @@
 import type { PageServerLoad, Actions } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { error, redirect, fail, isRedirect } from '@sveltejs/kit';
 import {
 	getSiemDestination,
@@ -14,9 +13,6 @@ import { ApiError } from '$lib/api/client';
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		redirect(302, '/login');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/');
 	}
 
 	try {

@@ -1,13 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { listPolicySimulations, listBatchSimulations, listSimulationComparisons } from '$lib/api/simulations';
-import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	try {
 		const [policySimulations, batchSimulations, comparisons] = await Promise.all([

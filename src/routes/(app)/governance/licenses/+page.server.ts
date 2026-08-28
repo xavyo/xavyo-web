@@ -1,14 +1,10 @@
 import type { PageServerLoad } from './$types';
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { listLicensePools } from '$lib/api/licenses';
-import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ locals, fetch, url }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	// Extract filter params from URL
 	const vendor = url.searchParams.get('vendor') || undefined;

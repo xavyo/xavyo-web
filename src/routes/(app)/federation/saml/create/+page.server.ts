@@ -2,7 +2,6 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
 import { createServiceProviderSchema } from '$lib/schemas/federation';
 import { createServiceProvider } from '$lib/api/federation';
 import { ApiError } from '$lib/api/client';
@@ -10,9 +9,6 @@ import type { CreateServiceProviderRequest } from '$lib/api/types';
 import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const form = await superValidate(zod(createServiceProviderSchema));
 	return { form };
 };
