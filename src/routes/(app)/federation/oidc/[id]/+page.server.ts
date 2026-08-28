@@ -2,7 +2,6 @@ import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
 import { updateIdentityProviderSchema } from '$lib/schemas/federation';
 import {
 	getIdentityProvider,
@@ -17,9 +16,6 @@ import { parseJsonStringRecord } from '$lib/utils/json-record';
 import type { UpdateIdentityProviderRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let idp;
 	let domains;

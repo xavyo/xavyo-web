@@ -2,12 +2,8 @@ import type { Actions, PageServerLoad } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { getNhiSodRule, deleteNhiSodRule } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	let rule;
 	try {
@@ -24,9 +20,6 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
 export const actions: Actions = {
 	delete: async ({ params, locals, fetch }) => {
-		if (!hasAdminRole(locals.user?.roles)) {
-			return fail(403, { error: 'Forbidden' });
-		}
 
 		try {
 			await deleteNhiSodRule(params.id, locals.accessToken!, locals.tenantId!, fetch);

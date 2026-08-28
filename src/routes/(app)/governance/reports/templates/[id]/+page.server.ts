@@ -5,13 +5,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { updateTemplateSchema, cloneTemplateSchema } from '$lib/schemas/governance-reporting';
 import { getTemplate, updateTemplate, archiveTemplate, cloneTemplate } from '$lib/api/governance-reporting';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}

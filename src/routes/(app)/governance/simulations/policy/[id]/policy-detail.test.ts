@@ -118,19 +118,18 @@ describe('Policy simulation detail +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'pol-1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			mockGetPolicySim.mockResolvedValue(makePolicySimulation());
+			mockListResults.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			mockCheckStaleness.mockResolvedValue(makeStalenessCheck());
+			const result = await load({
+				params: { id: 'pol-1' },
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any);
+			expect(result.simulation).toBeDefined();
+			expect(getPolicySimulation).toHaveBeenCalled();
 		});
 
 		it('returns simulation, results, and staleness for admin', async () => {

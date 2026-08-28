@@ -1,13 +1,9 @@
 import type { PageServerLoad } from './$types';
-import { error, isHttpError, redirect } from '@sveltejs/kit';
+import { error, isHttpError } from '@sveltejs/kit';
 import { getNhiCertCampaign, listNhiCertCampaignItems } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 
 	try {
 		const [campaign, itemsResult] = await Promise.all([
