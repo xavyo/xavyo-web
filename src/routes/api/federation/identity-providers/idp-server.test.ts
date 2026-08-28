@@ -111,4 +111,22 @@ describe('POST /api/federation/identity-providers', () => {
 		});
 		expect(createIdentityProvider).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'okta',
+					provider_type: 'oidc',
+					issuer_url: 'https://ex',
+					client_id: 'id',
+					client_secret: 'sec'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createIdentityProvider).toHaveBeenCalled();
+	});
 });

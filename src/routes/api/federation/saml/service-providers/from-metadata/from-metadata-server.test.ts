@@ -51,4 +51,14 @@ describe('POST /api/federation/saml/service-providers/from-metadata', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(createServiceProvider).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const xml =
+			'<EntityDescriptor entityID="https://ex"><SPSSODescriptor><AssertionConsumerService Location="https://ex/acs"/></SPSSODescriptor></EntityDescriptor>';
+		const response = await POST(makeEvent(JSON.stringify({ metadata_xml: xml })) as any);
+		expect(response.status).toBe(201);
+		expect(createServiceProvider).toHaveBeenCalled();
+	});
 });

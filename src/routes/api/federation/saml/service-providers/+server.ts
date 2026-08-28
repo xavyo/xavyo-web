@@ -1,7 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listServiceProviders, createServiceProvider } from '$lib/api/federation';
-import { hasAdminRole } from '$lib/server/auth';
 import type { CreateServiceProviderRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
 
@@ -28,9 +27,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
 
 	let parsed: unknown;
 	try {

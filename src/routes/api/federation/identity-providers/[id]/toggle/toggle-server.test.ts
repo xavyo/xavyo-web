@@ -56,4 +56,12 @@ describe('POST /api/federation/identity-providers/:id/toggle', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(toggleIdentityProvider).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(toggleIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ is_enabled: true })) as any);
+		expect(response.status).toBe(200);
+		expect(toggleIdentityProvider).toHaveBeenCalled();
+	});
 });

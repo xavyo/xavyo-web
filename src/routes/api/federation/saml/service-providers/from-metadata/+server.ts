@@ -1,6 +1,5 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { createServiceProvider } from '$lib/api/federation';
 import { XMLParser } from 'fast-xml-parser';
 
@@ -9,9 +8,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
 		error(401, 'Unauthorized');
 	}
 
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Forbidden');
-	}
 
 	let parsedBody: unknown;
 	try {

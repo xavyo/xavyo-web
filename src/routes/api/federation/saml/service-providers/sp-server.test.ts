@@ -78,4 +78,20 @@ describe('POST /api/federation/saml/service-providers', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createServiceProvider).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'app',
+					entity_id: 'https://ex',
+					acs_urls: ['https://ex/acs']
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createServiceProvider).toHaveBeenCalled();
+	});
 });

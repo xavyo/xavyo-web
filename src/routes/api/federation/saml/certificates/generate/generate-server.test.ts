@@ -38,6 +38,12 @@ describe('POST /api/federation/saml/certificates/generate', () => {
 		expect(uploadCertificate).not.toHaveBeenCalled();
 	});
 
+	it('does not 403 a non-admin JWT user before generating', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
+		expect(uploadCertificate).not.toHaveBeenCalled();
+	});
+
 	it('does not generate when common_name is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({ organization: 'x' })) as any)).rejects.toMatchObject(
 			{ status: 400 }
