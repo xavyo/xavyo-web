@@ -11,6 +11,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonArray, parseJsonRecord } from '$lib/utils/json-record';
 	import type { PageData } from './$types';
 	import type {
 		MetaRoleInheritance,
@@ -167,7 +168,7 @@
 	async function handleAddConstraint() {
 		addConstraintLoading = true;
 		try {
-			const parsedValue = JSON.parse(constraintValue) as Record<string, unknown>;
+			const parsedValue = parseJsonRecord(constraintValue);
 			await addConstraintClient(data.metaRole.id, {
 				constraint_type: constraintType as any,
 				constraint_value: parsedValue
@@ -177,8 +178,8 @@
 			constraintValue = '';
 			await invalidateAll();
 		} catch (e: any) {
-			if (e instanceof SyntaxError) {
-				addToast('error', 'Invalid JSON value');
+			if (isJsonParseError(e)) {
+				addToast('error', 'Constraint value must be a JSON object');
 			} else {
 				addToast('error', e.message || 'Failed to add constraint');
 			}
@@ -298,7 +299,11 @@
 		try {
 			let criteriaChanges: { field: string; operator: string; value: unknown }[] | undefined;
 			if (simulationType === 'criteria_change' && simulationCriteriaChanges.trim()) {
-				criteriaChanges = JSON.parse(simulationCriteriaChanges) as { field: string; operator: string; value: unknown }[];
+				criteriaChanges = parseJsonArray(simulationCriteriaChanges) as {
+					field: string;
+					operator: string;
+					value: unknown;
+				}[];
 			}
 			const result = await simulateMetaRoleClient(data.metaRole.id, {
 				simulation_type: simulationType as any,
@@ -307,8 +312,8 @@
 			});
 			simulationResult = result;
 		} catch (e: any) {
-			if (e instanceof SyntaxError) {
-				addToast('error', 'Invalid JSON in criteria changes');
+			if (isJsonParseError(e)) {
+				addToast('error', 'Criteria changes must be a JSON array');
 			} else {
 				addToast('error', e.message || 'Simulation failed');
 			}

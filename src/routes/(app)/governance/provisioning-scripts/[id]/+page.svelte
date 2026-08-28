@@ -11,6 +11,7 @@
 	import ValidationResult from '$lib/components/provisioning-scripts/validation-result.svelte';
 	import DryRunPanel from '$lib/components/provisioning-scripts/dry-run-panel.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 	import { Dialog } from 'bits-ui';
 	import DialogContent from '$lib/components/ui/dialog/dialog-content.svelte';
 	import DialogHeader from '$lib/components/ui/dialog/dialog-header.svelte';
@@ -231,7 +232,7 @@
 		dryRunLoading = true;
 		dryRunResult = null;
 		try {
-			const context = JSON.parse(contextStr) as Record<string, unknown>;
+			const context = parseJsonRecord(contextStr);
 			const latestVersion = versions[0];
 			const res = await fetch('/api/provisioning-scripts/dry-run', {
 				method: 'POST',
@@ -244,7 +245,11 @@
 				addToast('error', 'Dry run failed');
 			}
 		} catch (e: unknown) {
-			const message = e instanceof Error ? e.message : 'Dry run failed';
+			const message = isJsonParseError(e)
+				? 'Dry-run context must be a JSON object'
+				: e instanceof Error
+					? e.message
+					: 'Dry run failed';
 			addToast('error', message);
 		}
 		dryRunLoading = false;

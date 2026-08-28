@@ -108,3 +108,56 @@ describe('remaining forms reject non-array JSON', () => {
 		expect(s).not.toContain('JSON.parse(raw)');
 	});
 });
+
+describe('client JSON posts reject non-object JSON', () => {
+	it('lifecycle action editor uses parseJsonRecord and does not fail-open to {}', () => {
+		const s = src('../../lib/components/lifecycle/action-editor.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).toContain('return null');
+		expect(s).not.toContain('JSON.parse(json)');
+	});
+
+	it('lifecycle condition editor uses parseJsonRecord', () => {
+		const s = src('../../lib/components/lifecycle/condition-editor.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(evalContext)');
+	});
+
+	it('grant NHI permission dialog uses parseJsonRecord', () => {
+		const s = src('../../lib/components/nhi/grant-nhi-permission-dialog.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(allowedActionsJson)');
+	});
+
+	it('MCP tool card uses parseJsonRecord', () => {
+		const s = src('../../lib/components/nhi/mcp-tool-card.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(parametersJson)');
+	});
+
+	it('object template simulate uses parseJsonRecord', () => {
+		const s = src('governance/object-templates/[id]/+page.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(sampleDataStr)');
+	});
+
+	it('role parameter constraints use parseJsonRecord', () => {
+		const s = src('governance/roles/[id]/+page.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(newParam.constraints_json)');
+	});
+
+	it('meta-role constraint and simulate use typed JSON parsers', () => {
+		const s = src('governance/meta-roles/[id]/+page.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).toContain('parseJsonArray(');
+		expect(s).not.toContain('JSON.parse(constraintValue)');
+		expect(s).not.toContain('JSON.parse(simulationCriteriaChanges)');
+	});
+
+	it('provisioning-script dry-run uses parseJsonRecord', () => {
+		const s = src('governance/provisioning-scripts/[id]/+page.svelte');
+		expect(s).toContain('parseJsonRecord(');
+		expect(s).not.toContain('JSON.parse(contextStr)');
+	});
+});

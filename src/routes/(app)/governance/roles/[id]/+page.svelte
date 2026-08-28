@@ -11,6 +11,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 	import type { PageData } from './$types';
 	import type {
 		GovernanceRole,
@@ -243,7 +244,7 @@
 		try {
 			let constraints: Record<string, unknown> | undefined;
 			if (newParam.constraints_json) {
-				constraints = JSON.parse(newParam.constraints_json) as Record<string, unknown>;
+				constraints = parseJsonRecord(newParam.constraints_json);
 			}
 			await addRoleParameterClient(data.role.id, {
 				name: newParam.name,
@@ -261,8 +262,8 @@
 			parametersLoaded = false;
 			await loadParameters();
 		} catch (e: any) {
-			if (e instanceof SyntaxError) {
-				addToast('error', 'Invalid JSON in constraints');
+			if (isJsonParseError(e)) {
+				addToast('error', 'Constraints must be a JSON object');
 			} else {
 				addToast('error', e.message || 'Failed to add parameter');
 			}

@@ -8,6 +8,7 @@
 	import type { TransitionCondition, EvaluateConditionsResponse } from '$lib/api/types';
 	import { saveConditions, evaluateConditions } from '$lib/api/lifecycle-client';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 
 	let {
 		configId,
@@ -56,10 +57,12 @@
 		evalError = '';
 		evalResult = null;
 		try {
-			const ctx = JSON.parse(evalContext) as Record<string, unknown>;
+			const ctx = parseJsonRecord(evalContext);
 			evalResult = await evaluateConditions(configId, transitionId, ctx);
 		} catch (e: any) {
-			evalError = e.message || 'Failed to evaluate conditions';
+			evalError = isJsonParseError(e)
+				? 'Evaluation context must be a JSON object'
+				: e.message || 'Failed to evaluate conditions';
 		} finally {
 			evaluating = false;
 		}
