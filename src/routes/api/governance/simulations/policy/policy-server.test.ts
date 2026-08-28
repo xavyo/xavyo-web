@@ -19,8 +19,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createPolicySimulation } from '$lib/api/simulations';
+import { GET, POST } from './+server';
+import { createPolicySimulation, listPolicySimulations } from '$lib/api/simulations';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -37,6 +37,35 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/simulations/policy', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listPolicySimulations).mockResolvedValue({ items: [], total: 0, limit: 10, offset: 10 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/simulations/policy?page=2&page_size=10')
+		} as any);
+		expect(listPolicySimulations).toHaveBeenCalledWith(
+			{
+				simulation_type: undefined,
+				status: undefined,
+				created_by: undefined,
+				include_archived: undefined,
+				limit: 10,
+				offset: 10
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/simulations/policy', () => {
 	beforeEach(() => {

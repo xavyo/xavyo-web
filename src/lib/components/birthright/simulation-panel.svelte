@@ -4,6 +4,7 @@
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { SimulatePolicyResponse, SimulateAllPoliciesResponse } from '$lib/api/types';
 	import { simulatePolicyClient, simulateAllPoliciesClient } from '$lib/api/birthright-client';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 	import { FlaskConical } from 'lucide-svelte';
 
 	interface Props {
@@ -31,13 +32,9 @@
 
 		let parsed: Record<string, unknown>;
 		try {
-			parsed = JSON.parse(attributesJson) as Record<string, unknown>;
-			if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-				error = 'Must be a valid JSON object';
-				return;
-			}
-		} catch {
-			error = 'Invalid JSON format';
+			parsed = parseJsonRecord(attributesJson);
+		} catch (e) {
+			error = isJsonParseError(e) ? 'Must be a valid JSON object' : 'Invalid JSON format';
 			return;
 		}
 

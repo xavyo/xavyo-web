@@ -5,8 +5,8 @@ vi.mock('$lib/api/invitations', () => ({
 	createInvitation: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createInvitation } from '$lib/api/invitations';
+import { GET, POST } from './+server';
+import { createInvitation, listInvitations } from '$lib/api/invitations';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,42 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/invitations', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listInvitations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/invitations?page=2&page_size=10')
+		} as any);
+		expect(listInvitations).toHaveBeenCalledWith(
+			{ status: undefined, email: undefined, limit: 10, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listInvitations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/invitations?limit=abc&offset=nope')
+		} as any);
+		expect(listInvitations).toHaveBeenCalledWith(
+			{ status: undefined, email: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/invitations', () => {
 	beforeEach(() => {

@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listApprovalWorkflows, createApprovalWorkflow } from '$lib/api/approval-workflows';
 import { ApiError } from '$lib/api/client';
 import type { CreateApprovalStepRequest, CreateApprovalWorkflowRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 function parseSteps(value: unknown): CreateApprovalStepRequest[] {
 	if (!Array.isArray(value)) {
@@ -41,12 +42,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-
 	try {
 		const result = await listApprovalWorkflows(
-			{ limit, offset },
+			listPagination(url),
 			locals.accessToken,
 			locals.tenantId,
 			fetch

@@ -2,19 +2,18 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listAccessRequests, createAccessRequest } from '$lib/api/access-requests';
 import type { CreateAccessRequestRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
 	const status = url.searchParams.get('status') ?? undefined;
 	const entitlement_id = url.searchParams.get('entitlement_id') ?? undefined;
 
 	const result = await listAccessRequests(
-		{ status, entitlement_id, limit, offset },
+		{ status, entitlement_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
