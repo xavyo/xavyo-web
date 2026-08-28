@@ -8,7 +8,6 @@ import { updateCategorySchema } from '$lib/schemas/catalog';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	const [category, categoriesRes] = await Promise.all([
 		getCategory(params.id, locals.accessToken, locals.tenantId, fetch),

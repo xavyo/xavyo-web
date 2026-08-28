@@ -8,7 +8,6 @@ import { createCatalogItemSchema } from '$lib/schemas/catalog';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	const categoriesRes = await adminListCategories({ limit: 100, offset: 0 }, locals.accessToken, locals.tenantId, fetch);
 	const form = await superValidate(zod(createCatalogItemSchema));
