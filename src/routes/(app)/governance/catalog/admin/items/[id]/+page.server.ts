@@ -8,7 +8,6 @@ import { updateCatalogItemSchema } from '$lib/schemas/catalog';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	const [item, categoriesRes] = await Promise.all([
 		getCatalogItem(params.id, undefined, locals.accessToken, locals.tenantId, fetch),
