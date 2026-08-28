@@ -43,19 +43,23 @@ describe('Risk factors +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/risk/factors'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(listRiskFactors).mockResolvedValue({
+				items: [{ id: 'fac-1', name: 'Privileged access' }],
+				total: 1,
+				limit: 50,
+				offset: 0
+			} as any);
+
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/governance/risk/factors'),
+				fetch: vi.fn()
+			} as any);
+
+			expect(result.factors.items).toHaveLength(1);
+			expect(listRiskFactors).toHaveBeenCalled();
 		});
 
 		it('returns factors for admin users', async () => {

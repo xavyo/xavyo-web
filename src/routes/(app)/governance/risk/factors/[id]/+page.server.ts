@@ -6,13 +6,8 @@ import { updateRiskFactorSchema } from '$lib/schemas/risk';
 import { getRiskFactor, updateRiskFactor, deleteRiskFactor } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
 import type { UpdateRiskFactorRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	try {
 		const factor = await getRiskFactor(params.id, locals.accessToken!, locals.tenantId!, fetch);
 		const form = await superValidate(
