@@ -40,19 +40,23 @@ describe('Risk scores +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/risk/scores'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			vi.mocked(listRiskScores).mockResolvedValue({
+				items: [{ user_id: 'u-1', total_score: 80 }],
+				total: 1,
+				limit: 50,
+				offset: 0
+			} as any);
+
+			const result = await load({
+				locals: mockLocals(false),
+				url: new URL('http://localhost/governance/risk/scores'),
+				fetch: vi.fn()
+			} as any);
+
+			expect(result.scores.items).toHaveLength(1);
+			expect(listRiskScores).toHaveBeenCalled();
 		});
 
 		it('returns scores for admin users', async () => {

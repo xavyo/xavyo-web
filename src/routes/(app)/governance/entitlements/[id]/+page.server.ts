@@ -12,13 +12,8 @@ import {
 } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { UpdateEntitlementRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	let entitlement;
 	try {
 		entitlement = await getEntitlement(params.id, locals.accessToken!, locals.tenantId!, fetch);

@@ -1,15 +1,10 @@
 import type { Actions, PageServerLoad } from './$types';
-import { error, fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
-import { hasAdminRole } from '$lib/server/auth';
+import { error, fail, isRedirect, isHttpError } from '@sveltejs/kit';
 import { listRiskAlerts, getRiskAlertSummary, acknowledgeRiskAlert, deleteRiskAlert } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const severity = url.searchParams.get('severity') ?? undefined;
 	const acknowledged_str = url.searchParams.get('acknowledged');
 	const acknowledged = acknowledged_str === 'true' ? true : acknowledged_str === 'false' ? false : undefined;
