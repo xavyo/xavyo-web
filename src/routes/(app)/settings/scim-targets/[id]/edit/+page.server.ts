@@ -5,14 +5,9 @@ import { error, fail, isRedirect, isHttpError, redirect } from '@sveltejs/kit';
 import { editScimTargetSchema } from '$lib/schemas/scim-targets';
 import { getScimTarget, updateScimTarget } from '$lib/api/scim-targets';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { UpdateScimTargetRequest, ScimCredentials } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	let target;
 	try {
 		target = await getScimTarget(params.id, locals.accessToken!, locals.tenantId!, fetch);
