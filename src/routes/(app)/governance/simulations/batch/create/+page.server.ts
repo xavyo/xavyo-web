@@ -5,14 +5,9 @@ import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { createBatchSimulationSchema } from '$lib/schemas/simulations';
 import { createBatchSimulation } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import { parseJsonStringRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const form = await superValidate(zod(createBatchSimulationSchema));
 	return { form };
 };

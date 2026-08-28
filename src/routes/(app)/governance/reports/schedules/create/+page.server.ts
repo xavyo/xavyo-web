@@ -5,13 +5,9 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { createScheduleSchema } from '$lib/schemas/governance-reporting';
 import { createSchedule } from '$lib/api/governance-reporting';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { ErrorStatus } from 'sveltekit-superforms';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	const templateId = url.searchParams.get('template_id') ?? undefined;
 	const form = await superValidate(
 		{ template_id: templateId, schedule_hour: 8, output_format: 'json' as const },

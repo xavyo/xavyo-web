@@ -6,13 +6,8 @@ import { createReclamationRuleSchema } from '$lib/schemas/licenses';
 import { listLicensePools, createReclamationRule } from '$lib/api/licenses';
 import { ApiError } from '$lib/api/client';
 import type { CreateReclamationRuleRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const [form, poolsResponse] = await Promise.all([
 		superValidate(zod(createReclamationRuleSchema)),
 		listLicensePools({ limit: 100 }, locals.accessToken!, locals.tenantId!, fetch)

@@ -1,5 +1,4 @@
 import type { PageServerLoad, Actions } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { redirect, fail, isRedirect, isHttpError } from '@sveltejs/kit';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
@@ -11,9 +10,6 @@ import type { UpdateSiemDestinationRequest } from '$lib/api/types';
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		redirect(302, '/login');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/');
 	}
 
 	const destination = await getSiemDestination(

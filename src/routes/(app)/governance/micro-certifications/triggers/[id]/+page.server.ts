@@ -13,13 +13,8 @@ import {
 	setDefaultTriggerRule
 } from '$lib/api/micro-certifications';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	let rule;
 	try {
 		rule = await getTriggerRule(params.id, locals.accessToken!, locals.tenantId!, fetch);

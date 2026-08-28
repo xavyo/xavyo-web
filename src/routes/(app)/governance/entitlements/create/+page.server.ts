@@ -6,13 +6,8 @@ import { createEntitlementSchema } from '$lib/schemas/governance';
 import { createEntitlement, listApplications } from '$lib/api/governance';
 import { ApiError } from '$lib/api/client';
 import type { CreateEntitlementRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const form = await superValidate(zod(createEntitlementSchema));
 
 	try {

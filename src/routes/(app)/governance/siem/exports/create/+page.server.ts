@@ -5,15 +5,11 @@ import { fail, redirect, isRedirect, isHttpError } from '@sveltejs/kit';
 import { createSiemExportSchema } from '$lib/schemas/siem';
 import { createSiemExport } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { CreateSiemExportRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		redirect(302, '/login');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/');
 	}
 
 	const form = await superValidate(zod(createSiemExportSchema));

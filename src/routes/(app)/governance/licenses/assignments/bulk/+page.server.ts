@@ -1,18 +1,13 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { fail, redirect, isRedirect } from '@sveltejs/kit';
+import { fail, isRedirect } from '@sveltejs/kit';
 import { bulkAssignSchema, bulkReclaimSchema } from '$lib/schemas/licenses';
 import { listLicensePools, bulkAssignLicenses, bulkReclaimLicenses } from '$lib/api/licenses';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 import type { BulkAssignLicenseRequest, BulkReclaimLicenseRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	const [assignForm, reclaimForm, poolsResponse] = await Promise.all([
 		superValidate(zod(bulkAssignSchema)),
 		superValidate(zod(bulkReclaimSchema)),

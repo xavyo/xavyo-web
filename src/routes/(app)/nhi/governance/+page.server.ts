@@ -1,15 +1,11 @@
 import type { PageServerLoad } from './$types';
-import { redirect, error } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { getNhiRiskSummary, getStalenessReport, listOrphanDetections } from '$lib/api/nhi-governance';
 import { listNhi } from '$lib/api/nhi';
-import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 import type { NhiRiskSummary } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
 
 	const defaultRiskSummary: NhiRiskSummary = {

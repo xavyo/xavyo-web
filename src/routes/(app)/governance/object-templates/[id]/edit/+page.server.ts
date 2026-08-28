@@ -5,13 +5,8 @@ import { fail, redirect, error, isRedirect, isHttpError } from '@sveltejs/kit';
 import { updateObjectTemplateSchema } from '$lib/schemas/object-templates';
 import { getObjectTemplate, updateObjectTemplate } from '$lib/api/object-templates';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const load: PageServerLoad = async ({ locals, params }) => {
-	if (!hasAdminRole(locals.user?.roles)) {
-		redirect(302, '/dashboard');
-	}
-
 	try {
 		const template = await getObjectTemplate(params.id, locals.accessToken!, locals.tenantId!);
 		const form = await superValidate(

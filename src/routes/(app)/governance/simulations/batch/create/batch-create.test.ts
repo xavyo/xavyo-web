@@ -66,18 +66,13 @@ describe('Batch simulation create +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
+		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			const { load } = await import('./+page.server');
-			try {
-				await load({
-					locals: mockLocals(false)
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
+			const result = await load({
+				locals: mockLocals(false)
+			} as any);
+			expect(result).toBeDefined();
 		});
 
 		it('returns superform data for admin', async () => {
@@ -301,7 +296,11 @@ describe('Batch simulation create form logic', () => {
 	describe('filter metadata JSON parsing', () => {
 		it('uses parseJsonStringRecord instead of JSON.parse', async () => {
 			const { readFileSync } = await import('node:fs');
-			const src = readFileSync(new URL('./+page.server.ts', import.meta.url), 'utf8');
+			const { resolve } = await import('node:path');
+			const src = readFileSync(
+				resolve('src/routes/(app)/governance/simulations/batch/create/+page.server.ts'),
+				'utf8'
+			);
 			expect(src).toContain('parseJsonStringRecord(');
 			expect(src).not.toContain('JSON.parse(data.filter_metadata)');
 		});

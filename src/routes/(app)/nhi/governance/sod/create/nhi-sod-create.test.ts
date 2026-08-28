@@ -26,17 +26,13 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('NHI SoD Rule create +page.server', () => {
-	it('redirects non-admin users on load', async () => {
+	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		try {
-			await load({
-				locals: mockLocals(false),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-		}
+		const result: any = await load({
+			locals: mockLocals(false),
+			fetch: vi.fn()
+		} as any);
+		expect(result.form).toBeDefined();
 	});
 
 	it('loads form data for admin users', async () => {
