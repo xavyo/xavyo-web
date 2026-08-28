@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listNhiRequests, submitNhiRequest } from '$lib/api/nhi-requests';
 import { ApiError } from '$lib/api/client';
 import type { SubmitNhiRequestBody } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -12,10 +13,8 @@ export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 		const status = url.searchParams.get('status') || undefined;
 		const requester_id = url.searchParams.get('requester_id') || undefined;
 		const pending_only = url.searchParams.get('pending_only') === 'true' || undefined;
-		const limit = url.searchParams.get('limit') ? Number(url.searchParams.get('limit')) : undefined;
-		const offset = url.searchParams.get('offset') ? Number(url.searchParams.get('offset')) : undefined;
 		const result = await listNhiRequests(
-			{ status, requester_id, pending_only, limit, offset },
+			{ status, requester_id, pending_only, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch
