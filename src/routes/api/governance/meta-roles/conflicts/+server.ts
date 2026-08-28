@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listConflicts } from '$lib/api/meta-roles';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -11,11 +12,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const meta_role_id = url.searchParams.get('meta_role_id') ?? undefined;
 	const conflict_type = url.searchParams.get('conflict_type') ?? undefined;
 	const resolution_status = url.searchParams.get('resolution_status') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listConflicts(
-		{ affected_role_id, meta_role_id, conflict_type, resolution_status, limit, offset },
+		{ affected_role_id, meta_role_id, conflict_type, resolution_status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

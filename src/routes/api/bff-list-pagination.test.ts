@@ -77,7 +77,28 @@ describe('BFF list endpoints honor finite pagination', () => {
 		'admin/authorization/mappings/+server.ts',
 		'operations/+server.ts',
 		'governance/reports/+server.ts',
-		'governance/simulations/comparisons/+server.ts'
+		'governance/simulations/comparisons/+server.ts',
+		'governance/reports/templates/+server.ts',
+		'governance/reports/schedules/+server.ts',
+		'governance/simulations/batch/+server.ts',
+		'governance/simulations/batch/[id]/results/+server.ts',
+		'governance/role-mining/jobs/+server.ts',
+		'governance/role-mining/jobs/[jobId]/candidates/+server.ts',
+		'governance/role-mining/jobs/[jobId]/patterns/+server.ts',
+		'governance/role-mining/jobs/[jobId]/excessive-privileges/+server.ts',
+		'governance/role-mining/jobs/[jobId]/consolidation-suggestions/+server.ts',
+		'governance/role-mining/simulations/+server.ts',
+		'governance/role-mining/metrics/+server.ts',
+		'governance/meta-roles/events/+server.ts',
+		'governance/meta-roles/conflicts/+server.ts',
+		'governance/meta-roles/[id]/inheritances/+server.ts',
+		'connectors/[id]/reconciliation/runs/+server.ts',
+		'connectors/[id]/reconciliation/actions/+server.ts',
+		'connectors/[id]/reconciliation/discrepancies/+server.ts',
+		'connectors/[connectorId]/correlation/rules/+server.ts',
+		'governance/semi-manual/applications/+server.ts',
+		'risk/events/user/[userId]/+server.ts',
+		'nhi/governance/sod/rules/+server.ts'
 	];
 
 	it.each(files)('%s uses listPagination instead of Number()', (rel) => {

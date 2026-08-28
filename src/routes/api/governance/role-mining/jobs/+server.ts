@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listMiningJobs, createMiningJob } from '$lib/api/role-mining';
 import type { CreateMiningJobRequest, MiningJobParameters } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -9,11 +10,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') || undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listMiningJobs(
-		{ status, limit, offset },
+		{ status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

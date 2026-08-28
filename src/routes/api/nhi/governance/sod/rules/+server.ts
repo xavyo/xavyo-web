@@ -4,6 +4,7 @@ import { listNhiSodRules, createNhiSodRule } from '$lib/api/nhi-governance';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
 import type { CreateNhiSodRuleRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -14,10 +15,8 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	try {
-		const limit = Number(url.searchParams.get('limit') ?? '20');
-		const offset = Number(url.searchParams.get('offset') ?? '0');
 		const result = await listNhiSodRules(
-			{ limit, offset },
+			{ ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch

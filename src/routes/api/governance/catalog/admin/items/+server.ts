@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { adminListItems, adminCreateItem } from '$lib/api/catalog';
 import { hasAdminRole } from '$lib/server/auth';
 import type { CatalogItemType, CreateCatalogItemRequest, FormField, RequestabilityRules } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const ITEM_TYPES = ['role', 'entitlement', 'resource'] as const;
 
@@ -14,9 +15,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const enabled = url.searchParams.get('enabled') !== null ? url.searchParams.get('enabled') === 'true' : undefined;
 	const search = url.searchParams.get('search') ?? undefined;
 	const tag = url.searchParams.get('tag') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const result = await adminListItems({ category_id, item_type, enabled, search, tag, limit, offset }, locals.accessToken, locals.tenantId, fetch);
+	const result = await adminListItems({ category_id, item_type, enabled, search, tag, ...listPagination(url) }, locals.accessToken, locals.tenantId, fetch);
 	return json(result);
 };
 

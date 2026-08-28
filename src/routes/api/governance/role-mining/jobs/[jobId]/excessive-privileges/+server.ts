@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listExcessivePrivileges } from '$lib/api/role-mining';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -8,12 +9,10 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') || undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listExcessivePrivileges(
 		params.jobId,
-		{ status, limit, offset },
+		{ status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

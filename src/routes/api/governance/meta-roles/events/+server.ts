@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listEvents } from '$lib/api/meta-roles';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -16,11 +17,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const actor_id = url.searchParams.get('actor_id') ?? undefined;
 	const from_date = url.searchParams.get('from_date') ?? undefined;
 	const to_date = url.searchParams.get('to_date') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listEvents(
-		{ meta_role_id, event_type, actor_id, from_date, to_date, limit, offset },
+		{ meta_role_id, event_type, actor_id, from_date, to_date, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

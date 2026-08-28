@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { fetchAdminLoginAttempts } from '$lib/api/audit';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -14,9 +15,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const cursor = url.searchParams.get('cursor') ?? undefined;
-	const limit = url.searchParams.get('limit')
-		? Number(url.searchParams.get('limit'))
-		: undefined;
+	const { limit } = listPagination(url);
 	const user_id = url.searchParams.get('user_id') ?? undefined;
 	const email = url.searchParams.get('email') ?? undefined;
 	const start_date = url.searchParams.get('start_date') ?? undefined;

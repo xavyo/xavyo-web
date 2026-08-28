@@ -5,8 +5,8 @@ vi.mock('$lib/api/reconciliation', () => ({
 	triggerRun: vi.fn()
 }));
 
-import { POST } from './+server';
-import { triggerRun } from '$lib/api/reconciliation';
+import { GET, POST } from './+server';
+import { listRuns, triggerRun } from '$lib/api/reconciliation';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -23,6 +23,36 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/connectors/:id/reconciliation/runs', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listRuns).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			params: { id: 'c1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/connectors/c1/reconciliation/runs?limit=abc&offset=nope'
+			)
+		} as any);
+		expect(listRuns).toHaveBeenCalledWith(
+			'c1',
+			{
+				mode: undefined,
+				status: undefined,
+				limit: undefined,
+				offset: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/connectors/:id/reconciliation/runs', () => {
 	beforeEach(() => {

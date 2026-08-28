@@ -3,22 +3,20 @@ import type { RequestHandler } from './$types';
 import { listBatchSimulations, createBatchSimulation } from '$lib/api/simulations';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 const BATCH_TYPES = ['role_add', 'role_remove', 'entitlement_add', 'entitlement_remove'] as const;
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const batch_type = url.searchParams.get('batch_type') || undefined;
 		const status = url.searchParams.get('status') || undefined;
 		const created_by = url.searchParams.get('created_by') || undefined;
 		const include_archived = url.searchParams.get('include_archived') === 'true' ? true : undefined;
-		const offset = Number(url.searchParams.get('offset') ?? '0');
-		const limit = Number(url.searchParams.get('limit') ?? '20');
 		const result = await listBatchSimulations(
-			{ batch_type, status, created_by, include_archived, offset, limit },
+			{ batch_type, status, created_by, include_archived, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch
