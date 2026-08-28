@@ -67,6 +67,21 @@ describe('Connector conflicts +page.server', () => {
 		expect(result.conflicts.conflicts).toHaveLength(1);
 	});
 
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listConflicts).mockResolvedValue({ conflicts: [], total: 0 } as any);
+		await load({
+			locals: mockLocals(true),
+			url: new URL('http://localhost/connectors/conflicts?limit=abc&offset=nope'),
+			fetch: vi.fn()
+		} as any);
+		expect(listConflicts).toHaveBeenCalledWith(
+			{ conflict_type: undefined, pending_only: undefined, limit: 20, offset: 0 },
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
+
 	it('fails closed when list API throws', async () => {
 		vi.mocked(listConflicts).mockRejectedValue(new Error('network'));
 

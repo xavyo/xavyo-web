@@ -67,6 +67,31 @@ describe('Connector operations +page.server', () => {
 		expect(result.connectors).toHaveLength(1);
 	});
 
+	it('does not forward NaN pagination', async () => {
+		vi.mocked(listOperations).mockResolvedValue({ operations: [], total: 0 } as any);
+		vi.mocked(getOperationStats).mockResolvedValue({} as any);
+		vi.mocked(listConnectors).mockResolvedValue({ items: [] } as any);
+		await load({
+			locals: mockLocals(true),
+			url: new URL('http://localhost/connectors/operations?limit=abc&offset=nope'),
+			fetch: vi.fn()
+		} as any);
+		expect(listOperations).toHaveBeenCalledWith(
+			{
+				connector_id: undefined,
+				status: undefined,
+				operation_type: undefined,
+				from_date: undefined,
+				to_date: undefined,
+				limit: 20,
+				offset: 0
+			},
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
+
 	it('fails closed when operations list throws', async () => {
 		vi.mocked(listOperations).mockRejectedValue(new Error('network'));
 		vi.mocked(getOperationStats).mockResolvedValue({} as any);

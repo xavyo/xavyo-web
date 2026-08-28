@@ -4,6 +4,7 @@ import { hasAdminRole } from '$lib/server/auth';
 import { listOperations, getOperationStats } from '$lib/api/operations';
 import { listConnectors } from '$lib/api/connectors';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -15,8 +16,7 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const operation_type = url.searchParams.get('operation_type') ?? undefined;
 	const from_date = url.searchParams.get('from_date') ?? undefined;
 	const to_date = url.searchParams.get('to_date') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const [operations, stats, connectors] = await Promise.all([

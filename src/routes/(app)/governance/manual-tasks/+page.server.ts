@@ -3,6 +3,7 @@ import { error, redirect } from '@sveltejs/kit';
 import { hasAdminRole } from '$lib/server/auth';
 import { getManualTaskDashboard, listManualTasks } from '$lib/api/manual-tasks';
 import { ApiError } from '$lib/api/client';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	if (!hasAdminRole(locals.user?.roles)) {
@@ -14,8 +15,7 @@ export const load: PageServerLoad = async ({ url, locals, fetch }) => {
 	const user_id = url.searchParams.get('user_id') ?? undefined;
 	const sla_breached = url.searchParams.get('sla_breached') === 'true' ? true : url.searchParams.get('sla_breached') === 'false' ? false : undefined;
 	const assignee_id = url.searchParams.get('assignee_id') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
+	const { limit = 20, offset = 0 } = listPagination(url);
 
 	try {
 		const [dashboard, tasks] = await Promise.all([

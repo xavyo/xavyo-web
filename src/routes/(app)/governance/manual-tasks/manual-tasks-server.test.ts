@@ -79,6 +79,31 @@ describe('Manual tasks +page.server', () => {
 			expect(result.dashboard.pending_count).toBe(5);
 		});
 
+		it('does not forward NaN pagination', async () => {
+			vi.mocked(hasAdminRole).mockReturnValue(true);
+			vi.mocked(getManualTaskDashboard).mockResolvedValue({} as any);
+			vi.mocked(listManualTasks).mockResolvedValue({ items: [], total: 0 } as any);
+			await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/governance/manual-tasks?limit=abc&offset=nope'),
+				fetch: vi.fn()
+			} as any);
+			expect(listManualTasks).toHaveBeenCalledWith(
+				{
+					status: undefined,
+					application_id: undefined,
+					user_id: undefined,
+					sla_breached: undefined,
+					assignee_id: undefined,
+					limit: 20,
+					offset: 0
+				},
+				'tok',
+				'tid',
+				expect.any(Function)
+			);
+		});
+
 		it('fails closed when list API throws', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(getManualTaskDashboard).mockResolvedValue({ pending_count: 0 } as any);
