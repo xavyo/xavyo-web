@@ -1,4 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 vi.mock('$lib/api/nhi-usage', () => ({
 	getNhiStalenessReport: vi.fn()
@@ -14,17 +17,11 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-vi.mock('$lib/server/auth', () => ({
-	hasAdminRole: vi.fn()
-}));
-
 import { load } from './+page.server';
 import { getNhiStalenessReport } from '$lib/api/nhi-usage';
-import { hasAdminRole } from '$lib/server/auth';
 import type { NhiStalenessEntry } from '$lib/api/types';
 
 const mockGetReport = vi.mocked(getNhiStalenessReport);
-const mockHasAdminRole = vi.mocked(hasAdminRole);
 
 function makeEntry(overrides: Partial<NhiStalenessEntry> = {}): NhiStalenessEntry {
 	return {
@@ -45,9 +42,16 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('NHI Staleness +page.server', () => {
+	it('does not 403 non-admin users before calling the API', () => {
+		const src = readFileSync(
+			join(dirname(fileURLToPath(import.meta.url)), '+page.server.ts'),
+			'utf8'
+		);
+		expect(src).not.toContain('hasAdminRole');
+	});
+
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockHasAdminRole.mockReturnValue(true);
 	});
 
 	describe('load', () => {
@@ -75,17 +79,14 @@ describe('NHI Staleness +page.server', () => {
 			}
 		});
 
-		it('throws 403 for non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown');
-			} catch (e: any) {
-				expect(e.status).toBe(403);
-			}
+		it('loads for non-admin authenticated users (API has no admin gate)', async () => {
+			mockGetReport.mockResolvedValue({ items: [makeEntry()], total: 1, limit: 50, offset: 0 });
+			const result = (await load({
+				locals: mockLocals(false),
+				fetch: vi.fn()
+			} as any)) as any;
+			expect(result.entries).toHaveLength(1);
+			expect(mockGetReport).toHaveBeenCalled();
 		});
 
 		it('returns entries for admin', async () => {

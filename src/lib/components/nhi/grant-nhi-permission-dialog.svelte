@@ -3,6 +3,7 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 
 	interface Props {
 		open: boolean;
@@ -42,9 +43,10 @@
 		let allowedActions: Record<string, unknown> | undefined;
 		if (allowedActionsJson.trim()) {
 			try {
-				allowedActions = JSON.parse(allowedActionsJson) as Record<string, unknown>;
-			} catch {
-				error = 'Invalid JSON for allowed actions';
+				allowedActions = parseJsonRecord(allowedActionsJson);
+			} catch (e) {
+				if (!isJsonParseError(e)) throw e;
+				error = 'Allowed actions must be a JSON object';
 				return;
 			}
 		}

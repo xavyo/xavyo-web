@@ -8,6 +8,7 @@
 	import type { LifecycleStateAction } from '$lib/api/types';
 	import { saveStateActions } from '$lib/api/lifecycle-client';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 
 	let {
 		configId,
@@ -44,11 +45,13 @@
 		exitActions = exitActions.filter((_, i) => i !== index);
 	}
 
-	function parseParams(json: string): Record<string, unknown> {
+	function parseParams(json: string): Record<string, unknown> | null {
 		try {
-			return JSON.parse(json) as Record<string, unknown>;
-		} catch {
-			return {};
+			return parseJsonRecord(json);
+		} catch (e) {
+			if (!isJsonParseError(e)) throw e;
+			error = 'Parameters must be a JSON object';
+			return null;
 		}
 	}
 
@@ -104,7 +107,13 @@
 							<textarea
 								class="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-mono"
 								value={stringifyParams(action.parameters)}
-								onchange={(e) => { action.parameters = parseParams((e.target as HTMLTextAreaElement).value); }}
+								onchange={(e) => {
+									const parsed = parseParams((e.target as HTMLTextAreaElement).value);
+									if (parsed) {
+										error = '';
+										action.parameters = parsed;
+									}
+								}}
 							></textarea>
 						</div>
 						<Button variant="ghost" size="sm" class="mt-6" onclick={() => removeEntryAction(i)}>
@@ -142,7 +151,13 @@
 							<textarea
 								class="flex min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-xs font-mono"
 								value={stringifyParams(action.parameters)}
-								onchange={(e) => { action.parameters = parseParams((e.target as HTMLTextAreaElement).value); }}
+								onchange={(e) => {
+									const parsed = parseParams((e.target as HTMLTextAreaElement).value);
+									if (parsed) {
+										error = '';
+										action.parameters = parsed;
+									}
+								}}
 							></textarea>
 						</div>
 						<Button variant="ghost" size="sm" class="mt-6" onclick={() => removeExitAction(i)}>

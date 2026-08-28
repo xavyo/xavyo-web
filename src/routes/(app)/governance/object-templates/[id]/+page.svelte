@@ -16,6 +16,7 @@
 	import RuleEditor from '$lib/components/object-templates/rule-editor.svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 	import {
 		deleteObjectTemplateClient,
 		activateObjectTemplateClient,
@@ -214,10 +215,14 @@
 		simError = null;
 		simResult = null;
 		try {
-			const sampleData = JSON.parse(sampleDataStr) as Record<string, unknown>;
+			const sampleData = parseJsonRecord(sampleDataStr);
 			simResult = await simulateTemplateClient(template.id, sampleData);
 		} catch (e) {
-			simError = e instanceof Error ? e.message : 'Simulation failed';
+			simError = isJsonParseError(e)
+				? 'Sample object must be a JSON object'
+				: e instanceof Error
+					? e.message
+					: 'Simulation failed';
 		} finally {
 			simLoading = false;
 		}

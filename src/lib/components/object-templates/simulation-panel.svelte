@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { TemplateSimulationResult } from '$lib/api/types';
+	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 
 	interface Props {
 		result?: TemplateSimulationResult | null;
@@ -16,9 +17,11 @@
 	function handleSimulate() {
 		jsonError = '';
 		try {
-			JSON.parse(sampleObjectInput);
-		} catch {
-			jsonError = 'Invalid JSON. Please check your input.';
+			parseJsonRecord(sampleObjectInput);
+		} catch (e) {
+			jsonError = isJsonParseError(e)
+				? 'Sample object must be a JSON object'
+				: 'Invalid JSON. Please check your input.';
 			return;
 		}
 		onsubmit?.(sampleObjectInput);
