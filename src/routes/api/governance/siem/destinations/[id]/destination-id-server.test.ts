@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { GET, PUT } from './+server';
-import { getSiemDestination, updateSiemDestination } from '$lib/api/siem';
+import { GET, PUT, DELETE } from './+server';
+import { getSiemDestination, updateSiemDestination, deleteSiemDestination } from '$lib/api/siem';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -89,5 +89,23 @@ describe('PUT /api/governance/siem/destinations/:id', () => {
 		const response = await PUT(makeEvent(JSON.stringify({ name: 'n', enabled: false })) as any);
 		expect(response.status).toBe(200);
 		expect(updateSiemDestination).toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/siem/destinations/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteSiemDestination).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'd1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteSiemDestination).toHaveBeenCalledWith('d1', TOKEN, TENANT, expect.any(Function));
 	});
 });

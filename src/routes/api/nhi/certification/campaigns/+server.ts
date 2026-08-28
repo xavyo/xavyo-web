@@ -2,7 +2,6 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listNhiCertCampaignsV2, createNhiCertCampaignV2 } from '$lib/api/nhi-cert-campaigns';
 import type { CreateNhiCertCampaignRequest } from '$lib/api/types';
-import { hasAdminRole } from '$lib/server/auth';
 import { listPagination } from '$lib/server/list-pagination';
 import { ApiError } from '$lib/api/client';
 
@@ -27,7 +26,6 @@ export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 
 export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (!hasAdminRole(locals.user?.roles)) return json({ error: 'Forbidden' }, { status: 403 });
 	let parsed: unknown;
 	try {
 		parsed = await request.json();

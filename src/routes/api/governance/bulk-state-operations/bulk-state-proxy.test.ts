@@ -127,11 +127,16 @@ describe('POST /api/governance/bulk-state-operations (create)', () => {
 		).rejects.toMatchObject({ status: 401 });
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(
-			POST(makeRequestEvent({ request: makeJsonRequest({}) }))
-		).rejects.toMatchObject({ status: 403 });
+		const body = {
+			transition_id: '11111111-1111-1111-1111-111111111111',
+			object_ids: ['u-1']
+		};
+		vi.mocked(createBulkStateOperation).mockResolvedValue({ id: 'bso-new', ...body } as any);
+		const response = await POST(makeRequestEvent({ request: makeJsonRequest(body) }));
+		expect(response.status).toBe(201);
+		expect(createBulkStateOperation).toHaveBeenCalled();
 	});
 
 	it('propagates API errors on create', async () => {
@@ -273,6 +278,14 @@ describe('POST /api/governance/bulk-state-operations/[id]/cancel', () => {
 			POST(makeRequestEvent({ params: { id: 'bso-1' } }))
 		).rejects.toThrow('Already completed');
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(cancelBulkStateOperation).mockResolvedValue({ id: 'bso-1', status: 'cancelled' } as any);
+		const response = await POST(makeRequestEvent({ params: { id: 'bso-1' } }));
+		expect(response.status).toBe(200);
+		expect(cancelBulkStateOperation).toHaveBeenCalled();
+	});
 });
 
 // =============================================================================
@@ -301,11 +314,12 @@ describe('POST /api/governance/bulk-state-operations/process', () => {
 		expect(processPendingBulkStateOperations).toHaveBeenCalledWith(TOKEN, TENANT, expect.any(Function));
 	});
 
-	it('returns 403 for non-admin', async () => {
+	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
-		await expect(
-			POST(makeRequestEvent())
-		).rejects.toMatchObject({ status: 403 });
+		vi.mocked(processPendingBulkStateOperations).mockResolvedValue({ processed: 2 });
+		const response = await POST(makeRequestEvent());
+		expect(response.status).toBe(200);
+		expect(processPendingBulkStateOperations).toHaveBeenCalled();
 	});
 
 	it('propagates processing errors', async () => {

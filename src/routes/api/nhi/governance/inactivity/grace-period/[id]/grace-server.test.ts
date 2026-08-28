@@ -60,4 +60,12 @@ describe('POST /api/nhi/governance/inactivity/grace-period/:id', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(grantGracePeriod).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(grantGracePeriod).mockResolvedValue(undefined as any);
+		const response = await POST(makeEvent(JSON.stringify({ grace_days: 14 })) as any);
+		expect(response.status).toBe(204);
+		expect(grantGracePeriod).toHaveBeenCalled();
+	});
 });

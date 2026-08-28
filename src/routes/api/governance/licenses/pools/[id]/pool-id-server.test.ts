@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { PUT } from './+server';
-import { updateLicensePool } from '$lib/api/licenses';
+import { PUT, DELETE } from './+server';
+import { updateLicensePool, deleteLicensePool } from '$lib/api/licenses';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -71,5 +71,23 @@ describe('PUT /api/governance/licenses/pools/:id', () => {
 		const response = await PUT(makeEvent(JSON.stringify({ name: 'Office 365' })) as any);
 		expect(response.status).toBe(200);
 		expect(updateLicensePool).toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/licenses/pools/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteLicensePool).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'p1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteLicensePool).toHaveBeenCalledWith('p1', TOKEN, TENANT, expect.any(Function));
 	});
 });

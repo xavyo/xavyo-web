@@ -324,4 +324,12 @@ describe('DELETE /api/governance/sla-policies/[id]', () => {
 			DELETE(makeRequestEvent({ params: { id: 'sla-1' } }))
 		).rejects.toThrow('Conflict');
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(deleteSlaPolicy).mockResolvedValue(undefined as any);
+		const response = await DELETE(makeRequestEvent({ params: { id: 'sla-1' } }));
+		expect(response.status).toBe(204);
+		expect(deleteSlaPolicy).toHaveBeenCalled();
+	});
 });

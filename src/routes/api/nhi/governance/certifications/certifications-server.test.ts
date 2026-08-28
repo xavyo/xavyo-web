@@ -92,4 +92,12 @@ describe('POST /api/nhi/governance/certifications', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(createNhiCertCampaign).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createNhiCertCampaign).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'Q1 review' })) as any);
+		expect(response.status).toBe(201);
+		expect(createNhiCertCampaign).toHaveBeenCalled();
+	});
 });

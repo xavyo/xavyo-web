@@ -10,8 +10,8 @@ vi.mock('$lib/api/federation', () => ({
 	deleteIdentityProvider: vi.fn()
 }));
 
-import { GET, PUT } from './+server';
-import { getIdentityProvider, updateIdentityProvider } from '$lib/api/federation';
+import { GET, PUT, DELETE } from './+server';
+import { getIdentityProvider, updateIdentityProvider, deleteIdentityProvider } from '$lib/api/federation';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -71,5 +71,31 @@ describe('PUT /api/federation/identity-providers/:id', () => {
 			PUT(makeEvent(JSON.stringify({ claim_mapping: [] })) as any)
 		).rejects.toMatchObject({ status: 400 });
 		expect(updateIdentityProvider).not.toHaveBeenCalled();
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(updateIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ name: 'okta' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateIdentityProvider).toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/federation/identity-providers/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(deleteIdentityProvider).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'idp-1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteIdentityProvider).toHaveBeenCalledWith('idp-1', TOKEN, TENANT, expect.any(Function));
 	});
 });

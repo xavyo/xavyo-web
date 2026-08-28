@@ -2,14 +2,10 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { deleteSecret } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(locals.user?.roles)) {
-		error(403, 'Admin role required');
 	}
 	try {
 		await deleteSecret(params.nhiId, params.secretId, locals.accessToken, locals.tenantId, fetch);
