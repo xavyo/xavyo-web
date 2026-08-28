@@ -41,7 +41,18 @@ function makeEvent(body: string) {
 describe('GET /api/governance/simulations/policy', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listPolicySimulations).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/simulations/policy')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listPolicySimulations).toHaveBeenCalled();
 	});
 
 	it('maps page/page_size onto limit/offset', async () => {

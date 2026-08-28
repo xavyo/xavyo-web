@@ -7,7 +7,6 @@ import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const simulation_type = url.searchParams.get('simulation_type') ?? undefined;

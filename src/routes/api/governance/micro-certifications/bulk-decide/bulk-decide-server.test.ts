@@ -1,23 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('$lib/server/auth', () => ({
-	hasAdminRole: vi.fn().mockReturnValue(true)
-}));
-
 vi.mock('$lib/api/micro-certifications', () => ({
 	bulkDecideMicroCertifications: vi.fn()
 }));
 
 import { POST } from './+server';
 import { bulkDecideMicroCertifications } from '$lib/api/micro-certifications';
-import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
 
 function makeEvent(body: string) {
 	return {
-		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+		locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
 		fetch: vi.fn(),
 		request: new Request('http://localhost/api/governance/micro-certifications/bulk-decide', {
 			method: 'POST',
@@ -30,7 +25,15 @@ function makeEvent(body: string) {
 describe('POST /api/governance/micro-certifications/bulk-decide', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(bulkDecideMicroCertifications).mockResolvedValue({ success_count: 1 } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ certification_ids: ['mc-1'], decision: 'approve' })) as any
+		);
+		expect(response.status).toBe(200);
+		expect(bulkDecideMicroCertifications).toHaveBeenCalled();
 	});
 
 	it('bulk-decides with required fields', async () => {

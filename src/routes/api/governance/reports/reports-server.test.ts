@@ -41,7 +41,17 @@ function makeEvent(body: string) {
 describe('GET /api/governance/reports', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(listReports).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/reports')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listReports).toHaveBeenCalled();
 	});
 
 	it('does not forward NaN pagination', async () => {

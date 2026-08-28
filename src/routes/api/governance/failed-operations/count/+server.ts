@@ -2,11 +2,9 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getFailedOperationCount } from '$lib/api/governance-operations';
 import { ApiError } from '$lib/api/client';
-import { hasAdminRole } from '$lib/server/auth';
 
 export const GET: RequestHandler = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const result = await getFailedOperationCount(locals.accessToken, locals.tenantId, fetch);

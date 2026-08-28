@@ -9,6 +9,7 @@ import type {
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 const TEMPLATE_TYPES = [
 	'access_review',
@@ -21,7 +22,6 @@ const COMPLIANCE_STANDARDS = ['sox', 'gdpr', 'hipaa', 'custom'] as const;
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const result = await listTemplates(
@@ -29,8 +29,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 				template_type: url.searchParams.get('template_type') ?? undefined,
 				compliance_standard: url.searchParams.get('compliance_standard') ?? undefined,
 				include_system: url.searchParams.get('include_system') === 'false' ? false : undefined,
-				limit: Number(url.searchParams.get('limit') ?? '50'),
-				offset: Number(url.searchParams.get('offset') ?? '0')
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

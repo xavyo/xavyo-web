@@ -8,21 +8,20 @@ import type {
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
+import { listPagination } from '$lib/server/list-pagination';
 
 const SCHEDULE_FREQUENCIES = ['daily', 'weekly', 'monthly'] as const;
 const OUTPUT_FORMATS = ['json', 'csv'] as const;
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 
 	try {
 		const result = await listSchedules(
 			{
 				template_id: url.searchParams.get('template_id') ?? undefined,
 				status: url.searchParams.get('status') ?? undefined,
-				limit: Number(url.searchParams.get('limit') ?? '50'),
-				offset: Number(url.searchParams.get('offset') ?? '0')
+				...listPagination(url)
 			},
 			locals.accessToken,
 			locals.tenantId,

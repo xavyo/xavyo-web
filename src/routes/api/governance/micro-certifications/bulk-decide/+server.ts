@@ -1,14 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { bulkDecideMicroCertifications } from '$lib/api/micro-certifications';
-import { hasAdminRole } from '$lib/server/auth';
 import type { BulkDecisionRequest, CertDecision } from '$lib/api/types';
 
 const DECISIONS = ['approve', 'revoke', 'reduce', 'delegate'] as const;
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Admin access required');
 
 	let parsed: unknown;
 	try {

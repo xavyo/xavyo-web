@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { hasAdminRole } from '$lib/server/auth';
 import { listCorrelationRules, createCorrelationRule } from '$lib/api/correlation';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -9,11 +10,9 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	const match_type = url.searchParams.get('match_type') ?? undefined;
 	const is_active = url.searchParams.has('is_active') ? url.searchParams.get('is_active') === 'true' : undefined;
 	const tier = url.searchParams.has('tier') ? Number(url.searchParams.get('tier')) : undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listCorrelationRules(
-		params.connectorId, { match_type, is_active, tier, limit, offset },
+		params.connectorId, { match_type, is_active, tier, ...listPagination(url) },
 		locals.accessToken, locals.tenantId, fetch
 	);
 	return json(result);

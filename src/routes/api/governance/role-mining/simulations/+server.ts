@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listSimulations, createSimulation } from '$lib/api/role-mining';
 import type { CreateSimulationRequest, ScenarioType, SimulationChanges } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const SCENARIO_TYPES = [
 	'add_entitlement',
@@ -18,11 +19,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const status = url.searchParams.get('status') || undefined;
 	const scenario_type = url.searchParams.get('scenario_type') || undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listSimulations(
-		{ status, scenario_type, limit, offset },
+		{ status, scenario_type, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
