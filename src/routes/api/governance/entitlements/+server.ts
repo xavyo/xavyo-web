@@ -7,6 +7,7 @@ import type {
 	LegalBasis,
 	RiskLevel
 } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const RISK_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
 const CLASSIFICATIONS = ['none', 'personal', 'sensitive', 'special_category'] as const;
@@ -24,14 +25,12 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
 	const status = url.searchParams.get('status') ?? undefined;
 	const risk_level = url.searchParams.get('risk_level') ?? undefined;
 	const classification = url.searchParams.get('classification') ?? undefined;
 
 	const result = await listEntitlements(
-		{ status, risk_level, classification, limit, offset },
+		{ status, risk_level, classification, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

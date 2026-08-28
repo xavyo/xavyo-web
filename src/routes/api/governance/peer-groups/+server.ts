@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listPeerGroups, createPeerGroup } from '$lib/api/peer-groups';
 import type { CreatePeerGroupRequest, PeerGroupType } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const GROUP_TYPES = ['department', 'role', 'location', 'custom'] as const;
 
@@ -10,9 +11,12 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const group_type = url.searchParams.get('group_type') ?? undefined;
 	const attribute_key = url.searchParams.get('attribute_key') ?? undefined;
 	const min_user_count = url.searchParams.get('min_user_count') ? Number(url.searchParams.get('min_user_count')) : undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const result = await listPeerGroups({ group_type, attribute_key, min_user_count, limit, offset }, locals.accessToken, locals.tenantId, fetch);
+	const result = await listPeerGroups(
+		{ group_type, attribute_key, min_user_count, ...listPagination(url) },
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 	return json(result);
 };
 

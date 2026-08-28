@@ -5,8 +5,8 @@ vi.mock('$lib/api/power-of-attorney', () => ({
 	grantPoa: vi.fn()
 }));
 
-import { POST } from './+server';
-import { grantPoa } from '$lib/api/power-of-attorney';
+import { GET, POST } from './+server';
+import { grantPoa, listPoa } from '$lib/api/power-of-attorney';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,28 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/power-of-attorney', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listPoa).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/power-of-attorney?page=2&page_size=8')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listPoa).toHaveBeenCalledWith(
+			expect.objectContaining({ limit: 8, offset: 8 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/power-of-attorney', () => {
 	beforeEach(() => {

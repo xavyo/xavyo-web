@@ -42,7 +42,16 @@ describe('BFF list endpoints honor finite pagination', () => {
 		'governance/object-templates/+server.ts',
 		'admin/webhooks/dlq/+server.ts',
 		'governance/risk/alerts/+server.ts',
-		'governance/sod-exemptions/+server.ts'
+		'governance/sod-exemptions/+server.ts',
+		'governance/entitlements/+server.ts',
+		'governance/applications/+server.ts',
+		'governance/peer-groups/+server.ts',
+		'governance/power-of-attorney/+server.ts',
+		'governance/manual-tasks/+server.ts',
+		'governance/approval-groups/+server.ts',
+		'connectors/+server.ts',
+		'risk/scores/+server.ts',
+		'nhi/governance/orphans/+server.ts'
 	];
 
 	it.each(files)('%s uses listPagination instead of Number()', (rel) => {

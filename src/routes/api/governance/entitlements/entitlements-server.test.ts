@@ -5,8 +5,8 @@ vi.mock('$lib/api/governance', () => ({
 	createEntitlement: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createEntitlement } from '$lib/api/governance';
+import { GET, POST } from './+server';
+import { createEntitlement, listEntitlements } from '$lib/api/governance';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,28 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/entitlements', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('maps page/page_size onto limit/offset', async () => {
+		vi.mocked(listEntitlements).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/entitlements?page=2&page_size=10')
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listEntitlements).toHaveBeenCalledWith(
+			expect.objectContaining({ limit: 10, offset: 10 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/entitlements', () => {
 	beforeEach(() => {

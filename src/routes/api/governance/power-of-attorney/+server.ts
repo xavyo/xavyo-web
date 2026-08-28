@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listPoa, grantPoa } from '$lib/api/power-of-attorney';
 import type { GrantPoaRequest, PoaScope } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,10 +11,13 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const direction = (url.searchParams.get('direction') ?? 'outgoing') as 'incoming' | 'outgoing';
 	const status = url.searchParams.get('status') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '20');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
-	const result = await listPoa({ direction, status, limit, offset }, locals.accessToken, locals.tenantId, fetch);
+	const result = await listPoa(
+		{ direction, status, ...listPagination(url) },
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 	return json(result);
 };
 

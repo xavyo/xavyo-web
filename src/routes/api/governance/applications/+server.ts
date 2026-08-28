@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listApplications, createApplication } from '$lib/api/governance';
 import type { AppType, CreateApplicationRequest } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const APP_TYPES = ['internal', 'external'] as const;
 
@@ -10,13 +11,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '100');
 	const status = url.searchParams.get('status') ?? undefined;
 	const app_type = url.searchParams.get('app_type') ?? undefined;
 
 	const result = await listApplications(
-		{ status, app_type, limit, offset },
+		{ status, app_type, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
