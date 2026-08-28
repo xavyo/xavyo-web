@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listLifecycleEvents, createLifecycleEvent } from '$lib/api/birthright';
 import type { CreateLifecycleEventRequest, LifecycleEventType } from '$lib/api/types';
+import { listPagination } from '$lib/server/list-pagination';
 
 const EVENT_TYPES = ['joiner', 'mover', 'leaver'] as const;
 
@@ -10,8 +11,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const offset = Number(url.searchParams.get('offset') ?? '0');
-	const limit = Number(url.searchParams.get('limit') ?? '20');
 	const user_id = url.searchParams.get('user_id') ?? undefined;
 	const event_type = url.searchParams.get('event_type') ?? undefined;
 	const from = url.searchParams.get('from') ?? undefined;
@@ -20,7 +19,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const processed = processedParam != null ? processedParam === 'true' : undefined;
 
 	const result = await listLifecycleEvents(
-		{ user_id, event_type, from, to, processed, limit, offset },
+		{ user_id, event_type, from, to, processed, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

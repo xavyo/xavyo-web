@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listMetaRoles, createMetaRole } from '$lib/api/meta-roles';
+import { listPagination } from '$lib/server/list-pagination';
 import type {
 	AddMetaRoleConstraintRequest,
 	AddMetaRoleCriterionRequest,
@@ -116,11 +117,9 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const status = url.searchParams.get('status') ?? undefined;
 	const name = url.searchParams.get('name') ?? undefined;
 	const created_by = url.searchParams.get('created_by') ?? undefined;
-	const limit = Number(url.searchParams.get('limit') ?? '50');
-	const offset = Number(url.searchParams.get('offset') ?? '0');
 
 	const result = await listMetaRoles(
-		{ status, name, created_by, limit, offset },
+		{ status, name, created_by, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

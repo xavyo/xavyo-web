@@ -10,8 +10,8 @@ vi.mock('$lib/api/micro-certifications', () => ({
 	deleteTriggerRule: vi.fn()
 }));
 
-import { PUT } from './+server';
-import { updateTriggerRule } from '$lib/api/micro-certifications';
+import { GET, PUT } from './+server';
+import { getTriggerRule, updateTriggerRule } from '$lib/api/micro-certifications';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -29,6 +29,23 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/micro-certifications/triggers/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('does not 403 a non-admin reviewer', async () => {
+		vi.mocked(getTriggerRule).mockResolvedValue({ id: 'tr1' } as any);
+		const response = await GET({
+			params: { id: 'tr1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(getTriggerRule).toHaveBeenCalledWith('tr1', TOKEN, TENANT, expect.any(Function));
+	});
+});
 
 describe('PUT /api/governance/micro-certifications/triggers/:id', () => {
 	beforeEach(() => {

@@ -25,7 +25,6 @@ const REVIEWER_TYPES = [
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Admin access required');
 
 	const result = await getTriggerRule(params.id, locals.accessToken, locals.tenantId, fetch);
 	return json(result);
