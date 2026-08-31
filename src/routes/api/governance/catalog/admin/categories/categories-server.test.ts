@@ -69,4 +69,12 @@ describe('POST /api/governance/catalog/admin/categories', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(adminCreateCategory).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(adminCreateCategory).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'Access' })) as any);
+		expect(response.status).toBe(201);
+		expect(adminCreateCategory).toHaveBeenCalled();
+	});
 });

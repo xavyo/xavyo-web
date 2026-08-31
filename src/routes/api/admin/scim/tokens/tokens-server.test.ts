@@ -79,4 +79,12 @@ describe('POST /api/admin/scim/tokens', () => {
 		expect(response.status).toBe(400);
 		expect(createScimToken).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createScimToken).mockResolvedValue({ id: 'tok-1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'Okta' })) as any);
+		expect(response.status).toBe(201);
+		expect(createScimToken).toHaveBeenCalled();
+	});
 });

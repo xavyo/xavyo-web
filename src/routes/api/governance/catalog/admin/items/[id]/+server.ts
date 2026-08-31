@@ -1,7 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminUpdateItem, adminDeleteItem } from '$lib/api/catalog';
-import { hasAdminRole } from '$lib/server/auth';
 import type {
 	CatalogItemType,
 	FormField,
@@ -13,7 +12,6 @@ const ITEM_TYPES = ['role', 'entitlement', 'resource'] as const;
 
 export const PUT: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	let parsed: unknown;
 	try {
 		parsed = await request.json();
@@ -84,7 +82,6 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 
 export const DELETE: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
-	if (!hasAdminRole(locals.user?.roles)) error(403, 'Forbidden');
 	await adminDeleteItem(params.id, locals.accessToken, locals.tenantId, fetch);
 	return new Response(null, { status: 204 });
 };

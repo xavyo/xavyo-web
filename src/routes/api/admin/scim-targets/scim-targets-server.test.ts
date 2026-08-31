@@ -91,4 +91,21 @@ describe('POST /api/admin/scim-targets', () => {
 		expect(response.status).toBe(400);
 		expect(createScimTarget).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(createScimTarget).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					base_url: 'https://ex',
+					auth_method: 'bearer',
+					credentials: { token: 't' }
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createScimTarget).toHaveBeenCalled();
+	});
 });
