@@ -9,8 +9,8 @@ vi.mock('$lib/api/catalog', () => ({
 	adminDeleteCategory: vi.fn()
 }));
 
-import { PUT } from './+server';
-import { adminUpdateCategory } from '$lib/api/catalog';
+import { DELETE, PUT } from './+server';
+import { adminDeleteCategory, adminUpdateCategory } from '$lib/api/catalog';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -52,5 +52,32 @@ describe('PUT /api/governance/catalog/admin/categories/:id', () => {
 			status: 400
 		});
 		expect(adminUpdateCategory).not.toHaveBeenCalled();
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(adminUpdateCategory).mockResolvedValue({ id: 'c1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ name: 'Access' })) as any);
+		expect(response.status).toBe(200);
+		expect(adminUpdateCategory).toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/governance/catalog/admin/categories/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(adminDeleteCategory).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 'c1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(adminDeleteCategory).toHaveBeenCalled();
 	});
 });

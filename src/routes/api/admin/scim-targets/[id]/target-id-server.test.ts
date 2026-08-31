@@ -20,8 +20,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { GET, PUT } from './+server';
-import { getScimTarget, updateScimTarget } from '$lib/api/scim-targets';
+import { DELETE, GET, PUT } from './+server';
+import { deleteScimTarget, getScimTarget, updateScimTarget } from '$lib/api/scim-targets';
 import { hasAdminRole } from '$lib/server/auth';
 
 const TOKEN = 'tok';
@@ -81,5 +81,32 @@ describe('PUT /api/admin/scim-targets/:id', () => {
 		const response = await PUT(makeEvent(JSON.stringify({ name: '' })) as any);
 		expect(response.status).toBe(400);
 		expect(updateScimTarget).not.toHaveBeenCalled();
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(updateScimTarget).mockResolvedValue({ id: 's1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ name: 'n' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateScimTarget).toHaveBeenCalled();
+	});
+});
+
+describe('DELETE /api/admin/scim-targets/:id', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(deleteScimTarget).mockResolvedValue(undefined as any);
+		const response = await DELETE({
+			params: { id: 's1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(204);
+		expect(deleteScimTarget).toHaveBeenCalled();
 	});
 });
