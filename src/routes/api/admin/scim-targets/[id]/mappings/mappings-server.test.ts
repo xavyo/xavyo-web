@@ -95,4 +95,25 @@ describe('PUT /api/admin/scim-targets/:id/mappings', () => {
 		expect(response.status).toBe(400);
 		expect(replaceScimTargetMappings).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(replaceScimTargetMappings).mockResolvedValue({ mappings: [], total_count: 0 } as any);
+		const response = await PUT(
+			makeEvent(
+				JSON.stringify({
+					mappings: [
+						{
+							source_field: 'email',
+							target_scim_path: 'userName',
+							mapping_type: 'direct',
+							resource_type: 'User'
+						}
+					]
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(replaceScimTargetMappings).toHaveBeenCalled();
+	});
 });

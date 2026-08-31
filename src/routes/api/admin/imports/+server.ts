@@ -1,6 +1,5 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { hasAdminRole } from '$lib/server/auth';
 import { listImportJobs, uploadImport } from '$lib/api/imports';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
@@ -25,9 +24,6 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 export const POST: RequestHandler = async (event) => {
 	if (!event.locals.accessToken || !event.locals.tenantId) {
 		error(401, 'Unauthorized');
-	}
-	if (!hasAdminRole(event.locals.user?.roles)) {
-		error(403, 'Forbidden');
 	}
 
 	try {
