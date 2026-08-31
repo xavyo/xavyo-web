@@ -52,4 +52,12 @@ describe('POST /api/governance/power-of-attorney/admin/:id/revoke', () => {
 		});
 		expect(adminRevokePoa).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(adminRevokePoa).mockResolvedValue({ id: 'p1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ reason: 'policy' })) as any);
+		expect(response.status).toBe(200);
+		expect(adminRevokePoa).toHaveBeenCalled();
+	});
 });

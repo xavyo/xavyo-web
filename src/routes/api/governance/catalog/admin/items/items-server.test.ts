@@ -73,4 +73,14 @@ describe('POST /api/governance/catalog/admin/items', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(adminCreateItem).not.toHaveBeenCalled();
 	});
+
+	it('does not 403 a non-admin JWT user', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(false);
+		vi.mocked(adminCreateItem).mockResolvedValue({ id: 'i1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'Admin role', item_type: 'role' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(adminCreateItem).toHaveBeenCalled();
+	});
 });
