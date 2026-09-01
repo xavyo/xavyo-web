@@ -80,6 +80,13 @@ describe('PUT /api/federation/saml/service-providers/:id', () => {
 		expect(response.status).toBe(200);
 		expect(updateServiceProvider).toHaveBeenCalled();
 	});
+
+	it('rejects NaN assertion_validity_seconds instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ assertion_validity_seconds: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateServiceProvider).not.toHaveBeenCalled();
+	});
 });
 
 describe('DELETE /api/federation/saml/service-providers/:id', () => {

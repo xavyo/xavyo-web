@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { getRiskThreshold, updateRiskThreshold, deleteRiskThreshold } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
 import type { UpdateRiskThresholdRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -39,10 +40,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			data.name = body.name;
 		}
 		if (body.score_value !== undefined) {
-			if (typeof body.score_value !== 'number') {
-				error(400, 'score_value must be a number');
+			try {
+				data.score_value = requireFiniteNumber(body.score_value, 'score_value');
+			} catch (e) {
+				if (e instanceof JsonObjectError) error(400, e.message);
+				throw e;
 			}
-			data.score_value = body.score_value;
 		}
 		if (body.severity !== undefined) {
 			if (body.severity !== 'info' && body.severity !== 'warning' && body.severity !== 'critical') {
@@ -57,10 +60,17 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			data.action = body.action;
 		}
 		if (body.cooldown_hours !== undefined) {
-			if (typeof body.cooldown_hours !== 'number') {
-				error(400, 'cooldown_hours must be a number');
+			try {
+				data.cooldown_hours = parseBoundedInteger(
+					body.cooldown_hours,
+					0,
+					8760,
+					'cooldown_hours'
+				);
+			} catch (e) {
+				if (e instanceof JsonObjectError) error(400, e.message);
+				throw e;
 			}
-			data.cooldown_hours = body.cooldown_hours;
 		}
 		if (body.is_enabled !== undefined) {
 			if (typeof body.is_enabled !== 'boolean') {

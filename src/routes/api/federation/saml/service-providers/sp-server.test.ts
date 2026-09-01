@@ -94,4 +94,20 @@ describe('POST /api/federation/saml/service-providers', () => {
 		expect(response.status).toBe(201);
 		expect(createServiceProvider).toHaveBeenCalled();
 	});
+
+	it('rejects NaN assertion_validity_seconds instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'app',
+						entity_id: 'https://ex',
+						acs_urls: ['https://ex/acs'],
+						assertion_validity_seconds: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createServiceProvider).not.toHaveBeenCalled();
+	});
 });

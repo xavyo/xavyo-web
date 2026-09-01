@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { getRiskFactor, updateRiskFactor, deleteRiskFactor } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
 import type { UpdateRiskFactorRequest } from '$lib/api/types';
+import { JsonObjectError, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -51,10 +52,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			data.factor_type = body.factor_type;
 		}
 		if (body.weight !== undefined) {
-			if (typeof body.weight !== 'number') {
-				error(400, 'weight must be a number');
+			try {
+				data.weight = requireFiniteNumber(body.weight, 'weight');
+			} catch (e) {
+				if (e instanceof JsonObjectError) error(400, e.message);
+				throw e;
 			}
-			data.weight = body.weight;
 		}
 		if (body.description !== undefined) {
 			if (typeof body.description !== 'string') {

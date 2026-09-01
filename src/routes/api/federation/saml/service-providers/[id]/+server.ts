@@ -6,6 +6,7 @@ import {
 	deleteServiceProvider
 } from '$lib/api/federation';
 import type { UpdateServiceProviderRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -90,10 +91,17 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.validate_signatures = body.validate_signatures;
 	}
 	if (body.assertion_validity_seconds !== undefined) {
-		if (typeof body.assertion_validity_seconds !== 'number') {
-			error(400, 'assertion_validity_seconds must be a number');
+		try {
+			data.assertion_validity_seconds = parseBoundedInteger(
+				body.assertion_validity_seconds,
+				1,
+				31_536_000,
+				'assertion_validity_seconds'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.assertion_validity_seconds = body.assertion_validity_seconds;
 	}
 	if (body.enabled !== undefined) {
 		if (typeof body.enabled !== 'boolean') {
