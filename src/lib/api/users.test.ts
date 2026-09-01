@@ -66,6 +66,22 @@ describe('users API functions', () => {
 				fetch: mockFetch
 			});
 		});
+
+		it('includes is_active filter in query string', async () => {
+			mockApiClient.mockResolvedValue({
+				users: [],
+				pagination: { total_count: 0, offset: 0, limit: 20, has_more: false }
+			});
+
+			await listUsers({ is_active: false }, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/admin/users?is_active=false', {
+				method: 'GET',
+				token,
+				tenantId,
+				fetch: mockFetch
+			});
+		});
 	});
 
 	describe('createUser', () => {

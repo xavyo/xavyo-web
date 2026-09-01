@@ -28,6 +28,7 @@ export async function fetchAccessRequests(
 		status?: AccessRequestStatus;
 		requester_id?: string;
 		entitlement_id?: string;
+		has_sod_warning?: boolean;
 		limit?: number;
 		offset?: number;
 	} = {},
@@ -37,6 +38,7 @@ export async function fetchAccessRequests(
 		status: params.status,
 		requester_id: params.requester_id,
 		entitlement_id: params.entitlement_id,
+		has_sod_warning: params.has_sod_warning,
 		limit: params.limit,
 		offset: params.offset
 	});

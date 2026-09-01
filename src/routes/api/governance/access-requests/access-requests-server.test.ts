@@ -24,7 +24,27 @@ describe('GET /api/governance/access-requests', () => {
 			url: new URL('http://localhost/api/governance/access-requests?page=3&page_size=10')
 		} as any);
 		expect(listAccessRequests).toHaveBeenCalledWith(
-			{ status: undefined, entitlement_id: undefined, limit: 10, offset: 20 },
+			{
+				status: undefined,
+				entitlement_id: undefined,
+				has_sod_warning: undefined,
+				limit: 10,
+				offset: 20
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised has_sod_warning filter', async () => {
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/access-requests?has_sod_warning=true')
+		} as any);
+		expect(listAccessRequests).toHaveBeenCalledWith(
+			expect.objectContaining({ has_sod_warning: true }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

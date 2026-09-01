@@ -9,9 +9,15 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const email = url.searchParams.get('email') ?? undefined;
+	const is_active =
+		url.searchParams.get('is_active') === 'true'
+			? true
+			: url.searchParams.get('is_active') === 'false'
+				? false
+				: undefined;
 
 	const result = await listUsers(
-		{ email, ...listPagination(url) },
+		{ email, is_active, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

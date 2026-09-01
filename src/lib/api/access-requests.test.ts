@@ -101,6 +101,22 @@ describe('access-requests API functions', () => {
 			);
 		});
 
+		it('includes has_sod_warning filter in query string', async () => {
+			mockApiClient.mockResolvedValue(mockListResponse);
+
+			await listAccessRequests({ has_sod_warning: true }, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/access-requests?has_sod_warning=true',
+				{
+					method: 'GET',
+					token,
+					tenantId,
+					fetch: mockFetch
+				}
+			);
+		});
+
 		it('includes limit and offset in query string', async () => {
 			mockApiClient.mockResolvedValue(mockListResponse);
 

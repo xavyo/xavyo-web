@@ -13,6 +13,7 @@ import type {
 export interface ListAccessRequestsParams {
 	status?: string;
 	entitlement_id?: string;
+	has_sod_warning?: boolean;
 	limit?: number;
 	offset?: number;
 }
@@ -24,7 +25,7 @@ export interface ListMyApprovalsParams {
 
 // Helper
 
-function buildSearchParams(params: Record<string, string | number | undefined>): string {
+function buildSearchParams(params: Record<string, string | number | boolean | undefined>): string {
 	const searchParams = new URLSearchParams();
 	for (const [key, value] of Object.entries(params)) {
 		if (value !== undefined && value !== '') {
@@ -45,6 +46,7 @@ export async function listAccessRequests(
 	const query = buildSearchParams({
 		status: params.status,
 		entitlement_id: params.entitlement_id,
+		has_sod_warning: params.has_sod_warning,
 		limit: params.limit,
 		offset: params.offset
 	});

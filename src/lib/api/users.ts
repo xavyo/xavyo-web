@@ -10,6 +10,7 @@ export interface ListUsersParams {
 	offset?: number;
 	limit?: number;
 	email?: string;
+	is_active?: boolean;
 }
 
 export async function listUsers(
@@ -22,6 +23,7 @@ export async function listUsers(
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.email) searchParams.set('email', params.email);
+	if (params.is_active !== undefined) searchParams.set('is_active', String(params.is_active));
 
 	const query = searchParams.toString();
 	const endpoint = `/admin/users${query ? `?${query}` : ''}`;

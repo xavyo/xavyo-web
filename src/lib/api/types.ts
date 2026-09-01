@@ -1987,6 +1987,7 @@ export interface CreateGovernanceRoleRequest {
 	description?: string;
 	parent_role_id?: string;
 	application_id?: string;
+	is_abstract?: boolean;
 }
 
 export interface UpdateGovernanceRoleRequest {

@@ -30,6 +30,10 @@ import type {
 export interface ListRolesParams {
 	limit?: number;
 	offset?: number;
+	parent_role_id?: string;
+	is_abstract?: boolean;
+	name?: string;
+	application_id?: string;
 }
 
 // --- Helper ---
@@ -55,7 +59,11 @@ export async function listRoles(
 ): Promise<GovernanceRoleListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		parent_role_id: params.parent_role_id,
+		is_abstract: params.is_abstract,
+		name: params.name,
+		application_id: params.application_id
 	});
 	return apiClient<GovernanceRoleListResponse>(`/governance/roles${qs}`, {
 		method: 'GET',

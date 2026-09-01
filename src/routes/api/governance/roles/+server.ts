@@ -9,7 +9,25 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
-	const result = await listRoles(listPagination(url), locals.accessToken, locals.tenantId, fetch);
+	const is_abstract =
+		url.searchParams.get('is_abstract') === 'true'
+			? true
+			: url.searchParams.get('is_abstract') === 'false'
+				? false
+				: undefined;
+
+	const result = await listRoles(
+		{
+			parent_role_id: url.searchParams.get('parent_role_id') ?? undefined,
+			is_abstract,
+			name: url.searchParams.get('name') ?? undefined,
+			application_id: url.searchParams.get('application_id') ?? undefined,
+			...listPagination(url)
+		},
+		locals.accessToken,
+		locals.tenantId,
+		fetch
+	);
 
 	return json(result);
 };
@@ -50,6 +68,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			error(400, 'application_id must be a string');
 		}
 		data.application_id = body.application_id;
+	}
+	if (body.is_abstract !== undefined) {
+		if (typeof body.is_abstract !== 'boolean') {
+			error(400, 'is_abstract must be a boolean');
+		}
+		data.is_abstract = body.is_abstract;
 	}
 	const result = await createRole(data, locals.accessToken, locals.tenantId, fetch);
 

@@ -11,9 +11,15 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const status = url.searchParams.get('status') ?? undefined;
 	const entitlement_id = url.searchParams.get('entitlement_id') ?? undefined;
+	const has_sod_warning =
+		url.searchParams.get('has_sod_warning') === 'true'
+			? true
+			: url.searchParams.get('has_sod_warning') === 'false'
+				? false
+				: undefined;
 
 	const result = await listAccessRequests(
-		{ status, entitlement_id, ...listPagination(url) },
+		{ status, entitlement_id, has_sod_warning, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

@@ -40,10 +40,24 @@ function buildSearchParams(params: Record<string, string | number | boolean | un
 // --- Role CRUD ---
 
 export async function fetchRoles(
-	params: { limit?: number; offset?: number } = {},
+	params: {
+		limit?: number;
+		offset?: number;
+		parent_role_id?: string;
+		is_abstract?: boolean;
+		name?: string;
+		application_id?: string;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<GovernanceRoleListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		parent_role_id: params.parent_role_id,
+		is_abstract: params.is_abstract,
+		name: params.name,
+		application_id: params.application_id
+	});
 	const res = await fetchFn(`/api/governance/roles${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch roles: ${res.status}`);
 	return res.json();
