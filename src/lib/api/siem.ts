@@ -149,6 +149,8 @@ export async function getSiemHealthSummary(
 }
 
 export interface ListSiemHealthHistoryParams {
+	from?: string;
+	to?: string;
 	limit?: number;
 	offset?: number;
 }
@@ -161,6 +163,8 @@ export async function getSiemHealthHistory(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<SiemDeliveryHealthListResponse> {
 	const qs = buildSearchParams({
+		from: params.from,
+		to: params.to,
 		limit: params.limit,
 		offset: params.offset
 	});

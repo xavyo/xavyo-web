@@ -14,6 +14,7 @@ import type {
 export interface PaginationParams {
 	limit?: number;
 	offset?: number;
+	permission_type?: string;
 }
 
 function buildSearchParams(params: Record<string, string | number | boolean | undefined>): string {
@@ -140,7 +141,11 @@ export async function listCallers(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<PaginatedPermissionResponse<NhiNhiPermission>> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		permission_type: params.permission_type
+	});
 	return apiClient<PaginatedPermissionResponse<NhiNhiPermission>>(`/nhi/${id}/callers${qs}`, {
 		method: 'GET',
 		token,
@@ -156,7 +161,11 @@ export async function listCallees(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<PaginatedPermissionResponse<NhiNhiPermission>> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		permission_type: params.permission_type
+	});
 	return apiClient<PaginatedPermissionResponse<NhiNhiPermission>>(`/nhi/${id}/callees${qs}`, {
 		method: 'GET',
 		token,
@@ -208,7 +217,11 @@ export async function listNhiUsers(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<PaginatedPermissionResponse<NhiUserPermission>> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		permission_type: params.permission_type
+	});
 	return apiClient<PaginatedPermissionResponse<NhiUserPermission>>(`/nhi/${id}/users${qs}`, {
 		method: 'GET',
 		token,

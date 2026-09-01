@@ -138,6 +138,24 @@ describe('NHI Governance API', () => {
 			expect(calledPath).toContain('/governance/orphan-detections');
 			expect(result.items).toHaveLength(1);
 		});
+
+		it('forwards advertised orphan filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+			await listOrphanDetections(token, tenantId, mockFetch, {
+				reason: 'no_owner',
+				run_id: 'run-1',
+				user_id: 'user-1',
+				since: '2026-01-01T00:00:00Z',
+				until: '2026-01-31T00:00:00Z'
+			});
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('reason')).toBe('no_owner');
+			expect(params.get('run_id')).toBe('run-1');
+			expect(params.get('user_id')).toBe('user-1');
+			expect(params.get('since')).toBe('2026-01-01T00:00:00Z');
+			expect(params.get('until')).toBe('2026-01-31T00:00:00Z');
+		});
 	});
 
 	// --- SoD Rules ---

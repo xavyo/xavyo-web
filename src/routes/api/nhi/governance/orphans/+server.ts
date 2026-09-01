@@ -10,6 +10,11 @@ export const GET: RequestHandler = async ({ locals, fetch, url }) => {
 	}
 
 	const status = url.searchParams.get('status');
+	const reason = url.searchParams.get('reason');
+	const run_id = url.searchParams.get('run_id');
+	const user_id = url.searchParams.get('user_id');
+	const since = url.searchParams.get('since');
+	const until = url.searchParams.get('until');
 
 	try {
 		const result = await listOrphanDetections(
@@ -18,7 +23,12 @@ export const GET: RequestHandler = async ({ locals, fetch, url }) => {
 			fetch,
 			{
 				...listPagination(url),
-				status: status ?? undefined
+				status: status ?? undefined,
+				reason: reason ?? undefined,
+				run_id: run_id ?? undefined,
+				user_id: user_id ?? undefined,
+				since: since ?? undefined,
+				until: until ?? undefined
 			}
 		);
 		return json(result);

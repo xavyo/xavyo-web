@@ -96,7 +96,13 @@ describe('GET /api/governance/bulk-actions (list)', () => {
 		const data = await response.json();
 		expect(data).toEqual(mockData);
 		expect(listBulkActions).toHaveBeenCalledWith(
-			{ status: undefined, action_type: undefined, limit: undefined, offset: undefined },
+			{
+				status: undefined,
+				action_type: undefined,
+				created_by: undefined,
+				limit: undefined,
+				offset: undefined
+			},
 			TOKEN,
 			TENANT,
 			expect.any(Function)
@@ -111,7 +117,28 @@ describe('GET /api/governance/bulk-actions (list)', () => {
 			})
 		);
 		expect(listBulkActions).toHaveBeenCalledWith(
-			{ status: undefined, action_type: undefined, limit: 10, offset: 10 },
+			{
+				status: undefined,
+				action_type: undefined,
+				created_by: undefined,
+				limit: 10,
+				offset: 10
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised created_by', async () => {
+		vi.mocked(listBulkActions).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL('http://localhost/api/governance/bulk-actions?created_by=user-1')
+			})
+		);
+		expect(listBulkActions).toHaveBeenCalledWith(
+			expect.objectContaining({ created_by: 'user-1' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

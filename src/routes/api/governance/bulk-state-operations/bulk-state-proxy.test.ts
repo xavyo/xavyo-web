@@ -184,7 +184,30 @@ describe('GET /api/governance/bulk-state-operations (list)', () => {
 			})
 		);
 		expect(listBulkStateOperations).toHaveBeenCalledWith(
-			{ status: undefined, transition_id: undefined, limit: 8, offset: 8 },
+			{
+				status: undefined,
+				transition_id: undefined,
+				requested_by: undefined,
+				limit: 8,
+				offset: 8
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised requested_by', async () => {
+		vi.mocked(listBulkStateOperations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(
+			makeRequestEvent({
+				url: new URL(
+					'http://localhost/api/governance/bulk-state-operations?requested_by=user-9'
+				)
+			})
+		);
+		expect(listBulkStateOperations).toHaveBeenCalledWith(
+			expect.objectContaining({ requested_by: 'user-9' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

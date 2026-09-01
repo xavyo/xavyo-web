@@ -184,6 +184,7 @@ export async function listBulkActions(
 	params: {
 		status?: string;
 		action_type?: string;
+		created_by?: string;
 		limit?: number;
 		offset?: number;
 	},
@@ -194,6 +195,7 @@ export async function listBulkActions(
 	const searchParams = new URLSearchParams();
 	if (params.status) searchParams.set('status', params.status);
 	if (params.action_type) searchParams.set('action_type', params.action_type);
+	if (params.created_by) searchParams.set('created_by', params.created_by);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -369,6 +371,7 @@ export async function listBulkStateOperations(
 	params: {
 		status?: string;
 		transition_id?: string;
+		requested_by?: string;
 		limit?: number;
 		offset?: number;
 	},
@@ -379,6 +382,7 @@ export async function listBulkStateOperations(
 	const searchParams = new URLSearchParams();
 	if (params.status) searchParams.set('status', params.status);
 	if (params.transition_id) searchParams.set('transition_id', params.transition_id);
+	if (params.requested_by) searchParams.set('requested_by', params.requested_by);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

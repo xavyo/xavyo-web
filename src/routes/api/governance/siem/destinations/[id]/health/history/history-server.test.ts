@@ -62,4 +62,26 @@ describe('GET /api/governance/siem/destinations/:id/health/history', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('forwards advertised from and to', async () => {
+		vi.mocked(getSiemHealthHistory).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			params: { id: 'd1' },
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/siem/destinations/d1/health/history?from=2026-01-01T00:00:00Z&to=2026-01-31T00:00:00Z'
+			)
+		} as any);
+		expect(getSiemHealthHistory).toHaveBeenCalledWith(
+			'd1',
+			expect.objectContaining({
+				from: '2026-01-01T00:00:00Z',
+				to: '2026-01-31T00:00:00Z'
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });

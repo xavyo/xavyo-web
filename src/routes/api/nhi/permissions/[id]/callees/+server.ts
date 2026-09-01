@@ -12,7 +12,10 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	try {
 		const result = await listCallees(
 			params.id,
-			listPagination(url),
+			{
+				permission_type: url.searchParams.get('permission_type') ?? undefined,
+				...listPagination(url)
+			},
 			locals.accessToken,
 			locals.tenantId,
 			fetch
