@@ -43,6 +43,8 @@ export const updateIdentityProviderSchema = z.object({
 	sync_on_login: z.boolean().optional()
 });
 
+const groupValueFormat = z.enum(['name', 'id', 'dn']);
+
 export const createServiceProviderSchema = z.object({
 	name: z.string().min(1, 'Name is required').max(255),
 	entity_id: z.string().min(1, 'Entity ID is required').max(1000),
@@ -55,7 +57,13 @@ export const createServiceProviderSchema = z.object({
 	assertion_validity_seconds: z.coerce.number().int().min(60).max(86400).optional().default(300),
 	metadata_url: z.string().url('Must be a valid URL').optional(),
 	slo_url: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
-	slo_binding: z.string().optional()
+	slo_binding: z.string().optional(),
+	group_attribute_name: z.string().max(256).optional(),
+	group_value_format: groupValueFormat.optional(),
+	group_filter: z.union([z.literal(''), validJsonString]).optional(),
+	include_groups: z.boolean().optional().default(true),
+	omit_empty_groups: z.boolean().optional().default(true),
+	group_dn_base: z.string().max(512).optional()
 });
 
 export const updateServiceProviderSchema = z.object({
@@ -71,7 +79,13 @@ export const updateServiceProviderSchema = z.object({
 	metadata_url: z.string().url('Must be a valid URL').optional(),
 	slo_url: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
 	slo_binding: z.string().optional(),
-	enabled: z.boolean().optional()
+	enabled: z.boolean().optional(),
+	group_attribute_name: z.string().max(256).optional(),
+	group_value_format: groupValueFormat.optional(),
+	group_filter: z.union([z.literal(''), validJsonString]).optional(),
+	include_groups: z.boolean().optional(),
+	omit_empty_groups: z.boolean().optional(),
+	group_dn_base: z.string().max(512).optional()
 });
 
 export const uploadCertificateSchema = z.object({

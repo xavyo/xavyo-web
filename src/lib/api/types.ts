@@ -781,6 +781,21 @@ export interface ValidationResult {
 
 // SAML Service Provider
 
+export interface SpGroupFilter {
+	filter_type: string;
+	patterns?: string[];
+	allowlist?: string[];
+}
+
+export interface SpGroupConfig {
+	attribute_name: string;
+	value_format: string;
+	filter?: SpGroupFilter | null;
+	include_groups: boolean;
+	omit_empty_groups: boolean;
+	dn_base?: string | null;
+}
+
 export interface ServiceProvider {
 	id: string;
 	name: string;
@@ -796,6 +811,12 @@ export interface ServiceProvider {
 	metadata_url: string | null;
 	slo_url: string | null;
 	slo_binding: string;
+	group_attribute_name?: string | null;
+	group_value_format?: string;
+	group_filter?: Record<string, unknown> | null;
+	include_groups?: boolean;
+	omit_empty_groups?: boolean;
+	group_dn_base?: string | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -820,6 +841,13 @@ export interface CreateServiceProviderRequest {
 	metadata_url?: string;
 	slo_url?: string;
 	slo_binding?: string;
+	group_config?: SpGroupConfig;
+	group_attribute_name?: string;
+	group_value_format?: string;
+	group_filter?: Record<string, unknown>;
+	include_groups?: boolean;
+	omit_empty_groups?: boolean;
+	group_dn_base?: string;
 }
 
 export interface UpdateServiceProviderRequest {
@@ -836,6 +864,13 @@ export interface UpdateServiceProviderRequest {
 	metadata_url?: string;
 	slo_url?: string;
 	slo_binding?: string;
+	group_config?: SpGroupConfig;
+	group_attribute_name?: string;
+	group_value_format?: string;
+	group_filter?: Record<string, unknown>;
+	include_groups?: boolean;
+	omit_empty_groups?: boolean;
+	group_dn_base?: string;
 }
 
 // --- SAML SLO ---
