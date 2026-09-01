@@ -3,7 +3,8 @@ import type { RequestHandler } from './$types';
 import { getScimTarget, updateScimTarget, deleteScimTarget } from '$lib/api/scim-targets';
 import { ApiError } from '$lib/api/client';
 import type { UpdateScimTargetRequest } from '$lib/api/types';
-import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
+import { applyScimTargetAdvertisedFields } from '$lib/server/scim-target-fields';
+import { JsonObjectError } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -62,57 +63,13 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			}
 			data.credentials = body.credentials as UpdateScimTargetRequest['credentials'];
 		}
-		if (body.deprovisioning_strategy !== undefined) {
-			if (body.deprovisioning_strategy !== 'deactivate' && body.deprovisioning_strategy !== 'delete') {
-				return json({ error: 'deprovisioning_strategy must be deactivate or delete' }, { status: 400 });
+		try {
+			applyScimTargetAdvertisedFields(body, data);
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
 			}
-			data.deprovisioning_strategy = body.deprovisioning_strategy;
-		}
-		if (body.tls_verify !== undefined) {
-			if (typeof body.tls_verify !== 'boolean') {
-				return json({ error: 'tls_verify must be a boolean' }, { status: 400 });
-			}
-			data.tls_verify = body.tls_verify;
-		}
-		if (body.rate_limit_per_minute !== undefined) {
-			try {
-				data.rate_limit_per_minute = parseBoundedInteger(
-					body.rate_limit_per_minute,
-					1,
-					1_000_000,
-					'rate_limit_per_minute'
-				);
-			} catch (e) {
-				if (e instanceof JsonObjectError) {
-					return json({ error: e.message }, { status: 400 });
-				}
-				throw e;
-			}
-		}
-		if (body.request_timeout_secs !== undefined) {
-			try {
-				data.request_timeout_secs = parseBoundedInteger(
-					body.request_timeout_secs,
-					1,
-					3600,
-					'request_timeout_secs'
-				);
-			} catch (e) {
-				if (e instanceof JsonObjectError) {
-					return json({ error: e.message }, { status: 400 });
-				}
-				throw e;
-			}
-		}
-		if (body.max_retries !== undefined) {
-			try {
-				data.max_retries = parseBoundedInteger(body.max_retries, 0, 100, 'max_retries');
-			} catch (e) {
-				if (e instanceof JsonObjectError) {
-					return json({ error: e.message }, { status: 400 });
-				}
-				throw e;
-			}
+			throw e;
 		}
 		const result = await updateScimTarget(params.id, data, locals.accessToken, locals.tenantId, fetch);
 		return json(result);

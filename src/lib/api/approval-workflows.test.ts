@@ -82,6 +82,22 @@ describe('Approval Workflows API — Workflows', () => {
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
 		});
+
+		it('includes is_active and is_default filters in query string', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listApprovalWorkflows(
+				{ is_active: true, is_default: false },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('is_active')).toBe('true');
+			expect(params.get('is_default')).toBe('false');
+		});
 	});
 
 	describe('createApprovalWorkflow', () => {

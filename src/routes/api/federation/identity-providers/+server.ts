@@ -63,6 +63,11 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (body.sync_on_login !== undefined && typeof body.sync_on_login !== 'boolean') {
 		error(400, 'sync_on_login must be a boolean');
 	}
+	if (body.domains !== undefined) {
+		if (!Array.isArray(body.domains) || !body.domains.every((d) => typeof d === 'string')) {
+			error(400, 'domains must be an array of strings');
+		}
+	}
 	const result = await createIdentityProvider(
 		{
 			name: body.name,
@@ -72,7 +77,8 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			client_secret: body.client_secret,
 			scopes: typeof body.scopes === 'string' ? body.scopes : undefined,
 			claim_mapping,
-			sync_on_login: typeof body.sync_on_login === 'boolean' ? body.sync_on_login : undefined
+			sync_on_login: typeof body.sync_on_login === 'boolean' ? body.sync_on_login : undefined,
+			domains: Array.isArray(body.domains) ? (body.domains as string[]) : undefined
 		},
 		locals.accessToken,
 		locals.tenantId,

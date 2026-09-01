@@ -4,6 +4,8 @@ import { listScimTargets, createScimTarget } from '$lib/api/scim-targets';
 import { ApiError } from '$lib/api/client';
 import type { CreateScimTargetRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { applyScimTargetAdvertisedFields } from '$lib/server/scim-target-fields';
+import { JsonObjectError } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -56,13 +58,22 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		if (!body.credentials || typeof body.credentials !== 'object' || Array.isArray(body.credentials)) {
 			return json({ error: 'credentials is required' }, { status: 400 });
 		}
+		const data: CreateScimTargetRequest = {
+			name: body.name,
+			base_url: body.base_url,
+			auth_method: body.auth_method,
+			credentials: body.credentials as CreateScimTargetRequest['credentials']
+		};
+		try {
+			applyScimTargetAdvertisedFields(body, data);
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
+			}
+			throw e;
+		}
 		const result = await createScimTarget(
-			{
-				name: body.name,
-				base_url: body.base_url,
-				auth_method: body.auth_method,
-				credentials: body.credentials as CreateScimTargetRequest['credentials']
-			},
+			data,
 			locals.accessToken,
 			locals.tenantId,
 			fetch

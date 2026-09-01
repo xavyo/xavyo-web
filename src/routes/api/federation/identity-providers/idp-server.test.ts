@@ -100,6 +100,29 @@ describe('POST /api/federation/identity-providers', () => {
 		expect(createIdentityProvider).toHaveBeenCalled();
 	});
 
+	it('forwards advertised domains', async () => {
+		vi.mocked(createIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'okta',
+					provider_type: 'oidc',
+					issuer_url: 'https://ex',
+					client_id: 'id',
+					client_secret: 'sec',
+					domains: ['acme.com', 'acme.io']
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createIdentityProvider).toHaveBeenCalledWith(
+			expect.objectContaining({ domains: ['acme.com', 'acme.io'] }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('forwards advertised claim_mapping and sync_on_login', async () => {
 		vi.mocked(createIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
 		const response = await POST(

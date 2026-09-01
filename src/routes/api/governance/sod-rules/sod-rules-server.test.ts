@@ -71,6 +71,28 @@ describe('POST /api/governance/sod-rules', () => {
 		expect(createSodRule).toHaveBeenCalled();
 	});
 
+	it('forwards advertised business_rationale', async () => {
+		vi.mocked(createSodRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					first_entitlement_id: 'e1',
+					second_entitlement_id: 'e2',
+					severity: 'high',
+					business_rationale: 'sox dual control'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSodRule).toHaveBeenCalledWith(
+			expect.objectContaining({ business_rationale: 'sox dual control' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(createSodRule).not.toHaveBeenCalled();

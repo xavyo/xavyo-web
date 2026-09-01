@@ -37,6 +37,8 @@ function buildSearchParams(params: Record<string, string | number | boolean | un
 // --- Approval Workflows ---
 
 export interface ListWorkflowsParams {
+	is_active?: boolean;
+	is_default?: boolean;
 	limit?: number;
 	offset?: number;
 }
@@ -47,7 +49,12 @@ export async function listApprovalWorkflows(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<ApprovalWorkflowListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		is_active: params.is_active,
+		is_default: params.is_default,
+		limit: params.limit,
+		offset: params.offset
+	});
 	return apiClient<ApprovalWorkflowListResponse>(`/governance/approval-workflows${qs}`, {
 		method: 'GET',
 		token,

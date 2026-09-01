@@ -108,4 +108,52 @@ describe('POST /api/admin/scim-targets', () => {
 		expect(response.status).toBe(201);
 		expect(createScimTarget).toHaveBeenCalled();
 	});
+
+	it('forwards advertised delivery and TLS fields', async () => {
+		vi.mocked(createScimTarget).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					base_url: 'https://ex',
+					auth_method: 'bearer',
+					credentials: { token: 't' },
+					deprovisioning_strategy: 'delete',
+					tls_verify: false,
+					rate_limit_per_minute: 120,
+					request_timeout_secs: 45,
+					max_retries: 3
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createScimTarget).toHaveBeenCalledWith(
+			expect.objectContaining({
+				deprovisioning_strategy: 'delete',
+				tls_verify: false,
+				rate_limit_per_minute: 120,
+				request_timeout_secs: 45,
+				max_retries: 3
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN rate_limit_per_minute instead of dropping it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					base_url: 'https://ex',
+					auth_method: 'bearer',
+					credentials: { token: 't' },
+					rate_limit_per_minute: Number.NaN
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createScimTarget).not.toHaveBeenCalled();
+	});
 });
