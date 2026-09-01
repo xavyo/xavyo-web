@@ -26,6 +26,7 @@ export async function fetchManualTasks(
 		user_id?: string;
 		sla_breached?: boolean;
 		assignee_id?: string;
+		operation?: string;
 		limit?: number;
 		offset?: number;
 	} = {},
@@ -37,6 +38,7 @@ export async function fetchManualTasks(
 		user_id: params.user_id,
 		sla_breached: params.sla_breached,
 		assignee_id: params.assignee_id,
+		operation: params.operation,
 		limit: params.limit,
 		offset: params.offset
 	});

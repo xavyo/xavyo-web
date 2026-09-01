@@ -115,6 +115,20 @@ describe('Ticketing Edit +page.server', () => {
 			expect(result.form.data.is_active).toBe(true);
 		});
 
+		it('pre-fills advertised field_mappings from the API response', async () => {
+			mockGetTicketingConfig.mockResolvedValue({
+				...mockConfig,
+				field_mappings: { priority: '1' }
+			} as any);
+			const result = (await load({
+				params: { id: 'tc1' },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any)) as any;
+
+			expect(result.form.data.field_mappings).toBe(JSON.stringify({ priority: '1' }));
+		});
+
 		it('throws error when config not found', async () => {
 			mockGetTicketingConfig.mockRejectedValue(new ApiError('Not found', 404));
 			await expect(

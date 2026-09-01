@@ -103,6 +103,7 @@ describe('Manual tasks +page.server', () => {
 					user_id: undefined,
 					sla_breached: undefined,
 					assignee_id: undefined,
+					operation: undefined,
 					limit: 20,
 					offset: 0
 				},

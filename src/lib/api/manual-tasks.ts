@@ -2,6 +2,7 @@ import { apiClient } from './client';
 import type {
 	ManualTask,
 	ManualTaskListResponse,
+	ManualTaskAuditListResponse,
 	ManualTaskDashboard,
 	ConfirmTaskRequest,
 	RejectTaskRequest
@@ -14,6 +15,7 @@ export async function listManualTasks(
 		user_id?: string;
 		sla_breached?: boolean;
 		assignee_id?: string;
+		operation?: string;
 		limit?: number;
 		offset?: number;
 	},
@@ -27,6 +29,7 @@ export async function listManualTasks(
 	if (params.user_id) searchParams.set('user_id', params.user_id);
 	if (params.sla_breached !== undefined) searchParams.set('sla_breached', String(params.sla_breached));
 	if (params.assignee_id) searchParams.set('assignee_id', params.assignee_id);
+	if (params.operation) searchParams.set('operation', params.operation);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -139,4 +142,38 @@ export async function cancelTask(
 		tenantId,
 		fetch: fetchFn
 	});
+}
+
+export async function listManualTaskAudit(
+	params: {
+		task_id?: string;
+		event_type?: string;
+		actor_id?: string;
+		from_date?: string;
+		to_date?: string;
+		limit?: number;
+		offset?: number;
+	},
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof fetch
+): Promise<ManualTaskAuditListResponse> {
+	const searchParams = new URLSearchParams();
+	if (params.task_id) searchParams.set('task_id', params.task_id);
+	if (params.event_type) searchParams.set('event_type', params.event_type);
+	if (params.actor_id) searchParams.set('actor_id', params.actor_id);
+	if (params.from_date) searchParams.set('from_date', params.from_date);
+	if (params.to_date) searchParams.set('to_date', params.to_date);
+	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
+	const qs = searchParams.toString();
+	return apiClient<ManualTaskAuditListResponse>(
+		`/governance/manual-tasks/audit${qs ? `?${qs}` : ''}`,
+		{
+			method: 'GET',
+			token,
+			tenantId,
+			fetch: fetchFn
+		}
+	);
 }

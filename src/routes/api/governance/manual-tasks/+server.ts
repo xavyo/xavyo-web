@@ -11,9 +11,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const user_id = url.searchParams.get('user_id') ?? undefined;
 	const sla_breached = url.searchParams.get('sla_breached') === 'true' ? true : url.searchParams.get('sla_breached') === 'false' ? false : undefined;
 	const assignee_id = url.searchParams.get('assignee_id') ?? undefined;
+	const operation = url.searchParams.get('operation') ?? undefined;
 
 	const result = await listManualTasks(
-		{ status, application_id, user_id, sla_breached, assignee_id, ...listPagination(url) },
+		{ status, application_id, user_id, sla_breached, assignee_id, operation, ...listPagination(url) },
 		locals.accessToken, locals.tenantId, fetch
 	);
 	return json(result);

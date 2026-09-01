@@ -16,6 +16,7 @@ const mockApiClient = vi.mocked(apiClient);
 
 import {
 	listManualTasks,
+	listManualTaskAudit,
 	getManualTask,
 	getManualTaskDashboard,
 	claimTask,
@@ -104,6 +105,15 @@ describe('manual-tasks API', () => {
 			expect(calledPath).toContain('assignee_id=assignee-1');
 		});
 
+		it('includes advertised operation query param', async () => {
+			mockApiClient.mockResolvedValue({} as any);
+
+			await listManualTasks({ operation: 'grant' }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('operation=grant');
+		});
+
 		it('includes limit and offset query params', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
@@ -140,6 +150,39 @@ describe('manual-tasks API', () => {
 			expect(calledPath).toContain('assignee_id=assignee-2');
 			expect(calledPath).toContain('limit=50');
 			expect(calledPath).toContain('offset=100');
+		});
+	});
+
+	describe('listManualTaskAudit', () => {
+		it('calls GET /governance/manual-tasks/audit with advertised filters', async () => {
+			const mockResponse = { items: [], total: 0, limit: 50, offset: 0 };
+			mockApiClient.mockResolvedValue(mockResponse);
+
+			const result = await listManualTaskAudit(
+				{
+					task_id: 'task-1',
+					event_type: 'task_created',
+					actor_id: 'user-1',
+					from_date: '2026-01-01T00:00:00Z',
+					to_date: '2026-01-31T23:59:59Z',
+					limit: 20,
+					offset: 5
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('/governance/manual-tasks/audit?');
+			expect(calledPath).toContain('task_id=task-1');
+			expect(calledPath).toContain('event_type=task_created');
+			expect(calledPath).toContain('actor_id=user-1');
+			expect(calledPath).toContain('from_date=2026-01-01T00%3A00%3A00Z');
+			expect(calledPath).toContain('to_date=2026-01-31T23%3A59%3A59Z');
+			expect(calledPath).toContain('limit=20');
+			expect(calledPath).toContain('offset=5');
+			expect(result).toEqual(mockResponse);
 		});
 	});
 

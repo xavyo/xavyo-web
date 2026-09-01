@@ -16,6 +16,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			{
 				name: config.name,
 				endpoint_url: config.endpoint_url,
+				field_mappings:
+					config.field_mappings === undefined || config.field_mappings === null
+						? undefined
+						: typeof config.field_mappings === 'string'
+							? config.field_mappings
+							: JSON.stringify(config.field_mappings),
 				default_assignee: config.default_assignee ?? undefined,
 				default_assignment_group: config.default_assignment_group ?? undefined,
 				project_key: config.project_key ?? undefined,
