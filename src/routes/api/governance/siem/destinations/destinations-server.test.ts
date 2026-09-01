@@ -64,6 +64,23 @@ describe('GET /api/governance/siem/destinations', () => {
 		} as any);
 		expect(listSiemDestinations).toHaveBeenCalledWith({}, TOKEN, TENANT, expect.any(Function));
 	});
+
+	it('forwards advertised destination_type filter', async () => {
+		vi.mocked(listSiemDestinations).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/siem/destinations?destination_type=splunk_hec'
+			)
+		} as any);
+		expect(listSiemDestinations).toHaveBeenCalledWith(
+			{ destination_type: 'splunk_hec' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
 
 describe('POST /api/governance/siem/destinations', () => {
@@ -161,5 +178,65 @@ describe('POST /api/governance/siem/destinations', () => {
 		);
 		expect(response.status).toBe(201);
 		expect(createSiemDestination).toHaveBeenCalled();
+	});
+
+	it('forwards advertised destination config fields', async () => {
+		vi.mocked(createSiemDestination).mockResolvedValue({ id: 'd1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'splunk',
+					destination_type: 'splunk_hec',
+					endpoint_host: 'siem.example',
+					export_format: 'json',
+					auth_config_b64: 'YWI=',
+					rate_limit_per_second: 250,
+					queue_buffer_size: 5000,
+					circuit_breaker_threshold: 7,
+					circuit_breaker_cooldown_secs: 90,
+					splunk_source: 'xavyo',
+					splunk_sourcetype: '_json',
+					splunk_index: 'main',
+					splunk_ack_enabled: true,
+					syslog_facility: 14,
+					tls_verify_cert: false
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSiemDestination).toHaveBeenCalledWith(
+			expect.objectContaining({
+				auth_config_b64: 'YWI=',
+				rate_limit_per_second: 250,
+				queue_buffer_size: 5000,
+				circuit_breaker_threshold: 7,
+				circuit_breaker_cooldown_secs: 90,
+				splunk_source: 'xavyo',
+				splunk_sourcetype: '_json',
+				splunk_index: 'main',
+				splunk_ack_enabled: true,
+				syslog_facility: 14,
+				tls_verify_cert: false
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN rate_limit_per_second instead of dropping it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'splunk',
+					destination_type: 'splunk_hec',
+					endpoint_host: 'siem.example',
+					export_format: 'json',
+					rate_limit_per_second: Number.NaN
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createSiemDestination).not.toHaveBeenCalled();
 	});
 });

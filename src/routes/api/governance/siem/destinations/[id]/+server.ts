@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getSiemDestination, updateSiemDestination, deleteSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
+import { applySiemDestinationAdvertisedFields } from '$lib/server/siem-destination-fields';
 import type { EventCategory, UpdateSiemDestinationRequest } from '$lib/api/types';
 import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
@@ -93,6 +94,14 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 				return json({ error: 'enabled must be a boolean' }, { status: 400 });
 			}
 			data.enabled = body.enabled;
+		}
+		try {
+			applySiemDestinationAdvertisedFields(body, data);
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
+			}
+			throw e;
 		}
 		const result = await updateSiemDestination(
 			params.id,
