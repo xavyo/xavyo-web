@@ -4,6 +4,7 @@ import { listSlaPolicies, createSlaPolicy } from '$lib/api/governance-operations
 import type { CreateSlaPolicyRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -50,14 +51,27 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		if (typeof body.name !== 'string' || body.name.length === 0) {
 			error(400, 'name is required');
 		}
-		if (typeof body.target_duration_seconds !== 'number') {
-			error(400, 'target_duration_seconds is required');
+		let targetDuration: number;
+		let warningPercent: number;
+		try {
+			targetDuration = parseBoundedInteger(
+				body.target_duration_seconds,
+				60,
+				604800,
+				'target_duration_seconds'
+			);
+			warningPercent =
+				body.warning_threshold_percent === undefined
+					? 75
+					: parseBoundedInteger(body.warning_threshold_percent, 1, 100, 'warning_threshold_percent');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
 		const data: CreateSlaPolicyRequest = {
 			name: body.name,
-			target_duration_seconds: body.target_duration_seconds,
-			warning_threshold_percent:
-				typeof body.warning_threshold_percent === 'number' ? body.warning_threshold_percent : 75,
+			target_duration_seconds: targetDuration,
+			warning_threshold_percent: warningPercent,
 			breach_notification_enabled:
 				typeof body.breach_notification_enabled === 'boolean'
 					? body.breach_notification_enabled
@@ -68,12 +82,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				error(400, 'description must be a string');
 			}
 			data.description = body.description;
-		}
-		if (body.warning_threshold_percent !== undefined) {
-			if (typeof body.warning_threshold_percent !== 'number') {
-				error(400, 'warning_threshold_percent must be a number');
-			}
-			data.warning_threshold_percent = body.warning_threshold_percent;
 		}
 		if (body.breach_notification_enabled !== undefined) {
 			if (typeof body.breach_notification_enabled !== 'boolean') {

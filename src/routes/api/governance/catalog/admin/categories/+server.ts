@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { adminListCategories, adminCreateCategory } from '$lib/api/catalog';
 import type { CreateCategoryRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -46,10 +47,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.icon = body.icon;
 	}
 	if (body.display_order !== undefined) {
-		if (typeof body.display_order !== 'number') {
-			error(400, 'display_order must be a number');
+		try {
+			data.display_order = parseBoundedInteger(body.display_order, 0, 1_000_000, 'display_order');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.display_order = body.display_order;
 	}
 	const result = await adminCreateCategory(data, locals.accessToken, locals.tenantId, fetch);
 	return json(result, { status: 201 });

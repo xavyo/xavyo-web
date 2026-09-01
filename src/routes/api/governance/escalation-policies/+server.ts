@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listEscalationPolicies, createEscalationPolicy } from '$lib/api/approval-workflows';
 import type { CreateEscalationPolicyRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -37,8 +38,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (typeof body.name !== 'string' || body.name.length === 0) {
 		error(400, 'name is required');
 	}
-	if (typeof body.default_timeout_secs !== 'number') {
-		error(400, 'default_timeout_secs is required');
+	let defaultTimeout: number;
+	try {
+		defaultTimeout = parseBoundedInteger(body.default_timeout_secs, 60, 31_536_000, 'default_timeout_secs');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (
 		body.final_fallback !== 'escalate_admin' &&
@@ -50,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 	const data: CreateEscalationPolicyRequest = {
 		name: body.name,
-		default_timeout_secs: body.default_timeout_secs,
+		default_timeout_secs: defaultTimeout,
 		final_fallback: body.final_fallback
 	};
 	if (body.description !== undefined) {
@@ -60,10 +65,17 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.description = body.description;
 	}
 	if (body.warning_threshold_secs !== undefined) {
-		if (typeof body.warning_threshold_secs !== 'number') {
-			error(400, 'warning_threshold_secs must be a number');
+		try {
+			data.warning_threshold_secs = parseBoundedInteger(
+				body.warning_threshold_secs,
+				60,
+				31_536_000,
+				'warning_threshold_secs'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.warning_threshold_secs = body.warning_threshold_secs;
 	}
 	const result = await createEscalationPolicy(data, locals.accessToken, locals.tenantId, fetch);
 

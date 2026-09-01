@@ -65,6 +65,25 @@ describe('POST /api/governance/catalog/admin/categories', () => {
 		expect(adminCreateCategory).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string display_order', async () => {
+		vi.mocked(adminCreateCategory).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'Access', display_order: '3' })) as any);
+		expect(response.status).toBe(201);
+		expect(adminCreateCategory).toHaveBeenCalledWith(
+			expect.objectContaining({ display_order: 3 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN display_order instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ name: 'Access', display_order: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(adminCreateCategory).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(adminCreateCategory).not.toHaveBeenCalled();
