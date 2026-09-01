@@ -28,7 +28,7 @@ export async function listCategoriesClient(
 }
 
 export async function listCatalogItemsClient(
-	params: { category_id?: string; item_type?: string; search?: string; tag?: string; beneficiary_id?: string; limit?: number; offset?: number } = {},
+	params: { category_id?: string; item_type?: string; search?: string; tag?: string; beneficiary_id?: string; enabled?: boolean; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<CatalogItemListResponse> {
 	const qs = buildQs(params);

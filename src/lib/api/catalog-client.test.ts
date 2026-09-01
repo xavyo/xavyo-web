@@ -88,7 +88,7 @@ describe('catalog-client', () => {
 			const { listCatalogItemsClient } = await import('./catalog-client');
 
 			await listCatalogItemsClient(
-				{ category_id: 'cat-1', item_type: 'role', search: 'admin', tag: 'core', beneficiary_id: 'user-1', limit: 10, offset: 5 },
+				{ category_id: 'cat-1', item_type: 'role', search: 'admin', tag: 'core', beneficiary_id: 'user-1', enabled: false, limit: 10, offset: 5 },
 				mockFetch
 			);
 
@@ -98,6 +98,7 @@ describe('catalog-client', () => {
 			expect(calledUrl).toContain('search=admin');
 			expect(calledUrl).toContain('tag=core');
 			expect(calledUrl).toContain('beneficiary_id=user-1');
+			expect(calledUrl).toContain('enabled=false');
 			expect(calledUrl).toContain('limit=10');
 			expect(calledUrl).toContain('offset=5');
 		});

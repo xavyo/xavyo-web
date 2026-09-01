@@ -10,8 +10,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const search = url.searchParams.get('search') ?? undefined;
 	const tag = url.searchParams.get('tag') ?? undefined;
 	const beneficiary_id = url.searchParams.get('beneficiary_id') ?? undefined;
+	const enabledParam = url.searchParams.get('enabled');
+	const enabled = enabledParam === 'true' ? true : enabledParam === 'false' ? false : undefined;
 	const result = await listCatalogItems(
-		{ category_id, item_type, search, tag, beneficiary_id, ...listPagination(url) },
+		{ category_id, item_type, search, tag, beneficiary_id, enabled, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
