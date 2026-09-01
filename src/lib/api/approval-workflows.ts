@@ -282,6 +282,7 @@ export async function removeGroupMembers(
 export interface ListEscalationPoliciesParams {
 	limit?: number;
 	offset?: number;
+	is_active?: boolean;
 }
 
 export async function listEscalationPolicies(
@@ -290,7 +291,11 @@ export async function listEscalationPolicies(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<EscalationPolicyListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		is_active: params.is_active
+	});
 	return apiClient<EscalationPolicyListResponse>(`/governance/escalation-policies${qs}`, {
 		method: 'GET',
 		token,

@@ -36,7 +36,22 @@ describe('GET /api/admin/authorization/mappings', () => {
 			url: new URL('http://localhost/api/admin/authorization/mappings?limit=abc&offset=nope')
 		} as any);
 		expect(listMappings).toHaveBeenCalledWith(
-			{ limit: undefined, offset: undefined },
+			{ entitlement_id: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised entitlement_id filter', async () => {
+		vi.mocked(listMappings).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/authorization/mappings?entitlement_id=ent-1')
+		} as any);
+		expect(listMappings).toHaveBeenCalledWith(
+			expect.objectContaining({ entitlement_id: 'ent-1' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

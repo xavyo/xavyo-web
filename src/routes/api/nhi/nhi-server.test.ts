@@ -23,7 +23,27 @@ describe('GET /api/nhi', () => {
 			url: new URL('http://localhost/api/nhi?page=4&page_size=5')
 		} as any);
 		expect(listNhi).toHaveBeenCalledWith(
-			{ offset: 15, limit: 5, nhi_type: undefined, lifecycle_state: undefined },
+			{
+				offset: 15,
+				limit: 5,
+				nhi_type: undefined,
+				lifecycle_state: undefined,
+				owner_id: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised owner_id filter', async () => {
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/nhi?owner_id=user-9')
+		} as any);
+		expect(listNhi).toHaveBeenCalledWith(
+			expect.objectContaining({ owner_id: 'user-9' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

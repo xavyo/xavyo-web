@@ -14,11 +14,14 @@ import type {
 export interface ListPoliciesParams {
 	limit?: number;
 	offset?: number;
+	status?: string;
+	effect?: string;
 }
 
 export interface ListMappingsParams {
 	limit?: number;
 	offset?: number;
+	entitlement_id?: string;
 }
 
 export interface CheckAuthorizationParams {
@@ -47,7 +50,9 @@ export async function listPolicies(
 ): Promise<PolicyListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		status: params.status,
+		effect: params.effect
 	});
 	return apiClient<PolicyListResponse>(`/admin/authorization/policies${qs}`, {
 		method: 'GET',
@@ -124,7 +129,8 @@ export async function listMappings(
 ): Promise<MappingListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		entitlement_id: params.entitlement_id
 	});
 	return apiClient<MappingListResponse>(`/admin/authorization/mappings${qs}`, {
 		method: 'GET',
