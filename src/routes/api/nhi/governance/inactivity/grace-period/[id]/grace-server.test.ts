@@ -61,6 +61,20 @@ describe('POST /api/nhi/governance/inactivity/grace-period/:id', () => {
 		expect(grantGracePeriod).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string grace_days', async () => {
+		vi.mocked(grantGracePeriod).mockResolvedValue(undefined as any);
+		const response = await POST(makeEvent(JSON.stringify({ grace_days: '14' })) as any);
+		expect(response.status).toBe(204);
+		expect(grantGracePeriod).toHaveBeenCalledWith('n1', 14, TOKEN, TENANT, expect.any(Function));
+	});
+
+	it('rejects NaN grace_days instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ grace_days: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(grantGracePeriod).not.toHaveBeenCalled();
+	});
+
 	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(grantGracePeriod).mockResolvedValue(undefined as any);

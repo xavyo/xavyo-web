@@ -76,4 +76,41 @@ describe('POST /api/governance/detection-rules', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createDetectionRule).not.toHaveBeenCalled();
 	});
+
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(createDetectionRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					rule_type: 'inactive',
+					is_enabled: true,
+					priority: '4'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createDetectionRule).toHaveBeenCalledWith(
+			expect.objectContaining({ priority: 4 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'n',
+						rule_type: 'inactive',
+						is_enabled: true,
+						priority: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createDetectionRule).not.toHaveBeenCalled();
+	});
 });

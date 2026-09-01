@@ -7,6 +7,7 @@ import type {
 	CreateIdentityCorrelationRuleRequest
 } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 const MATCH_TYPES = ['exact', 'fuzzy', 'expression'] as const;
 const ALGORITHMS = ['levenshtein', 'jaro_winkler'] as const;
@@ -46,22 +47,24 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!MATCH_TYPES.includes(body.match_type as (typeof MATCH_TYPES)[number])) {
 		error(400, 'match_type is required');
 	}
-	if (typeof body.threshold !== 'number') {
-		error(400, 'threshold is required');
-	}
-	if (typeof body.weight !== 'number') {
-		error(400, 'weight is required');
-	}
-	if (typeof body.priority !== 'number') {
-		error(400, 'priority is required');
+	let threshold: number;
+	let weight: number;
+	let priority: number;
+	try {
+		threshold = requireFiniteNumber(body.threshold, 'threshold');
+		weight = requireFiniteNumber(body.weight, 'weight');
+		priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	const data: CreateIdentityCorrelationRuleRequest = {
 		name: body.name,
 		attribute: body.attribute,
 		match_type: body.match_type as CorrelationMatchType,
-		threshold: body.threshold,
-		weight: body.weight,
-		priority: body.priority
+		threshold,
+		weight,
+		priority
 	};
 	if (body.algorithm !== undefined) {
 		if (!ALGORITHMS.includes(body.algorithm as (typeof ALGORITHMS)[number])) {

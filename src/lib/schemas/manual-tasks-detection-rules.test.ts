@@ -280,6 +280,30 @@ describe('createDetectionRuleSchema', () => {
 		expect(result.success).toBe(false);
 	});
 
+	it('coerces FormData string priority and days_threshold', () => {
+		const result = createDetectionRuleSchema.safeParse({
+			...validInput,
+			priority: '3',
+			days_threshold: '14'
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.priority).toBe(3);
+			expect(result.data.days_threshold).toBe(14);
+		}
+	});
+
+	it('treats empty days_threshold as omitted', () => {
+		const result = createDetectionRuleSchema.safeParse({
+			...validInput,
+			days_threshold: ''
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.days_threshold).toBeUndefined();
+		}
+	});
+
 	it('rejects days_threshold of 0', () => {
 		const result = createDetectionRuleSchema.safeParse({
 			...validInput,
@@ -421,6 +445,18 @@ describe('updateDetectionRuleSchema', () => {
 		expect(result.success).toBe(false);
 		if (!result.success) {
 			expect(result.error.issues[0].message).toBe('Description must be 500 characters or less');
+		}
+	});
+
+	it('coerces FormData string priority and days_threshold', () => {
+		const result = updateDetectionRuleSchema.safeParse({
+			priority: '5',
+			days_threshold: '90'
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.priority).toBe(5);
+			expect(result.data.days_threshold).toBe(90);
 		}
 	});
 });
