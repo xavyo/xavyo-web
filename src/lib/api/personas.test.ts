@@ -264,6 +264,26 @@ describe('personas API — personas', () => {
 			});
 			expect(result).toEqual(mockResponse);
 		});
+
+		it('forwards advertised valid_from and valid_until', async () => {
+			const data = {
+				archetype_id: 'arch-1',
+				physical_user_id: 'user-1',
+				valid_from: '2026-01-01T00:00:00Z',
+				valid_until: '2026-12-31T00:00:00Z'
+			};
+			mockApiClient.mockResolvedValue({ id: 'persona-1' });
+
+			await createPersona(data, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/personas', {
+				method: 'POST',
+				body: data,
+				token,
+				tenantId,
+				fetch: mockFetch
+			});
+		});
 	});
 
 	describe('getPersona', () => {

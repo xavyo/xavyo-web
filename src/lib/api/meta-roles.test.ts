@@ -111,6 +111,26 @@ describe('Meta-Roles API — CRUD', () => {
 			});
 			expect(result).toEqual(mockResponse);
 		});
+
+		it('forwards advertised entitlements and constraints', async () => {
+			const data = {
+				name: 'Auto Finance',
+				priority: 10,
+				entitlements: [{ entitlement_id: 'e1', permission_type: 'grant' as const }],
+				constraints: [{ constraint_type: 'require_mfa', constraint_value: { required: true } }]
+			};
+			mockApiClient.mockResolvedValue({ id: META_ROLE_ID });
+
+			await createMetaRole(data, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/meta-roles', {
+				method: 'POST',
+				body: data,
+				token,
+				tenantId,
+				fetch: mockFetch
+			});
+		});
 	});
 
 	describe('getMetaRole', () => {

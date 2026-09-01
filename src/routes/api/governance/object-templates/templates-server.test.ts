@@ -99,4 +99,33 @@ describe('POST /api/governance/object-templates', () => {
 		expect(response.status).toBe(201);
 		expect(createObjectTemplate).toHaveBeenCalled();
 	});
+
+	it('forwards advertised rules and scopes', async () => {
+		vi.mocked(createObjectTemplate).mockResolvedValue({ id: 't1' } as any);
+		const rules = [
+			{
+				rule_type: 'default',
+				target_attribute: 'department',
+				expression: '"eng"'
+			}
+		];
+		const scopes = [{ scope_type: 'all' }];
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'User Template',
+					object_type: 'user',
+					rules,
+					scopes
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createObjectTemplate).toHaveBeenCalledWith(
+			expect.objectContaining({ rules, scopes }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
