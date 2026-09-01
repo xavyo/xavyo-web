@@ -93,4 +93,21 @@ describe('POST /api/provisioning-scripts/bindings', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createHookBinding).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN execution_order instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						script_id: 's1',
+						connector_id: 'c1',
+						hook_phase: 'before',
+						operation_type: 'create',
+						execution_order: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createHookBinding).not.toHaveBeenCalled();
+	});
 });

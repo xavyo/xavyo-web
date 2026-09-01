@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { rollbackScript } from '$lib/api/provisioning-scripts';
 import type { RollbackScriptRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -18,10 +19,14 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(400, 'Invalid JSON body');
 	}
 	const body = parsed as Record<string, unknown>;
-	if (typeof body.target_version !== 'number') {
-		error(400, 'target_version is required');
+	let target_version: number;
+	try {
+		target_version = parseBoundedInteger(body.target_version, 1, 1_000_000, 'target_version');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
-	const data: RollbackScriptRequest = { target_version: body.target_version };
+	const data: RollbackScriptRequest = { target_version };
 	if (body.reason !== undefined) {
 		if (typeof body.reason !== 'string') {
 			error(400, 'reason must be a string');

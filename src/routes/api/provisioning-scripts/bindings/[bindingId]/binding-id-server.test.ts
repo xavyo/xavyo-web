@@ -48,4 +48,11 @@ describe('PUT /api/provisioning-scripts/bindings/:bindingId', () => {
 		});
 		expect(updateHookBinding).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN execution_order instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ execution_order: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateHookBinding).not.toHaveBeenCalled();
+	});
 });

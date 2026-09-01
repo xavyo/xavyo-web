@@ -95,4 +95,22 @@ describe('POST /api/operations', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(triggerOperation).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						connector_id: 'c1',
+						user_id: 'u1',
+						operation_type: 'create',
+						object_class: 'user',
+						payload: { mail: 'a@b.c' },
+						priority: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(triggerOperation).not.toHaveBeenCalled();
+	});
 });

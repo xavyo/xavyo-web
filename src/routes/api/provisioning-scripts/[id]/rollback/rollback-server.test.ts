@@ -44,4 +44,11 @@ describe('POST /api/provisioning-scripts/:id/rollback', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(rollbackScript).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN target_version instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ target_version: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(rollbackScript).not.toHaveBeenCalled();
+	});
 });

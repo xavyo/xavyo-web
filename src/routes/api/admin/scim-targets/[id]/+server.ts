@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { getScimTarget, updateScimTarget, deleteScimTarget } from '$lib/api/scim-targets';
 import { ApiError } from '$lib/api/client';
 import type { UpdateScimTargetRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -74,22 +75,44 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			data.tls_verify = body.tls_verify;
 		}
 		if (body.rate_limit_per_minute !== undefined) {
-			if (typeof body.rate_limit_per_minute !== 'number') {
-				return json({ error: 'rate_limit_per_minute must be a number' }, { status: 400 });
+			try {
+				data.rate_limit_per_minute = parseBoundedInteger(
+					body.rate_limit_per_minute,
+					1,
+					1_000_000,
+					'rate_limit_per_minute'
+				);
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.rate_limit_per_minute = body.rate_limit_per_minute;
 		}
 		if (body.request_timeout_secs !== undefined) {
-			if (typeof body.request_timeout_secs !== 'number') {
-				return json({ error: 'request_timeout_secs must be a number' }, { status: 400 });
+			try {
+				data.request_timeout_secs = parseBoundedInteger(
+					body.request_timeout_secs,
+					1,
+					3600,
+					'request_timeout_secs'
+				);
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.request_timeout_secs = body.request_timeout_secs;
 		}
 		if (body.max_retries !== undefined) {
-			if (typeof body.max_retries !== 'number') {
-				return json({ error: 'max_retries must be a number' }, { status: 400 });
+			try {
+				data.max_retries = parseBoundedInteger(body.max_retries, 0, 100, 'max_retries');
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.max_retries = body.max_retries;
 		}
 		const result = await updateScimTarget(params.id, data, locals.accessToken, locals.tenantId, fetch);
 		return json(result);
