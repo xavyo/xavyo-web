@@ -29,9 +29,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const status = url.searchParams.get('status') ?? undefined;
 	const risk_level = url.searchParams.get('risk_level') ?? undefined;
 	const classification = url.searchParams.get('classification') ?? undefined;
+	const application_id = url.searchParams.get('application_id') ?? undefined;
+	const owner_id = url.searchParams.get('owner_id') ?? undefined;
 
 	const result = await listEntitlements(
-		{ status, risk_level, classification, ...listPagination(url) },
+		{ status, risk_level, classification, application_id, owner_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

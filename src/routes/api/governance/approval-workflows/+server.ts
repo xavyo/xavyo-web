@@ -43,8 +43,14 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	try {
+		const isActiveParam = url.searchParams.get('is_active');
+		const isDefaultParam = url.searchParams.get('is_default');
 		const result = await listApprovalWorkflows(
-			listPagination(url),
+			{
+				is_active: isActiveParam !== null ? isActiveParam === 'true' : undefined,
+				is_default: isDefaultParam !== null ? isDefaultParam === 'true' : undefined,
+				...listPagination(url)
+			},
 			locals.accessToken,
 			locals.tenantId,
 			fetch

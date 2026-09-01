@@ -29,6 +29,8 @@ export interface ListEntitlementsParams {
 	status?: string;
 	risk_level?: string;
 	classification?: string;
+	application_id?: string;
+	owner_id?: string;
 	limit?: number;
 	offset?: number;
 }
@@ -94,6 +96,8 @@ export async function listEntitlements(
 		status: params.status,
 		risk_level: params.risk_level,
 		classification: params.classification,
+		application_id: params.application_id,
+		owner_id: params.owner_id,
 		limit: params.limit,
 		offset: params.offset
 	});

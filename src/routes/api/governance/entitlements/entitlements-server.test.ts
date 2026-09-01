@@ -43,6 +43,23 @@ describe('GET /api/governance/entitlements', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('forwards advertised application_id and owner_id filters', async () => {
+		vi.mocked(listEntitlements).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/entitlements?application_id=app-1&owner_id=user-1'
+			)
+		} as any);
+		expect(listEntitlements).toHaveBeenCalledWith(
+			expect.objectContaining({ application_id: 'app-1', owner_id: 'user-1' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
 
 describe('POST /api/governance/entitlements', () => {

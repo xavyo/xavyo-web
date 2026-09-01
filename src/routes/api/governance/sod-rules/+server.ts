@@ -54,13 +54,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	) {
 		error(400, 'severity is required');
 	}
+	if (body.description !== undefined && typeof body.description !== 'string') {
+		error(400, 'description must be a string');
+	}
+	if (body.business_rationale !== undefined && typeof body.business_rationale !== 'string') {
+		error(400, 'business_rationale must be a string');
+	}
 	const result = await createSodRule(
 		{
 			name: body.name,
 			first_entitlement_id: body.first_entitlement_id,
 			second_entitlement_id: body.second_entitlement_id,
 			severity: body.severity,
-			description: typeof body.description === 'string' ? body.description : undefined
+			description: typeof body.description === 'string' ? body.description : undefined,
+			business_rationale:
+				typeof body.business_rationale === 'string' ? body.business_rationale : undefined
 		},
 		locals.accessToken,
 		locals.tenantId,

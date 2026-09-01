@@ -99,6 +99,22 @@ describe('Governance API — Entitlements', () => {
 			expect(params.get('classification')).toBe('sensitive');
 		});
 
+		it('includes application_id and owner_id filters in query string', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listEntitlements(
+				{ application_id: 'app-1', owner_id: 'user-1' },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('application_id')).toBe('app-1');
+			expect(params.get('owner_id')).toBe('user-1');
+		});
+
 		it('includes pagination params in query string', async () => {
 			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 10, offset: 20 });
 

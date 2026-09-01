@@ -15,8 +15,8 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { POST } from './+server';
-import { createApprovalWorkflow } from '$lib/api/approval-workflows';
+import { GET, POST } from './+server';
+import { createApprovalWorkflow, listApprovalWorkflows } from '$lib/api/approval-workflows';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -32,6 +32,30 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/approval-workflows', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('forwards advertised is_active and is_default filters', async () => {
+		vi.mocked(listApprovalWorkflows).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/approval-workflows?is_active=true&is_default=false'
+			)
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listApprovalWorkflows).toHaveBeenCalledWith(
+			expect.objectContaining({ is_active: true, is_default: false }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/approval-workflows', () => {
 	beforeEach(() => {
