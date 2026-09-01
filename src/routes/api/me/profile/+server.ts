@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ locals, fetch }) => {
 			return json({
 				id: locals.user.id,
 				email: locals.user.email,
-				display_name: null,
+				display_name: locals.user.display_name,
 				first_name: null,
 				last_name: null,
 				avatar_url: null,

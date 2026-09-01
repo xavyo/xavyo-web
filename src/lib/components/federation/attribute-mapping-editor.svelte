@@ -85,21 +85,13 @@
 			onchange('');
 			return;
 		}
-		try {
-			const parsed = JSON.parse(raw);
-			if (parsed && typeof parsed === 'object' && 'name_id_source' in parsed) {
-				mapping = {
-					name_id_source: parsed.name_id_source ?? 'email',
-					attributes: Array.isArray(parsed.attributes) ? parsed.attributes : []
-				};
-				parseError = null;
-				onchange(raw);
-			} else {
-				parseError = 'JSON must have "name_id_source" and "attributes" fields';
-				onchange(raw);
-			}
-		} catch {
-			parseError = 'Invalid JSON';
+		const parsed = parseMapping(raw);
+		if (parsed) {
+			mapping = parsed;
+			parseError = null;
+			onchange(raw);
+		} else {
+			parseError = 'JSON must have a valid name_id_source and attribute rows';
 			onchange(raw);
 		}
 	}

@@ -11,17 +11,41 @@ export interface AttributeMapping {
 	attributes: AttributeRow[];
 }
 
-export const AVAILABLE_SOURCES = ['email', 'user_id', 'display_name', 'tenant_id', 'groups'] as const;
-export const NAME_ID_SOURCES = ['email', 'user_id', 'display_name'] as const;
+export const AVAILABLE_SOURCES = [
+	'email',
+	'user_id',
+	'display_name',
+	'first_name',
+	'given_name',
+	'last_name',
+	'family_name',
+	'username',
+	'tenant_id',
+	'groups'
+] as const;
+export const NAME_ID_SOURCES = ['email', 'user_id', 'display_name', 'username'] as const;
 
 function isNameIdSource(value: unknown): value is (typeof NAME_ID_SOURCES)[number] {
 	return typeof value === 'string' && (NAME_ID_SOURCES as readonly string[]).includes(value);
 }
 
+function isAttributeRow(value: unknown): value is AttributeRow {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+	const row = value as Record<string, unknown>;
+	return (
+		typeof row.source === 'string' &&
+		typeof row.target_name === 'string' &&
+		typeof row.target_friendly_name === 'string' &&
+		typeof row.format === 'string' &&
+		typeof row.multi_value === 'boolean'
+	);
+}
+
 function parseAttributes(value: unknown): AttributeRow[] | null {
 	if (value === undefined) return [];
 	if (!Array.isArray(value)) return null;
-	return value as AttributeRow[];
+	if (!value.every(isAttributeRow)) return null;
+	return value;
 }
 
 export function parseMapping(json: string): AttributeMapping | null {

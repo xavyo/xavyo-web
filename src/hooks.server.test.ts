@@ -12,4 +12,9 @@ describe('session tenant', () => {
 		expect(src).not.toContain('claims.tid ?? tenantId');
 		expect(src).not.toContain("claims.tid ?? event.cookies.get('tenant_id')");
 	});
+
+	it('copies advertised JWT name onto locals.user', () => {
+		expect(src).toContain('sessionUserFromClaims(claims)');
+		expect(src).not.toContain('email: claims.email ?? \'\'');
+	});
 });

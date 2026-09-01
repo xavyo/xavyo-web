@@ -406,6 +406,7 @@ export interface JwtClaims {
 	roles: string[];
 	purpose?: string;
 	email?: string;
+	name?: string;
 }
 
 // Security & Self-Service Types (mirror Rust DTOs from xavyo-api-auth)

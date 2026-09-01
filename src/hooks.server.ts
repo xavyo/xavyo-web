@@ -4,7 +4,8 @@ import {
 	isTokenExpired,
 	setCookies,
 	clearAuthCookies,
-	tenantIdFromJwt
+	tenantIdFromJwt,
+	sessionUserFromClaims
 } from '$lib/server/auth';
 import { refresh } from '$lib/api/auth';
 
@@ -29,11 +30,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		// Token is still valid
 		const claims = decodeAccessToken(accessToken);
 		if (claims) {
-			event.locals.user = {
-				id: claims.sub,
-				email: claims.email ?? '',
-				roles: claims.roles ?? []
-			};
+			event.locals.user = sessionUserFromClaims(claims);
 			event.locals.accessToken = accessToken;
 			event.locals.tenantId = tenantIdFromJwt(accessToken);
 		}
@@ -45,11 +42,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 			const claims = decodeAccessToken(tokens.access_token);
 			if (claims) {
-				event.locals.user = {
-					id: claims.sub,
-					email: claims.email ?? '',
-					roles: claims.roles ?? []
-				};
+				event.locals.user = sessionUserFromClaims(claims);
 				event.locals.accessToken = tokens.access_token;
 				event.locals.tenantId = tenantIdFromJwt(tokens.access_token);
 			}
