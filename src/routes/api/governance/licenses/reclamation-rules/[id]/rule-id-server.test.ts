@@ -59,6 +59,25 @@ describe('PUT /api/governance/licenses/reclamation-rules/:id', () => {
 		expect(updateReclamationRule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string threshold_days', async () => {
+		vi.mocked(updateReclamationRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ threshold_days: '14' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateReclamationRule).toHaveBeenCalledWith(
+			'r1',
+			expect.objectContaining({ threshold_days: 14 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN threshold_days instead of forwarding it', async () => {
+		const response = await PUT(makeEvent(JSON.stringify({ threshold_days: Number.NaN })) as any);
+		expect(response.status).toBe(400);
+		expect(updateReclamationRule).not.toHaveBeenCalled();
+	});
+
 	it('does not update when enabled is not a boolean', async () => {
 		const response = await PUT(makeEvent(JSON.stringify({ enabled: 'no' })) as any);
 		expect(response.status).toBe(400);

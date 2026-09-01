@@ -56,6 +56,26 @@ describe('PUT /api/governance/birthright-policies/:id', () => {
 		expect(updateBirthrightPolicy).toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(updateBirthrightPolicy).mockResolvedValue({ id: 'b1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ priority: '5' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateBirthrightPolicy).toHaveBeenCalledWith(
+			'b1',
+			expect.objectContaining({ priority: 5 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateBirthrightPolicy).not.toHaveBeenCalled();
+	});
+
 	it('does not update when evaluation_mode is invalid', async () => {
 		await expect(
 			PUT(makeEvent(JSON.stringify({ evaluation_mode: 'any' })) as any)

@@ -4,6 +4,7 @@ import { listReclamationRules, createReclamationRule } from '$lib/api/licenses';
 import type { CreateReclamationRuleRequest, LicenseReclamationTrigger } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const TRIGGER_TYPES = ['inactivity', 'lifecycle_state'] as const;
 
@@ -61,10 +62,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		trigger_type: body.trigger_type as LicenseReclamationTrigger
 	};
 	if (body.threshold_days !== undefined) {
-		if (typeof body.threshold_days !== 'number') {
-			return json({ error: 'threshold_days must be a number' }, { status: 400 });
+		try {
+			data.threshold_days = parseBoundedInteger(body.threshold_days, 1, 3650, 'threshold_days');
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
+			}
+			throw e;
 		}
-		data.threshold_days = body.threshold_days;
 	}
 	if (body.lifecycle_state !== undefined) {
 		if (typeof body.lifecycle_state !== 'string') {
@@ -73,10 +78,19 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.lifecycle_state = body.lifecycle_state;
 	}
 	if (body.notification_days_before !== undefined) {
-		if (typeof body.notification_days_before !== 'number') {
-			return json({ error: 'notification_days_before must be a number' }, { status: 400 });
+		try {
+			data.notification_days_before = parseBoundedInteger(
+				body.notification_days_before,
+				0,
+				365,
+				'notification_days_before'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
+			}
+			throw e;
 		}
-		data.notification_days_before = body.notification_days_before;
 	}
 	try {
 		const result = await createReclamationRule(data, locals.accessToken, locals.tenantId, fetch);

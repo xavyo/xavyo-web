@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createState } from '$lib/api/lifecycle';
 import type { CreateLifecycleStateRequest, EntitlementAction } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const ENTITLEMENT_ACTIONS = ['none', 'pause', 'revoke'] as const;
 
@@ -29,15 +30,19 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (!ENTITLEMENT_ACTIONS.includes(body.entitlement_action as (typeof ENTITLEMENT_ACTIONS)[number])) {
 		error(400, 'entitlement_action is required');
 	}
-	if (typeof body.position !== 'number') {
-		error(400, 'position is required');
+	let position: number;
+	try {
+		position = parseBoundedInteger(body.position, 0, 1_000_000, 'position');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	const data: CreateLifecycleStateRequest = {
 		name: body.name,
 		is_initial: body.is_initial,
 		is_terminal: body.is_terminal,
 		entitlement_action: body.entitlement_action as EntitlementAction,
-		position: body.position
+		position
 	};
 	if (body.description !== undefined) {
 		if (typeof body.description !== 'string') {

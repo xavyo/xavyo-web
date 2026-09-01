@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getBirthrightPolicy, updateBirthrightPolicy, archiveBirthrightPolicy } from '$lib/api/birthright';
 import type { BirthrightCondition, UpdateBirthrightPolicyRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const OPERATORS = ['equals', 'not_equals', 'in', 'not_in', 'starts_with', 'contains'] as const;
 
@@ -69,10 +70,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.description = body.description;
 	}
 	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
+		try {
+			data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.priority = body.priority;
 	}
 	if (body.conditions !== undefined) {
 		data.conditions = parseConditions(body.conditions);
@@ -93,10 +96,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.evaluation_mode = body.evaluation_mode;
 	}
 	if (body.grace_period_days !== undefined) {
-		if (typeof body.grace_period_days !== 'number') {
-			error(400, 'grace_period_days must be a number');
+		try {
+			data.grace_period_days = parseBoundedInteger(body.grace_period_days, 0, 365, 'grace_period_days');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.grace_period_days = body.grace_period_days;
 	}
 	const result = await updateBirthrightPolicy(
 		params.id,

@@ -56,6 +56,46 @@ describe('POST /api/governance/lifecycle/configs/:configId/states', () => {
 		expect(createState).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string position', async () => {
+		vi.mocked(createState).mockResolvedValue({ id: 'st1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'active',
+					is_initial: true,
+					is_terminal: false,
+					entitlement_action: 'none',
+					position: '2'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createState).toHaveBeenCalledWith(
+			'cfg1',
+			expect.objectContaining({ position: 2 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN position instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'active',
+						is_initial: true,
+						is_terminal: false,
+						entitlement_action: 'none',
+						position: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createState).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		await expect(
 			POST(

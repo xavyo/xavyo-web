@@ -59,6 +59,40 @@ describe('POST /api/governance/licenses/reclamation-rules', () => {
 		expect(createReclamationRule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string threshold_days', async () => {
+		vi.mocked(createReclamationRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					license_pool_id: 'p1',
+					trigger_type: 'inactivity',
+					threshold_days: '30'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createReclamationRule).toHaveBeenCalledWith(
+			expect.objectContaining({ threshold_days: 30 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN threshold_days instead of forwarding it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					license_pool_id: 'p1',
+					trigger_type: 'inactivity',
+					threshold_days: Number.NaN
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createReclamationRule).not.toHaveBeenCalled();
+	});
+
 	it('does not create when trigger_type is invalid', async () => {
 		const response = await POST(
 			makeEvent(JSON.stringify({ license_pool_id: 'p1', trigger_type: 'manual' })) as any

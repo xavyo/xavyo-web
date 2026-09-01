@@ -47,6 +47,27 @@ describe('PATCH /api/governance/lifecycle/configs/:configId/states/:stateId', ()
 		expect(updateState).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string position', async () => {
+		vi.mocked(updateState).mockResolvedValue({ id: 'st1' } as any);
+		const response = await PATCH(makeEvent(JSON.stringify({ position: '3' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateState).toHaveBeenCalledWith(
+			'cfg1',
+			'st1',
+			expect.objectContaining({ position: 3 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN position instead of forwarding it', async () => {
+		await expect(
+			PATCH(makeEvent(JSON.stringify({ position: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateState).not.toHaveBeenCalled();
+	});
+
 	it('does not update when name is empty', async () => {
 		await expect(PATCH(makeEvent(JSON.stringify({ name: '' })) as any)).rejects.toMatchObject({
 			status: 400
