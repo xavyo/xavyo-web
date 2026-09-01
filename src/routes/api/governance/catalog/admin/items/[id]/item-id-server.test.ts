@@ -42,6 +42,19 @@ describe('PUT /api/governance/catalog/admin/items/:id', () => {
 		expect(adminUpdateItem).toHaveBeenCalled();
 	});
 
+	it('forwards advertised icon on update', async () => {
+		vi.mocked(adminUpdateItem).mockResolvedValue({ id: 'i1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ icon: 'shield' })) as any);
+		expect(response.status).toBe(200);
+		expect(adminUpdateItem).toHaveBeenCalledWith(
+			'i1',
+			expect.objectContaining({ icon: 'shield' }),
+			TOKEN,
+			TENANT,
+			expect.anything()
+		);
+	});
+
 	it('does not update on invalid JSON', async () => {
 		await expect(PUT(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(adminUpdateItem).not.toHaveBeenCalled();

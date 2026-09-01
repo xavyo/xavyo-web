@@ -14,7 +14,8 @@ import type {
 	CreateCategoryRequest,
 	UpdateCategoryRequest,
 	CreateCatalogItemRequest,
-	UpdateCatalogItemRequest
+	UpdateCatalogItemRequest,
+	CatalogRequestListResponse
 } from './types';
 
 function buildQs(params: Record<string, string | number | boolean | undefined | null>): string {
@@ -105,6 +106,14 @@ export async function submitCart(
 	body: SubmitCartRequest, token: string, tenantId: string, fetchFn?: typeof fetch
 ): Promise<CartSubmissionResponse> {
 	return apiClient<CartSubmissionResponse>('/governance/catalog/cart/submit', { method: 'POST', body, token, tenantId, fetch: fetchFn });
+}
+
+export async function listCatalogRequests(
+	params: { status?: string; submission_id?: string; limit?: number; offset?: number },
+	token: string, tenantId: string, fetchFn?: typeof fetch
+): Promise<CatalogRequestListResponse> {
+	const qs = buildQs(params);
+	return apiClient<CatalogRequestListResponse>(`/governance/catalog/requests${qs}`, { method: 'GET', token, tenantId, fetch: fetchFn });
 }
 
 // --- Catalog Admin ---

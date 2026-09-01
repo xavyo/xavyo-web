@@ -5149,6 +5149,7 @@ export interface CreateCatalogItemRequest {
 	requestability_rules?: RequestabilityRules;
 	form_fields?: FormField[];
 	tags?: string[];
+	icon?: string;
 }
 
 export interface UpdateCatalogItemRequest {
@@ -5160,6 +5161,28 @@ export interface UpdateCatalogItemRequest {
 	requestability_rules?: RequestabilityRules | null;
 	form_fields?: FormField[];
 	tags?: string[];
+	icon?: string | null;
+}
+
+export interface CatalogRequestResponse {
+	id: string;
+	submission_id?: string | null;
+	catalog_item_id: string;
+	catalog_item_name: string;
+	catalog_item_type: CatalogItemType;
+	requester_id: string;
+	beneficiary_id?: string | null;
+	status: string;
+	justification?: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CatalogRequestListResponse {
+	items: CatalogRequestResponse[];
+	total: number;
+	limit: number;
+	offset: number;
 }
 
 // ============================================================================
