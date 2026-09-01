@@ -9,10 +9,11 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') || undefined;
+	const user_id = url.searchParams.get('user_id') || undefined;
 
 	const result = await listExcessivePrivileges(
 		params.jobId,
-		{ status, ...listPagination(url) },
+		{ status, user_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

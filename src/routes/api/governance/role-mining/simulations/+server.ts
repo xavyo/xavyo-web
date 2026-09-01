@@ -19,9 +19,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const status = url.searchParams.get('status') || undefined;
 	const scenario_type = url.searchParams.get('scenario_type') || undefined;
+	const target_role_id = url.searchParams.get('target_role_id') || undefined;
 
 	const result = await listSimulations(
-		{ status, scenario_type, ...listPagination(url) },
+		{ status, scenario_type, target_role_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

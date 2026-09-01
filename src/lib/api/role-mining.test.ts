@@ -163,13 +163,23 @@ describe('Role Mining API', () => {
 			expect(result).toEqual(mockResponse);
 		});
 
-		it('includes promotion_status query param', async () => {
+		it('maps advertised status onto the API query', async () => {
+			mockApiClient.mockResolvedValue({} as any);
+
+			await listCandidates('job-1', { status: 'promoted', min_confidence: 0.8 }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('status=promoted');
+			expect(calledPath).toContain('min_confidence=0.8');
+		});
+
+		it('maps promotion_status alias onto advertised status', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
 			await listCandidates('job-1', { promotion_status: 'promoted' }, token, tenantId, mockFetch);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			expect(calledPath).toContain('promotion_status=promoted');
+			expect(calledPath).toContain('status=promoted');
 		});
 
 		it('includes limit and offset query params', async () => {
@@ -319,13 +329,20 @@ describe('Role Mining API', () => {
 			expect(result).toEqual(mockResponse);
 		});
 
-		it('includes status query param', async () => {
+		it('includes status and user_id query params', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
-			await listExcessivePrivileges('job-1', { status: 'flagged' }, token, tenantId, mockFetch);
+			await listExcessivePrivileges(
+				'job-1',
+				{ status: 'flagged', user_id: 'user-1' },
+				token,
+				tenantId,
+				mockFetch
+			);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('status=flagged');
+			expect(calledPath).toContain('user_id=user-1');
 		});
 
 		it('includes limit and offset query params', async () => {
@@ -386,13 +403,20 @@ describe('Role Mining API', () => {
 			expect(result).toEqual(mockResponse);
 		});
 
-		it('includes status query param', async () => {
+		it('includes status and min_overlap query params', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
-			await listConsolidationSuggestions('job-1', { status: 'pending' }, token, tenantId, mockFetch);
+			await listConsolidationSuggestions(
+				'job-1',
+				{ status: 'pending', min_overlap: 0.7 },
+				token,
+				tenantId,
+				mockFetch
+			);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('status=pending');
+			expect(calledPath).toContain('min_overlap=0.7');
 		});
 
 		it('includes limit and offset query params', async () => {
@@ -496,7 +520,13 @@ describe('Role Mining API', () => {
 			mockApiClient.mockResolvedValue({} as any);
 
 			await listSimulations(
-				{ status: 'pending', scenario_type: 'what_if', limit: 20, offset: 0 },
+				{
+					status: 'pending',
+					scenario_type: 'what_if',
+					target_role_id: 'role-1',
+					limit: 20,
+					offset: 0
+				},
 				token,
 				tenantId,
 				mockFetch
@@ -505,6 +535,7 @@ describe('Role Mining API', () => {
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('status=pending');
 			expect(calledPath).toContain('scenario_type=what_if');
+			expect(calledPath).toContain('target_role_id=role-1');
 			expect(calledPath).toContain('limit=20');
 			expect(calledPath).toContain('offset=0');
 		});
@@ -600,13 +631,26 @@ describe('Role Mining API', () => {
 			expect(result).toEqual(mockResponse);
 		});
 
-		it('includes trend_direction query param', async () => {
+		it('includes advertised utilization and role filters', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
-			await listRoleMetrics({ trend_direction: 'increasing' }, token, tenantId, mockFetch);
+			await listRoleMetrics(
+				{
+					trend_direction: 'increasing',
+					role_id: 'role-1',
+					min_utilization: 0.2,
+					max_utilization: 0.9
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('trend_direction=increasing');
+			expect(calledPath).toContain('role_id=role-1');
+			expect(calledPath).toContain('min_utilization=0.2');
+			expect(calledPath).toContain('max_utilization=0.9');
 		});
 
 		it('includes limit and offset query params', async () => {

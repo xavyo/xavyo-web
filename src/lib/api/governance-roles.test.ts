@@ -24,7 +24,8 @@ import {
 	validateRoleParameters,
 	listInheritanceBlocks,
 	addInheritanceBlock,
-	removeInheritanceBlock
+	removeInheritanceBlock,
+	listParameterAudit
 } from './governance-roles';
 
 vi.mock('./client', () => ({
@@ -576,6 +577,29 @@ describe('Governance Roles API — Inheritance Blocks', () => {
 					fetch: mockFetch
 				}
 			);
+		});
+	});
+
+	describe('listParameterAudit', () => {
+		it('forwards advertised date filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+
+			await listParameterAudit(
+				{
+					assignment_id: 'a-1',
+					from_date: '2026-01-01T00:00:00Z',
+					to_date: '2026-01-31T23:59:59Z'
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('/governance/parameters/audit?');
+			expect(calledPath).toContain('assignment_id=a-1');
+			expect(calledPath).toContain('from_date=2026-01-01T00%3A00%3A00Z');
+			expect(calledPath).toContain('to_date=2026-01-31T23%3A59%3A59Z');
 		});
 	});
 });
