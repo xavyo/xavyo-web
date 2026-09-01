@@ -9,9 +9,10 @@ export const GET: RequestHandler = async ({ locals, params, url, fetch }) => {
 		return json({ error: 'Unauthorized' }, { status: 401 });
 	}
 	try {
+		const principal_id = url.searchParams.get('principal_id') || undefined;
 		const result = await listIncomingDelegations(
 			params.nhiId,
-			listPagination(url),
+			{ principal_id, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch

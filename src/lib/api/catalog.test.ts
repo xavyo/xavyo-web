@@ -166,6 +166,15 @@ describe('Catalog API', () => {
 			expect(calledPath).toContain('beneficiary_id=user-1');
 		});
 
+		it('includes enabled query param', async () => {
+			mockApiClient.mockResolvedValue({} as any);
+
+			await listCatalogItems({ enabled: false }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('enabled=false');
+		});
+
 		it('includes limit and offset query params', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 

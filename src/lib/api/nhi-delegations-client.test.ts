@@ -154,6 +154,16 @@ describe('nhi-delegations-client', () => {
 			expect(calledUrl).toContain('offset=5');
 		});
 
+		it('forwards advertised principal_id', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ data: [], limit: 20, offset: 0 }));
+			const { fetchIncomingDelegations } = await import('./nhi-delegations-client');
+
+			await fetchIncomingDelegations('nhi-1', { principal_id: 'user-1' }, mockFetch);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('principal_id=user-1');
+		});
+
 		it('throws on non-ok response', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 500));
 			const { fetchIncomingDelegations } = await import('./nhi-delegations-client');
@@ -172,6 +182,16 @@ describe('nhi-delegations-client', () => {
 
 			expect(mockFetch).toHaveBeenCalledWith('/api/nhi/delegations/entity/nhi-1/outgoing');
 			expect(result).toEqual(data);
+		});
+
+		it('forwards advertised actor_nhi_id', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ data: [], limit: 20, offset: 0 }));
+			const { fetchOutgoingDelegations } = await import('./nhi-delegations-client');
+
+			await fetchOutgoingDelegations('nhi-1', { actor_nhi_id: 'actor-1' }, mockFetch);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('actor_nhi_id=actor-1');
 		});
 
 		it('throws on non-ok response', async () => {

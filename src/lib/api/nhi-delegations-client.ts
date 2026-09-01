@@ -58,10 +58,11 @@ export async function revokeDelegationGrantClient(
 
 export async function fetchIncomingDelegations(
 	nhiId: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { principal_id?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PaginatedDelegationResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.principal_id) searchParams.set('principal_id', params.principal_id);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -72,10 +73,11 @@ export async function fetchIncomingDelegations(
 
 export async function fetchOutgoingDelegations(
 	nhiId: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { actor_nhi_id?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PaginatedDelegationResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.actor_nhi_id) searchParams.set('actor_nhi_id', params.actor_nhi_id);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

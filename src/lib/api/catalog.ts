@@ -43,7 +43,7 @@ export async function getCategory(
 }
 
 export async function listCatalogItems(
-	params: { category_id?: string; item_type?: string; search?: string; tag?: string; beneficiary_id?: string; limit?: number; offset?: number },
+	params: { category_id?: string; item_type?: string; search?: string; tag?: string; beneficiary_id?: string; enabled?: boolean; limit?: number; offset?: number },
 	token: string, tenantId: string, fetchFn?: typeof fetch
 ): Promise<CatalogItemListResponse> {
 	const qs = buildQs(params);

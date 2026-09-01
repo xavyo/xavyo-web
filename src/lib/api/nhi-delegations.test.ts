@@ -139,6 +139,22 @@ describe('NHI Delegations API', () => {
 			expect(calledPath).toContain('limit=20');
 			expect(result).toEqual(mockResult);
 		});
+
+		it('forwards advertised principal_id', async () => {
+			mockApiClient.mockResolvedValue({ data: [], limit: 20, offset: 0 });
+
+			await listIncomingDelegations(
+				'nhi-1',
+				{ principal_id: 'user-1', limit: 10 },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('principal_id=user-1');
+			expect(calledPath).toContain('limit=10');
+		});
 	});
 
 	describe('listOutgoingDelegations', () => {
@@ -152,6 +168,22 @@ describe('NHI Delegations API', () => {
 			expect(calledPath).toContain('/nhi/nhi-1/delegations/outgoing');
 			expect(calledPath).toContain('limit=20');
 			expect(result).toEqual(mockResult);
+		});
+
+		it('forwards advertised actor_nhi_id', async () => {
+			mockApiClient.mockResolvedValue({ data: [], limit: 20, offset: 0 });
+
+			await listOutgoingDelegations(
+				'nhi-1',
+				{ actor_nhi_id: 'actor-1', limit: 10 },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('actor_nhi_id=actor-1');
+			expect(calledPath).toContain('limit=10');
 		});
 	});
 });
