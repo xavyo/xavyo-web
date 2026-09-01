@@ -1673,17 +1673,24 @@ export interface NhiSodCheckRequest {
 
 export interface NhiCertificationCampaign {
 	id: string;
-	tenant_id: string;
+	tenant_id?: string;
 	name: string;
 	description: string | null;
-	scope: string;
+	scope?: string;
 	nhi_type_filter: string | null;
 	specific_nhi_ids: string[] | null;
 	status: string;
-	due_date: string | null;
+	due_date?: string | null;
+	deadline?: string;
+	owner_filter?: string | null;
+	needs_certification_only?: boolean;
+	reviewer_type?: string;
+	specific_reviewers?: string[] | null;
 	created_by: string | null;
 	created_at: string;
-	updated_at: string;
+	updated_at?: string;
+	launched_at?: string | null;
+	completed_at?: string | null;
 }
 
 export interface CreateNhiCertCampaignRequest {
