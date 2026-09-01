@@ -36,7 +36,22 @@ describe('GET /api/admin/authorization/policies', () => {
 			url: new URL('http://localhost/api/admin/authorization/policies?limit=abc&offset=nope')
 		} as any);
 		expect(listPolicies).toHaveBeenCalledWith(
-			{ limit: undefined, offset: undefined },
+			{ status: undefined, effect: undefined, limit: undefined, offset: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised status and effect filters', async () => {
+		vi.mocked(listPolicies).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/authorization/policies?status=active&effect=deny')
+		} as any);
+		expect(listPolicies).toHaveBeenCalledWith(
+			expect.objectContaining({ status: 'active', effect: 'deny' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)
@@ -54,6 +69,28 @@ describe('POST /api/admin/authorization/policies', () => {
 		const response = await POST(makeEvent(JSON.stringify({ name: 'n', effect: 'allow' })) as any);
 		expect(response.status).toBe(201);
 		expect(createPolicy).toHaveBeenCalled();
+	});
+
+	it('forwards advertised conditions on create', async () => {
+		vi.mocked(createPolicy).mockResolvedValue({ id: 'p1' } as any);
+		const conditions = [
+			{
+				condition_type: 'user_attribute',
+				attribute_path: 'department',
+				operator: 'equals',
+				value: 'eng'
+			}
+		];
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'n', effect: 'allow', conditions })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createPolicy).toHaveBeenCalledWith(
+			expect.objectContaining({ conditions }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('does not create on invalid JSON', async () => {

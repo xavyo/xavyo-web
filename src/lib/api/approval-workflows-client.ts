@@ -205,10 +205,14 @@ export async function removeGroupMembersClient(
 // --- Escalation Policies ---
 
 export async function fetchEscalationPolicies(
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; is_active?: boolean } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<EscalationPolicyListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		is_active: params.is_active
+	});
 	const res = await fetchFn(`/api/governance/escalation-policies${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch escalation policies: ${res.status}`);
 	return res.json();

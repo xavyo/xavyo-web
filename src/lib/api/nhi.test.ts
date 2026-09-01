@@ -85,6 +85,19 @@ describe('NHI API — unified list', () => {
 				fetch: mockFetch
 			});
 		});
+
+		it('includes owner_id filter in query string', async () => {
+			mockApiClient.mockResolvedValue({ data: [], total: 0, limit: 20, offset: 0 });
+
+			await listNhi({ owner_id: 'user-9' }, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/nhi?owner_id=user-9', {
+				method: 'GET',
+				token,
+				tenantId,
+				fetch: mockFetch
+			});
+		});
 	});
 });
 

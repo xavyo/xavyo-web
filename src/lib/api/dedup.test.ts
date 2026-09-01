@@ -135,6 +135,21 @@ describe('dedup API client', () => {
 				expect.anything()
 			);
 		});
+
+		it('includes advertised status and identity_id filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+
+			await listMergeOperations(
+				{ status: 'completed', identity_id: 'id-1' },
+				TOKEN,
+				TENANT_ID
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('status')).toBe('completed');
+			expect(params.get('identity_id')).toBe('id-1');
+		});
 	});
 
 	describe('previewMerge', () => {

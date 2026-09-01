@@ -8,8 +8,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
+	const entitlement_id = url.searchParams.get('entitlement_id') ?? undefined;
+
 	const result = await listMappings(
-		listPagination(url),
+		{ entitlement_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

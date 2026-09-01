@@ -10,10 +10,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const nhi_type = url.searchParams.get('nhi_type') ?? undefined;
 	const lifecycle_state = url.searchParams.get('lifecycle_state') ?? undefined;
+	const owner_id = url.searchParams.get('owner_id') ?? undefined;
 	const { limit, offset } = listPagination(url);
 
 	const result = await listNhi(
-		{ offset: offset ?? 0, limit: limit ?? 20, nhi_type, lifecycle_state },
+		{ offset: offset ?? 0, limit: limit ?? 20, nhi_type, lifecycle_state, owner_id },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

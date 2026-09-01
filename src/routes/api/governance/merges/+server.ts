@@ -8,8 +8,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
+	const status = url.searchParams.get('status') ?? undefined;
+	const identity_id = url.searchParams.get('identity_id') ?? undefined;
+
 	const result = await listMergeOperations(
-		listPagination(url),
+		{ status, identity_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

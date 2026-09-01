@@ -36,7 +36,22 @@ describe('GET /api/governance/escalation-policies', () => {
 			url: new URL('http://localhost/api/governance/escalation-policies?page=2&page_size=20')
 		} as any);
 		expect(listEscalationPolicies).toHaveBeenCalledWith(
-			{ limit: 20, offset: 20 },
+			{ is_active: undefined, limit: 20, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised is_active filter', async () => {
+		vi.mocked(listEscalationPolicies).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/escalation-policies?is_active=false')
+		} as any);
+		expect(listEscalationPolicies).toHaveBeenCalledWith(
+			expect.objectContaining({ is_active: false }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

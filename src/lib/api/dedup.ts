@@ -100,14 +100,16 @@ export async function detectDuplicates(
 // Merge Operations
 
 export async function listMergeOperations(
-	params: { limit?: number; offset?: number },
+	params: { limit?: number; offset?: number; status?: string; identity_id?: string },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<{ items: MergeOperationResponse[]; total: number; limit: number; offset: number }> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		status: params.status,
+		identity_id: params.identity_id
 	});
 	return apiClient(`/governance/merges${qs}`, {
 		method: 'GET',

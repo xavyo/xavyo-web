@@ -16,12 +16,14 @@ function buildSearchParams(params: Record<string, string | number | boolean | un
 }
 
 export async function fetchPolicies(
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; status?: string; effect?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PolicyListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		status: params.status,
+		effect: params.effect
 	});
 	const res = await fetchFn(`/api/admin/authorization/policies${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch policies: ${res.status}`);
@@ -29,12 +31,13 @@ export async function fetchPolicies(
 }
 
 export async function fetchMappings(
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; entitlement_id?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<MappingListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		entitlement_id: params.entitlement_id
 	});
 	const res = await fetchFn(`/api/admin/authorization/mappings${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch mappings: ${res.status}`);

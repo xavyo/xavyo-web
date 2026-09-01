@@ -10,10 +10,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const status = url.searchParams.get('status') ?? undefined;
 	const archetype_id = url.searchParams.get('archetype_id') ?? undefined;
+	const physical_user_id = url.searchParams.get('physical_user_id') ?? undefined;
 	const { limit, offset } = listPagination(url);
 
 	const result = await listPersonas(
-		{ offset: offset ?? 0, limit: limit ?? 20, status, archetype_id },
+		{ offset: offset ?? 0, limit: limit ?? 20, status, archetype_id, physical_user_id },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

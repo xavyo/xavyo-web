@@ -23,7 +23,27 @@ describe('GET /api/personas', () => {
 			url: new URL('http://localhost/api/personas?page=2&page_size=25')
 		} as any);
 		expect(listPersonas).toHaveBeenCalledWith(
-			{ offset: 25, limit: 25, status: undefined, archetype_id: undefined },
+			{
+				offset: 25,
+				limit: 25,
+				status: undefined,
+				archetype_id: undefined,
+				physical_user_id: undefined
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised physical_user_id filter', async () => {
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/personas?physical_user_id=user-1')
+		} as any);
+		expect(listPersonas).toHaveBeenCalledWith(
+			expect.objectContaining({ physical_user_id: 'user-1' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

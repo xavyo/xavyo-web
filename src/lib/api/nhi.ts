@@ -61,6 +61,7 @@ export interface ListNhiParams {
 	limit?: number;
 	nhi_type?: string;
 	lifecycle_state?: string;
+	owner_id?: string;
 }
 
 // Unified list
@@ -76,6 +77,7 @@ export async function listNhi(
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.nhi_type) searchParams.set('nhi_type', params.nhi_type);
 	if (params.lifecycle_state) searchParams.set('lifecycle_state', params.lifecycle_state);
+	if (params.owner_id) searchParams.set('owner_id', params.owner_id);
 
 	const query = searchParams.toString();
 	const endpoint = `/nhi${query ? `?${query}` : ''}`;

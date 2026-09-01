@@ -62,6 +62,17 @@ describe('Authorization API — Policies', () => {
 			expect(params.get('offset')).toBe('20');
 		});
 
+		it('includes advertised status and effect filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listPolicies({ status: 'active', effect: 'deny' }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('status')).toBe('active');
+			expect(params.get('effect')).toBe('deny');
+		});
+
 		it('propagates errors from apiClient', async () => {
 			mockApiClient.mockRejectedValue(new ApiError('Forbidden', 403));
 
@@ -206,6 +217,16 @@ describe('Authorization API — Mappings', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
+		});
+
+		it('includes advertised entitlement_id filter', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listMappings({ entitlement_id: 'ent-1' }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('entitlement_id')).toBe('ent-1');
 		});
 
 		it('propagates errors from apiClient', async () => {

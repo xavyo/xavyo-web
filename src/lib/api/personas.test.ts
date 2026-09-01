@@ -228,6 +228,22 @@ describe('personas API — personas', () => {
 				fetch: mockFetch
 			});
 		});
+
+		it('includes physical_user_id filter in query string', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+
+			await listPersonas({ physical_user_id: 'user-1' }, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/personas?physical_user_id=user-1',
+				{
+					method: 'GET',
+					token,
+					tenantId,
+					fetch: mockFetch
+				}
+			);
+		});
 	});
 
 	describe('createPersona', () => {
