@@ -4,6 +4,7 @@ import { listSiemDestinations, createSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 import type { CreateSiemDestinationRequest, EventCategory } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const DESTINATION_TYPES = ['syslog_tcp_tls', 'syslog_udp', 'webhook', 'splunk_hec'] as const;
 const EXPORT_FORMATS = ['cef', 'syslog_rfc5424', 'json', 'csv'] as const;
@@ -80,10 +81,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			export_format: body.export_format as CreateSiemDestinationRequest['export_format']
 		};
 		if (body.endpoint_port !== undefined) {
-			if (typeof body.endpoint_port !== 'number') {
-				return json({ error: 'endpoint_port must be a number' }, { status: 400 });
+			try {
+				data.endpoint_port = parseBoundedInteger(body.endpoint_port, 1, 65535, 'endpoint_port');
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.endpoint_port = body.endpoint_port;
 		}
 		if (body.auth_config_b64 !== undefined) {
 			if (typeof body.auth_config_b64 !== 'string') {

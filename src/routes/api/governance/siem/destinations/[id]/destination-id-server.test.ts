@@ -77,6 +77,25 @@ describe('PUT /api/governance/siem/destinations/:id', () => {
 		expect(updateSiemDestination).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string endpoint_port', async () => {
+		vi.mocked(updateSiemDestination).mockResolvedValue({ id: 'd1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ endpoint_port: '514' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateSiemDestination).toHaveBeenCalledWith(
+			'd1',
+			expect.objectContaining({ endpoint_port: 514 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN endpoint_port instead of forwarding it', async () => {
+		const response = await PUT(makeEvent(JSON.stringify({ endpoint_port: Number.NaN })) as any);
+		expect(response.status).toBe(400);
+		expect(updateSiemDestination).not.toHaveBeenCalled();
+	});
+
 	it('does not update when enabled is not a boolean', async () => {
 		const response = await PUT(makeEvent(JSON.stringify({ enabled: 'yes' })) as any);
 		expect(response.status).toBe(400);

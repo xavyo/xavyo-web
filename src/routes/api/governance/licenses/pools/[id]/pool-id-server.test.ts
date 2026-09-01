@@ -59,6 +59,25 @@ describe('PUT /api/governance/licenses/pools/:id', () => {
 		expect(updateLicensePool).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string total_capacity', async () => {
+		vi.mocked(updateLicensePool).mockResolvedValue({ id: 'p1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ total_capacity: '250' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateLicensePool).toHaveBeenCalledWith(
+			'p1',
+			expect.objectContaining({ total_capacity: 250 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN total_capacity instead of forwarding it', async () => {
+		const response = await PUT(makeEvent(JSON.stringify({ total_capacity: Number.NaN })) as any);
+		expect(response.status).toBe(400);
+		expect(updateLicensePool).not.toHaveBeenCalled();
+	});
+
 	it('does not update when name is empty', async () => {
 		const response = await PUT(makeEvent(JSON.stringify({ name: '' })) as any);
 		expect(response.status).toBe(400);

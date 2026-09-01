@@ -47,6 +47,26 @@ describe('PUT /api/governance/catalog/admin/categories/:id', () => {
 		expect(adminUpdateCategory).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string display_order', async () => {
+		vi.mocked(adminUpdateCategory).mockResolvedValue({ id: 'c1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ display_order: '4' })) as any);
+		expect(response.status).toBe(200);
+		expect(adminUpdateCategory).toHaveBeenCalledWith(
+			'c1',
+			expect.objectContaining({ display_order: 4 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN display_order instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ display_order: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(adminUpdateCategory).not.toHaveBeenCalled();
+	});
+
 	it('does not update when name is empty', async () => {
 		await expect(PUT(makeEvent(JSON.stringify({ name: '' })) as any)).rejects.toMatchObject({
 			status: 400

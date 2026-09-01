@@ -4,6 +4,7 @@ import { listTicketingConfigs, createTicketingConfig } from '$lib/api/governance
 import type { CreateTicketingConfigRequest, TicketingSystemType } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const TICKETING_TYPES = ['service_now', 'jira', 'webhook'] as const;
 
@@ -58,13 +59,27 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		if (typeof body.credentials !== 'string' || body.credentials.length === 0) {
 			error(400, 'credentials is required');
 		}
+		let pollingInterval: number;
+		try {
+			pollingInterval =
+				body.polling_interval_seconds === undefined
+					? 300
+					: parseBoundedInteger(
+							body.polling_interval_seconds,
+							60,
+							3600,
+							'polling_interval_seconds'
+						);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
+		}
 		const data: CreateTicketingConfigRequest = {
 			name: body.name,
 			ticketing_type: body.ticketing_type as TicketingSystemType,
 			endpoint_url: body.endpoint_url,
 			credentials: body.credentials,
-			polling_interval_seconds:
-				typeof body.polling_interval_seconds === 'number' ? body.polling_interval_seconds : 300
+			polling_interval_seconds: pollingInterval
 		};
 		if (body.field_mappings !== undefined) {
 			data.field_mappings = body.field_mappings;
@@ -92,12 +107,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				error(400, 'issue_type must be a string');
 			}
 			data.issue_type = body.issue_type;
-		}
-		if (body.polling_interval_seconds !== undefined) {
-			if (typeof body.polling_interval_seconds !== 'number') {
-				error(400, 'polling_interval_seconds must be a number');
-			}
-			data.polling_interval_seconds = body.polling_interval_seconds;
 		}
 		const result = await createTicketingConfig(data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });

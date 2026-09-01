@@ -89,6 +89,46 @@ describe('POST /api/governance/micro-certifications/triggers', () => {
 		expect(createTriggerRule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string timeout_secs and priority', async () => {
+		vi.mocked(createTriggerRule).mockResolvedValue({ id: 'tr1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'high risk',
+					trigger_type: 'high_risk_assignment',
+					scope_type: 'tenant',
+					reviewer_type: 'user_manager',
+					timeout_secs: '3600',
+					priority: '2'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTriggerRule).toHaveBeenCalledWith(
+			expect.objectContaining({ timeout_secs: 3600, priority: 2 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN timeout_secs instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'high risk',
+						trigger_type: 'high_risk_assignment',
+						scope_type: 'tenant',
+						reviewer_type: 'user_manager',
+						timeout_secs: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createTriggerRule).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		await expect(
 			POST(
