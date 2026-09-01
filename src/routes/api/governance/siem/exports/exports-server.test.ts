@@ -64,6 +64,21 @@ describe('GET /api/governance/siem/exports', () => {
 		} as any);
 		expect(listSiemExports).toHaveBeenCalledWith({}, TOKEN, TENANT, expect.any(Function));
 	});
+
+	it('forwards advertised output_format filter', async () => {
+		vi.mocked(listSiemExports).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/siem/exports?output_format=cef')
+		} as any);
+		expect(listSiemExports).toHaveBeenCalledWith(
+			{ output_format: 'cef' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
 
 describe('POST /api/governance/siem/exports', () => {

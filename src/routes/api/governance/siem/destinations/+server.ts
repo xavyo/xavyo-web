@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listSiemDestinations, createSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { applySiemDestinationAdvertisedFields } from '$lib/server/siem-destination-fields';
 import type { CreateSiemDestinationRequest, EventCategory } from '$lib/api/types';
 import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
@@ -90,12 +91,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				throw e;
 			}
 		}
-		if (body.auth_config_b64 !== undefined) {
-			if (typeof body.auth_config_b64 !== 'string') {
-				return json({ error: 'auth_config_b64 must be a string' }, { status: 400 });
-			}
-			data.auth_config_b64 = body.auth_config_b64;
-		}
 		if (body.event_type_filter !== undefined) {
 			if (
 				!Array.isArray(body.event_type_filter) ||
@@ -110,6 +105,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				return json({ error: 'enabled must be a boolean' }, { status: 400 });
 			}
 			data.enabled = body.enabled;
+		}
+		try {
+			applySiemDestinationAdvertisedFields(body, data);
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
+			}
+			throw e;
 		}
 		const result = await createSiemDestination(data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });

@@ -109,6 +109,53 @@ describe('PUT /api/governance/siem/destinations/:id', () => {
 		expect(response.status).toBe(200);
 		expect(updateSiemDestination).toHaveBeenCalled();
 	});
+
+	it('forwards advertised destination config fields', async () => {
+		vi.mocked(updateSiemDestination).mockResolvedValue({ id: 'd1' } as any);
+		const response = await PUT(
+			makeEvent(
+				JSON.stringify({
+					auth_config_b64: 'YWI=',
+					rate_limit_per_second: 250,
+					queue_buffer_size: 5000,
+					circuit_breaker_threshold: 7,
+					circuit_breaker_cooldown_secs: 90,
+					splunk_source: 'xavyo',
+					splunk_sourcetype: '_json',
+					splunk_index: 'main',
+					splunk_ack_enabled: true,
+					syslog_facility: 14,
+					tls_verify_cert: false
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateSiemDestination).toHaveBeenCalledWith(
+			'd1',
+			expect.objectContaining({
+				auth_config_b64: 'YWI=',
+				rate_limit_per_second: 250,
+				queue_buffer_size: 5000,
+				circuit_breaker_threshold: 7,
+				circuit_breaker_cooldown_secs: 90,
+				splunk_source: 'xavyo',
+				splunk_sourcetype: '_json',
+				splunk_index: 'main',
+				splunk_ack_enabled: true,
+				syslog_facility: 14,
+				tls_verify_cert: false
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects invalid syslog_facility instead of dropping it', async () => {
+		const response = await PUT(makeEvent(JSON.stringify({ syslog_facility: 24 })) as any);
+		expect(response.status).toBe(400);
+		expect(updateSiemDestination).not.toHaveBeenCalled();
+	});
 });
 
 describe('DELETE /api/governance/siem/destinations/:id', () => {
