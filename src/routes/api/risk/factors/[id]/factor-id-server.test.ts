@@ -64,4 +64,11 @@ describe('PUT /api/risk/factors/:id', () => {
 		});
 		expect(updateRiskFactor).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN weight instead of forwarding it', async () => {
+		await expect(PUT(makeEvent(JSON.stringify({ weight: Number.NaN })) as any)).rejects.toMatchObject(
+			{ status: 400 }
+		);
+		expect(updateRiskFactor).not.toHaveBeenCalled();
+	});
 });

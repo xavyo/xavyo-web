@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listServiceProviders, createServiceProvider } from '$lib/api/federation';
 import type { CreateServiceProviderRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -91,10 +92,17 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.validate_signatures = body.validate_signatures;
 	}
 	if (body.assertion_validity_seconds !== undefined) {
-		if (typeof body.assertion_validity_seconds !== 'number') {
-			error(400, 'assertion_validity_seconds must be a number');
+		try {
+			data.assertion_validity_seconds = parseBoundedInteger(
+				body.assertion_validity_seconds,
+				1,
+				31_536_000,
+				'assertion_validity_seconds'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.assertion_validity_seconds = body.assertion_validity_seconds;
 	}
 	if (body.metadata_url !== undefined) {
 		if (typeof body.metadata_url !== 'string') {

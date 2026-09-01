@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listRiskThresholds, createRiskThreshold } from '$lib/api/risk';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -41,8 +42,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		if (typeof body.name !== 'string' || body.name.length === 0) {
 			error(400, 'name is required');
 		}
-		if (typeof body.score_value !== 'number') {
-			error(400, 'score_value is required');
+		let score_value: number;
+		try {
+			score_value = requireFiniteNumber(body.score_value, 'score_value');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
 		if (body.severity !== 'info' && body.severity !== 'warning' && body.severity !== 'critical') {
 			error(400, 'severity is required');
@@ -50,7 +55,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		const result = await createRiskThreshold(
 			{
 				name: body.name,
-				score_value: body.score_value,
+				score_value,
 				severity: body.severity
 			},
 			locals.accessToken,

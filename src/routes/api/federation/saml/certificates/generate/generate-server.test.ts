@@ -57,4 +57,11 @@ describe('POST /api/federation/saml/certificates/generate', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(uploadCertificate).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN validity_days instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ common_name: 'cn', validity_days: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(uploadCertificate).not.toHaveBeenCalled();
+	});
 });

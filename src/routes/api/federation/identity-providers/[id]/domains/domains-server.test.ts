@@ -79,4 +79,11 @@ describe('POST /api/federation/identity-providers/:id/domains', () => {
 		expect(response.status).toBe(201);
 		expect(addDomain).toHaveBeenCalled();
 	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ domain: 'ex.com', priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(addDomain).not.toHaveBeenCalled();
+	});
 });

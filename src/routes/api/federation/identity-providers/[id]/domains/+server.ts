@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listDomains, addDomain } from '$lib/api/federation';
 import type { CreateDomainRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -32,10 +33,12 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	}
 	const data: CreateDomainRequest = { domain: body.domain };
 	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
+		try {
+			data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.priority = body.priority;
 	}
 	const result = await addDomain(params.id, data, locals.accessToken, locals.tenantId, fetch);
 	return json(result, { status: 201 });

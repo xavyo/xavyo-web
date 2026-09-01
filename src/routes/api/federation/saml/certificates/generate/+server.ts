@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { uploadCertificate } from '$lib/api/federation';
 import forge from 'node-forge';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -38,10 +39,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 	let validity_days = 365;
 	if (body.validity_days !== undefined) {
-		if (typeof body.validity_days !== 'number') {
-			error(400, 'validity_days must be a number');
+		try {
+			validity_days = parseBoundedInteger(body.validity_days, 1, 3650, 'validity_days');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		validity_days = body.validity_days;
 	}
 
 	// Generate RSA-2048 keypair

@@ -58,4 +58,18 @@ describe('PUT /api/risk/thresholds/:id', () => {
 		});
 		expect(updateRiskThreshold).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN score_value instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ score_value: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateRiskThreshold).not.toHaveBeenCalled();
+	});
+
+	it('rejects NaN cooldown_hours instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ cooldown_hours: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateRiskThreshold).not.toHaveBeenCalled();
+	});
 });

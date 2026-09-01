@@ -58,4 +58,13 @@ describe('POST /api/risk/thresholds', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createRiskThreshold).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN score_value instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(JSON.stringify({ name: 'n', score_value: Number.NaN, severity: 'critical' })) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createRiskThreshold).not.toHaveBeenCalled();
+	});
 });
