@@ -132,6 +132,105 @@
 				<p class="text-sm text-destructive">{$errors.attribute_mapping}</p>
 			{/if}
 
+			<Separator class="my-6" />
+
+			<h3 class="text-base font-medium">Group assertions</h3>
+			<p class="text-xs text-muted-foreground">
+				Control how this service provider receives user groups in SAML assertions.
+			</p>
+
+			<div class="flex items-center gap-2">
+				<input
+					id="sp-include-groups"
+					name="include_groups"
+					type="checkbox"
+					checked={$form.include_groups ?? true}
+					class="h-4 w-4 rounded border-input"
+				/>
+				<Label for="sp-include-groups">Include groups in assertions</Label>
+			</div>
+			{#if $errors.include_groups}
+				<p class="text-sm text-destructive">{$errors.include_groups}</p>
+			{/if}
+
+			<div class="flex items-center gap-2">
+				<input
+					id="sp-omit-empty-groups"
+					name="omit_empty_groups"
+					type="checkbox"
+					checked={$form.omit_empty_groups ?? true}
+					class="h-4 w-4 rounded border-input"
+				/>
+				<Label for="sp-omit-empty-groups">Omit groups attribute when empty</Label>
+			</div>
+			{#if $errors.omit_empty_groups}
+				<p class="text-sm text-destructive">{$errors.omit_empty_groups}</p>
+			{/if}
+
+			<div class="space-y-2">
+				<Label for="sp-group-attribute-name">Group attribute name</Label>
+				<Input
+					id="sp-group-attribute-name"
+					name="group_attribute_name"
+					type="text"
+					placeholder="groups"
+					value={String($form.group_attribute_name ?? '')}
+				/>
+				<p class="text-xs text-muted-foreground">SAML attribute name (default: groups)</p>
+				{#if $errors.group_attribute_name}
+					<p class="text-sm text-destructive">{$errors.group_attribute_name}</p>
+				{/if}
+			</div>
+
+			<div class="space-y-2">
+				<Label for="sp-group-value-format">Group value format</Label>
+				<select
+					id="sp-group-value-format"
+					name="group_value_format"
+					class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+					value={String($form.group_value_format ?? 'name')}
+				>
+					<option value="name">Name (display name)</option>
+					<option value="id">ID (UUID)</option>
+					<option value="dn">DN (distinguished name)</option>
+				</select>
+				{#if $errors.group_value_format}
+					<p class="text-sm text-destructive">{$errors.group_value_format}</p>
+				{/if}
+			</div>
+
+			<div class="space-y-2">
+				<Label for="sp-group-dn-base">Group DN base (optional)</Label>
+				<Input
+					id="sp-group-dn-base"
+					name="group_dn_base"
+					type="text"
+					placeholder="ou=Groups,dc=example,dc=com"
+					value={String($form.group_dn_base ?? '')}
+				/>
+				{#if $errors.group_dn_base}
+					<p class="text-sm text-destructive">{$errors.group_dn_base}</p>
+				{/if}
+			</div>
+
+			<div class="space-y-2">
+				<Label for="sp-group-filter">Group filter JSON (optional)</Label>
+				<textarea
+					id="sp-group-filter"
+					name="group_filter"
+					placeholder={'{"filter_type":"allowlist","allowlist":["admins"]}'}
+					rows="4"
+					class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+					value={String($form.group_filter ?? '')}
+				></textarea>
+				<p class="text-xs text-muted-foreground">
+					filter_type: none, pattern, or allowlist. Patterns use glob syntax.
+				</p>
+				{#if $errors.group_filter}
+					<p class="text-sm text-destructive">{$errors.group_filter}</p>
+				{/if}
+			</div>
+
 			<div class="flex items-center gap-2">
 				<input
 					id="sp-sign-assertions"

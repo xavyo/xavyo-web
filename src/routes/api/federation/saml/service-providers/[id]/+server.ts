@@ -6,6 +6,7 @@ import {
 	deleteServiceProvider
 } from '$lib/api/federation';
 import type { UpdateServiceProviderRequest } from '$lib/api/types';
+import { applyGroupConfigFields } from '$lib/server/sp-group-fields';
 import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
@@ -127,6 +128,7 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		}
 		data.slo_binding = body.slo_binding;
 	}
+	applyGroupConfigFields(body, data);
 	const result = await updateServiceProvider(
 		params.id,
 		data,

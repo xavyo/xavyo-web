@@ -81,6 +81,40 @@ describe('PUT /api/federation/saml/service-providers/:id', () => {
 		expect(updateServiceProvider).toHaveBeenCalled();
 	});
 
+	it('forwards advertised group config instead of dropping it', async () => {
+		vi.mocked(updateServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const response = await PUT(
+			makeEvent(
+				JSON.stringify({
+					include_groups: false,
+					group_attribute_name: 'Roles',
+					group_value_format: 'id',
+					group_filter: { filter_type: 'allowlist', allowlist: ['admins'] }
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateServiceProvider).toHaveBeenCalledWith(
+			'sp1',
+			expect.objectContaining({
+				include_groups: false,
+				group_attribute_name: 'Roles',
+				group_value_format: 'id',
+				group_filter: { filter_type: 'allowlist', allowlist: ['admins'] }
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects unknown group_value_format', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ group_value_format: 'uuid' })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateServiceProvider).not.toHaveBeenCalled();
+	});
+
 	it('rejects NaN assertion_validity_seconds instead of forwarding it', async () => {
 		await expect(
 			PUT(makeEvent(JSON.stringify({ assertion_validity_seconds: Number.NaN })) as any)

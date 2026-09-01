@@ -95,6 +95,88 @@ describe('POST /api/federation/saml/service-providers', () => {
 		expect(createServiceProvider).toHaveBeenCalled();
 	});
 
+	it('forwards advertised group config instead of dropping it', async () => {
+		vi.mocked(createServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'app',
+					entity_id: 'https://ex',
+					acs_urls: ['https://ex/acs'],
+					group_attribute_name: 'Roles',
+					group_value_format: 'id',
+					include_groups: false,
+					omit_empty_groups: false,
+					group_dn_base: 'ou=Groups,dc=example,dc=com',
+					group_filter: { filter_type: 'allowlist', allowlist: ['admins'] }
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createServiceProvider).toHaveBeenCalledWith(
+			expect.objectContaining({
+				group_attribute_name: 'Roles',
+				group_value_format: 'id',
+				include_groups: false,
+				omit_empty_groups: false,
+				group_dn_base: 'ou=Groups,dc=example,dc=com',
+				group_filter: { filter_type: 'allowlist', allowlist: ['admins'] }
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards nested group_config', async () => {
+		vi.mocked(createServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'app',
+					entity_id: 'https://ex',
+					acs_urls: ['https://ex/acs'],
+					group_config: {
+						attribute_name: 'memberOf',
+						value_format: 'dn',
+						include_groups: true,
+						omit_empty_groups: true,
+						dn_base: 'ou=Groups,dc=example,dc=com',
+						filter: { filter_type: 'pattern', patterns: ['app-*'] }
+					}
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createServiceProvider).toHaveBeenCalledWith(
+			expect.objectContaining({
+				group_config: expect.objectContaining({
+					attribute_name: 'memberOf',
+					value_format: 'dn'
+				})
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects unknown group_value_format', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'app',
+						entity_id: 'https://ex',
+						acs_urls: ['https://ex/acs'],
+						group_value_format: 'uuid'
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createServiceProvider).not.toHaveBeenCalled();
+	});
+
 	it('rejects NaN assertion_validity_seconds instead of forwarding it', async () => {
 		await expect(
 			POST(

@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listServiceProviders, createServiceProvider } from '$lib/api/federation';
 import type { CreateServiceProviderRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { applyGroupConfigFields } from '$lib/server/sp-group-fields';
 import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
@@ -122,6 +123,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		}
 		data.slo_binding = body.slo_binding;
 	}
+	applyGroupConfigFields(body, data);
 	const result = await createServiceProvider(data, locals.accessToken, locals.tenantId, fetch);
 
 	return json(result, { status: 201 });

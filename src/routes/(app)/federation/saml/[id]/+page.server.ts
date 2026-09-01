@@ -45,7 +45,13 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			metadata_url: sp.metadata_url ?? '',
 			slo_url: sp.slo_url ?? '',
 			slo_binding: sp.slo_binding ?? '',
-			enabled: sp.enabled
+			enabled: sp.enabled,
+			group_attribute_name: sp.group_attribute_name ?? '',
+			group_value_format: (sp.group_value_format as 'name' | 'id' | 'dn' | undefined) ?? 'name',
+			group_filter: sp.group_filter ? JSON.stringify(sp.group_filter, null, 2) : '',
+			include_groups: sp.include_groups ?? true,
+			omit_empty_groups: sp.omit_empty_groups ?? true,
+			group_dn_base: sp.group_dn_base ?? ''
 		},
 		zod(updateServiceProviderSchema)
 	);
@@ -81,6 +87,17 @@ export const actions: Actions = {
 			}
 		}
 
+		let group_filter: Record<string, unknown> | undefined;
+		if (form.data.group_filter) {
+			try {
+				group_filter = parseJsonRecord(form.data.group_filter);
+			} catch {
+				return message(form, 'Group filter must be a JSON object', {
+					status: 400 as ErrorStatus
+				});
+			}
+		}
+
 		const body: UpdateServiceProviderRequest = {
 			name: form.data.name || undefined,
 			entity_id: form.data.entity_id || undefined,
@@ -94,7 +111,13 @@ export const actions: Actions = {
 			enabled: form.data.enabled,
 			metadata_url: form.data.metadata_url || undefined,
 			slo_url: form.data.slo_url || undefined,
-			slo_binding: form.data.slo_binding || undefined
+			slo_binding: form.data.slo_binding || undefined,
+			group_attribute_name: form.data.group_attribute_name || undefined,
+			group_value_format: form.data.group_value_format || undefined,
+			group_filter,
+			include_groups: form.data.include_groups,
+			omit_empty_groups: form.data.omit_empty_groups,
+			group_dn_base: form.data.group_dn_base || undefined
 		};
 
 		try {

@@ -42,6 +42,17 @@ export const actions: Actions = {
 			}
 		}
 
+		let group_filter: Record<string, unknown> | undefined;
+		if (form.data.group_filter) {
+			try {
+				group_filter = parseJsonRecord(form.data.group_filter);
+			} catch {
+				return message(form, 'Group filter must be a JSON object', {
+					status: 400 as ErrorStatus
+				});
+			}
+		}
+
 		const body: CreateServiceProviderRequest = {
 			name: form.data.name,
 			entity_id: form.data.entity_id,
@@ -54,7 +65,13 @@ export const actions: Actions = {
 			assertion_validity_seconds: form.data.assertion_validity_seconds,
 			metadata_url: form.data.metadata_url || undefined,
 			slo_url: form.data.slo_url || undefined,
-			slo_binding: form.data.slo_binding || undefined
+			slo_binding: form.data.slo_binding || undefined,
+			group_attribute_name: form.data.group_attribute_name || undefined,
+			group_value_format: form.data.group_value_format || undefined,
+			group_filter,
+			include_groups: form.data.include_groups,
+			omit_empty_groups: form.data.omit_empty_groups,
+			group_dn_base: form.data.group_dn_base || undefined
 		};
 
 		try {
