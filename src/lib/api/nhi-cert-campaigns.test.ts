@@ -50,6 +50,27 @@ describe('NHI Cert Campaigns API', () => {
 			});
 			expect(result).toEqual(mockResult);
 		});
+
+		it('forwards advertised owner_filter and needs_certification_only', async () => {
+			const body = {
+				name: 'Owner review',
+				owner_filter: 'user-1',
+				needs_certification_only: false,
+				nhi_type_filter: 'agent',
+				specific_nhi_ids: ['nhi-1']
+			};
+			mockApiClient.mockResolvedValue({ id: 'camp-1' });
+
+			await createNhiCertCampaignV2(body as any, token, tenantId, mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/certification/campaigns', {
+				method: 'POST',
+				token,
+				tenantId,
+				body,
+				fetch: mockFetch
+			});
+		});
 	});
 
 	describe('listNhiCertCampaignsV2', () => {

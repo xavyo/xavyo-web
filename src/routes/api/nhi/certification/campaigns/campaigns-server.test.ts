@@ -98,6 +98,30 @@ describe('POST /api/nhi/certification/campaigns', () => {
 		expect(createNhiCertCampaignV2).toHaveBeenCalled();
 	});
 
+	it('forwards advertised nhi_type_filter and specific_nhi_ids', async () => {
+		vi.mocked(createNhiCertCampaignV2).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'Agents only',
+					deadline: '2026-12-01T00:00:00Z',
+					nhi_type_filter: 'agent',
+					specific_nhi_ids: ['nhi-1', 'nhi-2']
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createNhiCertCampaignV2).toHaveBeenCalledWith(
+			expect.objectContaining({
+				nhi_type_filter: 'agent',
+				specific_nhi_ids: ['nhi-1', 'nhi-2']
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('maps due_date onto advertised deadline and forwards owner_filter', async () => {
 		vi.mocked(createNhiCertCampaignV2).mockResolvedValue({ id: 'c1' } as any);
 		const response = await POST(
