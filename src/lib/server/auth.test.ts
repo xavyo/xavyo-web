@@ -12,7 +12,8 @@ import {
 	stampTenantCookieFromQuery,
 	clearAuthCookies,
 	omitTokenFields,
-	SYSTEM_TENANT_ID
+	SYSTEM_TENANT_ID,
+	sessionUserFromClaims
 } from './auth';
 
 describe('decodeAccessToken', () => {
@@ -49,6 +50,54 @@ describe('decodeAccessToken', () => {
 	it('returns null for empty string', () => {
 		const claims = decodeAccessToken('');
 		expect(claims).toBeNull();
+	});
+});
+
+describe('sessionUserFromClaims', () => {
+	it('copies advertised JWT name onto display_name', () => {
+		const user = sessionUserFromClaims({
+			sub: 'user-1',
+			iss: 'xavyo',
+			aud: ['xavyo'],
+			exp: 9999999999,
+			iat: 1,
+			jti: 'j',
+			roles: ['user'],
+			email: 'ada@example.com',
+			name: 'Ada Lovelace'
+		});
+		expect(user).toEqual({
+			id: 'user-1',
+			email: 'ada@example.com',
+			roles: ['user'],
+			display_name: 'Ada Lovelace'
+		});
+	});
+
+	it('uses null display_name when name is absent or blank', () => {
+		expect(
+			sessionUserFromClaims({
+				sub: 'user-1',
+				iss: 'xavyo',
+				aud: ['xavyo'],
+				exp: 1,
+				iat: 1,
+				jti: 'j',
+				roles: []
+			}).display_name
+		).toBeNull();
+		expect(
+			sessionUserFromClaims({
+				sub: 'user-1',
+				iss: 'xavyo',
+				aud: ['xavyo'],
+				exp: 1,
+				iat: 1,
+				jti: 'j',
+				roles: [],
+				name: '   '
+			}).display_name
+		).toBeNull();
 	});
 });
 

@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import {
 	parseMapping,
@@ -160,6 +163,56 @@ describe('attribute-mapping utility', () => {
 		it('groups is available but not a NameID source', () => {
 			expect(AVAILABLE_SOURCES).toContain('groups');
 			expect(NAME_ID_SOURCES).not.toContain('groups');
+		});
+
+		it('includes advertised profile sources filled by the SAML API', () => {
+			for (const src of ['first_name', 'given_name', 'last_name', 'family_name', 'username']) {
+				expect(AVAILABLE_SOURCES).toContain(src);
+			}
+			expect(NAME_ID_SOURCES).toContain('username');
+		});
+	});
+
+	describe('advanced JSON path', () => {
+		it('uses parseMapping instead of name_id_source fallback', () => {
+			const src = readFileSync(
+				join(dirname(fileURLToPath(import.meta.url)), 'attribute-mapping-editor.svelte'),
+				'utf8'
+			);
+			expect(src).toContain('parseMapping(raw)');
+			expect(src).not.toContain("parsed.name_id_source ?? 'email'");
+		});
+	});
+
+	describe('parseMapping attribute rows', () => {
+		it('returns null when an attribute row is missing required fields', () => {
+			expect(
+				parseMapping(
+					JSON.stringify({
+						name_id_source: 'email',
+						attributes: [{ source: 'email' }]
+					})
+				)
+			).toBeNull();
+		});
+
+		it('accepts first_name as an attribute source', () => {
+			const result = parseMapping(
+				JSON.stringify({
+					name_id_source: 'username',
+					attributes: [
+						{
+							source: 'first_name',
+							target_name: 'givenName',
+							target_friendly_name: 'Given name',
+							format: '',
+							multi_value: false
+						}
+					]
+				})
+			);
+			expect(result?.name_id_source).toBe('username');
+			expect(result?.attributes[0].source).toBe('first_name');
 		});
 	});
 

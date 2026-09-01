@@ -5,6 +5,22 @@ import type { Cookies } from '@sveltejs/kit';
 
 export const SYSTEM_TENANT_ID = '00000000-0000-0000-0000-000000000001';
 
+/** Session user from advertised JWT claims (`sub`, `email`, `roles`, `name`). */
+export function sessionUserFromClaims(claims: JwtClaims): {
+	id: string;
+	email: string;
+	roles: string[];
+	display_name: string | null;
+} {
+	const name = typeof claims.name === 'string' ? claims.name.trim() : '';
+	return {
+		id: claims.sub,
+		email: typeof claims.email === 'string' ? claims.email : '',
+		roles: Array.isArray(claims.roles) ? claims.roles : [],
+		display_name: name.length > 0 ? name : null
+	};
+}
+
 export function decodeAccessToken(token: string): JwtClaims | null {
 	if (!token) return null;
 	try {

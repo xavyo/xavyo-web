@@ -27,7 +27,7 @@ function makeEvent(overrides: Record<string, unknown> = {}) {
 		locals: {
 			accessToken: TOKEN,
 			tenantId: TENANT,
-			user: { id: 'user-1', email: 'user@example.com', roles: ['user'] }
+			user: { id: 'user-1', email: 'user@example.com', roles: ['user'], display_name: 'Ada Lovelace' }
 		},
 		fetch: vi.fn(),
 		...overrides
@@ -56,7 +56,7 @@ describe('GET /api/me/profile', () => {
 		const body = await response.json();
 		expect(body.id).toBe('user-1');
 		expect(body.email).toBe('user@example.com');
-		expect(body.display_name).toBeNull();
+		expect(body.display_name).toBe('Ada Lovelace');
 	});
 
 	it('fails closed on 500', async () => {

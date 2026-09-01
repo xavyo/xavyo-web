@@ -5,6 +5,7 @@ declare global {
 				id: string;
 				email: string;
 				roles: string[];
+				display_name: string | null;
 			};
 			accessToken?: string;
 			tenantId?: string;
