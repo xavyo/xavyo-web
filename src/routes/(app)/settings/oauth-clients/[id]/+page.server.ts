@@ -10,6 +10,7 @@ import {
 } from '$lib/api/oauth-clients';
 import { ApiError } from '$lib/api/client';
 import type { UpdateOAuthClientRequest } from '$lib/api/types';
+import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 	let client;
@@ -30,7 +31,12 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			scopes: client.scopes.join(', '),
 			post_logout_redirect_uris: client.post_logout_redirect_uris.join(', '),
 			logo_url: client.logo_url ?? '',
-			description: client.description ?? ''
+			description: client.description ?? '',
+			require_dpop: client.require_dpop ?? false,
+			fapi_profile: client.fapi_profile ?? false,
+			jwks: client.jwks ? JSON.stringify(client.jwks, null, 2) : '',
+			tls_client_cert_thumbprint: client.tls_client_cert_thumbprint ?? '',
+			nhi_id: client.nhi_id ?? ''
 		},
 		zod(updateOAuthClientSchema)
 	);
@@ -73,8 +79,22 @@ export const actions: Actions = {
 						.filter(Boolean)
 				: undefined,
 			...(form.data.logo_url ? { logo_url: form.data.logo_url } : {}),
-			...(form.data.description ? { description: form.data.description } : {})
+			...(form.data.description ? { description: form.data.description } : {}),
+			require_dpop: form.data.require_dpop,
+			fapi_profile: form.data.fapi_profile,
+			...(form.data.tls_client_cert_thumbprint
+				? { tls_client_cert_thumbprint: form.data.tls_client_cert_thumbprint }
+				: {}),
+			...(form.data.nhi_id ? { nhi_id: form.data.nhi_id } : {})
 		};
+
+		if (form.data.jwks) {
+			try {
+				body.jwks = parseJsonRecord(form.data.jwks);
+			} catch {
+				return message(form, 'JWKS must be a JSON object', { status: 400 as ErrorStatus });
+			}
+		}
 
 		try {
 			await updateOAuthClient(params.id, body, locals.accessToken!, locals.tenantId!, fetch);

@@ -130,6 +130,19 @@ describe('createOAuthClientSchema', () => {
 		expect(result.success).toBe(true);
 	});
 
+	it('accepts require_dpop and fapi_profile', () => {
+		const result = createOAuthClientSchema.safeParse({
+			...validInput,
+			require_dpop: true,
+			fapi_profile: true
+		});
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.require_dpop).toBe(true);
+			expect(result.data.fapi_profile).toBe(true);
+		}
+	});
+
 	it('accepts multiple comma-separated scopes', () => {
 		const result = createOAuthClientSchema.safeParse({
 			...validInput,

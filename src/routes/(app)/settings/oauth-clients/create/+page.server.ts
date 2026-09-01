@@ -5,6 +5,7 @@ import { fail } from '@sveltejs/kit';
 import { createOAuthClientSchema } from '$lib/schemas/oauth-clients';
 import { createOAuthClient } from '$lib/api/oauth-clients';
 import { ApiError } from '$lib/api/client';
+import { parseJsonRecord } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async () => {
 	const form = await superValidate(zod(createOAuthClientSchema));
@@ -15,6 +16,15 @@ export const actions: Actions = {
 	default: async ({ request, locals, fetch }) => {
 		const form = await superValidate(request, zod(createOAuthClientSchema));
 		if (!form.valid) return fail(400, { form });
+
+		let jwks: Record<string, unknown> | undefined;
+		if (form.data.jwks) {
+			try {
+				jwks = parseJsonRecord(form.data.jwks);
+			} catch {
+				return message(form, 'JWKS must be a JSON object', { status: 400 as ErrorStatus });
+			}
+		}
 
 		try {
 			const result = await createOAuthClient(
@@ -42,7 +52,14 @@ export const actions: Actions = {
 							}
 						: {}),
 					...(form.data.logo_url ? { logo_url: form.data.logo_url } : {}),
-					...(form.data.description ? { description: form.data.description } : {})
+					...(form.data.description ? { description: form.data.description } : {}),
+					require_dpop: form.data.require_dpop,
+					fapi_profile: form.data.fapi_profile,
+					...(form.data.tls_client_cert_thumbprint
+						? { tls_client_cert_thumbprint: form.data.tls_client_cert_thumbprint }
+						: {}),
+					...(form.data.nhi_id ? { nhi_id: form.data.nhi_id } : {}),
+					...(jwks ? { jwks } : {})
 				},
 				locals.accessToken!,
 				locals.tenantId!,
