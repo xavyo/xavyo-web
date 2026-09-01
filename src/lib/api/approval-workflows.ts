@@ -141,6 +141,7 @@ export async function setDefaultWorkflow(
 export interface ListGroupsParams {
 	limit?: number;
 	offset?: number;
+	is_active?: boolean;
 }
 
 export async function listApprovalGroups(
@@ -149,7 +150,11 @@ export async function listApprovalGroups(
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<ApprovalGroupListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		is_active: params.is_active
+	});
 	return apiClient<ApprovalGroupListResponse>(`/governance/approval-groups${qs}`, {
 		method: 'GET',
 		token,

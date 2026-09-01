@@ -439,6 +439,31 @@ describe('Governance API — SoD Rules', () => {
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
 		});
+
+		it('includes advertised SoD violation list filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listSodViolations(
+				{
+					rule_id: 'r1',
+					user_id: 'u1',
+					status: 'open',
+					detected_after: '2024-01-01T00:00:00Z',
+					detected_before: '2024-02-01T00:00:00Z'
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('rule_id')).toBe('r1');
+			expect(params.get('user_id')).toBe('u1');
+			expect(params.get('status')).toBe('open');
+			expect(params.get('detected_after')).toBe('2024-01-01T00:00:00Z');
+			expect(params.get('detected_before')).toBe('2024-02-01T00:00:00Z');
+		});
 	});
 });
 

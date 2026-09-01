@@ -221,6 +221,16 @@ describe('Approval Workflows API — Groups', () => {
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('20');
 		});
+
+		it('includes advertised is_active filter', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listApprovalGroups({ is_active: false }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('is_active')).toBe('false');
+		});
 	});
 
 	describe('createApprovalGroup', () => {

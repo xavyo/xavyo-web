@@ -226,6 +226,9 @@ export async function fetchSodViolations(
 	params: {
 		rule_id?: string;
 		user_id?: string;
+		status?: string;
+		detected_after?: string;
+		detected_before?: string;
 		severity?: RiskLevel;
 		limit?: number;
 		offset?: number;
@@ -235,6 +238,9 @@ export async function fetchSodViolations(
 	const qs = buildSearchParams({
 		rule_id: params.rule_id,
 		user_id: params.user_id,
+		status: params.status,
+		detected_after: params.detected_after,
+		detected_before: params.detected_before,
 		severity: params.severity,
 		limit: params.limit,
 		offset: params.offset

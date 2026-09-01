@@ -11,7 +11,13 @@ export const GET: RequestHandler = async ({ locals, params, url, fetch }) => {
 	try {
 		const result = await getNhiUsageHistory(
 			params.id,
-			listPagination(url),
+			{
+				target_resource: url.searchParams.get('target_resource') ?? undefined,
+				outcome: url.searchParams.get('outcome') ?? undefined,
+				start_date: url.searchParams.get('start_date') ?? undefined,
+				end_date: url.searchParams.get('end_date') ?? undefined,
+				...listPagination(url)
+			},
 			locals.accessToken,
 			locals.tenantId,
 			fetch

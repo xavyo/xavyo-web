@@ -7,10 +7,21 @@ import type {
 
 export async function fetchNhiUsageHistory(
 	nhiId: string,
-	params: { limit?: number; offset?: number } = {},
+	params: {
+		target_resource?: string;
+		outcome?: string;
+		start_date?: string;
+		end_date?: string;
+		limit?: number;
+		offset?: number;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<NhiUsageListResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.target_resource) searchParams.set('target_resource', params.target_resource);
+	if (params.outcome) searchParams.set('outcome', params.outcome);
+	if (params.start_date) searchParams.set('start_date', params.start_date);
+	if (params.end_date) searchParams.set('end_date', params.end_date);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

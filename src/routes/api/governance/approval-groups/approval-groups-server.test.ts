@@ -5,8 +5,8 @@ vi.mock('$lib/api/approval-workflows', () => ({
 	createApprovalGroup: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createApprovalGroup } from '$lib/api/approval-workflows';
+import { GET, POST } from './+server';
+import { createApprovalGroup, listApprovalGroups } from '$lib/api/approval-workflows';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/governance/approval-groups', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('forwards advertised is_active filter', async () => {
+		vi.mocked(listApprovalGroups).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/approval-groups?is_active=false')
+		} as any);
+		expect(listApprovalGroups).toHaveBeenCalledWith(
+			expect.objectContaining({ is_active: false }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/governance/approval-groups', () => {
 	beforeEach(() => {
