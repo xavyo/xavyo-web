@@ -84,6 +84,47 @@ describe('POST /api/governance/reports/schedules', () => {
 		expect(createSchedule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string schedule_hour', async () => {
+		vi.mocked(createSchedule).mockResolvedValue({ id: 's1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					template_id: 't1',
+					name: 'Nightly',
+					frequency: 'daily',
+					schedule_hour: '2',
+					recipients: ['ops@example.com'],
+					output_format: 'csv'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSchedule).toHaveBeenCalledWith(
+			expect.objectContaining({ schedule_hour: 2 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN schedule_hour instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						template_id: 't1',
+						name: 'Nightly',
+						frequency: 'daily',
+						schedule_hour: Number.NaN,
+						recipients: ['ops@example.com'],
+						output_format: 'csv'
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createSchedule).not.toHaveBeenCalled();
+	});
+
 	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(createSchedule).mockResolvedValue({ id: 's1' } as any);

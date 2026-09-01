@@ -58,6 +58,31 @@ describe('POST /api/governance/object-templates', () => {
 		expect(createObjectTemplate).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(createObjectTemplate).mockResolvedValue({ id: 't1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'User Template', object_type: 'user', priority: '50' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createObjectTemplate).toHaveBeenCalledWith(
+			expect.objectContaining({ priority: 50 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({ name: 'User Template', object_type: 'user', priority: Number.NaN })
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createObjectTemplate).not.toHaveBeenCalled();
+	});
+
 	it('does not create when object_type is invalid', async () => {
 		await expect(
 			POST(makeEvent(JSON.stringify({ name: 'User Template', object_type: 'group' })) as any)

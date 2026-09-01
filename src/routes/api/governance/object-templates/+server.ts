@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listObjectTemplates, createObjectTemplate } from '$lib/api/object-templates';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const OBJECT_TYPES = ['user', 'role', 'entitlement', 'application'] as const;
 
@@ -55,10 +56,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.description = body.description;
 	}
 	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
+		try {
+			data.priority = parseBoundedInteger(body.priority, 1, 1000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.priority = body.priority;
 	}
 	if (body.parent_template_id !== undefined) {
 		if (body.parent_template_id !== null && typeof body.parent_template_id !== 'string') {

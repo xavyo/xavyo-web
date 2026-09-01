@@ -174,6 +174,33 @@ describe('POST /api/governance/sla-policies (create)', () => {
 		expect(createSlaPolicy).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string target_duration_seconds', async () => {
+		vi.mocked(createSlaPolicy).mockResolvedValue({ id: 'sla-new' } as any);
+		const response = await POST(
+			makeRequestEvent({
+				request: makeJsonRequest({ name: 'Gold SLA', target_duration_seconds: '3600' })
+			})
+		);
+		expect(response.status).toBe(201);
+		expect(createSlaPolicy).toHaveBeenCalledWith(
+			expect.objectContaining({ target_duration_seconds: 3600 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN target_duration_seconds instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: makeJsonRequest({ name: 'Gold SLA', target_duration_seconds: Number.NaN })
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createSlaPolicy).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		await expect(
 			POST(makeRequestEvent({ request: makeJsonRequest({ target_duration_seconds: 3600 }) }))

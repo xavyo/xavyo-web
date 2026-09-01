@@ -8,6 +8,7 @@ import type {
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const SCHEDULE_FREQUENCIES = ['daily', 'weekly', 'monthly'] as const;
 const OUTPUT_FORMATS = ['json', 'csv'] as const;
@@ -55,8 +56,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!SCHEDULE_FREQUENCIES.includes(body.frequency as (typeof SCHEDULE_FREQUENCIES)[number])) {
 		error(400, 'frequency is required');
 	}
-	if (typeof body.schedule_hour !== 'number') {
-		error(400, 'schedule_hour is required');
+	let scheduleHour: number;
+	try {
+		scheduleHour = parseBoundedInteger(body.schedule_hour, 0, 23, 'schedule_hour');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (
 		!Array.isArray(body.recipients) ||
@@ -72,21 +77,30 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		template_id: body.template_id,
 		name: body.name,
 		frequency: body.frequency as ScheduleFrequency,
-		schedule_hour: body.schedule_hour,
+		schedule_hour: scheduleHour,
 		recipients: body.recipients as string[],
 		output_format: body.output_format as OutputFormat
 	};
-	if (body.schedule_day_of_week !== undefined) {
-		if (typeof body.schedule_day_of_week !== 'number') {
-			error(400, 'schedule_day_of_week must be a number');
+	try {
+		if (body.schedule_day_of_week !== undefined) {
+			data.schedule_day_of_week = parseBoundedInteger(
+				body.schedule_day_of_week,
+				0,
+				6,
+				'schedule_day_of_week'
+			);
 		}
-		data.schedule_day_of_week = body.schedule_day_of_week;
-	}
-	if (body.schedule_day_of_month !== undefined) {
-		if (typeof body.schedule_day_of_month !== 'number') {
-			error(400, 'schedule_day_of_month must be a number');
+		if (body.schedule_day_of_month !== undefined) {
+			data.schedule_day_of_month = parseBoundedInteger(
+				body.schedule_day_of_month,
+				1,
+				31,
+				'schedule_day_of_month'
+			);
 		}
-		data.schedule_day_of_month = body.schedule_day_of_month;
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (body.parameters !== undefined) {
 		if (!body.parameters || typeof body.parameters !== 'object' || Array.isArray(body.parameters)) {

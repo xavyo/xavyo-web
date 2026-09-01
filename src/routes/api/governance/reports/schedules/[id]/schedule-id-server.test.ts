@@ -76,6 +76,26 @@ describe('PUT /api/governance/reports/schedules/:id', () => {
 		expect(updateSchedule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string schedule_hour', async () => {
+		vi.mocked(updateSchedule).mockResolvedValue({ id: 's1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ schedule_hour: '9' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateSchedule).toHaveBeenCalledWith(
+			's1',
+			expect.objectContaining({ schedule_hour: 9 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN schedule_hour instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ schedule_hour: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateSchedule).not.toHaveBeenCalled();
+	});
+
 	it('does not update when frequency is invalid', async () => {
 		await expect(
 			PUT(makeEvent(JSON.stringify({ frequency: 'hourly' })) as any)

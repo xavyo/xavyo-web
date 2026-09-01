@@ -69,6 +69,41 @@ describe('POST /api/governance/escalation-policies', () => {
 		expect(createEscalationPolicy).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string default_timeout_secs', async () => {
+		vi.mocked(createEscalationPolicy).mockResolvedValue({ id: 'e1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					default_timeout_secs: '3600',
+					final_fallback: 'escalate_admin'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createEscalationPolicy).toHaveBeenCalledWith(
+			expect.objectContaining({ default_timeout_secs: 3600 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN default_timeout_secs instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'n',
+						default_timeout_secs: Number.NaN,
+						final_fallback: 'escalate_admin'
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createEscalationPolicy).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		await expect(
 			POST(makeEvent(JSON.stringify({ default_timeout_secs: 1, final_fallback: 'auto_approve' })) as any)

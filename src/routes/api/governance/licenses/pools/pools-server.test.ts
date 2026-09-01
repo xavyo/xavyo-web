@@ -88,6 +88,42 @@ describe('POST /api/governance/licenses/pools', () => {
 		expect(createLicensePool).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string total_capacity', async () => {
+		vi.mocked(createLicensePool).mockResolvedValue({ id: 'p1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'Office',
+					vendor: 'Microsoft',
+					total_capacity: '100',
+					billing_period: 'annual'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createLicensePool).toHaveBeenCalledWith(
+			expect.objectContaining({ total_capacity: 100 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN total_capacity instead of forwarding it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'Office',
+					vendor: 'Microsoft',
+					total_capacity: Number.NaN,
+					billing_period: 'annual'
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createLicensePool).not.toHaveBeenCalled();
+	});
+
 	it('does not create when billing_period is invalid', async () => {
 		const response = await POST(
 			makeEvent(

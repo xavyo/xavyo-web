@@ -9,6 +9,7 @@ import type {
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 const BILLING_PERIODS = ['monthly', 'annual', 'perpetual'] as const;
 const LICENSE_TYPES = ['named', 'concurrent'] as const;
@@ -64,8 +65,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		if (typeof body.vendor !== 'string' || body.vendor.length === 0) {
 			return json({ error: 'vendor is required' }, { status: 400 });
 		}
-		if (typeof body.total_capacity !== 'number') {
-			return json({ error: 'total_capacity is required' }, { status: 400 });
+		let totalCapacity: number;
+		try {
+			totalCapacity = parseBoundedInteger(body.total_capacity, 0, 1_000_000_000, 'total_capacity');
+		} catch (e) {
+			if (e instanceof JsonObjectError) {
+				return json({ error: e.message }, { status: 400 });
+			}
+			throw e;
 		}
 		if (!BILLING_PERIODS.includes(body.billing_period as (typeof BILLING_PERIODS)[number])) {
 			return json({ error: 'billing_period is required' }, { status: 400 });
@@ -73,7 +80,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		const data: CreateLicensePoolRequest = {
 			name: body.name,
 			vendor: body.vendor,
-			total_capacity: body.total_capacity,
+			total_capacity: totalCapacity,
 			billing_period: body.billing_period as LicenseBillingPeriod
 		};
 		if (body.description !== undefined) {
@@ -83,10 +90,18 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			data.description = body.description;
 		}
 		if (body.cost_per_license !== undefined) {
-			if (typeof body.cost_per_license !== 'number') {
-				return json({ error: 'cost_per_license must be a number' }, { status: 400 });
+			try {
+				const cost = requireFiniteNumber(body.cost_per_license, 'cost_per_license');
+				if (cost < 0) {
+					return json({ error: 'cost_per_license must be a finite number' }, { status: 400 });
+				}
+				data.cost_per_license = cost;
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.cost_per_license = body.cost_per_license;
 		}
 		if (body.currency !== undefined) {
 			if (typeof body.currency !== 'string') {
@@ -115,10 +130,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			data.expiration_policy = body.expiration_policy as LicenseExpirationPolicy;
 		}
 		if (body.warning_days !== undefined) {
-			if (typeof body.warning_days !== 'number') {
-				return json({ error: 'warning_days must be a number' }, { status: 400 });
+			try {
+				data.warning_days = parseBoundedInteger(body.warning_days, 1, 365, 'warning_days');
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.warning_days = body.warning_days;
 		}
 		const result = await createLicensePool(data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });

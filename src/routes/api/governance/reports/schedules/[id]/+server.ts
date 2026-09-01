@@ -7,6 +7,7 @@ import type {
 	UpdateReportScheduleRequest
 } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const SCHEDULE_FREQUENCIES = ['daily', 'weekly', 'monthly'] as const;
 const OUTPUT_FORMATS = ['json', 'csv'] as const;
@@ -49,23 +50,25 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		}
 		data.frequency = body.frequency as ScheduleFrequency;
 	}
-	if (body.schedule_hour !== undefined) {
-		if (typeof body.schedule_hour !== 'number') {
-			error(400, 'schedule_hour must be a number');
+	try {
+		if (body.schedule_hour !== undefined) {
+			data.schedule_hour = parseBoundedInteger(body.schedule_hour, 0, 23, 'schedule_hour');
 		}
-		data.schedule_hour = body.schedule_hour;
-	}
-	if (body.schedule_day_of_week !== undefined) {
-		if (body.schedule_day_of_week !== null && typeof body.schedule_day_of_week !== 'number') {
-			error(400, 'schedule_day_of_week must be a number or null');
+		if (body.schedule_day_of_week !== undefined) {
+			data.schedule_day_of_week =
+				body.schedule_day_of_week === null
+					? null
+					: parseBoundedInteger(body.schedule_day_of_week, 0, 6, 'schedule_day_of_week');
 		}
-		data.schedule_day_of_week = body.schedule_day_of_week as number | null;
-	}
-	if (body.schedule_day_of_month !== undefined) {
-		if (body.schedule_day_of_month !== null && typeof body.schedule_day_of_month !== 'number') {
-			error(400, 'schedule_day_of_month must be a number or null');
+		if (body.schedule_day_of_month !== undefined) {
+			data.schedule_day_of_month =
+				body.schedule_day_of_month === null
+					? null
+					: parseBoundedInteger(body.schedule_day_of_month, 1, 31, 'schedule_day_of_month');
 		}
-		data.schedule_day_of_month = body.schedule_day_of_month as number | null;
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (body.recipients !== undefined) {
 		if (
