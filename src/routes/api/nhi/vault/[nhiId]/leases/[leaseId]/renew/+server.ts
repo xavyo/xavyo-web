@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { renewLease } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
 import type { RenewLeaseRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -19,10 +20,14 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		error(400, 'Invalid JSON body');
 	}
 	const body = parsed as Record<string, unknown>;
-	if (typeof body.extend_secs !== 'number') {
-		error(400, 'extend_secs is required');
+	let extend_secs: number;
+	try {
+		extend_secs = parseBoundedInteger(body.extend_secs, 1, 31_536_000, 'extend_secs');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
-	const data: RenewLeaseRequest = { extend_secs: body.extend_secs };
+	const data: RenewLeaseRequest = { extend_secs };
 
 	try {
 		const result = await renewLease(

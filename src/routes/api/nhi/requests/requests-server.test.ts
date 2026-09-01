@@ -97,4 +97,18 @@ describe('POST /api/nhi/requests', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('rejects NaN requested_rotation_days instead of forwarding it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'bot',
+					purpose: 'ci pipeline bot',
+					requested_rotation_days: Number.NaN
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(submitNhiRequest).not.toHaveBeenCalled();
+	});
 });

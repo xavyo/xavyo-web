@@ -48,4 +48,11 @@ describe('PUT /api/governance/roles/:id', () => {
 		});
 		expect(updateRole).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN version instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ version: Number.NaN, name: 'n' })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateRole).not.toHaveBeenCalled();
+	});
 });

@@ -60,4 +60,11 @@ describe('POST /api/nhi/:nhiId/vault/leases/:leaseId/renew', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(renewLease).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN extend_secs instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ extend_secs: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(renewLease).not.toHaveBeenCalled();
+	});
 });

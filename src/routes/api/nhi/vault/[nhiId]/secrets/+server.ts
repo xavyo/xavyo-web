@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listSecrets, storeSecret } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
 import type { StoreSecretRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -69,23 +70,34 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		}
 		data.expires_at = body.expires_at;
 	}
-	if (body.rotation_interval_days !== undefined) {
-		if (typeof body.rotation_interval_days !== 'number') {
-			error(400, 'rotation_interval_days must be a number');
+	try {
+		if (body.rotation_interval_days !== undefined) {
+			data.rotation_interval_days = parseBoundedInteger(
+				body.rotation_interval_days,
+				1,
+				3650,
+				'rotation_interval_days'
+			);
 		}
-		data.rotation_interval_days = body.rotation_interval_days;
-	}
-	if (body.max_lease_duration_secs !== undefined) {
-		if (typeof body.max_lease_duration_secs !== 'number') {
-			error(400, 'max_lease_duration_secs must be a number');
+		if (body.max_lease_duration_secs !== undefined) {
+			data.max_lease_duration_secs = parseBoundedInteger(
+				body.max_lease_duration_secs,
+				1,
+				31_536_000,
+				'max_lease_duration_secs'
+			);
 		}
-		data.max_lease_duration_secs = body.max_lease_duration_secs;
-	}
-	if (body.max_concurrent_leases !== undefined) {
-		if (typeof body.max_concurrent_leases !== 'number') {
-			error(400, 'max_concurrent_leases must be a number');
+		if (body.max_concurrent_leases !== undefined) {
+			data.max_concurrent_leases = parseBoundedInteger(
+				body.max_concurrent_leases,
+				1,
+				10_000,
+				'max_concurrent_leases'
+			);
 		}
-		data.max_concurrent_leases = body.max_concurrent_leases;
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 
 	try {

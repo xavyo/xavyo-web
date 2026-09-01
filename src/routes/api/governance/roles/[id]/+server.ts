@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRole, updateRole, deleteRole } from '$lib/api/governance-roles';
 import type { UpdateGovernanceRoleRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -28,10 +29,14 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		error(400, 'Invalid JSON body');
 	}
 	const body = parsed as Record<string, unknown>;
-	if (typeof body.version !== 'number') {
-		error(400, 'version is required');
+	let version: number;
+	try {
+		version = parseBoundedInteger(body.version, 0, 1_000_000, 'version');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
-	const data: UpdateGovernanceRoleRequest = { version: body.version };
+	const data: UpdateGovernanceRoleRequest = { version };
 	if (body.name !== undefined) {
 		if (typeof body.name !== 'string' || body.name.length === 0) {
 			error(400, 'name must be a non-empty string');

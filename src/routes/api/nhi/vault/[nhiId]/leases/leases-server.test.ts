@@ -65,4 +65,15 @@ describe('POST /api/nhi/:nhiId/vault/leases', () => {
 		);
 		expect(createLease).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN duration_secs instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({ secret_id: 's1', lessee_nhi_id: 'n2', duration_secs: Number.NaN })
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createLease).not.toHaveBeenCalled();
+	});
 });

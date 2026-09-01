@@ -4,6 +4,7 @@ import { listNhiRequests, submitNhiRequest } from '$lib/api/nhi-requests';
 import { ApiError } from '$lib/api/client';
 import type { SubmitNhiRequestBody } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -68,10 +69,19 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 				? body.requested_rotation_days
 				: body.rotation_interval_days;
 		if (rotation !== undefined) {
-			if (typeof rotation !== 'number') {
-				return json({ error: 'requested_rotation_days must be a number' }, { status: 400 });
+			try {
+				data.requested_rotation_days = parseBoundedInteger(
+					rotation,
+					1,
+					3650,
+					'requested_rotation_days'
+				);
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.requested_rotation_days = rotation;
 		}
 		const result = await submitNhiRequest(data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });
