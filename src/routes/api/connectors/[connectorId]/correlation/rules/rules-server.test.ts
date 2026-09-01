@@ -68,4 +68,26 @@ describe('POST /api/connectors/:connectorId/correlation/rules', () => {
 		});
 		expect(createCorrelationRule).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN threshold instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'n',
+						source_attribute: 'email',
+						target_attribute: 'mail',
+						match_type: 'exact',
+						threshold: Number.NaN,
+						weight: 1,
+						tier: 1,
+						is_definitive: true,
+						normalize: true,
+						priority: 1
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createCorrelationRule).not.toHaveBeenCalled();
+	});
 });

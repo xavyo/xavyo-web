@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listPolicies, createPolicy } from '$lib/api/authorization';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -39,12 +40,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (body.effect !== 'allow' && body.effect !== 'deny') {
 		error(400, 'effect is required');
 	}
+	let priority: number | undefined;
+	if (body.priority !== undefined) {
+		try {
+			priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
+		}
+	}
 	const result = await createPolicy(
 		{
 			name: body.name,
 			effect: body.effect,
 			description: typeof body.description === 'string' ? body.description : undefined,
-			priority: typeof body.priority === 'number' ? body.priority : undefined,
+			priority,
 			resource_type: typeof body.resource_type === 'string' ? body.resource_type : undefined,
 			action: typeof body.action === 'string' ? body.action : undefined
 		},

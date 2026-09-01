@@ -76,4 +76,11 @@ describe('POST /api/governance/duplicates', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(detectDuplicates).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN min_confidence instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ min_confidence: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(detectDuplicates).not.toHaveBeenCalled();
+	});
 });

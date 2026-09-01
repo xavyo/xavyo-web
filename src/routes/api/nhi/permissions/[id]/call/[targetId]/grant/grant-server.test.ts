@@ -68,4 +68,13 @@ describe('POST /api/nhi/permissions/:id/call/:targetId/grant', () => {
 		});
 		expect(grantNhiPermission).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN max_calls_per_hour instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(JSON.stringify({ permission_type: 'call', max_calls_per_hour: Number.NaN })) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(grantNhiPermission).not.toHaveBeenCalled();
+	});
 });

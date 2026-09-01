@@ -57,4 +57,20 @@ describe('POST /api/governance/merges/batch/preview', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(previewBatchMerge).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN min_confidence instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						candidate_ids: ['c1'],
+						entitlement_strategy: 'union',
+						attribute_rule: 'newest_wins',
+						min_confidence: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(previewBatchMerge).not.toHaveBeenCalled();
+	});
 });

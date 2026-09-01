@@ -48,4 +48,11 @@ describe('PUT /api/admin/authorization/policies/:id', () => {
 		});
 		expect(updatePolicy).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updatePolicy).not.toHaveBeenCalled();
+	});
 });
