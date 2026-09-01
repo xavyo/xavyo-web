@@ -21,12 +21,19 @@ function buildSearchParams(params: Record<string, string | number | boolean | un
 }
 
 export async function listPoaClient(
-	params: { direction: 'incoming' | 'outgoing'; status?: string; limit?: number; offset?: number } = { direction: 'outgoing' },
+	params: {
+		direction: 'incoming' | 'outgoing';
+		status?: string;
+		active_now?: boolean;
+		limit?: number;
+		offset?: number;
+	} = { direction: 'outgoing' },
 	fetchFn: typeof fetch = fetch
 ): Promise<PoaListResponse> {
 	const qs = buildSearchParams({
 		direction: params.direction,
 		status: params.status,
+		active_now: params.active_now,
 		limit: params.limit,
 		offset: params.offset
 	});
@@ -136,13 +143,21 @@ export async function getPoaAuditClient(
 }
 
 export async function adminListPoaClient(
-	params: { donor_id?: string; attorney_id?: string; status?: string; limit?: number; offset?: number } = {},
+	params: {
+		donor_id?: string;
+		attorney_id?: string;
+		status?: string;
+		active_now?: boolean;
+		limit?: number;
+		offset?: number;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PoaListResponse> {
 	const qs = buildSearchParams({
 		donor_id: params.donor_id,
 		attorney_id: params.attorney_id,
 		status: params.status,
+		active_now: params.active_now,
 		limit: params.limit,
 		offset: params.offset
 	});

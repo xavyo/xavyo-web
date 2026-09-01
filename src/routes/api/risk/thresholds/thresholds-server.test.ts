@@ -47,6 +47,36 @@ describe('POST /api/risk/thresholds', () => {
 		expect(createRiskThreshold).toHaveBeenCalled();
 	});
 
+	it('forwards advertised action, cooldown_hours, and is_enabled', async () => {
+		vi.mocked(createRiskThreshold).mockResolvedValue({ id: 't1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					score_value: 80,
+					severity: 'critical',
+					action: 'require_mfa',
+					cooldown_hours: 12,
+					is_enabled: false
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createRiskThreshold).toHaveBeenCalledWith(
+			{
+				name: 'n',
+				score_value: 80,
+				severity: 'critical',
+				action: 'require_mfa',
+				cooldown_hours: 12,
+				is_enabled: false
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(createRiskThreshold).not.toHaveBeenCalled();

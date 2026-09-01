@@ -28,4 +28,23 @@ describe('GET /api/governance/power-of-attorney/admin', () => {
 		expect(response.status).toBe(200);
 		expect(adminListPoa).toHaveBeenCalled();
 	});
+
+	it('forwards advertised active_now filter', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(adminListPoa).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			url: new URL(
+				'http://localhost/api/governance/power-of-attorney/admin?active_now=false'
+			),
+			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['admin'] } },
+			fetch: vi.fn()
+		} as any);
+		expect(response.status).toBe(200);
+		expect(adminListPoa).toHaveBeenCalledWith(
+			expect.objectContaining({ active_now: false }),
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
 });

@@ -43,6 +43,24 @@ describe('GET /api/governance/power-of-attorney', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('forwards advertised active_now filter', async () => {
+		vi.mocked(listPoa).mockResolvedValue({ items: [], total: 0 } as any);
+		const response = await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/power-of-attorney?direction=incoming&active_now=true'
+			)
+		} as any);
+		expect(response.status).toBe(200);
+		expect(listPoa).toHaveBeenCalledWith(
+			expect.objectContaining({ direction: 'incoming', active_now: true }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
 
 describe('POST /api/governance/power-of-attorney', () => {

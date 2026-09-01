@@ -13,6 +13,7 @@ import type {
 export interface ListPoaParams {
 	direction: 'incoming' | 'outgoing';
 	status?: string;
+	active_now?: boolean;
 	limit?: number;
 	offset?: number;
 }
@@ -21,6 +22,7 @@ export interface AdminListPoaParams {
 	donor_id?: string;
 	attorney_id?: string;
 	status?: string;
+	active_now?: boolean;
 	limit?: number;
 	offset?: number;
 }
@@ -68,6 +70,7 @@ export async function listPoa(
 	const qs = buildSearchParams({
 		direction: params.direction,
 		status: params.status,
+		active_now: params.active_now,
 		limit: params.limit,
 		offset: params.offset
 	});
@@ -199,6 +202,7 @@ export async function adminListPoa(
 		donor_id: params.donor_id,
 		attorney_id: params.attorney_id,
 		status: params.status,
+		active_now: params.active_now,
 		limit: params.limit,
 		offset: params.offset
 	});

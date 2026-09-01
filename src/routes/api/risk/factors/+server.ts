@@ -55,13 +55,20 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			if (e instanceof JsonObjectError) error(400, e.message);
 			throw e;
 		}
+		if (body.description !== undefined && typeof body.description !== 'string') {
+			error(400, 'description must be a string');
+		}
+		if (body.is_enabled !== undefined && typeof body.is_enabled !== 'boolean') {
+			error(400, 'is_enabled must be a boolean');
+		}
 		const result = await createRiskFactor(
 			{
 				name: body.name,
 				category: body.category,
 				factor_type: body.factor_type,
 				weight,
-				description: typeof body.description === 'string' ? body.description : undefined
+				description: typeof body.description === 'string' ? body.description : undefined,
+				is_enabled: typeof body.is_enabled === 'boolean' ? body.is_enabled : undefined
 			},
 			locals.accessToken,
 			locals.tenantId,
