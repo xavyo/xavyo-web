@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { updateState, deleteState } from '$lib/api/lifecycle';
 import type { EntitlementAction, UpdateLifecycleStateRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const ENTITLEMENT_ACTIONS = ['none', 'pause', 'revoke'] as const;
 
@@ -49,10 +50,12 @@ export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) 
 		data.entitlement_action = body.entitlement_action as EntitlementAction;
 	}
 	if (body.position !== undefined) {
-		if (typeof body.position !== 'number') {
-			error(400, 'position must be a number');
+		try {
+			data.position = parseBoundedInteger(body.position, 0, 1_000_000, 'position');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.position = body.position;
 	}
 	const result = await updateState(params.configId, params.stateId, data, locals.accessToken, locals.tenantId, fetch);
 	return json(result);

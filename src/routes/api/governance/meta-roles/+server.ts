@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listMetaRoles, createMetaRole } from '$lib/api/meta-roles';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 import type {
 	AddMetaRoleConstraintRequest,
 	AddMetaRoleCriterionRequest,
@@ -146,10 +147,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (typeof body.name !== 'string' || body.name.length === 0) {
 		error(400, 'name is required');
 	}
-	if (typeof body.priority !== 'number') {
-		error(400, 'priority is required');
+	let priority: number;
+	try {
+		priority = parseBoundedInteger(body.priority, 1, 1000, 'priority');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
-	const data: CreateMetaRoleRequest = { name: body.name, priority: body.priority };
+	const data: CreateMetaRoleRequest = { name: body.name, priority };
 	if (body.description !== undefined) {
 		if (typeof body.description !== 'string') {
 			error(400, 'description must be a string');

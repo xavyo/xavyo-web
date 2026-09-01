@@ -71,6 +71,45 @@ describe('POST /api/governance/entitlements', () => {
 		expect(createEntitlement).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string retention_period_days', async () => {
+		vi.mocked(createEntitlement).mockResolvedValue({ id: 'e1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					application_id: 'a1',
+					name: 'Admin',
+					risk_level: 'high',
+					data_protection_classification: 'none',
+					retention_period_days: '90'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createEntitlement).toHaveBeenCalledWith(
+			expect.objectContaining({ retention_period_days: 90 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN retention_period_days instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						application_id: 'a1',
+						name: 'Admin',
+						risk_level: 'high',
+						data_protection_classification: 'none',
+						retention_period_days: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createEntitlement).not.toHaveBeenCalled();
+	});
+
 	it('does not create when application_id is missing', async () => {
 		await expect(
 			POST(

@@ -40,6 +40,25 @@ describe('POST /api/governance/meta-roles', () => {
 		expect(createMetaRole).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(createMetaRole).mockResolvedValue({ id: 'm1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'n', priority: '10' })) as any);
+		expect(response.status).toBe(201);
+		expect(createMetaRole).toHaveBeenCalledWith(
+			expect.objectContaining({ priority: 10 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ name: 'n', priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createMetaRole).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({ priority: 1 })) as any)).rejects.toMatchObject({
 			status: 400
