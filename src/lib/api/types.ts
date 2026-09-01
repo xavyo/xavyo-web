@@ -1693,6 +1693,11 @@ export interface CreateNhiCertCampaignRequest {
 	nhi_type_filter?: string;
 	specific_nhi_ids?: string[];
 	due_date?: string;
+	deadline?: string;
+	owner_filter?: string;
+	needs_certification_only?: boolean;
+	reviewer_type?: string;
+	specific_reviewers?: string[];
 }
 
 export interface NhiCertificationItem {

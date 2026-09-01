@@ -6,13 +6,15 @@ import { listPagination } from '$lib/server/list-pagination';
 import { ApiError } from '$lib/api/client';
 
 const CERT_SCOPES = ['all', 'by_type', 'specific'] as const;
+const REVIEWER_TYPES = ['owner', 'backup_owner', 'specific_users', 'owner_manager'] as const;
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const status = url.searchParams.get('status') || undefined;
+		const created_by = url.searchParams.get('created_by') || undefined;
 		const result = await listNhiCertCampaignsV2(
-			{ status, ...listPagination(url) },
+			{ status, created_by, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch
@@ -63,6 +65,41 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 			return json({ error: 'due_date must be a string' }, { status: 400 });
 		}
 		data.due_date = body.due_date;
+	}
+	if (body.deadline !== undefined) {
+		if (typeof body.deadline !== 'string' || body.deadline.length === 0) {
+			return json({ error: 'deadline must be a non-empty string' }, { status: 400 });
+		}
+		data.deadline = body.deadline;
+	} else if (data.due_date) {
+		data.deadline = data.due_date;
+	}
+	if (body.owner_filter !== undefined) {
+		if (typeof body.owner_filter !== 'string') {
+			return json({ error: 'owner_filter must be a string' }, { status: 400 });
+		}
+		data.owner_filter = body.owner_filter;
+	}
+	if (body.needs_certification_only !== undefined) {
+		if (typeof body.needs_certification_only !== 'boolean') {
+			return json({ error: 'needs_certification_only must be a boolean' }, { status: 400 });
+		}
+		data.needs_certification_only = body.needs_certification_only;
+	}
+	if (body.reviewer_type !== undefined) {
+		if (!REVIEWER_TYPES.includes(body.reviewer_type as (typeof REVIEWER_TYPES)[number])) {
+			return json({ error: 'reviewer_type is required' }, { status: 400 });
+		}
+		data.reviewer_type = body.reviewer_type as string;
+	}
+	if (body.specific_reviewers !== undefined) {
+		if (
+			!Array.isArray(body.specific_reviewers) ||
+			body.specific_reviewers.some((id) => typeof id !== 'string')
+		) {
+			return json({ error: 'specific_reviewers must be an array of strings' }, { status: 400 });
+		}
+		data.specific_reviewers = body.specific_reviewers as string[];
 	}
 	if (body.specific_nhi_ids !== undefined) {
 		if (

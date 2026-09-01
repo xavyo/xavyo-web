@@ -62,7 +62,22 @@ describe('GET /api/nhi/certification/campaigns', () => {
 			url: new URL('http://localhost/api/nhi/certification/campaigns?page=3&page_size=10')
 		} as any);
 		expect(listNhiCertCampaignsV2).toHaveBeenCalledWith(
-			{ status: undefined, limit: 10, offset: 20 },
+			{ status: undefined, created_by: undefined, limit: 10, offset: 20 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised created_by filter', async () => {
+		vi.mocked(listNhiCertCampaignsV2).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/nhi/certification/campaigns?created_by=user-1')
+		} as any);
+		expect(listNhiCertCampaignsV2).toHaveBeenCalledWith(
+			expect.objectContaining({ created_by: 'user-1' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)
@@ -81,6 +96,35 @@ describe('POST /api/nhi/certification/campaigns', () => {
 		const response = await POST(makeEvent(JSON.stringify({ name: 'Q1 review' })) as any);
 		expect(response.status).toBe(201);
 		expect(createNhiCertCampaignV2).toHaveBeenCalled();
+	});
+
+	it('maps due_date onto advertised deadline and forwards owner_filter', async () => {
+		vi.mocked(createNhiCertCampaignV2).mockResolvedValue({ id: 'c1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'Q1 review',
+					due_date: '2026-12-01T00:00:00Z',
+					owner_filter: 'user-1',
+					needs_certification_only: false,
+					reviewer_type: 'owner',
+					specific_reviewers: ['user-2']
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createNhiCertCampaignV2).toHaveBeenCalledWith(
+			expect.objectContaining({
+				deadline: '2026-12-01T00:00:00Z',
+				owner_filter: 'user-1',
+				needs_certification_only: false,
+				reviewer_type: 'owner',
+				specific_reviewers: ['user-2']
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 
 	it('does not create on invalid JSON', async () => {

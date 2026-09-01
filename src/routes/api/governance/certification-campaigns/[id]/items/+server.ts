@@ -10,7 +10,11 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 
 	const result = await listCampaignItems(
 		params.id,
-		listPagination(url),
+		{
+			status: url.searchParams.get('status') ?? undefined,
+			reviewer_id: url.searchParams.get('reviewer_id') ?? undefined,
+			...listPagination(url)
+		},
 		locals.accessToken,
 		locals.tenantId,
 		fetch
