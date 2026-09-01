@@ -229,6 +229,49 @@
 					<p class="text-xs text-muted-foreground">Shown on the consent page below the application name.</p>
 				</div>
 
+				<div class="flex items-center gap-2">
+					<input
+						id="require_dpop"
+						name="require_dpop"
+						type="checkbox"
+						checked={$form.require_dpop ?? false}
+						class="h-4 w-4 rounded border-input"
+					/>
+					<Label for="require_dpop">Require DPoP-bound tokens</Label>
+				</div>
+				<div class="flex items-center gap-2">
+					<input
+						id="fapi_profile"
+						name="fapi_profile"
+						type="checkbox"
+						checked={$form.fapi_profile ?? false}
+						class="h-4 w-4 rounded border-input"
+					/>
+					<Label for="fapi_profile">FAPI 2.0 profile (PAR + DPoP)</Label>
+				</div>
+				<div class="space-y-2">
+					<Label for="tls_client_cert_thumbprint">mTLS cert thumbprint (optional)</Label>
+					<Input
+						id="tls_client_cert_thumbprint"
+						name="tls_client_cert_thumbprint"
+						type="text"
+						value={String($form.tls_client_cert_thumbprint ?? '')}
+					/>
+				</div>
+				<div class="space-y-2">
+					<Label for="nhi_id">NHI identity ID (optional)</Label>
+					<Input id="nhi_id" name="nhi_id" type="text" value={String($form.nhi_id ?? '')} />
+				</div>
+				<div class="space-y-2">
+					<Label for="jwks">JWKS JSON (optional, private_key_jwt)</Label>
+					<textarea
+						id="jwks"
+						name="jwks"
+						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm"
+						value={String($form.jwks ?? '')}
+					></textarea>
+				</div>
+
 				<div class="flex gap-2 pt-2">
 					<Button type="submit">Create Client</Button>
 					<a

@@ -16,7 +16,12 @@ export const createOAuthClientSchema = z.object({
 	scopes: z.string().min(1, 'At least one scope is required'),
 	post_logout_redirect_uris: z.string().optional().nullable(),
 	logo_url: z.string().url().or(z.literal('')).optional().nullable(),
-	description: z.string().max(500).optional().nullable()
+	description: z.string().max(500).optional().nullable(),
+	require_dpop: z.boolean().optional().default(false),
+	fapi_profile: z.boolean().optional().default(false),
+	jwks: z.string().optional().nullable(),
+	tls_client_cert_thumbprint: z.string().max(128).optional().nullable(),
+	nhi_id: z.string().uuid().or(z.literal('')).optional().nullable()
 });
 
 export const updateOAuthClientSchema = z.object({
@@ -27,7 +32,12 @@ export const updateOAuthClientSchema = z.object({
 	post_logout_redirect_uris: z.string().optional().nullable(),
 	is_active: z.boolean().optional(),
 	logo_url: z.string().url().or(z.literal('')).optional().nullable(),
-	description: z.string().max(500).optional().nullable()
+	description: z.string().max(500).optional().nullable(),
+	require_dpop: z.boolean().optional(),
+	fapi_profile: z.boolean().optional(),
+	jwks: z.string().optional().nullable(),
+	tls_client_cert_thumbprint: z.string().max(128).optional().nullable(),
+	nhi_id: z.string().uuid().or(z.literal('')).optional().nullable()
 });
 
 export type CreateOAuthClientSchema = typeof createOAuthClientSchema;

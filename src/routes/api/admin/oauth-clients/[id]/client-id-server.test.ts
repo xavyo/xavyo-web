@@ -37,6 +37,35 @@ describe('PUT /api/admin/oauth-clients/:id', () => {
 		expect(updateOAuthClient).toHaveBeenCalled();
 	});
 
+	it('forwards advertised security fields instead of dropping them', async () => {
+		vi.mocked(updateOAuthClient).mockResolvedValue({ id: 'c1' } as any);
+		const response = await PUT(
+			makeEvent(
+				JSON.stringify({
+					require_dpop: true,
+					fapi_profile: false,
+					jwks: { keys: [] },
+					tls_client_cert_thumbprint: 'thumb',
+					nhi_id: '11111111-1111-1111-1111-111111111111'
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateOAuthClient).toHaveBeenCalledWith(
+			'c1',
+			expect.objectContaining({
+				require_dpop: true,
+				fapi_profile: false,
+				jwks: { keys: [] },
+				tls_client_cert_thumbprint: 'thumb',
+				nhi_id: '11111111-1111-1111-1111-111111111111'
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not update on invalid JSON', async () => {
 		await expect(PUT(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(updateOAuthClient).not.toHaveBeenCalled();

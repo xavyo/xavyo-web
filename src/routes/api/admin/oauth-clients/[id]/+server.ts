@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getOAuthClient, updateOAuthClient, deleteOAuthClient } from '$lib/api/oauth-clients';
 import type { UpdateOAuthClientRequest } from '$lib/api/types';
+import { applyOAuthAdvertisedFields } from '$lib/server/oauth-client-fields';
 
 function stringArray(value: unknown, field: string): string[] {
 	if (!Array.isArray(value) || !value.every((item) => typeof item === 'string')) {
@@ -69,18 +70,7 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		}
 		data.description = body.description;
 	}
-	if (body.post_logout_redirect_uris !== undefined) {
-		data.post_logout_redirect_uris = stringArray(
-			body.post_logout_redirect_uris,
-			'post_logout_redirect_uris'
-		);
-	}
-	if (body.nhi_id !== undefined) {
-		if (typeof body.nhi_id !== 'string') {
-			error(400, 'nhi_id must be a string');
-		}
-		data.nhi_id = body.nhi_id;
-	}
+	applyOAuthAdvertisedFields(body, data);
 	const result = await updateOAuthClient(
 		params.id,
 		data,

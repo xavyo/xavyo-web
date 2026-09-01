@@ -3328,6 +3328,10 @@ export interface OAuthClient {
 	description: string | null;
 	nhi_id: string | null;
 	post_logout_redirect_uris: string[];
+	require_dpop?: boolean;
+	fapi_profile?: boolean;
+	jwks?: Record<string, unknown> | null;
+	tls_client_cert_thumbprint?: string | null;
 	created_at: string;
 	updated_at: string;
 }
@@ -3351,6 +3355,10 @@ export interface CreateOAuthClientRequest {
 	description?: string;
 	post_logout_redirect_uris?: string[];
 	nhi_id?: string;
+	require_dpop?: boolean;
+	fapi_profile?: boolean;
+	jwks?: Record<string, unknown>;
+	tls_client_cert_thumbprint?: string;
 }
 
 export interface UpdateOAuthClientRequest {
@@ -3363,6 +3371,10 @@ export interface UpdateOAuthClientRequest {
 	description?: string;
 	post_logout_redirect_uris?: string[];
 	nhi_id?: string;
+	require_dpop?: boolean;
+	fapi_profile?: boolean;
+	jwks?: Record<string, unknown>;
+	tls_client_cert_thumbprint?: string;
 }
 
 // --- User Group Types ---
