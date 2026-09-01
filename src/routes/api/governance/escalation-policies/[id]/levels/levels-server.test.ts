@@ -42,6 +42,34 @@ describe('POST /api/governance/escalation-policies/:id/levels', () => {
 		expect(addEscalationLevel).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string level_order and timeout_secs', async () => {
+		vi.mocked(addEscalationLevel).mockResolvedValue({ id: 'l1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({ level_order: '1', timeout_secs: '60', target_type: 'manager' })
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(addEscalationLevel).toHaveBeenCalledWith(
+			'e1',
+			expect.objectContaining({ level_order: 1, timeout_secs: 60 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN timeout_secs instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({ level_order: 1, timeout_secs: Number.NaN, target_type: 'manager' })
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(addEscalationLevel).not.toHaveBeenCalled();
+	});
+
 	it('does not add when target_type is missing', async () => {
 		await expect(
 			POST(makeEvent(JSON.stringify({ level_order: 1, timeout_secs: 60 })) as any)

@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { getSlaPolicy, updateSlaPolicy, deleteSlaPolicy } from '$lib/api/governance-operations';
 import type { UpdateSlaPolicyRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -47,17 +48,26 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			}
 			data.description = body.description;
 		}
-		if (body.target_duration_seconds !== undefined) {
-			if (typeof body.target_duration_seconds !== 'number') {
-				error(400, 'target_duration_seconds must be a number');
+		try {
+			if (body.target_duration_seconds !== undefined) {
+				data.target_duration_seconds = parseBoundedInteger(
+					body.target_duration_seconds,
+					60,
+					604800,
+					'target_duration_seconds'
+				);
 			}
-			data.target_duration_seconds = body.target_duration_seconds;
-		}
-		if (body.warning_threshold_percent !== undefined) {
-			if (typeof body.warning_threshold_percent !== 'number') {
-				error(400, 'warning_threshold_percent must be a number');
+			if (body.warning_threshold_percent !== undefined) {
+				data.warning_threshold_percent = parseBoundedInteger(
+					body.warning_threshold_percent,
+					1,
+					100,
+					'warning_threshold_percent'
+				);
 			}
-			data.warning_threshold_percent = body.warning_threshold_percent;
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
 		if (body.breach_notification_enabled !== undefined) {
 			if (typeof body.breach_notification_enabled !== 'boolean') {

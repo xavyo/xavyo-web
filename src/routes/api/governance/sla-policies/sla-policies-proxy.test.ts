@@ -307,6 +307,36 @@ describe('PUT /api/governance/sla-policies/[id] (update)', () => {
 		expect(updateSlaPolicy).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string target_duration_seconds', async () => {
+		vi.mocked(updateSlaPolicy).mockResolvedValue({ id: 'sla-1' } as any);
+		const response = await PUT(
+			makeRequestEvent({
+				params: { id: 'sla-1' },
+				request: makeJsonRequest({ target_duration_seconds: '3600' })
+			})
+		);
+		expect(response.status).toBe(200);
+		expect(updateSlaPolicy).toHaveBeenCalledWith(
+			'sla-1',
+			expect.objectContaining({ target_duration_seconds: 3600 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN target_duration_seconds instead of forwarding it', async () => {
+		await expect(
+			PUT(
+				makeRequestEvent({
+					params: { id: 'sla-1' },
+					request: makeJsonRequest({ target_duration_seconds: Number.NaN })
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateSlaPolicy).not.toHaveBeenCalled();
+	});
+
 	it('does not update when name is empty', async () => {
 		await expect(
 			PUT(makeRequestEvent({ params: { id: 'sla-1' }, request: makeJsonRequest({ name: '' }) }))

@@ -7,6 +7,7 @@ import {
 } from '$lib/api/governance-operations';
 import type { UpdateTicketingConfigRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -90,10 +91,17 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			data.issue_type = body.issue_type;
 		}
 		if (body.polling_interval_seconds !== undefined) {
-			if (typeof body.polling_interval_seconds !== 'number') {
-				error(400, 'polling_interval_seconds must be a number');
+			try {
+				data.polling_interval_seconds = parseBoundedInteger(
+					body.polling_interval_seconds,
+					60,
+					3600,
+					'polling_interval_seconds'
+				);
+			} catch (e) {
+				if (e instanceof JsonObjectError) error(400, e.message);
+				throw e;
 			}
-			data.polling_interval_seconds = body.polling_interval_seconds;
 		}
 		const result = await updateTicketingConfig(
 			params.id,

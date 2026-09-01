@@ -310,6 +310,36 @@ describe('PUT /api/governance/ticketing-configuration/[id] (update)', () => {
 		expect(updateTicketingConfig).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string polling_interval_seconds', async () => {
+		vi.mocked(updateTicketingConfig).mockResolvedValue({ id: 'tc-1' } as any);
+		const response = await PUT(
+			makeRequestEvent({
+				params: { id: 'tc-1' },
+				request: makeJsonRequest({ polling_interval_seconds: '120' })
+			})
+		);
+		expect(response.status).toBe(200);
+		expect(updateTicketingConfig).toHaveBeenCalledWith(
+			'tc-1',
+			expect.objectContaining({ polling_interval_seconds: 120 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN polling_interval_seconds instead of forwarding it', async () => {
+		await expect(
+			PUT(
+				makeRequestEvent({
+					params: { id: 'tc-1' },
+					request: makeJsonRequest({ polling_interval_seconds: Number.NaN })
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateTicketingConfig).not.toHaveBeenCalled();
+	});
+
 	it('does not update when name is empty', async () => {
 		await expect(
 			PUT(makeRequestEvent({ params: { id: 'tc-1' }, request: makeJsonRequest({ name: '' }) }))

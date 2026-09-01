@@ -57,6 +57,27 @@ describe('PUT /api/governance/object-templates/:id/rules/:ruleId', () => {
 		expect(updateTemplateRule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(updateTemplateRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ priority: '75' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateTemplateRule).toHaveBeenCalledWith(
+			't1',
+			'r1',
+			expect.objectContaining({ priority: 75 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateTemplateRule).not.toHaveBeenCalled();
+	});
+
 	it('does not update when expression is empty', async () => {
 		await expect(PUT(makeEvent(JSON.stringify({ expression: '' })) as any)).rejects.toMatchObject({
 			status: 400
