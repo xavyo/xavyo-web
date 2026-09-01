@@ -11,6 +11,7 @@
 	import { Separator } from '$lib/components/ui/separator';
 	import { Tabs, TabsList, TabsTrigger, TabsContent } from '$lib/components/ui/tabs';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import { isJsonParseError, parseOptionalBoundedInteger } from '$lib/utils/json-record';
 	import type { PageData } from './$types';
 	import type { LifecycleState, LifecycleTransition, TransitionCondition, LifecycleStateAction } from '$lib/api/types';
 	import {
@@ -196,7 +197,12 @@
 				from_state_id: newTransitionFromStateId,
 				to_state_id: newTransitionToStateId,
 				requires_approval: newTransitionRequiresApproval,
-				grace_period_hours: newTransitionGracePeriodHours ? Number(newTransitionGracePeriodHours) : undefined
+				grace_period_hours: parseOptionalBoundedInteger(
+					newTransitionGracePeriodHours,
+					0,
+					8760,
+					'grace_period_hours'
+				)
 			});
 			addToast('success', `Transition "${newTransitionName}" added`);
 			resetAddTransition();

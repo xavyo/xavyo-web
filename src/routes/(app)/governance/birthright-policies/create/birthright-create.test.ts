@@ -36,4 +36,22 @@ describe('Birthright policies create action', () => {
 		}
 		expect(createBirthrightPolicy).not.toHaveBeenCalled();
 	});
+
+	it('rejects non-numeric priority instead of posting NaN', async () => {
+		const fd = new FormData();
+		fd.set('name', 'Policy');
+		fd.set('conditions_json', '[]');
+		fd.set('priority', 'abc');
+		try {
+			await actions.default({
+				request: new Request('http://localhost', { method: 'POST', body: fd }),
+				locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['admin'] } },
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should have thrown');
+		} catch (e: any) {
+			expect(e.status).toBe(400);
+		}
+		expect(createBirthrightPolicy).not.toHaveBeenCalled();
+	});
 });

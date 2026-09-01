@@ -46,4 +46,11 @@ describe('PUT /api/governance/outliers/config', () => {
 		});
 		expect(updateOutlierConfig).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN confidence_threshold instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ confidence_threshold: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateOutlierConfig).not.toHaveBeenCalled();
+	});
 });

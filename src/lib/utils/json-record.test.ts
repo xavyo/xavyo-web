@@ -2,10 +2,13 @@ import { describe, it, expect } from 'vitest';
 import {
 	JsonObjectError,
 	isJsonParseError,
+	parseBoundedInteger,
 	parseJsonArray,
 	parseJsonRecord,
 	parseJsonStringArray,
-	parseJsonStringRecord
+	parseJsonStringRecord,
+	parseOptionalBoundedInteger,
+	requireFiniteNumber
 } from './json-record';
 
 describe('parseJsonRecord', () => {
@@ -66,5 +69,41 @@ describe('parseJsonStringArray', () => {
 
 	it('rejects non-string items', () => {
 		expect(() => parseJsonStringArray('[1]')).toThrow(JsonObjectError);
+	});
+});
+
+describe('requireFiniteNumber', () => {
+	it('accepts finite numbers and numeric strings', () => {
+		expect(requireFiniteNumber(1.5, 'score')).toBe(1.5);
+		expect(requireFiniteNumber('2', 'score')).toBe(2);
+	});
+
+	it('rejects NaN and non-numeric values', () => {
+		expect(() => requireFiniteNumber(Number('abc'), 'score')).toThrow(JsonObjectError);
+		expect(() => requireFiniteNumber('abc', 'score')).toThrow(JsonObjectError);
+		expect(() => requireFiniteNumber(Infinity, 'score')).toThrow(JsonObjectError);
+	});
+});
+
+describe('parseOptionalBoundedInteger', () => {
+	it('returns undefined for empty and parses in-range integers', () => {
+		expect(parseOptionalBoundedInteger('', 1, 365, 'days')).toBeUndefined();
+		expect(parseOptionalBoundedInteger('7', 1, 365, 'days')).toBe(7);
+	});
+
+	it('rejects NaN and out-of-range', () => {
+		expect(() => parseOptionalBoundedInteger('abc', 0, 100, 'priority')).toThrow(JsonObjectError);
+		expect(() => parseOptionalBoundedInteger(101, 0, 100, 'priority')).toThrow(JsonObjectError);
+	});
+});
+
+describe('parseBoundedInteger', () => {
+	it('parses in-range values and uses fallback for empty', () => {
+		expect(parseBoundedInteger('9', 0, 23, 'hour')).toBe(9);
+		expect(parseBoundedInteger('', 1, 86400, 'secs', 3600)).toBe(3600);
+	});
+
+	it('rejects NaN instead of forwarding it', () => {
+		expect(() => parseBoundedInteger('abc', 1, 86400, 'secs', 3600)).toThrow(JsonObjectError);
 	});
 });

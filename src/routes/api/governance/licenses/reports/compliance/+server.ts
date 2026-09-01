@@ -3,23 +3,29 @@ import type { RequestHandler } from './$types';
 import { generateComplianceReport } from '$lib/api/licenses';
 import { ApiError } from '$lib/api/client';
 import type { ComplianceReport } from '$lib/api/types';
+import { JsonObjectError, requireFiniteNumber } from '$lib/utils/json-record';
+
+function finiteField(raw: unknown, fallback: number, field: string): number {
+	if (raw == null || raw === '') return fallback;
+	return requireFiniteNumber(raw, field);
+}
 
 // Backend returns a different shape than our frontend ComplianceReport type.
 // Normalize here in the BFF layer.
 function normalizeComplianceReport(raw: Record<string, unknown>): ComplianceReport {
 	const poolSummaries = (raw.pool_summaries as Record<string, unknown>[]) ?? [];
-	const totalPools = Number(raw.total_pools ?? poolSummaries.length);
-	const totalLicenses = Number(raw.total_licenses ?? 0);
-	const totalAssigned = Number(raw.total_assigned ?? 0);
-	const overallScore = Number(raw.overall_compliance_score ?? 0);
+	const totalPools = finiteField(raw.total_pools, poolSummaries.length, 'total_pools');
+	const totalLicenses = finiteField(raw.total_licenses, 0, 'total_licenses');
+	const totalAssigned = finiteField(raw.total_assigned, 0, 'total_assigned');
+	const overallScore = finiteField(raw.overall_compliance_score, 0, 'overall_compliance_score');
 
 	const pools = poolSummaries.map((ps) => ({
 		pool_id: String(ps.pool_id ?? ''),
 		pool_name: String(ps.pool_name ?? ''),
 		vendor: String(ps.vendor ?? ''),
-		total_capacity: Number(ps.total_capacity ?? 0),
-		allocated_count: Number(ps.allocated_count ?? 0),
-		utilization_percent: Number(ps.utilization_percent ?? 0),
+		total_capacity: finiteField(ps.total_capacity, 0, 'total_capacity'),
+		allocated_count: finiteField(ps.allocated_count, 0, 'allocated_count'),
+		utilization_percent: finiteField(ps.utilization_percent, 0, 'utilization_percent'),
 		status: String(ps.status ?? 'active') as 'active' | 'expired' | 'archived',
 		expiration_date: ps.expiration_date ? String(ps.expiration_date) : null,
 		is_compliant: !ps.is_over_allocated,
@@ -71,6 +77,9 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		const normalized = normalizeComplianceReport(raw as unknown as Record<string, unknown>);
 		return json(normalized);
 	} catch (e) {
+		if (e instanceof JsonObjectError) {
+			return json({ error: e.message }, { status: 400 });
+		}
 		if (e instanceof ApiError) {
 			return json({ error: e.message }, { status: e.status });
 		}

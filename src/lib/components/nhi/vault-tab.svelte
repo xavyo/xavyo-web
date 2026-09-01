@@ -9,6 +9,11 @@
 	import { addToast } from '$lib/stores/toast.svelte';
 	import { relativeTime } from '$lib/utils/relative-time';
 	import {
+		isJsonParseError,
+		parseBoundedInteger,
+		parseOptionalBoundedInteger
+	} from '$lib/utils/json-record';
+	import {
 		listSecretsClient,
 		storeSecretClient,
 		deleteSecretClient,
@@ -152,9 +157,27 @@
 			if (newSecretInjectAs) body.inject_as = newSecretInjectAs;
 			if (newSecretInjectFormat) body.inject_format = newSecretInjectFormat;
 			if (newSecretExpiresAt) body.expires_at = new Date(newSecretExpiresAt).toISOString();
-			if (newSecretRotationDays) body.rotation_interval_days = Number(newSecretRotationDays);
-			if (newSecretMaxLeaseSecs) body.max_lease_duration_secs = Number(newSecretMaxLeaseSecs);
-			if (newSecretMaxLeases) body.max_concurrent_leases = Number(newSecretMaxLeases);
+			const rotationDays = parseOptionalBoundedInteger(
+				newSecretRotationDays,
+				1,
+				3650,
+				'rotation_interval_days'
+			);
+			if (rotationDays != null) body.rotation_interval_days = rotationDays;
+			const maxLeaseSecs = parseOptionalBoundedInteger(
+				newSecretMaxLeaseSecs,
+				1,
+				31_536_000,
+				'max_lease_duration_secs'
+			);
+			if (maxLeaseSecs != null) body.max_lease_duration_secs = maxLeaseSecs;
+			const maxLeases = parseOptionalBoundedInteger(
+				newSecretMaxLeases,
+				1,
+				10_000,
+				'max_concurrent_leases'
+			);
+			if (maxLeases != null) body.max_concurrent_leases = maxLeases;
 
 			const created = await storeSecretClient(nhiId, body);
 			secrets = [...secrets, created];
@@ -162,7 +185,14 @@
 			resetAddForm();
 			addToast('success', 'Secret stored');
 		} catch (err: unknown) {
-			addToast('error', err instanceof Error ? err.message : 'Failed to store secret');
+			addToast(
+				'error',
+				isJsonParseError(err) && err instanceof Error
+					? err.message
+					: err instanceof Error
+						? err.message
+						: 'Failed to store secret'
+			);
 		} finally {
 			isStoringSecret = false;
 		}
@@ -226,14 +256,25 @@
 				lessee_nhi_id: newLeaseLesseeId
 			};
 			if (newLeaseLesseeType) body.lessee_type = newLeaseLesseeType;
-			if (newLeaseDurationSecs) body.duration_secs = Number(newLeaseDurationSecs);
+			if (newLeaseDurationSecs) {
+				body.duration_secs = parseBoundedInteger(
+					newLeaseDurationSecs,
+					1,
+					31_536_000,
+					'duration_secs',
+					3600
+				);
+			}
 
 			const created = await createLeaseClient(nhiId, body);
 			leases = [...leases, created];
 			showCreateLeaseDialog = false;
 			addToast('success', 'Lease created');
 		} catch (err: unknown) {
-			addToast('error', err instanceof Error ? err.message : 'Failed to create lease');
+			addToast(
+				'error',
+				err instanceof Error ? err.message : 'Failed to create lease'
+			);
 		} finally {
 			isCreatingLease = false;
 		}
@@ -250,7 +291,7 @@
 		isRenewing = true;
 		try {
 			const updated = await renewLeaseClient(nhiId, renewTarget.id, {
-				extend_secs: Number(renewExtendSecs)
+				extend_secs: parseBoundedInteger(renewExtendSecs, 1, 31_536_000, 'extend_secs', 3600)
 			});
 			leases = leases.map((l) => (l.id === updated.id ? updated : l));
 			showRenewLeaseDialog = false;
