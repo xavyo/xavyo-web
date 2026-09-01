@@ -55,4 +55,11 @@ describe('PUT /api/connectors/:connectorId/correlation/thresholds', () => {
 		});
 		expect(upsertCorrelationThresholds).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN auto_confirm_threshold instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ auto_confirm_threshold: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(upsertCorrelationThresholds).not.toHaveBeenCalled();
+	});
 });

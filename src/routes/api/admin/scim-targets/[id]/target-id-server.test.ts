@@ -90,6 +90,14 @@ describe('PUT /api/admin/scim-targets/:id', () => {
 		expect(response.status).toBe(200);
 		expect(updateScimTarget).toHaveBeenCalled();
 	});
+
+	it('rejects NaN rate_limit_per_minute instead of forwarding it', async () => {
+		const response = await PUT(
+			makeEvent(JSON.stringify({ rate_limit_per_minute: Number.NaN })) as any
+		);
+		expect(response.status).toBe(400);
+		expect(updateScimTarget).not.toHaveBeenCalled();
+	});
 });
 
 describe('DELETE /api/admin/scim-targets/:id', () => {

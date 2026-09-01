@@ -48,4 +48,11 @@ describe('PUT /api/governance/entitlements/:id', () => {
 		});
 		expect(updateEntitlement).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN retention_period_days instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ retention_period_days: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateEntitlement).not.toHaveBeenCalled();
+	});
 });

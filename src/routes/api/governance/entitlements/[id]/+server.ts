@@ -8,6 +8,7 @@ import type {
 	RiskLevel,
 	UpdateEntitlementRequest
 } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const RISK_LEVELS = ['low', 'medium', 'high', 'critical'] as const;
 const STATUSES = ['active', 'inactive', 'suspended'] as const;
@@ -113,10 +114,17 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.legal_basis = body.legal_basis as LegalBasis;
 	}
 	if (body.retention_period_days !== undefined) {
-		if (typeof body.retention_period_days !== 'number') {
-			error(400, 'retention_period_days must be a number');
+		try {
+			data.retention_period_days = parseBoundedInteger(
+				body.retention_period_days,
+				1,
+				3650,
+				'retention_period_days'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.retention_period_days = body.retention_period_days;
 	}
 	if (body.data_controller !== undefined) {
 		if (typeof body.data_controller !== 'string') {

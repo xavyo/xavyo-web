@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getCorrelationThresholds, upsertCorrelationThresholds } from '$lib/api/correlation';
 import type { UpsertCorrelationThresholdRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -24,16 +25,26 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 	const body = parsed as Record<string, unknown>;
 	const data: UpsertCorrelationThresholdRequest = {};
 	if (body.auto_confirm_threshold !== undefined) {
-		if (typeof body.auto_confirm_threshold !== 'number') {
-			error(400, 'auto_confirm_threshold must be a number');
+		try {
+			data.auto_confirm_threshold = requireFiniteNumber(
+				body.auto_confirm_threshold,
+				'auto_confirm_threshold'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.auto_confirm_threshold = body.auto_confirm_threshold;
 	}
 	if (body.manual_review_threshold !== undefined) {
-		if (typeof body.manual_review_threshold !== 'number') {
-			error(400, 'manual_review_threshold must be a number');
+		try {
+			data.manual_review_threshold = requireFiniteNumber(
+				body.manual_review_threshold,
+				'manual_review_threshold'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.manual_review_threshold = body.manual_review_threshold;
 	}
 	if (body.tuning_mode !== undefined) {
 		if (typeof body.tuning_mode !== 'boolean') {
@@ -48,10 +59,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.include_deactivated = body.include_deactivated;
 	}
 	if (body.batch_size !== undefined) {
-		if (typeof body.batch_size !== 'number') {
-			error(400, 'batch_size must be a number');
+		try {
+			data.batch_size = parseBoundedInteger(body.batch_size, 1, 10_000, 'batch_size');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.batch_size = body.batch_size;
 	}
 	const result = await upsertCorrelationThresholds(
 		params.connectorId,

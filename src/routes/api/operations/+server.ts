@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listOperations, triggerOperation } from '$lib/api/operations';
 import type { OperationType, TriggerOperationRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const OPERATION_TYPES = ['create', 'update', 'delete'] as const;
 
@@ -72,10 +73,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.target_uid = body.target_uid;
 	}
 	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
+		try {
+			data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.priority = body.priority;
 	}
 	const result = await triggerOperation(data, locals.accessToken, locals.tenantId, fetch);
 
