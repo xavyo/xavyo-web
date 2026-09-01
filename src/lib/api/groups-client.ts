@@ -14,12 +14,13 @@ function buildSearchParams(params: Record<string, string | number | boolean | un
 }
 
 export async function fetchGroups(
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; group_type?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<UserGroupListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		group_type: params.group_type
 	});
 	const res = await fetchFn(`/api/admin/groups${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch groups: ${res.status}`);

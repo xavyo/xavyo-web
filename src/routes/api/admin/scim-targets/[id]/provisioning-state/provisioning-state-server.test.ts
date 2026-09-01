@@ -39,4 +39,24 @@ describe('GET /api/admin/scim-targets/:id/provisioning-state', () => {
 		expect(response.status).toBe(200);
 		expect(listScimProvisioningState).toHaveBeenCalled();
 	});
+
+	it('forwards advertised resource_type and status filters', async () => {
+		vi.mocked(hasAdminRole).mockReturnValue(true);
+		vi.mocked(listScimProvisioningState).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			params: { id: 's1' },
+			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['admin'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/admin/scim-targets/s1/provisioning-state?resource_type=User&status=error'
+			)
+		} as any);
+		expect(listScimProvisioningState).toHaveBeenCalledWith(
+			's1',
+			expect.objectContaining({ resource_type: 'User', status: 'error' }),
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
 });

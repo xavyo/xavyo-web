@@ -11,6 +11,7 @@ import type {
 export interface ListGroupsParams {
 	limit?: number;
 	offset?: number;
+	group_type?: string;
 }
 
 function buildSearchParams(params: Record<string, string | number | boolean | undefined>): string {
@@ -32,7 +33,8 @@ export async function listGroups(
 ): Promise<UserGroupListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		group_type: params.group_type
 	});
 	return apiClient<UserGroupListResponse>(`/admin/groups${qs}`, {
 		method: 'GET',

@@ -25,12 +25,13 @@ export async function fetchWebhookEventTypes(
 }
 
 export async function fetchWebhookSubscriptions(
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; enabled?: boolean } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<WebhookSubscriptionListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		enabled: params.enabled
 	});
 	const res = await fetchFn(`/api/admin/webhooks/subscriptions${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch webhook subscriptions: ${res.status}`);
@@ -39,12 +40,13 @@ export async function fetchWebhookSubscriptions(
 
 export async function fetchWebhookDeliveries(
 	subscriptionId: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; status?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<WebhookDeliveryListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		status: params.status
 	});
 	const res = await fetchFn(`/api/admin/webhooks/subscriptions/${subscriptionId}/deliveries${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch webhook deliveries: ${res.status}`);
@@ -52,12 +54,25 @@ export async function fetchWebhookDeliveries(
 }
 
 export async function fetchDlqEntries(
-	params: { limit?: number; offset?: number } = {},
+	params: {
+		limit?: number;
+		offset?: number;
+		subscription_id?: string;
+		event_type?: string;
+		from?: string;
+		to?: string;
+		include_replayed?: boolean;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<WebhookDlqListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		subscription_id: params.subscription_id,
+		event_type: params.event_type,
+		from: params.from,
+		to: params.to,
+		include_replayed: params.include_replayed
 	});
 	const res = await fetchFn(`/api/admin/webhooks/dlq${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch DLQ entries: ${res.status}`);

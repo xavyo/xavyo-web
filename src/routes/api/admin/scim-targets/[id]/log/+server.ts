@@ -9,7 +9,15 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 	try {
-		const result = await listScimProvisioningLog(params.id, { ...listPagination(url) }, locals.accessToken, locals.tenantId, fetch);
+		const resource_type = url.searchParams.get('resource_type') ?? undefined;
+		const operation_type = url.searchParams.get('operation_type') ?? undefined;
+		const result = await listScimProvisioningLog(
+			params.id,
+			{ resource_type, operation_type, ...listPagination(url) },
+			locals.accessToken,
+			locals.tenantId,
+			fetch
+		);
 		return json(result);
 	} catch (e) {
 		if (e instanceof ApiError) {

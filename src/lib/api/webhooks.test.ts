@@ -124,6 +124,16 @@ describe('Webhooks API', () => {
 			expect(params.has('offset')).toBe(false);
 		});
 
+		it('includes advertised enabled filter', async () => {
+			mockApiClient.mockResolvedValue(mockResponse);
+
+			await listWebhookSubscriptions({ enabled: false }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('enabled')).toBe('false');
+		});
+
 		it('propagates ApiError on failure', async () => {
 			mockApiClient.mockRejectedValue(new ApiError('Server error', 500));
 
@@ -354,6 +364,22 @@ describe('Webhooks API', () => {
 			expect(params.get('offset')).toBe('5');
 		});
 
+		it('includes advertised status filter', async () => {
+			mockApiClient.mockResolvedValue(mockResponse);
+
+			await listWebhookDeliveries(
+				'sub-1',
+				{ status: 'failed' },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('status')).toBe('failed');
+		});
+
 		it('propagates ApiError on failure', async () => {
 			mockApiClient.mockRejectedValue(new ApiError('Server error', 500));
 
@@ -409,6 +435,31 @@ describe('Webhooks API', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('50');
 			expect(params.get('offset')).toBe('100');
+		});
+
+		it('includes advertised DLQ list filters', async () => {
+			mockApiClient.mockResolvedValue(mockResponse);
+
+			await listDlqEntries(
+				{
+					subscription_id: 'sub-1',
+					event_type: 'user.created',
+					from: '2024-01-01T00:00:00Z',
+					to: '2024-02-01T00:00:00Z',
+					include_replayed: true
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('subscription_id')).toBe('sub-1');
+			expect(params.get('event_type')).toBe('user.created');
+			expect(params.get('from')).toBe('2024-01-01T00:00:00Z');
+			expect(params.get('to')).toBe('2024-02-01T00:00:00Z');
+			expect(params.get('include_replayed')).toBe('true');
 		});
 
 		it('omits undefined params from query string', async () => {

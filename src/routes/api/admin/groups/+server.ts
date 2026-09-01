@@ -8,10 +8,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
+	const group_type = url.searchParams.get('group_type') ?? undefined;
 	const { limit, offset } = listPagination(url);
 
 	const result = await listGroups(
-		{ limit: limit ?? 20, offset: offset ?? 0 },
+		{ group_type, limit: limit ?? 20, offset: offset ?? 0 },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

@@ -9,9 +9,11 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	}
 
 
+	const status = url.searchParams.get('status') ?? undefined;
+
 	const result = await listWebhookDeliveries(
 		params.id,
-		{ ...listPagination(url) },
+		{ status, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch
