@@ -44,6 +44,11 @@ export interface ListSodRulesParams {
 }
 
 export interface ListSodViolationsParams {
+	rule_id?: string;
+	user_id?: string;
+	status?: string;
+	detected_after?: string;
+	detected_before?: string;
 	limit?: number;
 	offset?: number;
 }
@@ -332,6 +337,11 @@ export async function listSodViolations(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<SodViolationListResponse> {
 	const qs = buildSearchParams({
+		rule_id: params.rule_id,
+		user_id: params.user_id,
+		status: params.status,
+		detected_after: params.detected_after,
+		detected_before: params.detected_before,
 		limit: params.limit,
 		offset: params.offset
 	});

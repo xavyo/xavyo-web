@@ -53,6 +53,30 @@ describe('NHI Usage API', () => {
 			expect(calledPath).toContain('limit=20');
 			expect(calledPath).toContain('offset=10');
 		});
+
+		it('includes advertised usage list filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0 });
+
+			await getNhiUsageHistory(
+				'nhi-1',
+				{
+					target_resource: 'api/users',
+					outcome: 'success',
+					start_date: '2024-01-01T00:00:00Z',
+					end_date: '2024-02-01T00:00:00Z'
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('target_resource')).toBe('api/users');
+			expect(params.get('outcome')).toBe('success');
+			expect(params.get('start_date')).toBe('2024-01-01T00:00:00Z');
+			expect(params.get('end_date')).toBe('2024-02-01T00:00:00Z');
+		});
 	});
 
 	describe('getNhiUsageSummary', () => {

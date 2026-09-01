@@ -103,10 +103,14 @@ export async function setDefaultWorkflowClient(
 // --- Approval Groups ---
 
 export async function fetchApprovalGroups(
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; is_active?: boolean } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<ApprovalGroupListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		is_active: params.is_active
+	});
 	const res = await fetchFn(`/api/governance/approval-groups${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch groups: ${res.status}`);
 	return res.json();
