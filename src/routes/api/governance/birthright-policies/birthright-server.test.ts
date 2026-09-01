@@ -86,4 +86,20 @@ describe('POST /api/governance/birthright-policies', () => {
 		expect(response.status).toBe(201);
 		expect(createBirthrightPolicy).toHaveBeenCalled();
 	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'n',
+						priority: Number.NaN,
+						conditions: [{ attribute: 'dept', operator: 'equals', value: 'eng' }],
+						entitlement_ids: ['e1']
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createBirthrightPolicy).not.toHaveBeenCalled();
+	});
 });

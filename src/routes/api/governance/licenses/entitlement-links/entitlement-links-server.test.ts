@@ -64,4 +64,14 @@ describe('POST /api/governance/licenses/entitlement-links', () => {
 		expect(response.status).toBe(400);
 		expect(createLicenseEntitlementLink).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({ license_pool_id: 'p1', entitlement_id: 'e1', priority: Number.NaN })
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createLicenseEntitlementLink).not.toHaveBeenCalled();
+	});
 });

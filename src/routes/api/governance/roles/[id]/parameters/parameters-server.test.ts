@@ -49,4 +49,15 @@ describe('POST /api/governance/roles/:id/parameters', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(addRoleParameter).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN display_order instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({ name: 'region', parameter_type: 'string', display_order: Number.NaN })
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(addRoleParameter).not.toHaveBeenCalled();
+	});
 });

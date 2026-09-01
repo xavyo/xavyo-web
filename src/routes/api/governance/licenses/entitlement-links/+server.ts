@@ -4,6 +4,7 @@ import { listLicenseEntitlementLinks, createLicenseEntitlementLink } from '$lib/
 import type { CreateLicenseEntitlementLinkRequest } from '$lib/api/types';
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -65,10 +66,14 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			entitlement_id: body.entitlement_id
 		};
 		if (body.priority !== undefined) {
-			if (typeof body.priority !== 'number') {
-				return json({ error: 'priority must be a number' }, { status: 400 });
+			try {
+				data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.priority = body.priority;
 		}
 		const result = await createLicenseEntitlementLink(
 			data,

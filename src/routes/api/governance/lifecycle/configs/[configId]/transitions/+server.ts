@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createTransition } from '$lib/api/lifecycle';
 import type { CreateLifecycleTransitionRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const POST: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -36,10 +37,17 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		data.requires_approval = body.requires_approval;
 	}
 	if (body.grace_period_hours !== undefined) {
-		if (typeof body.grace_period_hours !== 'number') {
-			error(400, 'grace_period_hours must be a number');
+		try {
+			data.grace_period_hours = parseBoundedInteger(
+				body.grace_period_hours,
+				0,
+				8760,
+				'grace_period_hours'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.grace_period_hours = body.grace_period_hours;
 	}
 	const result = await createTransition(params.configId, data, locals.accessToken, locals.tenantId, fetch);
 	return json(result, { status: 201 });

@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listRoleParameters, addRoleParameter } from '$lib/api/governance-roles';
 import type { CreateRoleParameterRequest, ParameterType } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const PARAMETER_TYPES: ParameterType[] = ['string', 'integer', 'boolean', 'date', 'enum'];
 
@@ -68,10 +69,12 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		data.display_name = body.display_name;
 	}
 	if (body.display_order !== undefined) {
-		if (typeof body.display_order !== 'number') {
-			error(400, 'display_order must be a number');
+		try {
+			data.display_order = parseBoundedInteger(body.display_order, 0, 1_000_000, 'display_order');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.display_order = body.display_order;
 	}
 	const result = await addRoleParameter(params.id, data, locals.accessToken, locals.tenantId, fetch);
 

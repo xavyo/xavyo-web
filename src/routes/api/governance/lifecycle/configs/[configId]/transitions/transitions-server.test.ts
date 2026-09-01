@@ -54,4 +54,20 @@ describe('POST /api/governance/lifecycle/configs/:configId/transitions', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createTransition).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN grace_period_hours instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'hire',
+						from_state_id: 's1',
+						to_state_id: 's2',
+						grace_period_hours: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createTransition).not.toHaveBeenCalled();
+	});
 });
