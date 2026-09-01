@@ -114,7 +114,9 @@ export async function deleteMiningJob(
 export async function listCandidates(
 	jobId: string,
 	params: {
+		status?: string;
 		promotion_status?: string;
+		min_confidence?: number;
 		limit?: number;
 		offset?: number;
 	},
@@ -123,7 +125,9 @@ export async function listCandidates(
 	fetchFn?: typeof fetch
 ): Promise<RoleCandidateListResponse> {
 	const searchParams = new URLSearchParams();
-	if (params.promotion_status) searchParams.set('promotion_status', params.promotion_status);
+	const status = params.status ?? params.promotion_status;
+	if (status) searchParams.set('status', status);
+	if (params.min_confidence !== undefined) searchParams.set('min_confidence', String(params.min_confidence));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -224,6 +228,7 @@ export async function listExcessivePrivileges(
 	jobId: string,
 	params: {
 		status?: string;
+		user_id?: string;
 		limit?: number;
 		offset?: number;
 	},
@@ -233,6 +238,7 @@ export async function listExcessivePrivileges(
 ): Promise<ExcessivePrivilegeListResponse> {
 	const searchParams = new URLSearchParams();
 	if (params.status) searchParams.set('status', params.status);
+	if (params.user_id) searchParams.set('user_id', params.user_id);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -278,6 +284,7 @@ export async function listConsolidationSuggestions(
 	jobId: string,
 	params: {
 		status?: string;
+		min_overlap?: number;
 		limit?: number;
 		offset?: number;
 	},
@@ -287,6 +294,7 @@ export async function listConsolidationSuggestions(
 ): Promise<ConsolidationSuggestionListResponse> {
 	const searchParams = new URLSearchParams();
 	if (params.status) searchParams.set('status', params.status);
+	if (params.min_overlap !== undefined) searchParams.set('min_overlap', String(params.min_overlap));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -327,6 +335,7 @@ export async function listSimulations(
 	params: {
 		status?: string;
 		scenario_type?: string;
+		target_role_id?: string;
 		limit?: number;
 		offset?: number;
 	},
@@ -337,6 +346,7 @@ export async function listSimulations(
 	const searchParams = new URLSearchParams();
 	if (params.status) searchParams.set('status', params.status);
 	if (params.scenario_type) searchParams.set('scenario_type', params.scenario_type);
+	if (params.target_role_id) searchParams.set('target_role_id', params.target_role_id);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -426,6 +436,9 @@ export async function deleteSimulation(
 export async function listRoleMetrics(
 	params: {
 		trend_direction?: string;
+		role_id?: string;
+		min_utilization?: number;
+		max_utilization?: number;
 		limit?: number;
 		offset?: number;
 	},
@@ -435,6 +448,11 @@ export async function listRoleMetrics(
 ): Promise<RoleMetricsListResponse> {
 	const searchParams = new URLSearchParams();
 	if (params.trend_direction) searchParams.set('trend_direction', params.trend_direction);
+	if (params.role_id) searchParams.set('role_id', params.role_id);
+	if (params.min_utilization !== undefined)
+		searchParams.set('min_utilization', String(params.min_utilization));
+	if (params.max_utilization !== undefined)
+		searchParams.set('max_utilization', String(params.max_utilization));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

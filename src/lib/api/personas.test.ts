@@ -13,7 +13,8 @@ import {
 	updatePersona,
 	activatePersona,
 	deactivatePersona,
-	archivePersona
+	archivePersona,
+	listPersonaAudit
 } from './personas';
 
 vi.mock('./client', () => ({
@@ -343,6 +344,25 @@ describe('personas API — personas', () => {
 				tenantId,
 				fetch: mockFetch
 			});
+		});
+	});
+
+	describe('listPersonaAudit', () => {
+		it('forwards advertised date filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+
+			await listPersonaAudit(
+				{ persona_id: 'p-1', from_date: '2026-01-01T00:00:00Z', to_date: '2026-01-31T23:59:59Z' },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('/governance/persona-audit?');
+			expect(calledPath).toContain('persona_id=p-1');
+			expect(calledPath).toContain('from_date=2026-01-01T00%3A00%3A00Z');
+			expect(calledPath).toContain('to_date=2026-01-31T23%3A59%3A59Z');
 		});
 	});
 });

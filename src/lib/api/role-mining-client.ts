@@ -76,10 +76,21 @@ export const deleteJobClient = cancelJobClient;
 
 export async function fetchCandidates(
 	jobId: string,
-	params: { promotion_status?: string; limit?: number; offset?: number } = {},
+	params: {
+		status?: string;
+		promotion_status?: string;
+		min_confidence?: number;
+		limit?: number;
+		offset?: number;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<RoleCandidateListResponse> {
-	const qs = buildSearchParams(params as Record<string, string | number | boolean | undefined>);
+	const qs = buildSearchParams({
+		status: params.status ?? params.promotion_status,
+		min_confidence: params.min_confidence,
+		limit: params.limit,
+		offset: params.offset
+	});
 	const res = await fetchFn(`/api/governance/role-mining/jobs/${jobId}/candidates${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch candidates: ${res.status}`);
 	return res.json();
@@ -139,7 +150,7 @@ export async function fetchAccessPattern(
 
 export async function fetchExcessivePrivileges(
 	jobId: string,
-	params: { status?: string; limit?: number; offset?: number } = {},
+	params: { status?: string; user_id?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<ExcessivePrivilegeListResponse> {
 	const qs = buildSearchParams(params as Record<string, string | number | boolean | undefined>);
@@ -166,7 +177,7 @@ export async function reviewPrivilegeClient(
 
 export async function fetchConsolidationSuggestions(
 	jobId: string,
-	params: { status?: string; limit?: number; offset?: number } = {},
+	params: { status?: string; min_overlap?: number; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<ConsolidationSuggestionListResponse> {
 	const qs = buildSearchParams(params as Record<string, string | number | boolean | undefined>);
@@ -192,7 +203,13 @@ export async function dismissConsolidationClient(
 // --- Simulations ---
 
 export async function fetchSimulations(
-	params: { status?: string; scenario_type?: string; limit?: number; offset?: number } = {},
+	params: {
+		status?: string;
+		scenario_type?: string;
+		target_role_id?: string;
+		limit?: number;
+		offset?: number;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<SimulationListResponse> {
 	const qs = buildSearchParams(params as Record<string, string | number | boolean | undefined>);
@@ -249,7 +266,14 @@ export async function cancelSimulationClient(
 // --- Metrics ---
 
 export async function fetchRoleMetrics(
-	params: { trend_direction?: string; limit?: number; offset?: number } = {},
+	params: {
+		trend_direction?: string;
+		role_id?: string;
+		min_utilization?: number;
+		max_utilization?: number;
+		limit?: number;
+		offset?: number;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<RoleMetricsListResponse> {
 	const qs = buildSearchParams(params as Record<string, string | number | boolean | undefined>);

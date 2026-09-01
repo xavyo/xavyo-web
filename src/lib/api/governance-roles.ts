@@ -481,6 +481,39 @@ export async function getRoleInducement(
 	});
 }
 
+export interface ListParameterAuditParams {
+	assignment_id?: string;
+	event_type?: string;
+	actor_id?: string;
+	from_date?: string;
+	to_date?: string;
+	limit?: number;
+	offset?: number;
+}
+
+export async function listParameterAudit(
+	params: ListParameterAuditParams,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<{ items: unknown[]; total: number; limit: number; offset: number }> {
+	const qs = buildSearchParams({
+		assignment_id: params.assignment_id,
+		event_type: params.event_type,
+		actor_id: params.actor_id,
+		from_date: params.from_date,
+		to_date: params.to_date,
+		limit: params.limit,
+		offset: params.offset
+	});
+	return apiClient(`/governance/parameters/audit${qs}`, {
+		method: 'GET',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
 export async function deleteRoleInducement(
 	roleId: string,
 	inducementId: string,

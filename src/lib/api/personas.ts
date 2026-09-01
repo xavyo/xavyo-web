@@ -258,3 +258,38 @@ export async function archivePersona(
 		fetch: fetchFn
 	});
 }
+
+export interface ListPersonaAuditParams {
+	persona_id?: string;
+	archetype_id?: string;
+	actor_id?: string;
+	event_type?: string;
+	from_date?: string;
+	to_date?: string;
+	limit?: number;
+	offset?: number;
+}
+
+export async function listPersonaAudit(
+	params: ListPersonaAuditParams,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<{ items: unknown[]; total: number; limit: number; offset: number }> {
+	const searchParams = new URLSearchParams();
+	if (params.persona_id) searchParams.set('persona_id', params.persona_id);
+	if (params.archetype_id) searchParams.set('archetype_id', params.archetype_id);
+	if (params.actor_id) searchParams.set('actor_id', params.actor_id);
+	if (params.event_type) searchParams.set('event_type', params.event_type);
+	if (params.from_date) searchParams.set('from_date', params.from_date);
+	if (params.to_date) searchParams.set('to_date', params.to_date);
+	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
+	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
+	const query = searchParams.toString();
+	return apiClient(`/governance/persona-audit${query ? `?${query}` : ''}`, {
+		method: 'GET',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}

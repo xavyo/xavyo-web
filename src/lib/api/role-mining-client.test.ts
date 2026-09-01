@@ -138,10 +138,15 @@ describe('role-mining-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
 			const { fetchCandidates } = await import('./role-mining-client');
 
-			await fetchCandidates('job-1', { promotion_status: 'promoted', limit: 5, offset: 10 }, mockFetch);
+			await fetchCandidates(
+				'job-1',
+				{ promotion_status: 'promoted', min_confidence: 0.8, limit: 5, offset: 10 },
+				mockFetch
+			);
 
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
-			expect(calledUrl).toContain('promotion_status=promoted');
+			expect(calledUrl).toContain('status=promoted');
+			expect(calledUrl).toContain('min_confidence=0.8');
 			expect(calledUrl).toContain('limit=5');
 			expect(calledUrl).toContain('offset=10');
 		});
@@ -290,10 +295,15 @@ describe('role-mining-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
 			const { fetchExcessivePrivileges } = await import('./role-mining-client');
 
-			await fetchExcessivePrivileges('job-1', { status: 'flagged', limit: 25, offset: 50 }, mockFetch);
+			await fetchExcessivePrivileges(
+				'job-1',
+				{ status: 'flagged', user_id: 'user-1', limit: 25, offset: 50 },
+				mockFetch
+			);
 
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('status=flagged');
+			expect(calledUrl).toContain('user_id=user-1');
 			expect(calledUrl).toContain('limit=25');
 			expect(calledUrl).toContain('offset=50');
 		});
@@ -349,10 +359,15 @@ describe('role-mining-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
 			const { fetchConsolidationSuggestions } = await import('./role-mining-client');
 
-			await fetchConsolidationSuggestions('job-1', { status: 'pending', limit: 15, offset: 30 }, mockFetch);
+			await fetchConsolidationSuggestions(
+				'job-1',
+				{ status: 'pending', min_overlap: 0.7, limit: 15, offset: 30 },
+				mockFetch
+			);
 
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('status=pending');
+			expect(calledUrl).toContain('min_overlap=0.7');
 			expect(calledUrl).toContain('limit=15');
 			expect(calledUrl).toContain('offset=30');
 		});
@@ -421,11 +436,21 @@ describe('role-mining-client', () => {
 			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
 			const { fetchSimulations } = await import('./role-mining-client');
 
-			await fetchSimulations({ status: 'completed', scenario_type: 'what_if', limit: 10, offset: 5 }, mockFetch);
+			await fetchSimulations(
+				{
+					status: 'completed',
+					scenario_type: 'what_if',
+					target_role_id: 'role-1',
+					limit: 10,
+					offset: 5
+				},
+				mockFetch
+			);
 
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('status=completed');
 			expect(calledUrl).toContain('scenario_type=what_if');
+			expect(calledUrl).toContain('target_role_id=role-1');
 			expect(calledUrl).toContain('limit=10');
 			expect(calledUrl).toContain('offset=5');
 		});
@@ -541,14 +566,27 @@ describe('role-mining-client', () => {
 			expect(result).toEqual(data);
 		});
 
-		it('includes trend_direction and pagination params', async () => {
+		it('includes advertised role and utilization filters', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
 			const { fetchRoleMetrics } = await import('./role-mining-client');
 
-			await fetchRoleMetrics({ trend_direction: 'increasing', limit: 10, offset: 0 }, mockFetch);
+			await fetchRoleMetrics(
+				{
+					trend_direction: 'increasing',
+					role_id: 'role-1',
+					min_utilization: 0.2,
+					max_utilization: 0.9,
+					limit: 10,
+					offset: 0
+				},
+				mockFetch
+			);
 
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('trend_direction=increasing');
+			expect(calledUrl).toContain('role_id=role-1');
+			expect(calledUrl).toContain('min_utilization=0.2');
+			expect(calledUrl).toContain('max_utilization=0.9');
 			expect(calledUrl).toContain('limit=10');
 			expect(calledUrl).toContain('offset=0');
 		});

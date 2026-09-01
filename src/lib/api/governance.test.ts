@@ -25,7 +25,8 @@ import {
 	getCampaignProgress,
 	listCampaignItems,
 	decideCertificationItem,
-	listMyCertifications
+	listMyCertifications,
+	listDelegationAudit
 } from './governance';
 
 vi.mock('./client', () => ({
@@ -733,6 +734,29 @@ describe('Governance API — Certifications', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
+		});
+	});
+
+	describe('listDelegationAudit', () => {
+		it('forwards advertised date filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
+
+			await listDelegationAudit(
+				{
+					delegation_id: 'd-1',
+					from_date: '2026-01-01T00:00:00Z',
+					to_date: '2026-01-31T23:59:59Z'
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('/governance/delegations/audit?');
+			expect(calledPath).toContain('delegation_id=d-1');
+			expect(calledPath).toContain('from_date=2026-01-01T00%3A00%3A00Z');
+			expect(calledPath).toContain('to_date=2026-01-31T23%3A59%3A59Z');
 		});
 	});
 });
