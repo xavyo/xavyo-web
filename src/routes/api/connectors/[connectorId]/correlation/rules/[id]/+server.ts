@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getCorrelationRule, updateCorrelationRule, deleteCorrelationRule } from '$lib/api/correlation';
 import type { UpdateCorrelationRuleRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -53,29 +54,28 @@ export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) 
 		}
 		data.algorithm = body.algorithm;
 	}
-	if (body.threshold !== undefined) {
-		if (typeof body.threshold !== 'number') {
-			error(400, 'threshold must be a number');
+	try {
+		if (body.threshold !== undefined) {
+			data.threshold = requireFiniteNumber(body.threshold, 'threshold');
 		}
-		data.threshold = body.threshold;
-	}
-	if (body.weight !== undefined) {
-		if (typeof body.weight !== 'number') {
-			error(400, 'weight must be a number');
+		if (body.weight !== undefined) {
+			data.weight = requireFiniteNumber(body.weight, 'weight');
 		}
-		data.weight = body.weight;
+		if (body.tier !== undefined) {
+			data.tier = parseBoundedInteger(body.tier, 0, 1_000_000, 'tier');
+		}
+		if (body.priority !== undefined) {
+			data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		}
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (body.expression !== undefined) {
 		if (body.expression !== null && typeof body.expression !== 'string') {
 			error(400, 'expression must be a string or null');
 		}
 		data.expression = body.expression;
-	}
-	if (body.tier !== undefined) {
-		if (typeof body.tier !== 'number') {
-			error(400, 'tier must be a number');
-		}
-		data.tier = body.tier;
 	}
 	if (body.is_definitive !== undefined) {
 		if (typeof body.is_definitive !== 'boolean') {
@@ -94,12 +94,6 @@ export const PATCH: RequestHandler = async ({ params, request, locals, fetch }) 
 			error(400, 'is_active must be a boolean');
 		}
 		data.is_active = body.is_active;
-	}
-	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
-		}
-		data.priority = body.priority;
 	}
 	const result = await updateCorrelationRule(
 		params.connectorId,

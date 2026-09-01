@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { executeBatchMerge } from '$lib/api/dedup';
+import { JsonObjectError, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -34,12 +35,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	) {
 		error(400, 'attribute_rule is required');
 	}
+	let min_confidence: number | undefined;
+	if (body.min_confidence !== undefined) {
+		try {
+			min_confidence = requireFiniteNumber(body.min_confidence, 'min_confidence');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
+		}
+	}
 	const result = await executeBatchMerge(
 		{
 			candidate_ids: body.candidate_ids as string[],
 			entitlement_strategy: body.entitlement_strategy,
 			attribute_rule: body.attribute_rule,
-			min_confidence: typeof body.min_confidence === 'number' ? body.min_confidence : undefined,
+			min_confidence,
 			skip_sod_violations: body.skip_sod_violations === true
 		},
 		locals.accessToken,

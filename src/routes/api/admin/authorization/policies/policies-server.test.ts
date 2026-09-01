@@ -67,4 +67,11 @@ describe('POST /api/admin/authorization/policies', () => {
 		});
 		expect(createPolicy).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ name: 'n', effect: 'allow', priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createPolicy).not.toHaveBeenCalled();
+	});
 });

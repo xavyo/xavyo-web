@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listCorrelationRules, createCorrelationRule } from '$lib/api/correlation';
 import { finiteNumber, listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -42,11 +43,18 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (body.match_type !== 'exact' && body.match_type !== 'fuzzy' && body.match_type !== 'expression') {
 		error(400, 'match_type is required');
 	}
-	if (typeof body.threshold !== 'number' || typeof body.weight !== 'number') {
-		error(400, 'threshold and weight are required');
-	}
-	if (typeof body.tier !== 'number' || typeof body.priority !== 'number') {
-		error(400, 'tier and priority are required');
+	let threshold: number;
+	let weight: number;
+	let tier: number;
+	let priority: number;
+	try {
+		threshold = requireFiniteNumber(body.threshold, 'threshold');
+		weight = requireFiniteNumber(body.weight, 'weight');
+		tier = parseBoundedInteger(body.tier, 0, 1_000_000, 'tier');
+		priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (typeof body.is_definitive !== 'boolean' || typeof body.normalize !== 'boolean') {
 		error(400, 'is_definitive and normalize are required');
@@ -58,12 +66,12 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 			source_attribute: body.source_attribute,
 			target_attribute: body.target_attribute,
 			match_type: body.match_type,
-			threshold: body.threshold,
-			weight: body.weight,
-			tier: body.tier,
+			threshold,
+			weight,
+			tier,
 			is_definitive: body.is_definitive,
 			normalize: body.normalize,
-			priority: body.priority
+			priority
 		},
 		locals.accessToken,
 		locals.tenantId,

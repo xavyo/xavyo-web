@@ -6,6 +6,11 @@ import type {
 	BatchMergePreviewRequest,
 	EntitlementStrategy
 } from '$lib/api/types';
+import {
+	JsonObjectError,
+	parseBoundedInteger,
+	requireFiniteNumber
+} from '$lib/utils/json-record';
 
 const STRATEGIES = ['union', 'intersection', 'manual'] as const;
 const ATTR_RULES = ['newest_wins', 'oldest_wins', 'prefer_non_null'] as const;
@@ -43,23 +48,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		entitlement_strategy: body.entitlement_strategy as EntitlementStrategy,
 		attribute_rule: body.attribute_rule as AttributeResolutionRule
 	};
-	if (body.min_confidence !== undefined) {
-		if (body.min_confidence !== null && typeof body.min_confidence !== 'number') {
-			error(400, 'min_confidence must be a number or null');
+	try {
+		if (body.min_confidence !== undefined && body.min_confidence !== null) {
+			data.min_confidence = requireFiniteNumber(body.min_confidence, 'min_confidence');
+		} else if (body.min_confidence === null) {
+			throw new JsonObjectError('min_confidence must be a finite number');
 		}
-		data.min_confidence = body.min_confidence as number | null;
-	}
-	if (body.limit !== undefined) {
-		if (typeof body.limit !== 'number') {
-			error(400, 'limit must be a number');
+		if (body.limit !== undefined) {
+			data.limit = parseBoundedInteger(body.limit, 1, 1000, 'limit');
 		}
-		data.limit = body.limit;
-	}
-	if (body.offset !== undefined) {
-		if (typeof body.offset !== 'number') {
-			error(400, 'offset must be a number');
+		if (body.offset !== undefined) {
+			data.offset = parseBoundedInteger(body.offset, 0, 1_000_000, 'offset');
 		}
-		data.offset = body.offset;
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	const result = await previewBatchMerge(data, locals.accessToken, locals.tenantId, fetch);
 

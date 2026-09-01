@@ -46,4 +46,11 @@ describe('POST /api/devices/:id/trust', () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(trustDevice).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN trust_duration_days instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ trust_duration_days: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(trustDevice).not.toHaveBeenCalled();
+	});
 });

@@ -54,6 +54,13 @@ describe('PATCH /api/connectors/:connectorId/correlation/rules/:id', () => {
 		});
 		expect(updateCorrelationRule).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN threshold instead of forwarding it', async () => {
+		await expect(
+			PATCH(makeEvent(JSON.stringify({ threshold: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateCorrelationRule).not.toHaveBeenCalled();
+	});
 });
 
 describe('DELETE /api/connectors/:connectorId/correlation/rules/:id', () => {
