@@ -25,13 +25,18 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const trigger_type = url.searchParams.get('trigger_type') ?? undefined;
 	const scope_type = url.searchParams.get('scope_type') ?? undefined;
+	const scope_id = url.searchParams.get('scope_id') ?? undefined;
 	const is_active =
 		url.searchParams.get('is_active') !== null
 			? url.searchParams.get('is_active') === 'true'
 			: undefined;
+	const is_default =
+		url.searchParams.get('is_default') !== null
+			? url.searchParams.get('is_default') === 'true'
+			: undefined;
 
 	const result = await listTriggerRules(
-		{ trigger_type, scope_type, is_active, ...listPagination(url) },
+		{ trigger_type, scope_type, scope_id, is_active, is_default, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

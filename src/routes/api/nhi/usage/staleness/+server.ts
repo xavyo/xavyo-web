@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getNhiStalenessReport } from '$lib/api/nhi-usage';
 import { ApiError } from '$lib/api/client';
-import { listPagination } from '$lib/server/list-pagination';
+import { finiteInteger, listPagination } from '$lib/server/list-pagination';
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -10,7 +10,10 @@ export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	}
 	try {
 		const result = await getNhiStalenessReport(
-			listPagination(url),
+			{
+				min_inactive_days: finiteInteger(url.searchParams.get('min_inactive_days')),
+				...listPagination(url)
+			},
 			locals.accessToken,
 			locals.tenantId,
 			fetch

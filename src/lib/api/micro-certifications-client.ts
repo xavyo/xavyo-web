@@ -34,6 +34,10 @@ export async function fetchMicroCertifications(
 		user_id?: string;
 		reviewer_id?: string;
 		entitlement_id?: string;
+		assignment_id?: string;
+		trigger_rule_id?: string;
+		from_date?: string;
+		to_date?: string;
 		escalated?: boolean;
 		past_deadline?: boolean;
 		limit?: number;
@@ -131,9 +135,18 @@ export async function fetchMicroCertificationStats(
 
 export async function fetchCertificationEvents(
 	id: string,
-	fetchFn: typeof fetch = fetch
+	fetchFn: typeof fetch = fetch,
+	params: {
+		event_type?: string;
+		actor_id?: string;
+		from_date?: string;
+		to_date?: string;
+		limit?: number;
+		offset?: number;
+	} = {}
 ): Promise<CertificationEventListResponse> {
-	const res = await fetchFn(`/api/governance/micro-certifications/${id}/events`);
+	const qs = buildSearchParams(params as Record<string, string | number | boolean | undefined>);
+	const res = await fetchFn(`/api/governance/micro-certifications/${id}/events${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch certification events: ${res.status}`);
 	return res.json();
 }
@@ -142,7 +155,7 @@ export async function searchCertificationEventsClient(
 	params: {
 		event_type?: string;
 		actor_id?: string;
-		certification_id?: string;
+		micro_certification_id?: string;
 		from_date?: string;
 		to_date?: string;
 		limit?: number;
@@ -175,7 +188,9 @@ export async function fetchTriggerRules(
 	params: {
 		trigger_type?: string;
 		scope_type?: string;
+		scope_id?: string;
 		is_active?: boolean;
+		is_default?: boolean;
 		limit?: number;
 		offset?: number;
 	} = {},

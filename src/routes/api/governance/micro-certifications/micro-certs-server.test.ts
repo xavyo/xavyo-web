@@ -58,6 +58,28 @@ describe('GET /api/governance/micro-certifications', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('forwards advertised assignment, trigger, and date filters', async () => {
+		vi.mocked(listMicroCertifications).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/micro-certifications?assignment_id=a1&trigger_rule_id=t1&from_date=2026-01-01T00:00:00Z&to_date=2026-02-01T00:00:00Z'
+			)
+		} as any);
+		expect(listMicroCertifications).toHaveBeenCalledWith(
+			expect.objectContaining({
+				assignment_id: 'a1',
+				trigger_rule_id: 't1',
+				from_date: '2026-01-01T00:00:00Z',
+				to_date: '2026-02-01T00:00:00Z'
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
 
 describe('POST /api/governance/micro-certifications', () => {

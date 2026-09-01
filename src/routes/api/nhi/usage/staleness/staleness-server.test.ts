@@ -44,7 +44,29 @@ describe('GET /api/nhi/usage/staleness', () => {
 		vi.mocked(getNhiStalenessReport).mockResolvedValue({ items: [], total: 0 } as any);
 		await GET(makeEvent('http://localhost/api/nhi/usage/staleness?page=3&page_size=5') as any);
 		expect(getNhiStalenessReport).toHaveBeenCalledWith(
-			{ limit: 5, offset: 10 },
+			{ min_inactive_days: undefined, limit: 5, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised min_inactive_days', async () => {
+		vi.mocked(getNhiStalenessReport).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(makeEvent('http://localhost/api/nhi/usage/staleness?min_inactive_days=60') as any);
+		expect(getNhiStalenessReport).toHaveBeenCalledWith(
+			expect.objectContaining({ min_inactive_days: 60 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not forward NaN min_inactive_days', async () => {
+		vi.mocked(getNhiStalenessReport).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET(makeEvent('http://localhost/api/nhi/usage/staleness?min_inactive_days=abc') as any);
+		expect(getNhiStalenessReport).toHaveBeenCalledWith(
+			expect.objectContaining({ min_inactive_days: undefined }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

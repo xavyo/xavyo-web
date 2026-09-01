@@ -117,6 +117,28 @@ describe('Micro Certifications API', () => {
 			expect(calledPath).toContain('past_deadline=false');
 		});
 
+		it('includes assignment, trigger, and date query params', async () => {
+			mockApiClient.mockResolvedValue({} as any);
+
+			await listMicroCertifications(
+				{
+					assignment_id: 'a1',
+					trigger_rule_id: 't1',
+					from_date: '2026-01-01',
+					to_date: '2026-02-01'
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('assignment_id=a1');
+			expect(calledPath).toContain('trigger_rule_id=t1');
+			expect(calledPath).toContain('from_date=2026-01-01');
+			expect(calledPath).toContain('to_date=2026-02-01');
+		});
+
 		it('includes limit and offset query params', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
@@ -288,6 +310,23 @@ describe('Micro Certifications API', () => {
 			);
 			expect(result).toEqual(mockResponse);
 		});
+
+		it('includes advertised event filters', async () => {
+			mockApiClient.mockResolvedValue({} as any);
+
+			await getMicroCertificationEvents(certId, token, tenantId, mockFetch, {
+				event_type: 'approved',
+				actor_id: 'user-1',
+				from_date: '2026-01-01',
+				limit: 20
+			});
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('event_type=approved');
+			expect(calledPath).toContain('actor_id=user-1');
+			expect(calledPath).toContain('from_date=2026-01-01');
+			expect(calledPath).toContain('limit=20');
+		});
 	});
 
 	describe('searchCertificationEvents', () => {
@@ -322,13 +361,13 @@ describe('Micro Certifications API', () => {
 			expect(calledPath).toContain('actor_id=user-1');
 		});
 
-		it('includes certification_id query param', async () => {
+		it('includes micro_certification_id query param', async () => {
 			mockApiClient.mockResolvedValue({} as any);
 
-			await searchCertificationEvents({ certification_id: certId }, token, tenantId, mockFetch);
+			await searchCertificationEvents({ micro_certification_id: certId }, token, tenantId, mockFetch);
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
-			expect(calledPath).toContain(`certification_id=${certId}`);
+			expect(calledPath).toContain(`micro_certification_id=${certId}`);
 		});
 
 		it('includes date range query params', async () => {
@@ -414,6 +453,16 @@ describe('Micro Certifications API', () => {
 
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('is_active=true');
+		});
+
+		it('includes scope_id and is_default query params', async () => {
+			mockApiClient.mockResolvedValue({} as any);
+
+			await listTriggerRules({ scope_id: 'ent-1', is_default: true }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('scope_id=ent-1');
+			expect(calledPath).toContain('is_default=true');
 		});
 
 		it('includes limit and offset query params', async () => {
