@@ -6,6 +6,7 @@ import {
 	deleteRoleParameter
 } from '$lib/api/governance-roles';
 import type { UpdateRoleParameterRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -67,10 +68,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.display_name = body.display_name;
 	}
 	if (body.display_order !== undefined) {
-		if (typeof body.display_order !== 'number') {
-			error(400, 'display_order must be a number');
+		try {
+			data.display_order = parseBoundedInteger(body.display_order, 0, 1_000_000, 'display_order');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.display_order = body.display_order;
 	}
 	const result = await updateRoleParameter(
 		params.id,

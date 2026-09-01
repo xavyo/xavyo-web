@@ -59,4 +59,20 @@ describe('PUT /api/connectors/:id/reconciliation/schedule', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(upsertSchedule).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN hour_of_day instead of forwarding it', async () => {
+		await expect(
+			PUT(
+				makeEvent(
+					JSON.stringify({
+						mode: 'full',
+						frequency: 'daily',
+						hour_of_day: Number.NaN,
+						enabled: true
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(upsertSchedule).not.toHaveBeenCalled();
+	});
 });

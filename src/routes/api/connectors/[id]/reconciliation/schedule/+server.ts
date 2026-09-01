@@ -6,6 +6,7 @@ import type {
 	ReconciliationScheduleFrequency,
 	UpsertScheduleRequest
 } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const MODES = ['full', 'delta'] as const;
 const FREQUENCIES = ['hourly', 'daily', 'weekly', 'monthly', 'cron'] as const;
@@ -41,8 +42,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 	if (!FREQUENCIES.includes(body.frequency as (typeof FREQUENCIES)[number])) {
 		error(400, 'frequency is required');
 	}
-	if (typeof body.hour_of_day !== 'number') {
-		error(400, 'hour_of_day is required');
+	let hour_of_day: number;
+	try {
+		hour_of_day = parseBoundedInteger(body.hour_of_day, 0, 23, 'hour_of_day');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (typeof body.enabled !== 'boolean') {
 		error(400, 'enabled is required');
@@ -50,20 +55,24 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 	const data: UpsertScheduleRequest = {
 		mode: body.mode as ReconciliationMode,
 		frequency: body.frequency as ReconciliationScheduleFrequency,
-		hour_of_day: body.hour_of_day,
+		hour_of_day,
 		enabled: body.enabled
 	};
 	if (body.day_of_week !== undefined) {
-		if (typeof body.day_of_week !== 'number') {
-			error(400, 'day_of_week must be a number');
+		try {
+			data.day_of_week = parseBoundedInteger(body.day_of_week, 0, 6, 'day_of_week');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.day_of_week = body.day_of_week;
 	}
 	if (body.day_of_month !== undefined) {
-		if (typeof body.day_of_month !== 'number') {
-			error(400, 'day_of_month must be a number');
+		try {
+			data.day_of_month = parseBoundedInteger(body.day_of_month, 1, 31, 'day_of_month');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.day_of_month = body.day_of_month;
 	}
 	const result = await upsertSchedule(
 		params.id,

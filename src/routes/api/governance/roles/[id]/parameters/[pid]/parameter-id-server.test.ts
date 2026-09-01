@@ -48,4 +48,11 @@ describe('PUT /api/governance/roles/:id/parameters/:pid', () => {
 		});
 		expect(updateRoleParameter).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN display_order instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ display_order: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateRoleParameter).not.toHaveBeenCalled();
+	});
 });

@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listBirthrightPolicies, createBirthrightPolicy } from '$lib/api/birthright';
 import { listPagination } from '$lib/server/list-pagination';
 import type { BirthrightCondition, CreateBirthrightPolicyRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const OPERATORS = ['equals', 'not_equals', 'in', 'not_in', 'starts_with', 'contains'] as const;
 
@@ -65,15 +66,19 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (typeof body.name !== 'string' || body.name.length === 0) {
 		error(400, 'name is required');
 	}
-	if (typeof body.priority !== 'number') {
-		error(400, 'priority is required');
+	let priority: number;
+	try {
+		priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (!Array.isArray(body.entitlement_ids) || !body.entitlement_ids.every((id) => typeof id === 'string')) {
 		error(400, 'entitlement_ids is required');
 	}
 	const data: CreateBirthrightPolicyRequest = {
 		name: body.name,
-		priority: body.priority,
+		priority,
 		conditions: parseConditions(body.conditions),
 		entitlement_ids: body.entitlement_ids
 	};
@@ -90,10 +95,17 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		data.evaluation_mode = body.evaluation_mode;
 	}
 	if (body.grace_period_days !== undefined) {
-		if (typeof body.grace_period_days !== 'number') {
-			error(400, 'grace_period_days must be a number');
+		try {
+			data.grace_period_days = parseBoundedInteger(
+				body.grace_period_days,
+				0,
+				365,
+				'grace_period_days'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.grace_period_days = body.grace_period_days;
 	}
 	const result = await createBirthrightPolicy(data, locals.accessToken, locals.tenantId, fetch);
 	return json(result, { status: 201 });

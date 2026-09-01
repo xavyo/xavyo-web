@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { simulateMetaRole } from '$lib/api/meta-roles';
 import type { CriteriaOperator, SimulateMetaRoleRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const OPERATORS: CriteriaOperator[] = [
 	'eq',
@@ -51,10 +52,12 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		data.meta_role_id = body.meta_role_id;
 	}
 	if (body.limit !== undefined) {
-		if (typeof body.limit !== 'number') {
-			error(400, 'limit must be a number');
+		try {
+			data.limit = parseBoundedInteger(body.limit, 1, 10_000, 'limit');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.limit = body.limit;
 	}
 	if (body.meta_role_data !== undefined) {
 		if (
@@ -68,10 +71,14 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		if (typeof role.name !== 'string' || role.name.length === 0) {
 			error(400, 'name is required');
 		}
-		if (typeof role.priority !== 'number') {
-			error(400, 'priority is required');
+		let priority: number;
+		try {
+			priority = parseBoundedInteger(role.priority, 1, 1000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.meta_role_data = { name: role.name, priority: role.priority };
+		data.meta_role_data = { name: role.name, priority };
 		if (typeof role.description === 'string') {
 			data.meta_role_data.description = role.description;
 		}

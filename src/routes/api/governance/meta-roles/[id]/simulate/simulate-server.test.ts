@@ -46,4 +46,11 @@ describe('POST /api/governance/meta-roles/:id/simulate', () => {
 		});
 		expect(simulateMetaRole).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN limit instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ simulation_type: 'update', limit: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(simulateMetaRole).not.toHaveBeenCalled();
+	});
 });
