@@ -100,6 +100,43 @@ describe('POST /api/federation/identity-providers', () => {
 		expect(createIdentityProvider).toHaveBeenCalled();
 	});
 
+	it('forwards advertised claim_mapping and sync_on_login', async () => {
+		vi.mocked(createIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'okta',
+					provider_type: 'oidc',
+					issuer_url: 'https://ex',
+					client_id: 'id',
+					client_secret: 'sec',
+					sync_on_login: true,
+					claim_mapping: {
+						email: 'email',
+						given_name: 'first_name',
+						family_name: 'last_name'
+					}
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createIdentityProvider).toHaveBeenCalledWith(
+			expect.objectContaining({
+				sync_on_login: true,
+				claim_mapping: {
+					mappings: expect.arrayContaining([
+						{ source: 'email', target: 'email' },
+						{ source: 'given_name', target: 'first_name' },
+						{ source: 'family_name', target: 'last_name' }
+					])
+				}
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(createIdentityProvider).not.toHaveBeenCalled();

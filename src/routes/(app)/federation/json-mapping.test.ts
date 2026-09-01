@@ -6,15 +6,17 @@ import { dirname, join } from 'node:path';
 const dir = dirname(fileURLToPath(import.meta.url));
 
 describe('federation mapping JSON must be objects', () => {
-	it('OIDC create uses parseJsonStringRecord', () => {
+	it('OIDC create uses parseClaimMappingJson', () => {
 		const src = readFileSync(join(dir, 'oidc/create/+page.server.ts'), 'utf8');
-		expect(src).toContain('parseJsonStringRecord(');
+		expect(src).toContain('parseClaimMappingJson(');
+		expect(src).not.toContain('parseJsonStringRecord(');
 		expect(src).not.toContain('JSON.parse(form.data.claim_mapping)');
 	});
 
-	it('OIDC edit uses parseJsonStringRecord', () => {
+	it('OIDC edit uses parseClaimMappingJson', () => {
 		const src = readFileSync(join(dir, 'oidc/[id]/+page.server.ts'), 'utf8');
-		expect(src).toContain('parseJsonStringRecord(');
+		expect(src).toContain('parseClaimMappingJson(');
+		expect(src).not.toContain('parseJsonStringRecord(');
 		expect(src).not.toContain('JSON.parse(form.data.claim_mapping)');
 	});
 
