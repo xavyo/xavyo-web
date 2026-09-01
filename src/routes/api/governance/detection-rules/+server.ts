@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listDetectionRules, createDetectionRule } from '$lib/api/detection-rules';
 import type { CreateDetectionRuleRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -50,14 +51,18 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (typeof body.is_enabled !== 'boolean') {
 		error(400, 'is_enabled is required');
 	}
-	if (typeof body.priority !== 'number') {
-		error(400, 'priority is required');
+	let priority: number;
+	try {
+		priority = parseBoundedInteger(body.priority, 1, 1_000_000, 'priority');
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	const data: CreateDetectionRuleRequest = {
 		name: body.name,
 		rule_type: body.rule_type,
 		is_enabled: body.is_enabled,
-		priority: body.priority
+		priority
 	};
 	if (body.parameters !== undefined) {
 		if (!body.parameters || typeof body.parameters !== 'object' || Array.isArray(body.parameters)) {

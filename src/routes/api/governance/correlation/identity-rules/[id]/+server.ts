@@ -6,6 +6,7 @@ import type {
 	CorrelationMatchType,
 	UpdateIdentityCorrelationRuleRequest
 } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 const MATCH_TYPES = ['exact', 'fuzzy', 'expression'] as const;
 const ALGORITHMS = ['levenshtein', 'jaro_winkler'] as const;
@@ -53,29 +54,25 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		}
 		data.algorithm = body.algorithm as CorrelationAlgorithm | null;
 	}
-	if (body.threshold !== undefined) {
-		if (typeof body.threshold !== 'number') {
-			error(400, 'threshold must be a number');
+	try {
+		if (body.threshold !== undefined) {
+			data.threshold = requireFiniteNumber(body.threshold, 'threshold');
 		}
-		data.threshold = body.threshold;
-	}
-	if (body.weight !== undefined) {
-		if (typeof body.weight !== 'number') {
-			error(400, 'weight must be a number');
+		if (body.weight !== undefined) {
+			data.weight = requireFiniteNumber(body.weight, 'weight');
 		}
-		data.weight = body.weight;
+		if (body.priority !== undefined) {
+			data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		}
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (body.is_active !== undefined) {
 		if (typeof body.is_active !== 'boolean') {
 			error(400, 'is_active must be a boolean');
 		}
 		data.is_active = body.is_active;
-	}
-	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
-		}
-		data.priority = body.priority;
 	}
 	const result = await updateIdentityCorrelationRule(params.id, data, locals.accessToken, locals.tenantId, fetch);
 	return json(result);

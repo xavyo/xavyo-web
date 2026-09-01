@@ -48,4 +48,24 @@ describe('PUT /api/governance/detection-rules/:id', () => {
 		});
 		expect(updateDetectionRule).not.toHaveBeenCalled();
 	});
+
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(updateDetectionRule).mockResolvedValue({ id: 'd1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ priority: '7' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateDetectionRule).toHaveBeenCalledWith(
+			'd1',
+			expect.objectContaining({ priority: 7 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ priority: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateDetectionRule).not.toHaveBeenCalled();
+	});
 });

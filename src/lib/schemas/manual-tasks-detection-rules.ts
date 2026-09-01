@@ -24,6 +24,12 @@ export const configureSemiManualSchema = z.object({
 
 export type ConfigureSemiManualFormData = z.infer<typeof configureSemiManualSchema>;
 
+/** HTML FormData sends numbers as strings; empty optional fields arrive as ''. */
+const optionalPositiveInt = z.preprocess(
+	(v) => (v === '' || v === null || v === undefined ? undefined : v),
+	z.coerce.number().int().min(1).optional()
+);
+
 export const createDetectionRuleSchema = z.object({
 	name: z
 		.string()
@@ -31,8 +37,8 @@ export const createDetectionRuleSchema = z.object({
 		.max(100, 'Name must be 100 characters or less'),
 	rule_type: z.enum(['no_manager', 'terminated', 'inactive', 'custom']),
 	is_enabled: z.boolean(),
-	priority: z.number().int().min(1, 'Priority must be at least 1'),
-	days_threshold: z.number().int().min(1).optional(),
+	priority: z.coerce.number().int().min(1, 'Priority must be at least 1'),
+	days_threshold: optionalPositiveInt,
 	expression: z.string().optional(),
 	description: z.string().max(500, 'Description must be 500 characters or less').optional()
 });
@@ -46,8 +52,11 @@ export const updateDetectionRuleSchema = z.object({
 		.max(100, 'Name must be 100 characters or less')
 		.optional(),
 	is_enabled: z.boolean().optional(),
-	priority: z.number().int().min(1, 'Priority must be at least 1').optional(),
-	days_threshold: z.number().int().min(1).optional(),
+	priority: z.preprocess(
+		(v) => (v === '' || v === null || v === undefined ? undefined : v),
+		z.coerce.number().int().min(1, 'Priority must be at least 1').optional()
+	),
+	days_threshold: optionalPositiveInt,
 	expression: z.string().optional(),
 	description: z.string().max(500, 'Description must be 500 characters or less').optional()
 });

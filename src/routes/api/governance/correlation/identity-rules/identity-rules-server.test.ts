@@ -102,4 +102,45 @@ describe('POST /api/governance/correlation/identity-rules', () => {
 		).rejects.toMatchObject({ status: 400 });
 		expect(createIdentityCorrelationRule).not.toHaveBeenCalled();
 	});
+
+	it('accepts numeric-string threshold, weight, and priority', async () => {
+		vi.mocked(createIdentityCorrelationRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'email',
+					attribute: 'email',
+					match_type: 'exact',
+					threshold: '0.9',
+					weight: '1',
+					priority: '2'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createIdentityCorrelationRule).toHaveBeenCalledWith(
+			expect.objectContaining({ threshold: 0.9, weight: 1, priority: 2 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN threshold instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						name: 'email',
+						attribute: 'email',
+						match_type: 'exact',
+						threshold: Number.NaN,
+						weight: 1,
+						priority: 1
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createIdentityCorrelationRule).not.toHaveBeenCalled();
+	});
 });

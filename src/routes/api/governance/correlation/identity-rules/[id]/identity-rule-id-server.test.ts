@@ -54,6 +54,28 @@ describe('PUT /api/governance/correlation/identity-rules/:id', () => {
 		});
 		expect(updateIdentityCorrelationRule).not.toHaveBeenCalled();
 	});
+
+	it('accepts numeric-string threshold, weight, and priority', async () => {
+		vi.mocked(updateIdentityCorrelationRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await PUT(
+			makeEvent(JSON.stringify({ threshold: '0.8', weight: '2', priority: '3' })) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateIdentityCorrelationRule).toHaveBeenCalledWith(
+			'r1',
+			expect.objectContaining({ threshold: 0.8, weight: 2, priority: 3 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN weight instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ weight: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateIdentityCorrelationRule).not.toHaveBeenCalled();
+	});
 });
 
 describe('DELETE /api/governance/correlation/identity-rules/:id', () => {
