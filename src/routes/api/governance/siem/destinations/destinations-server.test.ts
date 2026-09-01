@@ -94,6 +94,44 @@ describe('POST /api/governance/siem/destinations', () => {
 		expect(createSiemDestination).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string endpoint_port', async () => {
+		vi.mocked(createSiemDestination).mockResolvedValue({ id: 'd1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'splunk',
+					destination_type: 'splunk_hec',
+					endpoint_host: 'siem.example',
+					export_format: 'json',
+					endpoint_port: '8088'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createSiemDestination).toHaveBeenCalledWith(
+			expect.objectContaining({ endpoint_port: 8088 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN endpoint_port instead of forwarding it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'splunk',
+					destination_type: 'splunk_hec',
+					endpoint_host: 'siem.example',
+					export_format: 'json',
+					endpoint_port: Number.NaN
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createSiemDestination).not.toHaveBeenCalled();
+	});
+
 	it('does not create when name is missing', async () => {
 		const response = await POST(
 			makeEvent(

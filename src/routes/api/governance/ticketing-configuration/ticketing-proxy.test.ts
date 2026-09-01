@@ -174,6 +174,45 @@ describe('POST /api/governance/ticketing-configuration (create)', () => {
 		expect(createTicketingConfig).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string polling_interval_seconds', async () => {
+		vi.mocked(createTicketingConfig).mockResolvedValue({ id: 'tc-new' } as any);
+		const response = await POST(
+			makeRequestEvent({
+				request: makeJsonRequest({
+					name: 'Jira Config',
+					ticketing_type: 'jira',
+					endpoint_url: 'https://jira.example.com',
+					credentials: 'secret',
+					polling_interval_seconds: '120'
+				})
+			})
+		);
+		expect(response.status).toBe(201);
+		expect(createTicketingConfig).toHaveBeenCalledWith(
+			expect.objectContaining({ polling_interval_seconds: 120 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN polling_interval_seconds instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeRequestEvent({
+					request: makeJsonRequest({
+						name: 'Jira Config',
+						ticketing_type: 'jira',
+						endpoint_url: 'https://jira.example.com',
+						credentials: 'secret',
+						polling_interval_seconds: Number.NaN
+					})
+				})
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createTicketingConfig).not.toHaveBeenCalled();
+	});
+
 	it('does not create when ticketing_type is invalid', async () => {
 		await expect(
 			POST(

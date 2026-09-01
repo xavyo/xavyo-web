@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { getSiemDestination, updateSiemDestination, deleteSiemDestination } from '$lib/api/siem';
 import { ApiError } from '$lib/api/client';
 import type { EventCategory, UpdateSiemDestinationRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const EXPORT_FORMATS = ['cef', 'syslog_rfc5424', 'json', 'csv'] as const;
 const EVENT_CATEGORIES: EventCategory[] = [
@@ -63,10 +64,14 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 			data.endpoint_host = body.endpoint_host;
 		}
 		if (body.endpoint_port !== undefined) {
-			if (typeof body.endpoint_port !== 'number') {
-				return json({ error: 'endpoint_port must be a number' }, { status: 400 });
+			try {
+				data.endpoint_port = parseBoundedInteger(body.endpoint_port, 1, 65535, 'endpoint_port');
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.endpoint_port = body.endpoint_port;
 		}
 		if (body.export_format !== undefined) {
 			if (!EXPORT_FORMATS.includes(body.export_format as (typeof EXPORT_FORMATS)[number])) {

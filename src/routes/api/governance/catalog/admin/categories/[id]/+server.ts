@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { adminUpdateCategory, adminDeleteCategory } from '$lib/api/catalog';
 import type { UpdateCategoryRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const PUT: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -41,10 +42,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.icon = body.icon as string | null;
 	}
 	if (body.display_order !== undefined) {
-		if (typeof body.display_order !== 'number') {
-			error(400, 'display_order must be a number');
+		try {
+			data.display_order = parseBoundedInteger(body.display_order, 0, 1_000_000, 'display_order');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.display_order = body.display_order;
 	}
 	const result = await adminUpdateCategory(params.id, data, locals.accessToken, locals.tenantId, fetch);
 	return json(result);

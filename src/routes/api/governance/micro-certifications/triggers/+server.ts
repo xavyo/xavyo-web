@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listTriggerRules, createTriggerRule } from '$lib/api/micro-certifications';
 import { listPagination } from '$lib/server/list-pagination';
 import type { CreateTriggerRuleRequest, ReviewerType, ScopeType, TriggerType } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 const TRIGGER_TYPES = [
 	'high_risk_assignment',
@@ -87,17 +88,24 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		}
 		data.fallback_reviewer_id = body.fallback_reviewer_id;
 	}
-	if (body.timeout_secs !== undefined) {
-		if (typeof body.timeout_secs !== 'number') {
-			error(400, 'timeout_secs must be a number');
+	try {
+		if (body.timeout_secs !== undefined) {
+			data.timeout_secs = parseBoundedInteger(body.timeout_secs, 0, 31_536_000, 'timeout_secs');
 		}
-		data.timeout_secs = body.timeout_secs;
-	}
-	if (body.reminder_threshold_percent !== undefined) {
-		if (typeof body.reminder_threshold_percent !== 'number') {
-			error(400, 'reminder_threshold_percent must be a number');
+		if (body.reminder_threshold_percent !== undefined) {
+			data.reminder_threshold_percent = parseBoundedInteger(
+				body.reminder_threshold_percent,
+				0,
+				100,
+				'reminder_threshold_percent'
+			);
 		}
-		data.reminder_threshold_percent = body.reminder_threshold_percent;
+		if (body.priority !== undefined) {
+			data.priority = parseBoundedInteger(body.priority, 0, 1_000_000, 'priority');
+		}
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (body.auto_revoke !== undefined) {
 		if (typeof body.auto_revoke !== 'boolean') {
@@ -116,12 +124,6 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			error(400, 'is_default must be a boolean');
 		}
 		data.is_default = body.is_default;
-	}
-	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
-		}
-		data.priority = body.priority;
 	}
 	if (body.metadata !== undefined) {
 		if (!body.metadata || typeof body.metadata !== 'object' || Array.isArray(body.metadata)) {
