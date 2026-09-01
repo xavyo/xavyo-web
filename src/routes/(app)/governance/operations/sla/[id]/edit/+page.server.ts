@@ -20,7 +20,13 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 				description: policy.description ?? undefined,
 				target_duration_seconds: policy.target_duration_seconds,
 				warning_threshold_percent: policy.warning_threshold_percent,
-				breach_notification_enabled: policy.breach_notification_enabled
+				breach_notification_enabled: policy.breach_notification_enabled,
+				escalation_contacts:
+					policy.escalation_contacts === undefined || policy.escalation_contacts === null
+						? undefined
+						: typeof policy.escalation_contacts === 'string'
+							? policy.escalation_contacts
+							: JSON.stringify(policy.escalation_contacts)
 			},
 			zod(updateSlaPolicySchema)
 		);

@@ -57,6 +57,16 @@ describe('manual-tasks-client', () => {
 			expect(calledUrl).toContain('offset=20');
 		});
 
+		it('includes advertised operation query param', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0, limit: 20, offset: 0 }));
+			const { fetchManualTasks } = await import('./manual-tasks-client');
+
+			await fetchManualTasks({ operation: 'revoke' }, mockFetch);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('operation=revoke');
+		});
+
 		it('handles sla_breached=false correctly', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0, limit: 20, offset: 0 }));
 			const { fetchManualTasks } = await import('./manual-tasks-client');

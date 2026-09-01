@@ -294,6 +294,26 @@ describe('PUT /api/governance/ticketing-configuration/[id] (update)', () => {
 		expect(updateTicketingConfig).toHaveBeenCalledWith('tc-1', body, TOKEN, TENANT, expect.any(Function));
 	});
 
+	it('forwards advertised is_active on update', async () => {
+		vi.mocked(updateTicketingConfig).mockResolvedValue({ id: 'tc-1', is_active: false } as any);
+
+		const response = await PUT(
+			makeRequestEvent({
+				params: { id: 'tc-1' },
+				request: makeJsonRequest({ is_active: false })
+			})
+		);
+
+		expect(response.status).toBe(200);
+		expect(updateTicketingConfig).toHaveBeenCalledWith(
+			'tc-1',
+			expect.objectContaining({ is_active: false }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not update on invalid JSON', async () => {
 		await expect(
 			PUT(

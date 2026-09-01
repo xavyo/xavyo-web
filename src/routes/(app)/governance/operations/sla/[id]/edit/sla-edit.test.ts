@@ -117,6 +117,20 @@ describe('SLA Edit +page.server', () => {
 			expect(result.form.data.breach_notification_enabled).toBe(true);
 		});
 
+		it('pre-fills advertised escalation_contacts from the API response', async () => {
+			mockGetSlaPolicy.mockResolvedValue({
+				...mockPolicy,
+				escalation_contacts: ['ops@example.com']
+			} as any);
+			const result = (await load({
+				params: { id: 'p1' },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any)) as any;
+
+			expect(result.form.data.escalation_contacts).toBe(JSON.stringify(['ops@example.com']));
+		});
+
 		it('throws error when policy not found', async () => {
 			mockGetSlaPolicy.mockRejectedValue(new ApiError('Not found', 404));
 			await expect(

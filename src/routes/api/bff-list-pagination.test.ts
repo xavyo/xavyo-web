@@ -113,6 +113,7 @@ describe('BFF list endpoints honor finite pagination', () => {
 		'governance/persona-audit/+server.ts',
 		'governance/parameters/audit/+server.ts',
 		'governance/delegations/audit/+server.ts',
+		'governance/manual-tasks/audit/+server.ts',
 		'governance/role-mining/jobs/[jobId]/candidates/+server.ts',
 		'governance/role-mining/jobs/[jobId]/excessive-privileges/+server.ts',
 		'governance/role-mining/jobs/[jobId]/consolidation-suggestions/+server.ts',

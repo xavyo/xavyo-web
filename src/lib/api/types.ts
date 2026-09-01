@@ -6185,6 +6185,7 @@ export interface SlaPolicyResponse {
 	target_duration_human: string;
 	warning_threshold_percent: number;
 	breach_notification_enabled: boolean;
+	escalation_contacts?: unknown;
 	is_active: boolean;
 	created_at: string;
 	updated_at: string;
@@ -6234,6 +6235,7 @@ export interface TicketingConfigurationResponse {
 	default_assignment_group?: string;
 	project_key?: string;
 	issue_type?: string;
+	field_mappings?: unknown;
 	is_active: boolean;
 	created_at: string;
 	updated_at: string;
@@ -6250,6 +6252,7 @@ export interface UpdateTicketingConfigurationRequest {
 	project_key?: string;
 	issue_type?: string;
 	polling_interval_seconds?: number;
+	is_active?: boolean;
 }
 
 export interface TicketingConfigurationListResponse {
@@ -6934,6 +6937,23 @@ export interface ManualTask {
 	created_at: string;
 	updated_at: string;
 	completed_at: string | null;
+}
+
+export interface ManualTaskAuditEvent {
+	id: string;
+	task_id: string;
+	event_type: string;
+	actor_id?: string | null;
+	actor_name?: string | null;
+	details?: unknown;
+	created_at: string;
+}
+
+export interface ManualTaskAuditListResponse {
+	items: ManualTaskAuditEvent[];
+	total: number;
+	limit: number;
+	offset: number;
 }
 
 export interface ManualTaskListResponse {

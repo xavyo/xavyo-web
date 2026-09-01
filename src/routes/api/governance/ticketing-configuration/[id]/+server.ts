@@ -103,6 +103,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 				throw e;
 			}
 		}
+		if (body.is_active !== undefined) {
+			if (typeof body.is_active !== 'boolean') {
+				error(400, 'is_active must be a boolean');
+			}
+			data.is_active = body.is_active;
+		}
 		const result = await updateTicketingConfig(
 			params.id,
 			data,

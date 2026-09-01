@@ -54,7 +54,7 @@ describe('Manual Tasks Hub Page', () => {
 			limit: 20,
 			offset: 0
 		},
-		filters: { status: undefined, application_id: undefined, user_id: undefined, sla_breached: undefined, assignee_id: undefined }
+		filters: { status: undefined, application_id: undefined, user_id: undefined, sla_breached: undefined, assignee_id: undefined, operation: undefined }
 	};
 
 	it('renders page title', () => {
