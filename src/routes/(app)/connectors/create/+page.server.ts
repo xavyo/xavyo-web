@@ -5,7 +5,8 @@ import { fail, redirect } from '@sveltejs/kit';
 import { createConnectorSchema } from '$lib/schemas/connectors';
 import { createConnector } from '$lib/api/connectors';
 import { ApiError } from '$lib/api/client';
-import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
+import { JsonObjectError, isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
+import { parsePortNumber } from '$lib/server/list-pagination';
 import type { ConnectorType, CreateConnectorRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -17,7 +18,7 @@ function buildLdapConfigAndCredentials(data: Record<string, unknown>): { config:
 	return {
 		config: {
 			host: data.host as string,
-			port: Number(data.port || 636),
+			port: parsePortNumber(data.port, 636),
 			base_dn: data.base_dn as string,
 			use_ssl: data.use_ssl === 'on',
 			search_filter: (data.search_filter as string) || undefined
@@ -33,7 +34,7 @@ function buildDatabaseConfigAndCredentials(data: Record<string, unknown>): { con
 	return {
 		config: {
 			host: data.host as string,
-			port: Number(data.port || 5432),
+			port: parsePortNumber(data.port, 5432),
 			database: data.database as string,
 			driver: data.driver as string,
 			query: (data.query as string) || undefined
@@ -103,7 +104,9 @@ export const actions: Actions = {
 			}
 		} catch (e) {
 			if (isJsonParseError(e)) {
-				return message(form, 'Configuration JSON must be an object', {
+				const msg =
+					e instanceof JsonObjectError ? e.message : 'Configuration JSON must be an object';
+				return message(form, msg, {
 					status: 400 as ErrorStatus
 				});
 			}

@@ -316,6 +316,64 @@ describe('Connector Edit +page.server', () => {
 			);
 		});
 
+		it('rejects non-numeric LDAP port instead of posting NaN', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Updated LDAP',
+					connector_type: 'ldap',
+					host: 'ldap.example.com',
+					port: 'abc',
+					bind_dn: 'cn=admin,dc=example,dc=com',
+					bind_password: 'secret',
+					base_dn: 'dc=example,dc=com'
+				}),
+				params: { id: 'conn-1' },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(updateConnector).not.toHaveBeenCalled();
+		});
+
+		it('rejects LDAP port 0 instead of silently defaulting to 636', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Updated LDAP',
+					connector_type: 'ldap',
+					host: 'ldap.example.com',
+					port: '0',
+					bind_dn: 'cn=admin,dc=example,dc=com',
+					bind_password: 'secret',
+					base_dn: 'dc=example,dc=com'
+				}),
+				params: { id: 'conn-1' },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(updateConnector).not.toHaveBeenCalled();
+		});
+
+		it('rejects non-numeric database port instead of posting NaN', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Updated DB',
+					connector_type: 'database',
+					host: 'db.example.com',
+					port: 'nope',
+					database: 'users_db',
+					username: 'admin',
+					password: 'dbpass',
+					driver: 'mysql'
+				}),
+				params: { id: 'conn-2' },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(updateConnector).not.toHaveBeenCalled();
+		});
+
 		it('returns error for invalid JSON in auth_config', async () => {
 			const result: any = await actions.default({
 				request: makeFormData({

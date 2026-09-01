@@ -8,6 +8,8 @@ import {
 	disableSchedule
 } from '$lib/api/reconciliation';
 import { ApiError } from '$lib/api/client';
+import { isJsonParseError } from '$lib/utils/json-record';
+import { parseBoundedInteger, parseOptionalBoundedInteger } from '$lib/server/list-pagination';
 
 export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 
@@ -28,12 +30,18 @@ export const actions: Actions = {
 		const fd = await request.formData();
 		const mode = fd.get('mode') as string;
 		const frequency = fd.get('frequency') as string;
-		const day_of_week = fd.get('day_of_week') ? Number(fd.get('day_of_week')) : undefined;
-		const day_of_month = fd.get('day_of_month') ? Number(fd.get('day_of_month')) : undefined;
-		const hour_of_day = Number(fd.get('hour_of_day') ?? '0');
 		const enabled = fd.get('enabled') === 'on';
 
 		try {
+			const day_of_week = parseOptionalBoundedInteger(fd.get('day_of_week'), 0, 6, 'day_of_week');
+			const day_of_month = parseOptionalBoundedInteger(
+				fd.get('day_of_month'),
+				1,
+				31,
+				'day_of_month'
+			);
+			const hour_of_day = parseBoundedInteger(fd.get('hour_of_day'), 0, 23, 'hour_of_day', 0);
+
 			await upsertSchedule(
 				params.id,
 				{
@@ -50,6 +58,9 @@ export const actions: Actions = {
 			);
 			return { success: true, action: 'saved' };
 		} catch (e) {
+			if (isJsonParseError(e)) {
+				return fail(400, { error: e instanceof Error ? e.message : 'Invalid schedule fields' });
+			}
 			if (e instanceof ApiError) return fail(e.status, { error: e.message });
 			return fail(500, { error: 'An unexpected error occurred' });
 		}

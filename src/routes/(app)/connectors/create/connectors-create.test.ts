@@ -224,6 +224,89 @@ describe('Connectors Create +page.server', () => {
 			);
 		});
 
+		it('rejects LDAP port 0 instead of silently defaulting to 636', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Corp LDAP',
+					connector_type: 'ldap',
+					host: 'ldap.example.com',
+					port: '0',
+					bind_dn: 'cn=admin,dc=example,dc=com',
+					bind_password: 'secret',
+					base_dn: 'dc=example,dc=com'
+				}),
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(createConnector).not.toHaveBeenCalled();
+		});
+
+		it('rejects non-numeric LDAP port instead of posting NaN', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'Corp LDAP',
+					connector_type: 'ldap',
+					host: 'ldap.example.com',
+					port: 'abc',
+					bind_dn: 'cn=admin,dc=example,dc=com',
+					bind_password: 'secret',
+					base_dn: 'dc=example,dc=com'
+				}),
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(createConnector).not.toHaveBeenCalled();
+		});
+
+		it('rejects non-numeric database port instead of posting NaN', async () => {
+			const result: any = await actions.default({
+				request: makeFormData({
+					name: 'User DB',
+					connector_type: 'database',
+					host: 'db.example.com',
+					port: 'nope',
+					database: 'identity_db',
+					username: 'db_user',
+					password: 'db_pass',
+					driver: 'postgres'
+				}),
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+			expect(result.status).toBe(400);
+			expect(createConnector).not.toHaveBeenCalled();
+		});
+
+		it('defaults omitted LDAP port to 636', async () => {
+			vi.mocked(createConnector).mockResolvedValue({ id: 'conn-port' } as any);
+			try {
+				await actions.default({
+					request: makeFormData({
+						name: 'Corp LDAP',
+						connector_type: 'ldap',
+						host: 'ldap.example.com',
+						bind_dn: 'cn=admin,dc=example,dc=com',
+						bind_password: 'secret',
+						base_dn: 'dc=example,dc=com'
+					}),
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+			} catch (e: any) {
+				expect(e.status).toBe(303);
+			}
+			expect(createConnector).toHaveBeenCalledWith(
+				expect.objectContaining({
+					config: expect.objectContaining({ port: 636 })
+				}),
+				'tok',
+				'tid',
+				expect.any(Function)
+			);
+		});
+
 		it('returns error for invalid JSON in auth_config', async () => {
 			const result: any = await actions.default({
 				request: makeFormData({

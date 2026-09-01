@@ -10,7 +10,10 @@ export const createConnectorSchema = z.object({
 	connector_type: z.enum(CONNECTOR_TYPES, { required_error: 'Connector type is required' }),
 	// LDAP config fields
 	host: z.string().optional(),
-	port: z.coerce.number().optional(),
+	port: z.preprocess(
+		(v) => (v === '' || v == null ? undefined : v),
+		z.coerce.number().int().min(1).max(65535).optional()
+	),
 	bind_dn: z.string().optional(),
 	bind_password: z.string().optional(),
 	base_dn: z.string().optional(),
