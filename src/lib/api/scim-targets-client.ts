@@ -83,10 +83,14 @@ export async function triggerScimReconciliationClient(
 
 export async function fetchScimSyncRuns(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { run_type?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<ScimSyncRunListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		run_type: params.run_type,
+		limit: params.limit,
+		offset: params.offset
+	});
 	const res = await fetchFn(`/api/admin/scim-targets/${id}/sync-runs${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch sync runs: ${res.status}`);
 	return res.json();
@@ -96,10 +100,15 @@ export async function fetchScimSyncRuns(
 
 export async function fetchScimProvisioningState(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { resource_type?: string; status?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<ScimProvisioningStateListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		resource_type: params.resource_type,
+		status: params.status,
+		limit: params.limit,
+		offset: params.offset
+	});
 	const res = await fetchFn(`/api/admin/scim-targets/${id}/provisioning-state${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch provisioning state: ${res.status}`);
 	return res.json();
@@ -120,10 +129,15 @@ export async function retryScimProvisioningClient(
 
 export async function fetchScimProvisioningLog(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { resource_type?: string; operation_type?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<ScimProvisioningLogListResponse> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		resource_type: params.resource_type,
+		operation_type: params.operation_type,
+		limit: params.limit,
+		offset: params.offset
+	});
 	const res = await fetchFn(`/api/admin/scim-targets/${id}/log${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch provisioning log: ${res.status}`);
 	return res.json();

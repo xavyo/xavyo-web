@@ -12,16 +12,23 @@ import type {
 export interface ListWebhookSubscriptionsParams {
 	limit?: number;
 	offset?: number;
+	enabled?: boolean;
 }
 
 export interface ListWebhookDeliveriesParams {
 	limit?: number;
 	offset?: number;
+	status?: string;
 }
 
 export interface ListDlqEntriesParams {
 	limit?: number;
 	offset?: number;
+	subscription_id?: string;
+	event_type?: string;
+	from?: string;
+	to?: string;
+	include_replayed?: boolean;
 }
 
 function buildSearchParams(params: Record<string, string | number | boolean | undefined>): string {
@@ -56,7 +63,8 @@ export async function listWebhookSubscriptions(
 ): Promise<WebhookSubscriptionListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		enabled: params.enabled
 	});
 	return apiClient<WebhookSubscriptionListResponse>(`/webhooks/subscriptions${qs}`, {
 		method: 'GET',
@@ -134,7 +142,8 @@ export async function listWebhookDeliveries(
 ): Promise<WebhookDeliveryListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		status: params.status
 	});
 	return apiClient<WebhookDeliveryListResponse>(
 		`/webhooks/subscriptions/${subscriptionId}/deliveries${qs}`,
@@ -155,7 +164,12 @@ export async function listDlqEntries(
 ): Promise<WebhookDlqListResponse> {
 	const qs = buildSearchParams({
 		limit: params.limit,
-		offset: params.offset
+		offset: params.offset,
+		subscription_id: params.subscription_id,
+		event_type: params.event_type,
+		from: params.from,
+		to: params.to,
+		include_replayed: params.include_replayed
 	});
 	return apiClient<WebhookDlqListResponse>(`/webhooks/dlq${qs}`, {
 		method: 'GET',

@@ -145,12 +145,13 @@ export async function triggerScimReconciliation(
 
 export async function listScimSyncRuns(
 	id: string,
-	params: { limit?: number; offset?: number },
+	params: { run_type?: string; limit?: number; offset?: number },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof fetch
 ): Promise<ScimSyncRunListResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.run_type) searchParams.set('run_type', params.run_type);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -180,12 +181,14 @@ export async function getScimSyncRun(
 
 export async function listScimProvisioningState(
 	id: string,
-	params: { limit?: number; offset?: number },
+	params: { resource_type?: string; status?: string; limit?: number; offset?: number },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof fetch
 ): Promise<ScimProvisioningStateListResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.resource_type) searchParams.set('resource_type', params.resource_type);
+	if (params.status) searchParams.set('status', params.status);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -215,12 +218,14 @@ export async function retryScimProvisioning(
 
 export async function listScimProvisioningLog(
 	id: string,
-	params: { limit?: number; offset?: number },
+	params: { resource_type?: string; operation_type?: string; limit?: number; offset?: number },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof fetch
 ): Promise<ScimProvisioningLogListResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.resource_type) searchParams.set('resource_type', params.resource_type);
+	if (params.operation_type) searchParams.set('operation_type', params.operation_type);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

@@ -220,6 +220,18 @@ describe('scim-targets-client', () => {
 			expect(calledUrl).toContain('offset=20');
 		});
 
+		it('includes advertised run_type filter', async () => {
+			mockFetch.mockResolvedValueOnce(
+				mockResponse({ items: [], total: 0, limit: 20, offset: 0 })
+			);
+			const { fetchScimSyncRuns } = await import('./scim-targets-client');
+
+			await fetchScimSyncRuns('scim-1', { run_type: 'full_sync' }, mockFetch);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('run_type=full_sync');
+		});
+
 		it('throws on non-ok response', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 500));
 			const { fetchScimSyncRuns } = await import('./scim-targets-client');
@@ -257,6 +269,23 @@ describe('scim-targets-client', () => {
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('limit=10');
 			expect(calledUrl).toContain('offset=5');
+		});
+
+		it('includes advertised resource_type and status filters', async () => {
+			mockFetch.mockResolvedValueOnce(
+				mockResponse({ items: [], total: 0, limit: 20, offset: 0 })
+			);
+			const { fetchScimProvisioningState } = await import('./scim-targets-client');
+
+			await fetchScimProvisioningState(
+				'scim-1',
+				{ resource_type: 'User', status: 'pending' },
+				mockFetch
+			);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('resource_type=User');
+			expect(calledUrl).toContain('status=pending');
 		});
 
 		it('throws on non-ok response', async () => {
@@ -326,6 +355,23 @@ describe('scim-targets-client', () => {
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('limit=10');
 			expect(calledUrl).toContain('offset=5');
+		});
+
+		it('includes advertised resource_type and operation_type filters', async () => {
+			mockFetch.mockResolvedValueOnce(
+				mockResponse({ items: [], total: 0, limit: 20, offset: 0 })
+			);
+			const { fetchScimProvisioningLog } = await import('./scim-targets-client');
+
+			await fetchScimProvisioningLog(
+				'scim-1',
+				{ resource_type: 'User', operation_type: 'delete' },
+				mockFetch
+			);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('resource_type=User');
+			expect(calledUrl).toContain('operation_type=delete');
 		});
 
 		it('throws on non-ok response', async () => {

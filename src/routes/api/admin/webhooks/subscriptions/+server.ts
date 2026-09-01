@@ -8,8 +8,15 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
+	const enabled =
+		url.searchParams.get('enabled') === 'true'
+			? true
+			: url.searchParams.get('enabled') === 'false'
+				? false
+				: undefined;
+
 	const result = await listWebhookSubscriptions(
-		listPagination(url),
+		{ enabled, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

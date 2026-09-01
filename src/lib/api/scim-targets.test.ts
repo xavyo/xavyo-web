@@ -293,6 +293,22 @@ describe('SCIM Targets API', () => {
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('20');
 		});
+
+		it('includes advertised run_type filter', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listScimSyncRuns(
+				'scim-1',
+				{ run_type: 'reconciliation' },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('run_type')).toBe('reconciliation');
+		});
 	});
 
 	describe('getScimSyncRun', () => {
@@ -344,6 +360,23 @@ describe('SCIM Targets API', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
+		});
+
+		it('includes advertised resource_type and status filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listScimProvisioningState(
+				'scim-1',
+				{ resource_type: 'User', status: 'error' },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('resource_type')).toBe('User');
+			expect(params.get('status')).toBe('error');
 		});
 	});
 
@@ -400,6 +433,23 @@ describe('SCIM Targets API', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
+		});
+
+		it('includes advertised resource_type and operation_type filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listScimProvisioningLog(
+				'scim-1',
+				{ resource_type: 'Group', operation_type: 'create' },
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('resource_type')).toBe('Group');
+			expect(params.get('operation_type')).toBe('create');
 		});
 	});
 

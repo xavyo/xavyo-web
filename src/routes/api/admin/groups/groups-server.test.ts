@@ -5,8 +5,8 @@ vi.mock('$lib/api/groups', () => ({
 	createGroup: vi.fn()
 }));
 
-import { POST } from './+server';
-import { createGroup } from '$lib/api/groups';
+import { GET, POST } from './+server';
+import { createGroup, listGroups } from '$lib/api/groups';
 
 const TOKEN = 'tok';
 const TENANT = 'tid';
@@ -22,6 +22,27 @@ function makeEvent(body: string) {
 		})
 	};
 }
+
+describe('GET /api/admin/groups', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it('forwards advertised group_type filter', async () => {
+		vi.mocked(listGroups).mockResolvedValue({ groups: [], pagination: {} } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/admin/groups?group_type=department')
+		} as any);
+		expect(listGroups).toHaveBeenCalledWith(
+			expect.objectContaining({ group_type: 'department' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+});
 
 describe('POST /api/admin/groups', () => {
 	beforeEach(() => {
