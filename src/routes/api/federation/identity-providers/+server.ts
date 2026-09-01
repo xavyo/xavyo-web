@@ -1,7 +1,9 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { listIdentityProviders, createIdentityProvider } from '$lib/api/federation';
+import type { CreateIdentityProviderRequest } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { parseClaimMapping } from '$lib/utils/claim-mapping';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -50,6 +52,17 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (typeof body.client_secret !== 'string' || body.client_secret.length === 0) {
 		error(400, 'client_secret is required');
 	}
+	let claim_mapping: CreateIdentityProviderRequest['claim_mapping'];
+	if (body.claim_mapping !== undefined) {
+		try {
+			claim_mapping = parseClaimMapping(body.claim_mapping);
+		} catch {
+			error(400, 'claim_mapping must be a JSON object of source→target strings or {mappings:[{source,target}]}');
+		}
+	}
+	if (body.sync_on_login !== undefined && typeof body.sync_on_login !== 'boolean') {
+		error(400, 'sync_on_login must be a boolean');
+	}
 	const result = await createIdentityProvider(
 		{
 			name: body.name,
@@ -57,7 +70,9 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			issuer_url: body.issuer_url,
 			client_id: body.client_id,
 			client_secret: body.client_secret,
-			scopes: typeof body.scopes === 'string' ? body.scopes : undefined
+			scopes: typeof body.scopes === 'string' ? body.scopes : undefined,
+			claim_mapping,
+			sync_on_login: typeof body.sync_on_login === 'boolean' ? body.sync_on_login : undefined
 		},
 		locals.accessToken,
 		locals.tenantId,

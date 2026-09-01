@@ -678,8 +678,24 @@ export interface LoginAttemptStats {
 
 // OIDC Identity Provider
 
+export interface ClaimMappingEntry {
+	source: string;
+	target: string;
+	required?: boolean;
+	default?: string;
+	transform?: string;
+	group_mapping?: Record<string, string>;
+}
+
+export interface NameIdConfig {
+	source: string;
+	format?: string;
+}
+
+/** Canonical OIDC claim mapping (`{ mappings, name_id }`). Flat maps are parsed into this. */
 export interface ClaimMappingConfig {
-	[key: string]: string;
+	mappings: ClaimMappingEntry[];
+	name_id?: NameIdConfig;
 }
 
 export interface IdentityProvider {

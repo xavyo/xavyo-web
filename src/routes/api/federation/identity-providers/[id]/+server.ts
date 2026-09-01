@@ -5,7 +5,8 @@ import {
 	updateIdentityProvider,
 	deleteIdentityProvider
 } from '$lib/api/federation';
-import type { ClaimMappingConfig, UpdateIdentityProviderRequest } from '$lib/api/types';
+import type { UpdateIdentityProviderRequest } from '$lib/api/types';
+import { parseClaimMapping } from '$lib/utils/claim-mapping';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -69,21 +70,14 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.scopes = body.scopes;
 	}
 	if (body.claim_mapping !== undefined) {
-		if (
-			!body.claim_mapping ||
-			typeof body.claim_mapping !== 'object' ||
-			Array.isArray(body.claim_mapping)
-		) {
-			error(400, 'claim_mapping must be an object');
+		try {
+			data.claim_mapping = parseClaimMapping(body.claim_mapping);
+		} catch {
+			error(
+				400,
+				'claim_mapping must be a JSON object of source→target strings or {mappings:[{source,target}]}'
+			);
 		}
-		const mapping: ClaimMappingConfig = {};
-		for (const [key, value] of Object.entries(body.claim_mapping as Record<string, unknown>)) {
-			if (typeof value !== 'string') {
-				error(400, 'claim_mapping values must be strings');
-			}
-			mapping[key] = value;
-		}
-		data.claim_mapping = mapping;
 	}
 	if (body.sync_on_login !== undefined) {
 		if (typeof body.sync_on_login !== 'boolean') {

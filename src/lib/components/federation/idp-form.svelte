@@ -135,7 +135,7 @@
 				<textarea
 					id="claim_mapping"
 					name="claim_mapping"
-					placeholder={'{"sub": "id", "email": "email"}'}
+					placeholder={'{"email":"email","name":"display_name","given_name":"first_name","family_name":"last_name","picture":"avatar_url"}'}
 					rows="3"
 					class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
 					value={String($form.claim_mapping ?? '')}

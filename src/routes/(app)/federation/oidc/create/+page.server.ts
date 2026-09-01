@@ -6,7 +6,8 @@ import { createIdentityProviderSchema } from '$lib/schemas/federation';
 import { createIdentityProvider } from '$lib/api/federation';
 import { ApiError } from '$lib/api/client';
 import type { CreateIdentityProviderRequest } from '$lib/api/types';
-import { parseJsonStringRecord } from '$lib/utils/json-record';
+import { parseClaimMappingJson } from '$lib/utils/claim-mapping';
+import { isJsonParseError } from '$lib/utils/json-record';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const form = await superValidate(
@@ -23,13 +24,17 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		// Parse claim_mapping JSON if provided
-		let claim_mapping: Record<string, string> | undefined;
+		let claim_mapping: CreateIdentityProviderRequest['claim_mapping'];
 		if (form.data.claim_mapping) {
 			try {
-				claim_mapping = parseJsonStringRecord(form.data.claim_mapping);
-			} catch {
-				return message(form, 'Claim mapping must be a JSON object', { status: 400 as ErrorStatus });
+				claim_mapping = parseClaimMappingJson(form.data.claim_mapping);
+			} catch (e) {
+				if (isJsonParseError(e)) {
+					return message(form, 'Claim mapping must be a JSON object', {
+						status: 400 as ErrorStatus
+					});
+				}
+				throw e;
 			}
 		}
 

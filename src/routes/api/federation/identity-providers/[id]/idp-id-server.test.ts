@@ -73,6 +73,60 @@ describe('PUT /api/federation/identity-providers/:id', () => {
 		expect(updateIdentityProvider).not.toHaveBeenCalled();
 	});
 
+	it('forwards canonical API claim_mapping without 400', async () => {
+		vi.mocked(updateIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const claim_mapping = {
+			mappings: [
+				{ source: 'email', target: 'email', required: true },
+				{ source: 'given_name', target: 'first_name' }
+			],
+			name_id: { source: 'sub' }
+		};
+		const response = await PUT(makeEvent(JSON.stringify({ claim_mapping })) as any);
+		expect(response.status).toBe(200);
+		expect(updateIdentityProvider).toHaveBeenCalledWith(
+			'idp-1',
+			expect.objectContaining({
+				claim_mapping: {
+					mappings: [
+						{ source: 'email', target: 'email', required: true },
+						{ source: 'given_name', target: 'first_name' }
+					],
+					name_id: { source: 'sub' }
+				}
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('converts a flat claim_mapping map to mappings entries', async () => {
+		vi.mocked(updateIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
+		const response = await PUT(
+			makeEvent(
+				JSON.stringify({
+					claim_mapping: { given_name: 'first_name', family_name: 'last_name' }
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateIdentityProvider).toHaveBeenCalledWith(
+			'idp-1',
+			expect.objectContaining({
+				claim_mapping: {
+					mappings: expect.arrayContaining([
+						{ source: 'given_name', target: 'first_name' },
+						{ source: 'family_name', target: 'last_name' }
+					])
+				}
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not 403 a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(updateIdentityProvider).mockResolvedValue({ id: 'idp-1' } as any);
