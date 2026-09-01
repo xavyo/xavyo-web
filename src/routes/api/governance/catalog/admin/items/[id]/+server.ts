@@ -76,6 +76,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		}
 		data.tags = body.tags as string[];
 	}
+	if (body.icon !== undefined) {
+		if (body.icon !== null && typeof body.icon !== 'string') {
+			error(400, 'icon must be a string or null');
+		}
+		data.icon = body.icon as string | null;
+	}
 	const result = await adminUpdateItem(params.id, data, locals.accessToken, locals.tenantId, fetch);
 	return json(result);
 };

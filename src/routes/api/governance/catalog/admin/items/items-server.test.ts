@@ -62,6 +62,20 @@ describe('POST /api/governance/catalog/admin/items', () => {
 		expect(adminCreateItem).toHaveBeenCalled();
 	});
 
+	it('forwards advertised icon on create', async () => {
+		vi.mocked(adminCreateItem).mockResolvedValue({ id: 'i1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'Admin role', item_type: 'role', icon: 'shield' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(adminCreateItem).toHaveBeenCalledWith(
+			expect.objectContaining({ icon: 'shield' }),
+			TOKEN,
+			TENANT,
+			expect.anything()
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(adminCreateItem).not.toHaveBeenCalled();

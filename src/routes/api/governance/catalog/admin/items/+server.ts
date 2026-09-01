@@ -79,6 +79,12 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		}
 		data.tags = body.tags as string[];
 	}
+	if (body.icon !== undefined) {
+		if (typeof body.icon !== 'string') {
+			error(400, 'icon must be a string');
+		}
+		data.icon = body.icon;
+	}
 	const result = await adminCreateItem(data, locals.accessToken, locals.tenantId, fetch);
 	return json(result, { status: 201 });
 };
