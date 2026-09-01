@@ -69,4 +69,15 @@ describe('POST /api/governance/role-mining/jobs', () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(createMiningJob).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN min_users instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({ name: 'Q1 mine', parameters: { min_users: Number.NaN } })
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createMiningJob).not.toHaveBeenCalled();
+	});
 });

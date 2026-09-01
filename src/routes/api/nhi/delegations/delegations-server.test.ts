@@ -75,4 +75,21 @@ describe('POST /api/nhi/delegations', () => {
 		expect(response.status).toBe(400);
 		expect(createDelegationGrant).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN max_delegation_depth instead of forwarding it', async () => {
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					principal_id: 'u1',
+					principal_type: 'user',
+					actor_nhi_id: 'n1',
+					allowed_scopes: ['read'],
+					allowed_resource_types: ['tool'],
+					max_delegation_depth: Number.NaN
+				})
+			) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createDelegationGrant).not.toHaveBeenCalled();
+	});
 });

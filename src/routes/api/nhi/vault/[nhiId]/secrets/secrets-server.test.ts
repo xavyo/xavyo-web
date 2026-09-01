@@ -75,6 +75,15 @@ describe('POST /api/nhi/:nhiId/vault/secrets', () => {
 		expect(storeSecret).not.toHaveBeenCalled();
 	});
 
+	it('rejects NaN rotation_interval_days instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(JSON.stringify({ name: 'k', value: 'v', rotation_interval_days: Number.NaN })) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(storeSecret).not.toHaveBeenCalled();
+	});
+
 	it('does not store when name is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({ value: 'v' })) as any)).rejects.toMatchObject({
 			status: 400

@@ -4,6 +4,7 @@ import { listDelegationGrants, createDelegationGrant } from '$lib/api/nhi-delega
 import { ApiError } from '$lib/api/client';
 import { listPagination } from '$lib/server/list-pagination';
 import type { CreateDelegationGrantRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ locals, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -72,10 +73,19 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 			allowed_resource_types: body.allowed_resource_types
 		};
 		if (body.max_delegation_depth !== undefined) {
-			if (typeof body.max_delegation_depth !== 'number') {
-				return json({ error: 'max_delegation_depth must be a number' }, { status: 400 });
+			try {
+				data.max_delegation_depth = parseBoundedInteger(
+					body.max_delegation_depth,
+					0,
+					100,
+					'max_delegation_depth'
+				);
+			} catch (e) {
+				if (e instanceof JsonObjectError) {
+					return json({ error: e.message }, { status: 400 });
+				}
+				throw e;
 			}
-			data.max_delegation_depth = body.max_delegation_depth;
 		}
 		if (body.expires_at !== undefined) {
 			if (typeof body.expires_at !== 'string') {

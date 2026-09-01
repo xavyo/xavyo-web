@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listMiningJobs, createMiningJob } from '$lib/api/role-mining';
 import type { CreateMiningJobRequest, MiningJobParameters } from '$lib/api/types';
 import { listPagination } from '$lib/server/list-pagination';
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -46,24 +47,24 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		}
 		const p = body.parameters as Record<string, unknown>;
 		const parameters: MiningJobParameters = {};
-		if (p.min_users !== undefined) {
-			if (typeof p.min_users !== 'number') {
-				error(400, 'min_users must be a number');
+		try {
+			if (p.min_users !== undefined) {
+				parameters.min_users = parseBoundedInteger(p.min_users, 0, 1_000_000, 'min_users');
 			}
-			parameters.min_users = p.min_users;
-		}
-		if (p.min_entitlements !== undefined) {
-			if (typeof p.min_entitlements !== 'number') {
-				error(400, 'min_entitlements must be a number');
+			if (p.min_entitlements !== undefined) {
+				parameters.min_entitlements = parseBoundedInteger(
+					p.min_entitlements,
+					0,
+					1_000_000,
+					'min_entitlements'
+				);
 			}
-			parameters.min_entitlements = p.min_entitlements;
-		}
-		if (p.confidence_threshold !== undefined) {
-			if (typeof p.confidence_threshold !== 'number') {
-				error(400, 'confidence_threshold must be a number');
+			if (p.confidence_threshold !== undefined) {
+				parameters.confidence_threshold = requireFiniteNumber(
+					p.confidence_threshold,
+					'confidence_threshold'
+				);
 			}
-			parameters.confidence_threshold = p.confidence_threshold;
-		}
 		if (p.include_excessive_privilege !== undefined) {
 			if (typeof p.include_excessive_privilege !== 'boolean') {
 				error(400, 'include_excessive_privilege must be a boolean');
@@ -76,17 +77,21 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			}
 			parameters.include_consolidation = p.include_consolidation;
 		}
-		if (p.consolidation_threshold !== undefined) {
-			if (typeof p.consolidation_threshold !== 'number') {
-				error(400, 'consolidation_threshold must be a number');
+			if (p.consolidation_threshold !== undefined) {
+				parameters.consolidation_threshold = requireFiniteNumber(
+					p.consolidation_threshold,
+					'consolidation_threshold'
+				);
 			}
-			parameters.consolidation_threshold = p.consolidation_threshold;
-		}
-		if (p.deviation_threshold !== undefined) {
-			if (typeof p.deviation_threshold !== 'number') {
-				error(400, 'deviation_threshold must be a number');
+			if (p.deviation_threshold !== undefined) {
+				parameters.deviation_threshold = requireFiniteNumber(
+					p.deviation_threshold,
+					'deviation_threshold'
+				);
 			}
-			parameters.deviation_threshold = p.deviation_threshold;
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
 		if (p.peer_group_attribute !== undefined) {
 			if (p.peer_group_attribute !== null && typeof p.peer_group_attribute !== 'string') {

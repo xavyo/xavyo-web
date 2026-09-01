@@ -46,4 +46,11 @@ describe('POST /api/governance/roles/:id/move', () => {
 		});
 		expect(moveRole).not.toHaveBeenCalled();
 	});
+
+	it('rejects NaN version instead of forwarding it', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ new_parent_id: null, version: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(moveRole).not.toHaveBeenCalled();
+	});
 });

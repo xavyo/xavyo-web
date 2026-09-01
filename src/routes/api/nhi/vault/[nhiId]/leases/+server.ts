@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { listLeases, createLease } from '$lib/api/nhi-vault';
 import { ApiError } from '$lib/api/client';
 import type { CreateLeaseRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -49,10 +50,12 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		data.lessee_type = body.lessee_type;
 	}
 	if (body.duration_secs !== undefined) {
-		if (typeof body.duration_secs !== 'number') {
-			error(400, 'duration_secs must be a number');
+		try {
+			data.duration_secs = parseBoundedInteger(body.duration_secs, 1, 31_536_000, 'duration_secs');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.duration_secs = body.duration_secs;
 	}
 
 	try {
