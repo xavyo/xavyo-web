@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { finiteInteger, finiteNumber, listPagination, pagePagination } from './list-pagination';
+import { JsonObjectError } from '$lib/utils/json-record';
+import {
+	finiteInteger,
+	finiteNumber,
+	listPagination,
+	pagePagination,
+	parseBoundedInteger,
+	parseOptionalBoundedInteger,
+	parsePortNumber
+} from './list-pagination';
 
 describe('listPagination', () => {
 	it('passes through limit and offset', () => {
@@ -60,5 +69,56 @@ describe('finiteInteger', () => {
 		expect(finiteInteger('abc')).toBeUndefined();
 		expect(finiteInteger('3.5')).toBeUndefined();
 		expect(finiteInteger('3abc')).toBeUndefined();
+	});
+});
+
+describe('parsePortNumber', () => {
+	it('parses a valid port and uses fallback for empty', () => {
+		expect(parsePortNumber('636', 389)).toBe(636);
+		expect(parsePortNumber(389, 636)).toBe(389);
+		expect(parsePortNumber('', 636)).toBe(636);
+		expect(parsePortNumber(null, 5432)).toBe(5432);
+	});
+
+	it('rejects NaN, 0, floats, and out-of-range instead of defaulting', () => {
+		expect(() => parsePortNumber('abc', 636)).toThrow(JsonObjectError);
+		expect(() => parsePortNumber(0, 636)).toThrow(JsonObjectError);
+		expect(() => parsePortNumber('0', 636)).toThrow(JsonObjectError);
+		expect(() => parsePortNumber('12.5', 636)).toThrow(JsonObjectError);
+		expect(() => parsePortNumber(70000, 636)).toThrow(JsonObjectError);
+		expect(() => parsePortNumber(-1, 636)).toThrow(JsonObjectError);
+	});
+});
+
+describe('parseOptionalBoundedInteger', () => {
+	it('returns undefined for empty and parses in-range integers', () => {
+		expect(parseOptionalBoundedInteger('', 0, 6, 'day_of_week')).toBeUndefined();
+		expect(parseOptionalBoundedInteger(null, 1, 31, 'day_of_month')).toBeUndefined();
+		expect(parseOptionalBoundedInteger('0', 0, 6, 'day_of_week')).toBe(0);
+		expect(parseOptionalBoundedInteger(15, 1, 31, 'day_of_month')).toBe(15);
+	});
+
+	it('rejects NaN and out-of-range instead of forwarding NaN', () => {
+		expect(() => parseOptionalBoundedInteger('abc', 0, 6, 'day_of_week')).toThrow(
+			JsonObjectError
+		);
+		expect(() => parseOptionalBoundedInteger('7', 0, 6, 'day_of_week')).toThrow(JsonObjectError);
+		expect(() => parseOptionalBoundedInteger('32', 1, 31, 'day_of_month')).toThrow(
+			JsonObjectError
+		);
+	});
+});
+
+describe('parseBoundedInteger', () => {
+	it('parses in-range values and uses fallback for empty', () => {
+		expect(parseBoundedInteger('9', 0, 23, 'hour_of_day')).toBe(9);
+		expect(parseBoundedInteger('', 0, 23, 'hour_of_day', 0)).toBe(0);
+		expect(parseBoundedInteger(null, 0, 23, 'hour_of_day', 0)).toBe(0);
+	});
+
+	it('rejects NaN and out-of-range instead of forwarding NaN', () => {
+		expect(() => parseBoundedInteger('abc', 0, 23, 'hour_of_day', 0)).toThrow(JsonObjectError);
+		expect(() => parseBoundedInteger('24', 0, 23, 'hour_of_day', 0)).toThrow(JsonObjectError);
+		expect(() => parseBoundedInteger('', 0, 23, 'hour_of_day')).toThrow(JsonObjectError);
 	});
 });

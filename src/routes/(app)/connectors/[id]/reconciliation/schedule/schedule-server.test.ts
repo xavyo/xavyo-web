@@ -22,10 +22,22 @@ vi.mock('$lib/server/auth', () => ({
 	hasAdminRole: vi.fn()
 }));
 
-import { load } from './+page.server';
-import { getSchedule } from '$lib/api/reconciliation';
+import { actions, load } from './+page.server';
+import { getSchedule, upsertSchedule } from '$lib/api/reconciliation';
 import { hasAdminRole } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
+
+function makeFormData(data: Record<string, string>): Request {
+	const formData = new URLSearchParams();
+	for (const [k, v] of Object.entries(data)) {
+		formData.set(k, v);
+	}
+	return new Request('http://localhost/connectors/conn-1/reconciliation/schedule', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+		body: formData.toString()
+	});
+}
 
 const mockLocals = () => ({
 	accessToken: 'tok',
@@ -76,5 +88,81 @@ describe('Reconciliation schedule +page.server', () => {
 		} catch (e: any) {
 			expect(e.status).toBe(500);
 		}
+	});
+
+	it('saves finite schedule fields', async () => {
+		vi.mocked(upsertSchedule).mockResolvedValue({} as any);
+		const result: any = await actions.save({
+			params: { id: 'conn-1' },
+			request: makeFormData({
+				mode: 'full',
+				frequency: 'weekly',
+				day_of_week: '1',
+				hour_of_day: '9',
+				enabled: 'on'
+			}),
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+		expect(result.success).toBe(true);
+		expect(upsertSchedule).toHaveBeenCalledWith(
+			'conn-1',
+			expect.objectContaining({
+				day_of_week: 1,
+				day_of_month: undefined,
+				hour_of_day: 9,
+				enabled: true
+			}),
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
+
+	it('rejects non-numeric day_of_week instead of posting NaN', async () => {
+		const result: any = await actions.save({
+			params: { id: 'conn-1' },
+			request: makeFormData({
+				mode: 'full',
+				frequency: 'weekly',
+				day_of_week: 'abc',
+				hour_of_day: '9'
+			}),
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+		expect(result.status).toBe(400);
+		expect(upsertSchedule).not.toHaveBeenCalled();
+	});
+
+	it('rejects non-numeric day_of_month instead of posting NaN', async () => {
+		const result: any = await actions.save({
+			params: { id: 'conn-1' },
+			request: makeFormData({
+				mode: 'full',
+				frequency: 'monthly',
+				day_of_month: 'nope',
+				hour_of_day: '9'
+			}),
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+		expect(result.status).toBe(400);
+		expect(upsertSchedule).not.toHaveBeenCalled();
+	});
+
+	it('rejects non-numeric hour_of_day instead of posting NaN', async () => {
+		const result: any = await actions.save({
+			params: { id: 'conn-1' },
+			request: makeFormData({
+				mode: 'full',
+				frequency: 'daily',
+				hour_of_day: 'abc'
+			}),
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+		expect(result.status).toBe(400);
+		expect(upsertSchedule).not.toHaveBeenCalled();
 	});
 });

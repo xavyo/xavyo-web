@@ -1,3 +1,5 @@
+import { JsonObjectError } from '$lib/utils/json-record';
+
 export function finiteNumber(raw: string | null): number | undefined {
 	if (raw == null || raw === '') return undefined;
 	const parsed = Number(raw);
@@ -8,6 +10,54 @@ export function finiteNumber(raw: string | null): number | undefined {
 export function finiteInteger(raw: string | null | undefined): number | undefined {
 	const parsed = finiteNumber(raw ?? null);
 	return parsed != null && Number.isInteger(parsed) ? parsed : undefined;
+}
+
+function isBlank(raw: unknown): boolean {
+	return raw == null || raw === '';
+}
+
+function parseIntegerInRange(raw: unknown, min: number, max: number, field: string): number {
+	const parsed = finiteInteger(String(raw));
+	if (parsed == null || parsed < min || parsed > max) {
+		throw new JsonObjectError(`${field} must be an integer between ${min} and ${max}`);
+	}
+	return parsed;
+}
+
+/** TCP port. Empty uses `fallback`; 0 / NaN / out-of-range are rejected (not silently defaulted). */
+export function parsePortNumber(raw: unknown, fallback: number): number {
+	if (isBlank(raw)) {
+		return parseIntegerInRange(fallback, 1, 65535, 'Port');
+	}
+	return parseIntegerInRange(raw, 1, 65535, 'Port');
+}
+
+/** Empty/missing → undefined. Invalid or out-of-range throws instead of forwarding NaN. */
+export function parseOptionalBoundedInteger(
+	raw: unknown,
+	min: number,
+	max: number,
+	field: string
+): number | undefined {
+	if (isBlank(raw)) return undefined;
+	return parseIntegerInRange(raw, min, max, field);
+}
+
+/** Empty uses `fallback` when provided. Invalid or out-of-range throws instead of forwarding NaN. */
+export function parseBoundedInteger(
+	raw: unknown,
+	min: number,
+	max: number,
+	field: string,
+	fallback?: number
+): number {
+	if (isBlank(raw)) {
+		if (fallback === undefined) {
+			throw new JsonObjectError(`${field} is required`);
+		}
+		return parseIntegerInRange(fallback, min, max, field);
+	}
+	return parseIntegerInRange(raw, min, max, field);
 }
 
 /** Map UI `page`/`page_size` onto the API `limit`/`offset` contract. */
