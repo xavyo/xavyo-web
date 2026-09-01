@@ -11,9 +11,15 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 
 	const direction = (url.searchParams.get('direction') ?? 'outgoing') as 'incoming' | 'outgoing';
 	const status = url.searchParams.get('status') ?? undefined;
+	const active_now =
+		url.searchParams.get('active_now') === 'true'
+			? true
+			: url.searchParams.get('active_now') === 'false'
+				? false
+				: undefined;
 
 	const result = await listPoa(
-		{ direction, status, ...listPagination(url) },
+		{ direction, status, active_now, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

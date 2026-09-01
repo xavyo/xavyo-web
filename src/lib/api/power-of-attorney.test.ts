@@ -43,6 +43,15 @@ describe('listPoa', () => {
 		await listPoa({ direction: 'outgoing', status: 'active' }, 'token', 'tenant', mockFetch);
 		expect(apiClient).toHaveBeenCalledWith(expect.stringContaining('status=active'), expect.objectContaining({ method: 'GET' }));
 	});
+
+	it('includes advertised active_now filter in query string', async () => {
+		const { apiClient } = await import('./client');
+		await listPoa({ direction: 'outgoing', active_now: true }, 'token', 'tenant', mockFetch);
+		expect(apiClient).toHaveBeenCalledWith(
+			expect.stringContaining('active_now=true'),
+			expect.objectContaining({ method: 'GET' })
+		);
+	});
 });
 
 describe('getPoa', () => {
@@ -118,6 +127,15 @@ describe('adminListPoa', () => {
 		const { apiClient } = await import('./client');
 		await adminListPoa({ donor_id: 'user-1' }, 'token', 'tenant', mockFetch);
 		expect(apiClient).toHaveBeenCalledWith(expect.stringContaining('donor_id=user-1'), expect.objectContaining({ method: 'GET' }));
+	});
+
+	it('includes advertised active_now filter', async () => {
+		const { apiClient } = await import('./client');
+		await adminListPoa({ active_now: true }, 'token', 'tenant', mockFetch);
+		expect(apiClient).toHaveBeenCalledWith(
+			expect.stringContaining('active_now=true'),
+			expect.objectContaining({ method: 'GET' })
+		);
 	});
 });
 

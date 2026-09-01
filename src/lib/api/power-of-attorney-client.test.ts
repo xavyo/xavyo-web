@@ -40,6 +40,12 @@ describe('listPoaClient', () => {
 		expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('status=active'));
 	});
 
+	it('includes advertised active_now filter', async () => {
+		mockOk({ items: [], total: 0, limit: 20, offset: 0 });
+		await listPoaClient({ direction: 'outgoing', active_now: true }, mockFetch);
+		expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('active_now=true'));
+	});
+
 	it('throws on error', async () => {
 		mockError(500);
 		await expect(listPoaClient({ direction: 'outgoing' }, mockFetch)).rejects.toThrow('Failed to fetch PoA list: 500');
@@ -157,6 +163,12 @@ describe('adminListPoaClient', () => {
 		mockOk({ items: [], total: 0, limit: 20, offset: 0 });
 		await adminListPoaClient({ status: 'active' }, mockFetch);
 		expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('status=active'));
+	});
+
+	it('includes advertised active_now filter', async () => {
+		mockOk({ items: [], total: 0, limit: 20, offset: 0 });
+		await adminListPoaClient({ active_now: true }, mockFetch);
+		expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('active_now=true'));
 	});
 });
 
