@@ -65,4 +65,28 @@ describe('POST /api/governance/meta-roles', () => {
 		});
 		expect(createMetaRole).not.toHaveBeenCalled();
 	});
+
+	it('forwards advertised entitlements and constraints', async () => {
+		vi.mocked(createMetaRole).mockResolvedValue({ id: 'm1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					priority: 1,
+					entitlements: [{ entitlement_id: 'e1', permission_type: 'grant' }],
+					constraints: [{ constraint_type: 'require_mfa', constraint_value: { required: true } }]
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createMetaRole).toHaveBeenCalledWith(
+			expect.objectContaining({
+				entitlements: [{ entitlement_id: 'e1', permission_type: 'grant' }],
+				constraints: [{ constraint_type: 'require_mfa', constraint_value: { required: true } }]
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
