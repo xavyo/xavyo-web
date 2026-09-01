@@ -2,14 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getOutlierConfig, updateOutlierConfig } from '$lib/api/outliers';
 import type { ScoringWeights, UpdateOutlierConfigRequest } from '$lib/api/types';
-
-const WEIGHT_KEYS = [
-	'role_frequency',
-	'entitlement_count',
-	'assignment_pattern',
-	'peer_group_coverage',
-	'historical_deviation'
-] as const;
+import { JsonObjectError, parseBoundedInteger, requireFiniteNumber } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -30,23 +23,26 @@ export const PUT: RequestHandler = async ({ request, locals, fetch }) => {
 	}
 	const body = parsed as Record<string, unknown>;
 	const data: UpdateOutlierConfigRequest = {};
+	try {
 	if (body.confidence_threshold !== undefined) {
-		if (typeof body.confidence_threshold !== 'number') {
-			error(400, 'confidence_threshold must be a number');
-		}
-		data.confidence_threshold = body.confidence_threshold;
+		data.confidence_threshold = requireFiniteNumber(
+			body.confidence_threshold,
+			'confidence_threshold'
+		);
 	}
 	if (body.frequency_threshold !== undefined) {
-		if (typeof body.frequency_threshold !== 'number') {
-			error(400, 'frequency_threshold must be a number');
-		}
-		data.frequency_threshold = body.frequency_threshold;
+		data.frequency_threshold = requireFiniteNumber(
+			body.frequency_threshold,
+			'frequency_threshold'
+		);
 	}
 	if (body.min_peer_group_size !== undefined) {
-		if (typeof body.min_peer_group_size !== 'number') {
-			error(400, 'min_peer_group_size must be a number');
-		}
-		data.min_peer_group_size = body.min_peer_group_size;
+		data.min_peer_group_size = parseBoundedInteger(
+			body.min_peer_group_size,
+			1,
+			1_000_000,
+			'min_peer_group_size'
+		);
 	}
 	if (body.scoring_weights !== undefined) {
 		if (
@@ -57,17 +53,24 @@ export const PUT: RequestHandler = async ({ request, locals, fetch }) => {
 			error(400, 'scoring_weights must be an object');
 		}
 		const weights = body.scoring_weights as Record<string, unknown>;
-		for (const key of WEIGHT_KEYS) {
-			if (typeof weights[key] !== 'number') {
-				error(400, 'scoring_weights is required');
-			}
-		}
 		data.scoring_weights = {
-			role_frequency: weights.role_frequency as number,
-			entitlement_count: weights.entitlement_count as number,
-			assignment_pattern: weights.assignment_pattern as number,
-			peer_group_coverage: weights.peer_group_coverage as number,
-			historical_deviation: weights.historical_deviation as number
+			role_frequency: requireFiniteNumber(weights.role_frequency, 'scoring_weights.role_frequency'),
+			entitlement_count: requireFiniteNumber(
+				weights.entitlement_count,
+				'scoring_weights.entitlement_count'
+			),
+			assignment_pattern: requireFiniteNumber(
+				weights.assignment_pattern,
+				'scoring_weights.assignment_pattern'
+			),
+			peer_group_coverage: requireFiniteNumber(
+				weights.peer_group_coverage,
+				'scoring_weights.peer_group_coverage'
+			),
+			historical_deviation: requireFiniteNumber(
+				weights.historical_deviation,
+				'scoring_weights.historical_deviation'
+			)
 		} satisfies ScoringWeights;
 	}
 	if (body.schedule_cron !== undefined) {
@@ -77,16 +80,17 @@ export const PUT: RequestHandler = async ({ request, locals, fetch }) => {
 		data.schedule_cron = body.schedule_cron;
 	}
 	if (body.retention_days !== undefined) {
-		if (typeof body.retention_days !== 'number') {
-			error(400, 'retention_days must be a number');
-		}
-		data.retention_days = body.retention_days;
+		data.retention_days = parseBoundedInteger(body.retention_days, 1, 3650, 'retention_days');
 	}
 	if (body.is_enabled !== undefined) {
 		if (typeof body.is_enabled !== 'boolean') {
 			error(400, 'is_enabled must be a boolean');
 		}
 		data.is_enabled = body.is_enabled;
+	}
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	const result = await updateOutlierConfig(data, locals.accessToken, locals.tenantId, fetch);
 	return json(result);

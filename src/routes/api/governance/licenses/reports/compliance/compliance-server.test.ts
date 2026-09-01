@@ -90,4 +90,16 @@ describe('POST /api/governance/licenses/reports/compliance', () => {
 		expect(response.status).toBe(200);
 		expect(generateComplianceReport).toHaveBeenCalled();
 	});
+
+	it('does not forward NaN totals from the API payload', async () => {
+		vi.mocked(generateComplianceReport).mockResolvedValue({
+			generated_at: 'now',
+			total_pools: Number.NaN,
+			pool_summaries: []
+		} as any);
+		const response = await POST(makeEvent(JSON.stringify({})) as any);
+		expect(response.status).toBe(400);
+		const body = await response.json();
+		expect(body.error).toMatch(/finite number/i);
+	});
 });

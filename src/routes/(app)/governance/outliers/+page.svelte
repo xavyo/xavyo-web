@@ -8,6 +8,11 @@
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import {
+		isJsonParseError,
+		parseBoundedInteger,
+		requireFiniteNumber
+	} from '$lib/utils/json-record';
 	import type {
 		OutlierAnalysis,
 		OutlierResult,
@@ -421,10 +426,21 @@
 		savingConfig = true;
 		try {
 			const body = {
-				confidence_threshold: Number(editConfidenceThreshold),
-				frequency_threshold: Number(editFrequencyThreshold),
-				min_peer_group_size: Number(editMinPeerGroupSize),
-				retention_days: Number(editRetentionDays),
+				confidence_threshold: requireFiniteNumber(
+					editConfidenceThreshold,
+					'confidence_threshold'
+				),
+				frequency_threshold: requireFiniteNumber(
+					editFrequencyThreshold,
+					'frequency_threshold'
+				),
+				min_peer_group_size: parseBoundedInteger(
+					editMinPeerGroupSize,
+					1,
+					1_000_000,
+					'min_peer_group_size'
+				),
+				retention_days: parseBoundedInteger(editRetentionDays, 1, 3650, 'retention_days'),
 				schedule_cron: editScheduleCron
 			};
 			const res = await fetch('/api/governance/outliers/config', {
@@ -435,8 +451,11 @@
 			if (!res.ok) throw new Error('Failed');
 			config = await res.json();
 			addToast('success', 'Configuration saved');
-		} catch {
-			addToast('error', 'Failed to save config');
+		} catch (e) {
+			addToast(
+				'error',
+				isJsonParseError(e) && e instanceof Error ? e.message : 'Failed to save config'
+			);
 		} finally {
 			savingConfig = false;
 		}
