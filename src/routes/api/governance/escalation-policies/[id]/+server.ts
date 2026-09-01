@@ -6,6 +6,7 @@ import {
 	deleteEscalationPolicy
 } from '$lib/api/approval-workflows';
 import type { UpdateEscalationPolicyRequest } from '$lib/api/types';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const GET: RequestHandler = async ({ params, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) {
@@ -45,17 +46,26 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		}
 		data.description = body.description;
 	}
-	if (body.default_timeout_secs !== undefined) {
-		if (typeof body.default_timeout_secs !== 'number') {
-			error(400, 'default_timeout_secs must be a number');
+	try {
+		if (body.default_timeout_secs !== undefined) {
+			data.default_timeout_secs = parseBoundedInteger(
+				body.default_timeout_secs,
+				60,
+				31_536_000,
+				'default_timeout_secs'
+			);
 		}
-		data.default_timeout_secs = body.default_timeout_secs;
-	}
-	if (body.warning_threshold_secs !== undefined) {
-		if (typeof body.warning_threshold_secs !== 'number') {
-			error(400, 'warning_threshold_secs must be a number');
+		if (body.warning_threshold_secs !== undefined) {
+			data.warning_threshold_secs = parseBoundedInteger(
+				body.warning_threshold_secs,
+				60,
+				31_536_000,
+				'warning_threshold_secs'
+			);
 		}
-		data.warning_threshold_secs = body.warning_threshold_secs;
+	} catch (e) {
+		if (e instanceof JsonObjectError) error(400, e.message);
+		throw e;
 	}
 	if (body.final_fallback !== undefined) {
 		if (

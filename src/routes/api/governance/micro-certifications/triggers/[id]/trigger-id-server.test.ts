@@ -65,6 +65,28 @@ describe('PUT /api/governance/micro-certifications/triggers/:id', () => {
 		expect(updateTriggerRule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string timeout_secs and priority', async () => {
+		vi.mocked(updateTriggerRule).mockResolvedValue({ id: 'tr1' } as any);
+		const response = await PUT(
+			makeEvent(JSON.stringify({ timeout_secs: '3600', priority: '3' })) as any
+		);
+		expect(response.status).toBe(200);
+		expect(updateTriggerRule).toHaveBeenCalledWith(
+			'tr1',
+			expect.objectContaining({ timeout_secs: 3600, priority: 3 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN timeout_secs instead of forwarding it', async () => {
+		await expect(
+			PUT(makeEvent(JSON.stringify({ timeout_secs: Number.NaN })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(updateTriggerRule).not.toHaveBeenCalled();
+	});
+
 	it('does not update when name is empty', async () => {
 		await expect(PUT(makeEvent(JSON.stringify({ name: '' })) as any)).rejects.toMatchObject({
 			status: 400

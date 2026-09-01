@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { updateTemplateRule, deleteTemplateRule } from '$lib/api/object-templates';
 import { ApiError } from '$lib/api/client';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 
 export const PUT: RequestHandler = async ({ params, request, locals, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
@@ -36,10 +37,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		data.authoritative = body.authoritative;
 	}
 	if (body.priority !== undefined) {
-		if (typeof body.priority !== 'number') {
-			error(400, 'priority must be a number');
+		try {
+			data.priority = parseBoundedInteger(body.priority, 1, 1000, 'priority');
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
 		}
-		data.priority = body.priority;
 	}
 	if (body.condition !== undefined) {
 		if (typeof body.condition !== 'string') {

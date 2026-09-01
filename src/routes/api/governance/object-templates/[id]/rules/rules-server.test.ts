@@ -83,6 +83,44 @@ describe('POST /api/governance/object-templates/:id/rules', () => {
 		expect(createTemplateRule).not.toHaveBeenCalled();
 	});
 
+	it('accepts numeric-string priority', async () => {
+		vi.mocked(createTemplateRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					rule_type: 'default',
+					target_attribute: 'department',
+					expression: "'Engineering'",
+					priority: '50'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTemplateRule).toHaveBeenCalledWith(
+			't1',
+			expect.objectContaining({ priority: 50 }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('rejects NaN priority instead of forwarding it', async () => {
+		await expect(
+			POST(
+				makeEvent(
+					JSON.stringify({
+						rule_type: 'default',
+						target_attribute: 'department',
+						expression: "'Engineering'",
+						priority: Number.NaN
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createTemplateRule).not.toHaveBeenCalled();
+	});
+
 	it('does not create when expression is missing', async () => {
 		await expect(
 			POST(
