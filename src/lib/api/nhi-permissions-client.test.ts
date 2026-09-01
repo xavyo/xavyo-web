@@ -151,6 +151,14 @@ describe('nhi-permissions-client', () => {
 			expect(calledUrl).toContain('offset=5');
 		});
 
+		it('forwards advertised permission_type', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ data: [], limit: 20, offset: 0 }));
+			const { fetchCallers } = await import('./nhi-permissions-client');
+			await fetchCallers('nhi-1', { permission_type: 'call' }, mockFetch);
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('permission_type=call');
+		});
+
 		it('throws on non-ok response', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 404));
 			const { fetchCallers } = await import('./nhi-permissions-client');
@@ -214,6 +222,14 @@ describe('nhi-permissions-client', () => {
 			expect(calledUrl).toContain('/api/nhi/permissions/nhi-1/users');
 			expect(calledUrl).toContain('limit=20');
 			expect(result).toEqual(data);
+		});
+
+		it('forwards advertised permission_type', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ data: [], limit: 20, offset: 0 }));
+			const { fetchNhiUsers } = await import('./nhi-permissions-client');
+			await fetchNhiUsers('nhi-1', { permission_type: 'use' }, mockFetch);
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('permission_type=use');
 		});
 
 		it('throws on non-ok response', async () => {

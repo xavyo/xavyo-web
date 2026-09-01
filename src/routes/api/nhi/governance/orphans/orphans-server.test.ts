@@ -50,4 +50,27 @@ describe('GET /api/nhi/governance/orphans', () => {
 			expect.objectContaining({ limit: 10, offset: 20 })
 		);
 	});
+
+	it('forwards advertised reason, run_id, user_id, and date range', async () => {
+		vi.mocked(listOrphanDetections).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/nhi/governance/orphans?reason=no_owner&run_id=run-1&user_id=user-1&since=2026-01-01T00:00:00Z&until=2026-01-31T00:00:00Z'
+			)
+		} as any);
+		expect(listOrphanDetections).toHaveBeenCalledWith(
+			TOKEN,
+			TENANT,
+			expect.any(Function),
+			expect.objectContaining({
+				reason: 'no_owner',
+				run_id: 'run-1',
+				user_id: 'user-1',
+				since: '2026-01-01T00:00:00Z',
+				until: '2026-01-31T00:00:00Z'
+			})
+		);
+	});
 });

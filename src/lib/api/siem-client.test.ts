@@ -249,6 +249,19 @@ describe('siem-client', () => {
 			expect(calledUrl).toContain('offset=20');
 		});
 
+		it('forwards advertised from and to', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
+			const { fetchSiemHealthHistory } = await import('./siem-client');
+			await fetchSiemHealthHistory(
+				'dest-1',
+				{ from: '2026-01-01T00:00:00Z', to: '2026-01-31T00:00:00Z' },
+				mockFetch
+			);
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('from=2026-01-01T00%3A00%3A00Z');
+			expect(calledUrl).toContain('to=2026-01-31T00%3A00%3A00Z');
+		});
+
 		it('throws on non-ok response', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 500));
 			const { fetchSiemHealthHistory } = await import('./siem-client');

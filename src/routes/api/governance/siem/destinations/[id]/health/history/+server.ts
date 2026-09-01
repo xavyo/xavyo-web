@@ -10,7 +10,11 @@ export const GET: RequestHandler = async ({ params, url, locals, fetch }) => {
 	}
 
 	try {
-		const queryParams: Record<string, number> = {};
+		const queryParams: Record<string, string | number> = {};
+		const from = url.searchParams.get('from');
+		const to = url.searchParams.get('to');
+		if (from) queryParams.from = from;
+		if (to) queryParams.to = to;
 		const { limit, offset } = listPagination(url);
 		if (limit != null) queryParams.limit = limit;
 		if (offset != null) queryParams.offset = offset;

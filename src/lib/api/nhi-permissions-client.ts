@@ -105,10 +105,14 @@ export async function revokeNhiPermissionClient(
 
 export async function fetchCallers(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; permission_type?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PaginatedPermissionResponse<NhiNhiPermission>> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		permission_type: params.permission_type
+	});
 	const res = await fetchFn(`/api/nhi/permissions/${id}/callers${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch callers: ${res.status}`);
 	return res.json();
@@ -116,10 +120,14 @@ export async function fetchCallers(
 
 export async function fetchCallees(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; permission_type?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PaginatedPermissionResponse<NhiNhiPermission>> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		permission_type: params.permission_type
+	});
 	const res = await fetchFn(`/api/nhi/permissions/${id}/callees${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch callees: ${res.status}`);
 	return res.json();
@@ -159,10 +167,14 @@ export async function revokeUserPermissionClient(
 
 export async function fetchNhiUsers(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { limit?: number; offset?: number; permission_type?: string } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<PaginatedPermissionResponse<NhiUserPermission>> {
-	const qs = buildSearchParams({ limit: params.limit, offset: params.offset });
+	const qs = buildSearchParams({
+		limit: params.limit,
+		offset: params.offset,
+		permission_type: params.permission_type
+	});
 	const res = await fetchFn(`/api/nhi/permissions/${id}/users${qs}`);
 	if (!res.ok) throw new Error(`Failed to fetch NHI users: ${res.status}`);
 	return res.json();

@@ -298,6 +298,21 @@ describe('SIEM API client', () => {
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('5');
 		});
+
+		it('forwards advertised from and to', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+			await getSiemHealthHistory(
+				DEST_ID,
+				{ from: '2026-01-01T00:00:00Z', to: '2026-01-31T00:00:00Z' },
+				TOKEN,
+				TENANT,
+				mockFetch
+			);
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('from')).toBe('2026-01-01T00:00:00Z');
+			expect(params.get('to')).toBe('2026-01-31T00:00:00Z');
+		});
 	});
 
 	// --- Dead Letter ---

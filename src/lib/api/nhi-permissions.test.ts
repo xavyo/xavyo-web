@@ -171,6 +171,14 @@ describe('NHI Permissions API', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('10');
 		});
+
+		it('forwards advertised permission_type', async () => {
+			mockApiClient.mockResolvedValue({ data: [], limit: 20, offset: 0 });
+			await listCallers('nhi-1', { permission_type: 'call' }, token, tenantId, mockFetch);
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('permission_type')).toBe('call');
+		});
 	});
 
 	describe('listCallees', () => {
@@ -186,6 +194,14 @@ describe('NHI Permissions API', () => {
 				fetch: mockFetch
 			});
 			expect(result).toEqual({ data: [], limit: 20, offset: 0 });
+		});
+
+		it('forwards advertised permission_type', async () => {
+			mockApiClient.mockResolvedValue({ data: [], limit: 20, offset: 0 });
+			await listCallees('nhi-1', { permission_type: 'delegate' }, token, tenantId, mockFetch);
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('permission_type')).toBe('delegate');
 		});
 	});
 
@@ -237,6 +253,14 @@ describe('NHI Permissions API', () => {
 			const params = new URLSearchParams(calledPath.split('?')[1]);
 			expect(params.get('limit')).toBe('10');
 			expect(params.get('offset')).toBe('0');
+		});
+
+		it('forwards advertised permission_type', async () => {
+			mockApiClient.mockResolvedValue({ data: [], limit: 10, offset: 0 });
+			await listNhiUsers('nhi-1', { permission_type: 'admin' }, token, tenantId, mockFetch);
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('permission_type')).toBe('admin');
 		});
 	});
 });

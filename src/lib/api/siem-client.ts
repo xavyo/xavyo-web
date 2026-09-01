@@ -108,7 +108,7 @@ export async function fetchSiemHealthSummary(
 
 export async function fetchSiemHealthHistory(
 	id: string,
-	params: { limit?: number; offset?: number } = {},
+	params: { from?: string; to?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<SiemDeliveryHealthListResponse> {
 	const qs = buildSearchParams(params);

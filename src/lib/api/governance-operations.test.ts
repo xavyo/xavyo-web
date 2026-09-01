@@ -280,6 +280,13 @@ describe('governance-operations API', () => {
 			expect(calledPath).toContain('/governance/admin/bulk-actions');
 			expect(calledPath).toContain('action_type=grant');
 		});
+
+		it('forwards advertised created_by', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0 });
+			await listBulkActions({ created_by: 'user-1' }, token, tenantId, mockFetch);
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('created_by=user-1');
+		});
 	});
 
 	describe('createBulkAction', () => {
@@ -487,6 +494,13 @@ describe('governance-operations API', () => {
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('/governance/lifecycle/bulk-operations');
 			expect(calledPath).toContain('status=pending');
+		});
+
+		it('forwards advertised requested_by', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0 });
+			await listBulkStateOperations({ requested_by: 'user-9' }, token, tenantId, mockFetch);
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('requested_by=user-9');
 		});
 	});
 

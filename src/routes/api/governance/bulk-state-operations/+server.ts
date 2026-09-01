@@ -13,6 +13,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			{
 				status: url.searchParams.get('status') ?? undefined,
 				transition_id: url.searchParams.get('transition_id') ?? undefined,
+				requested_by: url.searchParams.get('requested_by') ?? undefined,
 				...listPagination(url)
 			},
 			locals.accessToken,

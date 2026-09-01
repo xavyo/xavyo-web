@@ -127,12 +127,26 @@ export async function listOrphanDetections(
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch,
-	params?: { limit?: number; offset?: number; status?: string }
+	params?: {
+		limit?: number;
+		offset?: number;
+		status?: string;
+		reason?: string;
+		run_id?: string;
+		user_id?: string;
+		since?: string;
+		until?: string;
+	}
 ): Promise<OrphanDetectionListResponse> {
 	const qs = buildSearchParams({
 		limit: params?.limit ?? 50,
 		offset: params?.offset ?? 0,
-		status: params?.status
+		status: params?.status,
+		reason: params?.reason,
+		run_id: params?.run_id,
+		user_id: params?.user_id,
+		since: params?.since,
+		until: params?.until
 	});
 	return apiClient<OrphanDetectionListResponse>(`/governance/orphan-detections${qs}`, {
 		method: 'GET',

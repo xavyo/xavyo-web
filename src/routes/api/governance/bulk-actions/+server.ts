@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			{
 				status: url.searchParams.get('status') ?? undefined,
 				action_type: url.searchParams.get('action_type') ?? undefined,
+				created_by: url.searchParams.get('created_by') ?? undefined,
 				...listPagination(url)
 			},
 			locals.accessToken,
