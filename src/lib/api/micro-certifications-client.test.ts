@@ -50,7 +50,17 @@ describe('fetchMicroCertifications', () => {
 	it('includes boolean and string filter params', async () => {
 		const mockFetch = createMockFetch({ items: [], total: 0 });
 		await fetchMicroCertifications(
-			{ escalated: true, past_deadline: false, user_id: 'u1', reviewer_id: 'r1', entitlement_id: 'e1' },
+			{
+				escalated: true,
+				past_deadline: false,
+				user_id: 'u1',
+				reviewer_id: 'r1',
+				entitlement_id: 'e1',
+				assignment_id: 'a1',
+				trigger_rule_id: 't1',
+				from_date: '2026-01-01',
+				to_date: '2026-02-01'
+			},
 			mockFetch
 		);
 		const url = mockFetch.mock.calls[0][0] as string;
@@ -59,6 +69,10 @@ describe('fetchMicroCertifications', () => {
 		expect(url).toContain('user_id=u1');
 		expect(url).toContain('reviewer_id=r1');
 		expect(url).toContain('entitlement_id=e1');
+		expect(url).toContain('assignment_id=a1');
+		expect(url).toContain('trigger_rule_id=t1');
+		expect(url).toContain('from_date=2026-01-01');
+		expect(url).toContain('to_date=2026-02-01');
 	});
 
 	it('throws on error response', async () => {
@@ -316,7 +330,7 @@ describe('searchCertificationEventsClient', () => {
 			{
 				event_type: 'approved',
 				actor_id: 'actor-1',
-				certification_id: 'cert-1',
+				micro_certification_id: 'cert-1',
 				from_date: '2026-01-01',
 				to_date: '2026-02-01',
 				limit: 50,
@@ -327,7 +341,7 @@ describe('searchCertificationEventsClient', () => {
 		const url = mockFetch.mock.calls[0][0] as string;
 		expect(url).toContain('event_type=approved');
 		expect(url).toContain('actor_id=actor-1');
-		expect(url).toContain('certification_id=cert-1');
+		expect(url).toContain('micro_certification_id=cert-1');
 		expect(url).toContain('from_date=2026-01-01');
 		expect(url).toContain('to_date=2026-02-01');
 		expect(url).toContain('limit=50');
@@ -386,13 +400,23 @@ describe('fetchTriggerRules', () => {
 	it('includes filter and pagination params', async () => {
 		const mockFetch = createMockFetch({ items: [], total: 0 });
 		await fetchTriggerRules(
-			{ trigger_type: 'event', scope_type: 'entitlement', is_active: true, limit: 25, offset: 0 },
+			{
+				trigger_type: 'event',
+				scope_type: 'entitlement',
+				scope_id: 'ent-1',
+				is_active: true,
+				is_default: false,
+				limit: 25,
+				offset: 0
+			},
 			mockFetch
 		);
 		const url = mockFetch.mock.calls[0][0] as string;
 		expect(url).toContain('trigger_type=event');
 		expect(url).toContain('scope_type=entitlement');
+		expect(url).toContain('scope_id=ent-1');
 		expect(url).toContain('is_active=true');
+		expect(url).toContain('is_default=false');
 		expect(url).toContain('limit=25');
 		expect(url).toContain('offset=0');
 	});

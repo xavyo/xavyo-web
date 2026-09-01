@@ -60,6 +60,23 @@ describe('GET /api/governance/micro-certifications/triggers', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('forwards advertised scope_id and is_default filters', async () => {
+		vi.mocked(listTriggerRules).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			url: new URL(
+				'http://localhost/api/governance/micro-certifications/triggers?scope_id=ent-1&is_default=true'
+			)
+		} as any);
+		expect(listTriggerRules).toHaveBeenCalledWith(
+			expect.objectContaining({ scope_id: 'ent-1', is_default: true }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
 
 describe('POST /api/governance/micro-certifications/triggers', () => {

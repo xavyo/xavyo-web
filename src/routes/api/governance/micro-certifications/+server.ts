@@ -13,6 +13,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	const user_id = url.searchParams.get('user_id') ?? undefined;
 	const reviewer_id = url.searchParams.get('reviewer_id') ?? undefined;
 	const entitlement_id = url.searchParams.get('entitlement_id') ?? undefined;
+	const assignment_id = url.searchParams.get('assignment_id') ?? undefined;
+	const trigger_rule_id = url.searchParams.get('trigger_rule_id') ?? undefined;
+	const from_date = url.searchParams.get('from_date') ?? undefined;
+	const to_date = url.searchParams.get('to_date') ?? undefined;
 	const escalated =
 		url.searchParams.get('escalated') !== null
 			? url.searchParams.get('escalated') === 'true'
@@ -28,6 +32,10 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 			user_id,
 			reviewer_id,
 			entitlement_id,
+			assignment_id,
+			trigger_rule_id,
+			from_date,
+			to_date,
 			escalated,
 			past_deadline,
 			...listPagination(url)

@@ -91,6 +91,17 @@ describe('NHI Usage API', () => {
 			});
 			expect(result).toEqual(mockResult);
 		});
+
+		it('includes period_days query param', async () => {
+			mockApiClient.mockResolvedValue({});
+
+			await getNhiUsageSummary('nhi-1', token, tenantId, mockFetch, { period_days: 90 });
+
+			expect(mockApiClient).toHaveBeenCalledWith(
+				'/governance/nhis/nhi-1/usage/summary?period_days=90',
+				{ method: 'GET', token, tenantId, fetch: mockFetch }
+			);
+		});
 	});
 
 	describe('getNhiStalenessReport', () => {
@@ -114,6 +125,15 @@ describe('NHI Usage API', () => {
 			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
 			expect(calledPath).toContain('limit=50');
 			expect(calledPath).toContain('offset=0');
+		});
+
+		it('includes min_inactive_days query param', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0 });
+
+			await getNhiStalenessReport({ min_inactive_days: 60 }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			expect(calledPath).toContain('min_inactive_days=60');
 		});
 	});
 

@@ -24,6 +24,10 @@ export async function listMicroCertifications(
 		user_id?: string;
 		reviewer_id?: string;
 		entitlement_id?: string;
+		assignment_id?: string;
+		trigger_rule_id?: string;
+		from_date?: string;
+		to_date?: string;
 		escalated?: boolean;
 		past_deadline?: boolean;
 		limit?: number;
@@ -38,6 +42,10 @@ export async function listMicroCertifications(
 	if (params.user_id) searchParams.set('user_id', params.user_id);
 	if (params.reviewer_id) searchParams.set('reviewer_id', params.reviewer_id);
 	if (params.entitlement_id) searchParams.set('entitlement_id', params.entitlement_id);
+	if (params.assignment_id) searchParams.set('assignment_id', params.assignment_id);
+	if (params.trigger_rule_id) searchParams.set('trigger_rule_id', params.trigger_rule_id);
+	if (params.from_date) searchParams.set('from_date', params.from_date);
+	if (params.to_date) searchParams.set('to_date', params.to_date);
 	if (params.escalated !== undefined) searchParams.set('escalated', String(params.escalated));
 	if (params.past_deadline !== undefined)
 		searchParams.set('past_deadline', String(params.past_deadline));
@@ -160,10 +168,26 @@ export async function getMicroCertificationEvents(
 	id: string,
 	token: string,
 	tenantId: string,
-	fetchFn?: typeof fetch
+	fetchFn?: typeof fetch,
+	params?: {
+		event_type?: string;
+		actor_id?: string;
+		from_date?: string;
+		to_date?: string;
+		limit?: number;
+		offset?: number;
+	}
 ): Promise<CertificationEventListResponse> {
+	const searchParams = new URLSearchParams();
+	if (params?.event_type) searchParams.set('event_type', params.event_type);
+	if (params?.actor_id) searchParams.set('actor_id', params.actor_id);
+	if (params?.from_date) searchParams.set('from_date', params.from_date);
+	if (params?.to_date) searchParams.set('to_date', params.to_date);
+	if (params?.limit !== undefined) searchParams.set('limit', String(params.limit));
+	if (params?.offset !== undefined) searchParams.set('offset', String(params.offset));
+	const qs = searchParams.toString();
 	return apiClient<CertificationEventListResponse>(
-		`/governance/micro-certifications/${id}/events`,
+		`/governance/micro-certifications/${id}/events${qs ? `?${qs}` : ''}`,
 		{ method: 'GET', token, tenantId, fetch: fetchFn }
 	);
 }
@@ -172,7 +196,7 @@ export async function searchCertificationEvents(
 	params: {
 		event_type?: string;
 		actor_id?: string;
-		certification_id?: string;
+		micro_certification_id?: string;
 		from_date?: string;
 		to_date?: string;
 		limit?: number;
@@ -185,7 +209,9 @@ export async function searchCertificationEvents(
 	const searchParams = new URLSearchParams();
 	if (params.event_type) searchParams.set('event_type', params.event_type);
 	if (params.actor_id) searchParams.set('actor_id', params.actor_id);
-	if (params.certification_id) searchParams.set('certification_id', params.certification_id);
+	if (params.micro_certification_id) {
+		searchParams.set('micro_certification_id', params.micro_certification_id);
+	}
 	if (params.from_date) searchParams.set('from_date', params.from_date);
 	if (params.to_date) searchParams.set('to_date', params.to_date);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
@@ -218,7 +244,9 @@ export async function listTriggerRules(
 	params: {
 		trigger_type?: string;
 		scope_type?: string;
+		scope_id?: string;
 		is_active?: boolean;
+		is_default?: boolean;
 		limit?: number;
 		offset?: number;
 	},
@@ -229,7 +257,9 @@ export async function listTriggerRules(
 	const searchParams = new URLSearchParams();
 	if (params.trigger_type) searchParams.set('trigger_type', params.trigger_type);
 	if (params.scope_type) searchParams.set('scope_type', params.scope_type);
+	if (params.scope_id) searchParams.set('scope_id', params.scope_id);
 	if (params.is_active !== undefined) searchParams.set('is_active', String(params.is_active));
+	if (params.is_default !== undefined) searchParams.set('is_default', String(params.is_default));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

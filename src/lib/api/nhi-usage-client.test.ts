@@ -63,6 +63,15 @@ describe('nhi-usage-client', () => {
 			expect(result).toEqual(data);
 		});
 
+		it('includes period_days query param', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({}));
+			const { fetchNhiUsageSummary } = await import('./nhi-usage-client');
+
+			await fetchNhiUsageSummary('nhi-1', mockFetch, { period_days: 90 });
+
+			expect(mockFetch).toHaveBeenCalledWith('/api/nhi/usage/nhi-1/summary?period_days=90');
+		});
+
 		it('throws on non-ok response', async () => {
 			mockFetch.mockResolvedValueOnce(mockResponse(null, false, 500));
 			const { fetchNhiUsageSummary } = await import('./nhi-usage-client');
@@ -94,6 +103,16 @@ describe('nhi-usage-client', () => {
 			const calledUrl = mockFetch.mock.calls[0][0] as string;
 			expect(calledUrl).toContain('limit=50');
 			expect(calledUrl).toContain('offset=25');
+		});
+
+		it('includes min_inactive_days query param', async () => {
+			mockFetch.mockResolvedValueOnce(mockResponse({ items: [], total: 0 }));
+			const { fetchNhiStalenessReport } = await import('./nhi-usage-client');
+
+			await fetchNhiStalenessReport({ min_inactive_days: 45 }, mockFetch);
+
+			const calledUrl = mockFetch.mock.calls[0][0] as string;
+			expect(calledUrl).toContain('min_inactive_days=45');
 		});
 
 		it('throws on non-ok response', async () => {

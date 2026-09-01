@@ -41,9 +41,13 @@ export async function getNhiUsageSummary(
 	nhiId: string,
 	token: string,
 	tenantId: string,
-	fetchFn?: typeof globalThis.fetch
+	fetchFn?: typeof globalThis.fetch,
+	params?: { period_days?: number }
 ): Promise<NhiUsageSummary> {
-	return apiClient<NhiUsageSummary>(`/governance/nhis/${nhiId}/usage/summary`, {
+	const searchParams = new URLSearchParams();
+	if (params?.period_days !== undefined) searchParams.set('period_days', String(params.period_days));
+	const qs = searchParams.toString();
+	return apiClient<NhiUsageSummary>(`/governance/nhis/${nhiId}/usage/summary${qs ? `?${qs}` : ''}`, {
 		method: 'GET',
 		token,
 		tenantId,
@@ -52,12 +56,15 @@ export async function getNhiUsageSummary(
 }
 
 export async function getNhiStalenessReport(
-	params: { limit?: number; offset?: number },
+	params: { min_inactive_days?: number; limit?: number; offset?: number },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiStalenessReportResponse> {
 	const searchParams = new URLSearchParams();
+	if (params.min_inactive_days !== undefined) {
+		searchParams.set('min_inactive_days', String(params.min_inactive_days));
+	}
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
