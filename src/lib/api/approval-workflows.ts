@@ -470,6 +470,8 @@ export async function resetEscalation(
 
 export interface ListSodExemptionsParams {
 	status?: string;
+	rule_id?: string;
+	user_id?: string;
 	limit?: number;
 	offset?: number;
 }
@@ -482,6 +484,8 @@ export async function listSodExemptions(
 ): Promise<SodExemptionListResponse> {
 	const qs = buildSearchParams({
 		status: params.status,
+		rule_id: params.rule_id,
+		user_id: params.user_id,
 		limit: params.limit,
 		offset: params.offset
 	});

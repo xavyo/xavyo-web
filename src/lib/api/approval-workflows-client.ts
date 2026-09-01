@@ -338,11 +338,13 @@ export async function resetEscalationClient(
 // --- SoD Exemptions ---
 
 export async function fetchSodExemptions(
-	params: { status?: string; limit?: number; offset?: number } = {},
+	params: { status?: string; rule_id?: string; user_id?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<SodExemptionListResponse> {
 	const qs = buildSearchParams({
 		status: params.status,
+		rule_id: params.rule_id,
+		user_id: params.user_id,
 		limit: params.limit,
 		offset: params.offset
 	});

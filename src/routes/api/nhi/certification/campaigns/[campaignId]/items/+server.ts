@@ -8,9 +8,18 @@ export const GET: RequestHandler = async ({ locals, params, url, fetch }) => {
 	if (!locals.accessToken || !locals.tenantId) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
 		const decision = url.searchParams.get('decision') || undefined;
+		const status = url.searchParams.get('status') || undefined;
+		const reviewer_id = url.searchParams.get('reviewer_id') || undefined;
+		const owner_id = url.searchParams.get('owner_id') || undefined;
+		const my_pending =
+			url.searchParams.get('my_pending') === 'true'
+				? true
+				: url.searchParams.get('my_pending') === 'false'
+					? false
+					: undefined;
 		const result = await listNhiCertCampaignItems(
 			params.campaignId,
-			{ decision, ...listPagination(url) },
+			{ decision, status, reviewer_id, owner_id, my_pending, ...listPagination(url) },
 			locals.accessToken,
 			locals.tenantId,
 			fetch

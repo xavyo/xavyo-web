@@ -36,7 +36,22 @@ describe('GET /api/governance/sod-exemptions', () => {
 			url: new URL('http://localhost/api/governance/sod-exemptions?page=3&page_size=5')
 		} as any);
 		expect(listSodExemptions).toHaveBeenCalledWith(
-			{ status: undefined, limit: 5, offset: 10 },
+			{ status: undefined, rule_id: undefined, user_id: undefined, limit: 5, offset: 10 },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised rule_id and user_id filters', async () => {
+		vi.mocked(listSodExemptions).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/sod-exemptions?rule_id=r1&user_id=u1')
+		} as any);
+		expect(listSodExemptions).toHaveBeenCalledWith(
+			expect.objectContaining({ rule_id: 'r1', user_id: 'u1' }),
 			TOKEN,
 			TENANT,
 			expect.any(Function)

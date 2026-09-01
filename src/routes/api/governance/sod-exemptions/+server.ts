@@ -9,9 +9,11 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 	}
 
 	const status = url.searchParams.get('status') ?? undefined;
+	const rule_id = url.searchParams.get('rule_id') ?? undefined;
+	const user_id = url.searchParams.get('user_id') ?? undefined;
 
 	const result = await listSodExemptions(
-		{ status, ...listPagination(url) },
+		{ status, rule_id, user_id, ...listPagination(url) },
 		locals.accessToken,
 		locals.tenantId,
 		fetch

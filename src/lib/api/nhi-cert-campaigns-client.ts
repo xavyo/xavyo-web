@@ -8,11 +8,12 @@ import type {
 } from './types';
 
 export async function fetchNhiCertCampaignsV2(
-	params: { status?: string; limit?: number; offset?: number } = {},
+	params: { status?: string; created_by?: string; limit?: number; offset?: number } = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<{ items: NhiCertificationCampaign[]; total: number }> {
 	const searchParams = new URLSearchParams();
 	if (params.status) searchParams.set('status', params.status);
+	if (params.created_by) searchParams.set('created_by', params.created_by);
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();
@@ -63,11 +64,23 @@ export async function fetchNhiCertCampaignSummary(
 
 export async function fetchNhiCertCampaignItems(
 	campaignId: string,
-	params: { decision?: string; limit?: number; offset?: number } = {},
+	params: {
+		decision?: string;
+		status?: string;
+		reviewer_id?: string;
+		owner_id?: string;
+		my_pending?: boolean;
+		limit?: number;
+		offset?: number;
+	} = {},
 	fetchFn: typeof fetch = fetch
 ): Promise<{ items: NhiCertificationItem[]; total: number }> {
 	const searchParams = new URLSearchParams();
 	if (params.decision) searchParams.set('decision', params.decision);
+	if (params.status) searchParams.set('status', params.status);
+	if (params.reviewer_id) searchParams.set('reviewer_id', params.reviewer_id);
+	if (params.owner_id) searchParams.set('owner_id', params.owner_id);
+	if (params.my_pending !== undefined) searchParams.set('my_pending', String(params.my_pending));
 	if (params.limit !== undefined) searchParams.set('limit', String(params.limit));
 	if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
 	const qs = searchParams.toString();

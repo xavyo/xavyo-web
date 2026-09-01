@@ -60,6 +60,8 @@ export interface ListCampaignsParams {
 }
 
 export interface ListCampaignItemsParams {
+	status?: string;
+	reviewer_id?: string;
 	limit?: number;
 	offset?: number;
 }
@@ -483,6 +485,8 @@ export async function listCampaignItems(
 	fetchFn?: typeof globalThis.fetch
 ): Promise<CertificationItemListResponse> {
 	const qs = buildSearchParams({
+		status: params.status,
+		reviewer_id: params.reviewer_id,
 		limit: params.limit,
 		offset: params.offset
 	});

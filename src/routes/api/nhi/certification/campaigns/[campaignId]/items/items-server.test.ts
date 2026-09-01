@@ -49,7 +49,39 @@ describe('GET /api/nhi/certification/campaigns/:id/items', () => {
 		} as any);
 		expect(listNhiCertCampaignItems).toHaveBeenCalledWith(
 			'camp-1',
-			{ decision: undefined, limit: 4, offset: 8 },
+			{
+				decision: undefined,
+				status: undefined,
+				reviewer_id: undefined,
+				owner_id: undefined,
+				my_pending: undefined,
+				limit: 4,
+				offset: 8
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('forwards advertised status, reviewer_id, owner_id, and my_pending filters', async () => {
+		vi.mocked(listNhiCertCampaignItems).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			params: { campaignId: 'camp-1' },
+			url: new URL(
+				'http://localhost/api/nhi/certification/campaigns/camp-1/items?status=pending&reviewer_id=u1&owner_id=u2&my_pending=true'
+			)
+		} as any);
+		expect(listNhiCertCampaignItems).toHaveBeenCalledWith(
+			'camp-1',
+			expect.objectContaining({
+				status: 'pending',
+				reviewer_id: 'u1',
+				owner_id: 'u2',
+				my_pending: true
+			}),
 			TOKEN,
 			TENANT,
 			expect.any(Function)
