@@ -90,6 +90,29 @@ describe('Governance Roles API — Role CRUD', () => {
 			expect(params.get('limit')).toBe('10');
 			expect(params.has('offset')).toBe(false);
 		});
+
+		it('includes advertised role list filters', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listRoles(
+				{
+					parent_role_id: 'null',
+					is_abstract: true,
+					name: 'admin',
+					application_id: 'app-1'
+				},
+				token,
+				tenantId,
+				mockFetch
+			);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('parent_role_id')).toBe('null');
+			expect(params.get('is_abstract')).toBe('true');
+			expect(params.get('name')).toBe('admin');
+			expect(params.get('application_id')).toBe('app-1');
+		});
 	});
 
 	describe('createRole', () => {

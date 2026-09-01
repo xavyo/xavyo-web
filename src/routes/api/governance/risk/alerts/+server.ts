@@ -8,8 +8,22 @@ export const GET: RequestHandler = async ({ url, locals, fetch }) => {
 		error(401, 'Unauthorized');
 	}
 
+	const acknowledged =
+		url.searchParams.get('acknowledged') === 'true'
+			? true
+			: url.searchParams.get('acknowledged') === 'false'
+				? false
+				: undefined;
+
 	const result = await listRiskAlerts(
-		listPagination(url),
+		{
+			user_id: url.searchParams.get('user_id') ?? undefined,
+			threshold_id: url.searchParams.get('threshold_id') ?? undefined,
+			severity: url.searchParams.get('severity') ?? undefined,
+			acknowledged,
+			sort_by: url.searchParams.get('sort_by') ?? undefined,
+			...listPagination(url)
+		},
 		locals.accessToken,
 		locals.tenantId,
 		fetch

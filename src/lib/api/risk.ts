@@ -23,6 +23,7 @@ import type {
 
 export interface ListRiskAlertsParams {
 	user_id?: string;
+	threshold_id?: string;
 	severity?: string;
 	acknowledged?: boolean;
 	sort_by?: string;
@@ -95,6 +96,7 @@ export async function listRiskAlerts(
 ): Promise<RiskAlertListResponse> {
 	const qs = buildSearchParams({
 		user_id: params.user_id,
+		threshold_id: params.threshold_id,
 		severity: params.severity,
 		acknowledged: params.acknowledged,
 		sort_by: params.sort_by,

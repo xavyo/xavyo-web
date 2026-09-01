@@ -331,6 +331,16 @@ describe('Risk API — risk alerts', () => {
 			);
 		});
 
+		it('includes advertised threshold_id filter', async () => {
+			mockApiClient.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
+
+			await listRiskAlerts({ threshold_id: 't1' }, token, tenantId, mockFetch);
+
+			const calledPath = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+			const params = new URLSearchParams(calledPath.split('?')[1]);
+			expect(params.get('threshold_id')).toBe('t1');
+		});
+
 		it('returns the response from apiClient', async () => {
 			const mockResponse = {
 				items: [
