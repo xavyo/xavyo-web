@@ -3494,7 +3494,7 @@ export interface RejectApprovalRequest {
 
 // --- My Certifications Types ---
 
-export type MyCertificationStatus = 'pending' | 'certified' | 'revoked';
+export type MyCertificationStatus = 'pending' | 'certified' | 'approved' | 'revoked';
 
 export interface MyCertificationItem {
 	id: string;
@@ -6587,7 +6587,7 @@ export interface NhiCertCampaignSummary {
 	pending: number;
 	certified: number;
 	revoked: number;
-	flagged: number;
+	expired?: number;
 }
 
 export type NhiCertItemDecision = 'certify' | 'revoke' | 'delegate';
@@ -6595,6 +6595,8 @@ export type NhiCertItemDecision = 'certify' | 'revoke' | 'delegate';
 export interface DecideNhiCertItemBody {
 	decision: NhiCertItemDecision;
 	notes?: string;
+	comment?: string;
+	delegate_to?: string;
 }
 
 export interface BulkDecideNhiCertBody {

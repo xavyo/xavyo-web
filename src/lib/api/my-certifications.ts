@@ -32,6 +32,7 @@ export async function listMyCertifications(
 	const page = params.page ?? 1;
 	const qs = buildSearchParams({
 		campaign_id: params.campaign_id,
+		status: params.status,
 		limit: pageSize,
 		offset: Math.max(0, (page - 1) * pageSize)
 	});

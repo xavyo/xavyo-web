@@ -64,6 +64,25 @@ describe('GET /api/nhi/certification/campaigns/:id/items', () => {
 		);
 	});
 
+	it('forwards advertised decision filter', async () => {
+		vi.mocked(listNhiCertCampaignItems).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT, user: { roles: ['user'] } },
+			fetch: vi.fn(),
+			params: { campaignId: 'camp-1' },
+			url: new URL(
+				'http://localhost/api/nhi/certification/campaigns/camp-1/items?decision=certified'
+			)
+		} as any);
+		expect(listNhiCertCampaignItems).toHaveBeenCalledWith(
+			'camp-1',
+			expect.objectContaining({ decision: 'certified' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('forwards advertised status, reviewer_id, owner_id, and my_pending filters', async () => {
 		vi.mocked(listNhiCertCampaignItems).mockResolvedValue({ items: [], total: 0 } as any);
 		await GET({

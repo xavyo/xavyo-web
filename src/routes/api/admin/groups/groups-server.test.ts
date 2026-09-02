@@ -56,6 +56,18 @@ describe('POST /api/admin/groups', () => {
 		expect(createGroup).toHaveBeenCalled();
 	});
 
+	it('accepts advertised name alias', async () => {
+		vi.mocked(createGroup).mockResolvedValue({ id: 'g1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ name: 'eng' })) as any);
+		expect(response.status).toBe(201);
+		expect(createGroup).toHaveBeenCalledWith(
+			expect.objectContaining({ display_name: 'eng' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(createGroup).not.toHaveBeenCalled();

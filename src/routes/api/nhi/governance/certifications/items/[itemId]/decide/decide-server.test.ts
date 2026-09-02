@@ -44,7 +44,7 @@ describe('POST /api/nhi/governance/certifications/items/:itemId/decide', () => {
 		expect(response.status).toBe(200);
 		expect(decideNhiCertItem).toHaveBeenCalledWith(
 			'item-1',
-			'certify',
+			{ decision: 'certify', notes: undefined, delegate_to: undefined },
 			TOKEN,
 			TENANT,
 			expect.any(Function)
@@ -66,5 +66,26 @@ describe('POST /api/nhi/governance/certifications/items/:itemId/decide', () => {
 	it('does not decide when decision is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(decideNhiCertItem).not.toHaveBeenCalled();
+	});
+
+	it('forwards advertised notes and delegate_to', async () => {
+		vi.mocked(decideNhiCertItem).mockResolvedValue({ id: 'item-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					decision: 'delegate',
+					notes: 'Please review',
+					delegate_to: 'user-2'
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(decideNhiCertItem).toHaveBeenCalledWith(
+			'item-1',
+			{ decision: 'delegate', notes: 'Please review', delegate_to: 'user-2' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
 	});
 });

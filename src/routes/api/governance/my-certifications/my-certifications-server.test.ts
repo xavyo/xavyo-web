@@ -29,4 +29,19 @@ describe('GET /api/governance/my-certifications', () => {
 			expect.any(Function)
 		);
 	});
+
+	it('forwards advertised status filter', async () => {
+		vi.mocked(listMyCertifications).mockResolvedValue({ items: [], total: 0 } as any);
+		await GET({
+			locals: { accessToken: TOKEN, tenantId: TENANT },
+			fetch: vi.fn(),
+			url: new URL('http://localhost/api/governance/my-certifications?status=certified')
+		} as any);
+		expect(listMyCertifications).toHaveBeenCalledWith(
+			expect.objectContaining({ status: 'certified' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });
