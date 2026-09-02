@@ -78,6 +78,26 @@ describe('POST /api/nhi/requests', () => {
 		expect(submitNhiRequest).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised nhi_type', async () => {
+		vi.mocked(submitNhiRequest).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'bot',
+					purpose: 'ci pipeline bot',
+					nhi_type: 'agent'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(submitNhiRequest).toHaveBeenCalledWith(
+			{ name: 'bot', purpose: 'ci pipeline bot', nhi_type: 'agent' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('maps rotation_interval_days onto requested_rotation_days', async () => {
 		vi.mocked(submitNhiRequest).mockResolvedValue({ id: 'r1' } as any);
 		const response = await POST(

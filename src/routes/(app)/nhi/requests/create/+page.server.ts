@@ -32,6 +32,7 @@ export const actions: Actions = {
 			if (form.data.rotation_interval_days) {
 				body.requested_rotation_days = form.data.rotation_interval_days;
 			}
+			if (form.data.nhi_type) body.nhi_type = form.data.nhi_type;
 
 			await submitNhiRequest(body as any, locals.accessToken, locals.tenantId, fetch);
 			redirect(303, '/nhi/requests');

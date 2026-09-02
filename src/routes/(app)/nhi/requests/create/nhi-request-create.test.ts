@@ -63,10 +63,10 @@ describe('NHI Request Create form schema', () => {
 	});
 
 	describe('field definitions', () => {
-		const fields = ['name', 'purpose', 'requested_permissions', 'requested_expiration', 'rotation_interval_days'];
+		const fields = ['name', 'purpose', 'requested_permissions', 'requested_expiration', 'rotation_interval_days', 'nhi_type'];
 
-		it('has 5 fields', () => {
-			expect(fields).toHaveLength(5);
+		it('has 6 fields', () => {
+			expect(fields).toHaveLength(6);
 		});
 
 		it('includes name', () => {
@@ -87,6 +87,10 @@ describe('NHI Request Create form schema', () => {
 
 		it('includes rotation_interval_days', () => {
 			expect(fields).toContain('rotation_interval_days');
+		});
+
+		it('includes nhi_type', () => {
+			expect(fields).toContain('nhi_type');
 		});
 	});
 
@@ -114,10 +118,10 @@ describe('NHI Request Create form schema', () => {
 	});
 
 	describe('form labels', () => {
-		const labels = ['Name', 'Purpose', 'Permissions (comma-separated UUIDs, optional)', 'Expiration Date (optional)', 'Credential Rotation Interval (days, optional)'];
+		const labels = ['Name', 'Purpose', 'Permissions (comma-separated UUIDs, optional)', 'Expiration Date (optional)', 'NHI Type (optional)', 'Credential Rotation Interval (days, optional)'];
 
 		it('has correct number of labels', () => {
-			expect(labels).toHaveLength(5);
+			expect(labels).toHaveLength(6);
 		});
 	});
 

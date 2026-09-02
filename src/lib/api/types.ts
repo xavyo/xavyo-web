@@ -2192,6 +2192,8 @@ export interface ReportTemplateListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface CreateReportTemplateRequest {
@@ -2238,6 +2240,8 @@ export interface GeneratedReportListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface GenerateReportRequest {
@@ -2278,6 +2282,8 @@ export interface ReportScheduleListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface CreateReportScheduleRequest {
@@ -6482,6 +6488,7 @@ export interface SubmitNhiRequestBody {
 	requested_expiration?: string;
 	requested_rotation_days?: number;
 	rotation_interval_days?: number;
+	nhi_type?: string;
 }
 
 export interface NhiRequestSummary {
@@ -7604,6 +7611,7 @@ export interface SecretMetadata {
 	rotation_interval_days: number | null;
 	max_lease_duration_secs: number | null;
 	max_concurrent_leases: number | null;
+	created_by: string | null;
 	created_at: string;
 	updated_at: string;
 }

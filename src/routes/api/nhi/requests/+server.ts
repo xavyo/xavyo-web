@@ -49,6 +49,12 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 			return json({ error: 'purpose is required' }, { status: 400 });
 		}
 		const data: SubmitNhiRequestBody = { name: body.name, purpose: body.purpose };
+		if (body.nhi_type !== undefined) {
+			if (typeof body.nhi_type !== 'string' || body.nhi_type.length === 0) {
+				return json({ error: 'nhi_type must be a string' }, { status: 400 });
+			}
+			data.nhi_type = body.nhi_type;
+		}
 		if (body.requested_permissions !== undefined) {
 			if (
 				!Array.isArray(body.requested_permissions) ||
