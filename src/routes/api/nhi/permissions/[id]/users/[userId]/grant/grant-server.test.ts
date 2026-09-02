@@ -57,6 +57,29 @@ describe('POST /api/nhi/permissions/:id/users/:userId/grant', () => {
 		expect(grantUserPermission).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised expires_at', async () => {
+		vi.mocked(grantUserPermission).mockResolvedValue({ id: 'perm-1' } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ permission_type: 'admin', expires_at: '2026-12-01T00:00:00Z' })) as any
+		);
+		expect(response.status).toBe(201);
+		expect(grantUserPermission).toHaveBeenCalledWith(
+			'nhi-1',
+			'user-1',
+			{ permission_type: 'admin', expires_at: '2026-12-01T00:00:00Z' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not grant when expires_at is not a string', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ permission_type: 'admin', expires_at: 123 })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(grantUserPermission).not.toHaveBeenCalled();
+	});
+
 	it('does not grant when permission_type is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({
 			status: 400

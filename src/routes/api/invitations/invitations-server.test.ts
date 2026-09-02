@@ -81,6 +81,25 @@ describe('POST /api/invitations', () => {
 		expect(createInvitation).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised role', async () => {
+		vi.mocked(createInvitation).mockResolvedValue({ id: 'inv-1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ email: 'a@b.c', role: 'admin' })) as any);
+		expect(response.status).toBe(201);
+		expect(createInvitation).toHaveBeenCalledWith(
+			{ email: 'a@b.c', role: 'admin' },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not invite when role is not a string', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ email: 'a@b.c', role: 1 })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(createInvitation).not.toHaveBeenCalled();
+	});
+
 	it('does not invite when email is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(createInvitation).not.toHaveBeenCalled();

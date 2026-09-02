@@ -110,6 +110,12 @@ export const POST: RequestHandler = async ({ locals, request, fetch }) => {
 		}
 		data.specific_nhi_ids = body.specific_nhi_ids as string[];
 	}
+	if (data.scope === 'by_type' && !data.nhi_type_filter) {
+		return json({ error: 'nhi_type_filter is required when scope is by_type' }, { status: 400 });
+	}
+	if (data.scope === 'specific' && (!data.specific_nhi_ids || data.specific_nhi_ids.length === 0)) {
+		return json({ error: 'specific_nhi_ids is required when scope is specific' }, { status: 400 });
+	}
 	try {
 		const result = await createNhiCertCampaignV2(data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });

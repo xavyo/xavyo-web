@@ -86,6 +86,24 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		}
 		data.exclusive = body.exclusive;
 	}
+	if (body.time_from !== undefined) {
+		if (typeof body.time_from !== 'string' || body.time_from.length === 0) {
+			error(400, 'time_from must be a non-empty string');
+		}
+		data.time_from = body.time_from;
+	}
+	if (body.time_to !== undefined) {
+		if (typeof body.time_to !== 'string' || body.time_to.length === 0) {
+			error(400, 'time_to must be a non-empty string');
+		}
+		data.time_to = body.time_to;
+	}
+	if (body.time_reference !== undefined) {
+		if (body.time_reference !== 'absolute' && body.time_reference !== 'relative_to_creation') {
+			error(400, 'time_reference must be absolute or relative_to_creation');
+		}
+		data.time_reference = body.time_reference;
+	}
 	try {
 		const result = await createTemplateRule(params.id, data, locals.accessToken, locals.tenantId, fetch);
 		return json(result, { status: 201 });

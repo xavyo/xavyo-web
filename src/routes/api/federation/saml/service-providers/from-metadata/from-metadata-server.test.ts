@@ -47,6 +47,41 @@ describe('POST /api/federation/saml/service-providers/from-metadata', () => {
 		expect(createServiceProvider).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised group config and SLO fields from the body', async () => {
+		vi.mocked(createServiceProvider).mockResolvedValue({ id: 'sp1' } as any);
+		const xml =
+			'<EntityDescriptor entityID="https://ex"><SPSSODescriptor><AssertionConsumerService Location="https://ex/acs"/></SPSSODescriptor></EntityDescriptor>';
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					metadata_xml: xml,
+					slo_url: 'https://ex/slo',
+					slo_binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+					sign_assertions: true,
+					include_groups: true,
+					omit_empty_groups: false,
+					group_attribute_name: 'groups',
+					group_value_format: 'name'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createServiceProvider).toHaveBeenCalledWith(
+			expect.objectContaining({
+				slo_url: 'https://ex/slo',
+				slo_binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+				sign_assertions: true,
+				include_groups: true,
+				omit_empty_groups: false,
+				group_attribute_name: 'groups',
+				group_value_format: 'name'
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create when metadata is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(createServiceProvider).not.toHaveBeenCalled();

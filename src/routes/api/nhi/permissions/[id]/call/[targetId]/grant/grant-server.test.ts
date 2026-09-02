@@ -69,6 +69,42 @@ describe('POST /api/nhi/permissions/:id/call/:targetId/grant', () => {
 		expect(grantNhiPermission).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised allowed_actions and expires_at', async () => {
+		vi.mocked(grantNhiPermission).mockResolvedValue({ id: 'perm-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					permission_type: 'call',
+					allowed_actions: { invoke: true },
+					expires_at: '2026-12-01T00:00:00Z'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(grantNhiPermission).toHaveBeenCalledWith(
+			'nhi-1',
+			'nhi-2',
+			{
+				permission_type: 'call',
+				allowed_actions: { invoke: true },
+				max_calls_per_hour: undefined,
+				expires_at: '2026-12-01T00:00:00Z'
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not grant when allowed_actions is an array', async () => {
+		await expect(
+			POST(
+				makeEvent(JSON.stringify({ permission_type: 'call', allowed_actions: ['invoke'] })) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(grantNhiPermission).not.toHaveBeenCalled();
+	});
+
 	it('rejects NaN max_calls_per_hour instead of forwarding it', async () => {
 		await expect(
 			POST(

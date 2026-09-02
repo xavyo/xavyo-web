@@ -1,6 +1,9 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createServiceProvider } from '$lib/api/federation';
+import type { CreateServiceProviderRequest } from '$lib/api/types';
+import { applyGroupConfigFields } from '$lib/server/sp-group-fields';
+import { JsonObjectError, parseBoundedInteger } from '$lib/utils/json-record';
 import { XMLParser } from 'fast-xml-parser';
 
 export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFetch }) => {
@@ -137,15 +140,70 @@ export const POST: RequestHandler = async ({ request, locals, fetch: svelteKitFe
 		nameIdFormat = Array.isArray(formats) ? formats[0] : formats;
 	}
 
+	const data: CreateServiceProviderRequest = {
+		name,
+		entity_id: entityId,
+		acs_urls: acsUrls,
+		certificate,
+		name_id_format: nameIdFormat,
+		metadata_url: metadata_url || undefined
+	};
+	if (body.name !== undefined) {
+		if (typeof body.name !== 'string' || body.name.length === 0) {
+			error(400, 'name must be a non-empty string');
+		}
+		data.name = body.name;
+	}
+	if (body.attribute_mapping !== undefined) {
+		if (
+			!body.attribute_mapping ||
+			typeof body.attribute_mapping !== 'object' ||
+			Array.isArray(body.attribute_mapping)
+		) {
+			error(400, 'attribute_mapping must be an object');
+		}
+		data.attribute_mapping = body.attribute_mapping as Record<string, unknown>;
+	}
+	if (body.sign_assertions !== undefined) {
+		if (typeof body.sign_assertions !== 'boolean') {
+			error(400, 'sign_assertions must be a boolean');
+		}
+		data.sign_assertions = body.sign_assertions;
+	}
+	if (body.validate_signatures !== undefined) {
+		if (typeof body.validate_signatures !== 'boolean') {
+			error(400, 'validate_signatures must be a boolean');
+		}
+		data.validate_signatures = body.validate_signatures;
+	}
+	if (body.assertion_validity_seconds !== undefined) {
+		try {
+			data.assertion_validity_seconds = parseBoundedInteger(
+				body.assertion_validity_seconds,
+				1,
+				31_536_000,
+				'assertion_validity_seconds'
+			);
+		} catch (e) {
+			if (e instanceof JsonObjectError) error(400, e.message);
+			throw e;
+		}
+	}
+	if (body.slo_url !== undefined) {
+		if (typeof body.slo_url !== 'string') {
+			error(400, 'slo_url must be a string');
+		}
+		data.slo_url = body.slo_url;
+	}
+	if (body.slo_binding !== undefined) {
+		if (typeof body.slo_binding !== 'string') {
+			error(400, 'slo_binding must be a string');
+		}
+		data.slo_binding = body.slo_binding;
+	}
+	applyGroupConfigFields(body, data);
 	const result = await createServiceProvider(
-		{
-			name,
-			entity_id: entityId,
-			acs_urls: acsUrls,
-			certificate,
-			name_id_format: nameIdFormat,
-			metadata_url: metadata_url || undefined
-		},
+		data,
 		locals.accessToken,
 		locals.tenantId,
 		svelteKitFetch
