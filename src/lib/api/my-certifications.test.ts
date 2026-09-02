@@ -29,6 +29,17 @@ describe('my-certifications API', () => {
 		expect(path).not.toContain('page_size=');
 	});
 
+	it('forwards advertised status filter', async () => {
+		await listMyCertifications(
+			{ status: 'certified', page: 1, page_size: 20 },
+			token,
+			tenantId,
+			fetchFn
+		);
+		const path = (mockApiClient.mock.calls[0] as unknown[])[0] as string;
+		expect(path).toContain('status=certified');
+	});
+
 	it('certifies via POST /governance/certification-items/:id/decide', async () => {
 		mockApiClient.mockResolvedValue({ id: 'item-1' });
 		await certifyItem('item-1', token, tenantId, fetchFn);

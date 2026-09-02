@@ -29,11 +29,12 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 	}
 	const body = parsed as Record<string, unknown>;
 	const data: UpdateUserGroupRequest = {};
-	if (body.display_name !== undefined) {
-		if (typeof body.display_name !== 'string' || body.display_name.length === 0) {
+	const displayName = body.display_name !== undefined ? body.display_name : body.name;
+	if (displayName !== undefined) {
+		if (typeof displayName !== 'string' || displayName.length === 0) {
 			error(400, 'display_name must be a non-empty string');
 		}
-		data.display_name = body.display_name;
+		data.display_name = displayName;
 	}
 	if (body.description !== undefined) {
 		if (typeof body.description !== 'string') {

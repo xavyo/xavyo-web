@@ -37,6 +37,19 @@ describe('PUT /api/admin/groups/:id', () => {
 		expect(updateGroup).toHaveBeenCalled();
 	});
 
+	it('accepts advertised name alias', async () => {
+		vi.mocked(updateGroup).mockResolvedValue({ id: 'g1' } as any);
+		const response = await PUT(makeEvent(JSON.stringify({ name: 'ops' })) as any);
+		expect(response.status).toBe(200);
+		expect(updateGroup).toHaveBeenCalledWith(
+			'g1',
+			expect.objectContaining({ display_name: 'ops' }),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not update on invalid JSON', async () => {
 		await expect(PUT(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(updateGroup).not.toHaveBeenCalled();

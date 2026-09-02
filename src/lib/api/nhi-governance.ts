@@ -353,18 +353,36 @@ export async function listNhiCertCampaignItems(
 
 export async function decideNhiCertItem(
 	itemId: string,
-	decision: 'certify' | 'revoke',
+	decision:
+		| 'certify'
+		| 'revoke'
+		| 'delegate'
+		| {
+				decision: 'certify' | 'revoke' | 'delegate';
+				notes?: string;
+				comment?: string;
+				delegate_to?: string;
+		  },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch
 ): Promise<NhiCertificationItem> {
+	const body =
+		typeof decision === 'string'
+			? { decision }
+			: {
+					decision: decision.decision,
+					notes: decision.notes,
+					comment: decision.comment,
+					delegate_to: decision.delegate_to
+				};
 	return apiClient<NhiCertificationItem>(
 		`/governance/nhis/certification/items/${itemId}/decide`,
 		{
 			method: 'POST',
 			token,
 			tenantId,
-			body: { decision },
+			body,
 			fetch: fetchFn
 		}
 	);

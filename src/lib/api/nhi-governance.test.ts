@@ -330,5 +330,28 @@ describe('NHI Governance API', () => {
 			});
 			expect(result.decision).toBe('revoke');
 		});
+
+		it('forwards advertised notes and delegate_to', async () => {
+			mockApiClient.mockResolvedValue({ id: 'item-1', decision: 'delegate' });
+			await decideNhiCertItem(
+				'item-1',
+				{ decision: 'delegate', notes: 'Please review', delegate_to: 'user-2' },
+				token,
+				tenantId,
+				mockFetch
+			);
+			expect(mockApiClient).toHaveBeenCalledWith('/governance/nhis/certification/items/item-1/decide', {
+				method: 'POST',
+				token,
+				tenantId,
+				body: {
+					decision: 'delegate',
+					notes: 'Please review',
+					comment: undefined,
+					delegate_to: 'user-2'
+				},
+				fetch: mockFetch
+			});
+		});
 	});
 });
