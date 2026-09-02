@@ -19,7 +19,7 @@ export const POST: RequestHandler = async ({ locals, params, request, fetch }) =
 		if (
 			body.decision !== 'certify' &&
 			body.decision !== 'revoke' &&
-			body.decision !== 'flag'
+			body.decision !== 'delegate'
 		) {
 			return json({ error: 'decision is required' }, { status: 400 });
 		}

@@ -62,4 +62,26 @@ describe('POST /api/nhi/certification/items/bulk-decide', () => {
 		expect(response.status).toBe(400);
 		expect(bulkDecideNhiCertItems).not.toHaveBeenCalled();
 	});
+
+	it('does not forward advertised flag to the API', async () => {
+		const response = await POST(
+			makeEvent(JSON.stringify({ item_ids: ['i1'], decision: 'flag' })) as any
+		);
+		expect(response.status).toBe(400);
+		expect(bulkDecideNhiCertItems).not.toHaveBeenCalled();
+	});
+
+	it('forwards delegate to the API', async () => {
+		vi.mocked(bulkDecideNhiCertItems).mockResolvedValue({ decided: 1, failed: 0 } as any);
+		const response = await POST(
+			makeEvent(JSON.stringify({ item_ids: ['i1'], decision: 'delegate' })) as any
+		);
+		expect(response.status).toBe(200);
+		expect(bulkDecideNhiCertItems).toHaveBeenCalledWith(
+			{ item_ids: ['i1'], decision: 'delegate', notes: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });

@@ -102,7 +102,7 @@ describe('CertItemTable', () => {
 		});
 		expect(screen.getByText('Certify')).toBeTruthy();
 		expect(screen.getByText('Revoke')).toBeTruthy();
-		expect(screen.getByText('Flag')).toBeTruthy();
+		expect(screen.getByText('Delegate')).toBeTruthy();
 	});
 
 	it('does not render action buttons for decided items', () => {
@@ -161,6 +161,6 @@ describe('CertItemTable', () => {
 		expect(screen.getByText('1 selected')).toBeTruthy();
 		expect(screen.getByText('Certify Selected')).toBeTruthy();
 		expect(screen.getByText('Revoke Selected')).toBeTruthy();
-		expect(screen.getByText('Flag Selected')).toBeTruthy();
+		expect(screen.getByText('Delegate Selected')).toBeTruthy();
 	});
 });
