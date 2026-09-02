@@ -38,18 +38,34 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		}
 	}
 
+	let allowed_actions: Record<string, unknown> | undefined;
+	if (body.allowed_actions !== undefined) {
+		if (
+			!body.allowed_actions ||
+			typeof body.allowed_actions !== 'object' ||
+			Array.isArray(body.allowed_actions)
+		) {
+			error(400, 'allowed_actions must be an object');
+		}
+		allowed_actions = body.allowed_actions as Record<string, unknown>;
+	}
+	let expires_at: string | undefined;
+	if (body.expires_at !== undefined) {
+		if (typeof body.expires_at !== 'string' || body.expires_at.length === 0) {
+			error(400, 'expires_at must be a non-empty string');
+		}
+		expires_at = body.expires_at;
+	}
+
 	try {
 		const result = await grantNhiPermission(
 			params.id,
 			params.targetId,
 			{
 				permission_type: body.permission_type,
-				allowed_actions:
-					body.allowed_actions && typeof body.allowed_actions === 'object'
-						? (body.allowed_actions as Record<string, unknown>)
-						: undefined,
+				allowed_actions,
 				max_calls_per_hour,
-				expires_at: typeof body.expires_at === 'string' ? body.expires_at : undefined
+				expires_at
 			},
 			locals.accessToken,
 			locals.tenantId,

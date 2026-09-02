@@ -39,6 +39,39 @@ describe('POST /api/governance/catalog/cart/items', () => {
 		expect(addToCart).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised beneficiary_id, parameters, and form_values', async () => {
+		vi.mocked(addToCart).mockResolvedValue({ id: 'item-1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					catalog_item_id: 'cat-1',
+					beneficiary_id: 'user-1',
+					parameters: { dept: 'eng' },
+					form_values: { reason: 'needed' }
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(addToCart).toHaveBeenCalledWith(
+			{
+				catalog_item_id: 'cat-1',
+				beneficiary_id: 'user-1',
+				parameters: { dept: 'eng' },
+				form_values: { reason: 'needed' }
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not add when parameters is an array', async () => {
+		await expect(
+			POST(makeEvent(JSON.stringify({ catalog_item_id: 'cat-1', parameters: ['x'] })) as any)
+		).rejects.toMatchObject({ status: 400 });
+		expect(addToCart).not.toHaveBeenCalled();
+	});
+
 	it('does not add when catalog_item_id is missing', async () => {
 		await expect(POST(makeEvent(JSON.stringify({})) as any)).rejects.toMatchObject({ status: 400 });
 		expect(addToCart).not.toHaveBeenCalled();

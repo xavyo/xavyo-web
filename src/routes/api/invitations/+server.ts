@@ -39,10 +39,17 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 	if (typeof body.email !== 'string' || body.email.length === 0) {
 		error(400, 'email is required');
 	}
+	let role: string | undefined;
+	if (body.role !== undefined) {
+		if (typeof body.role !== 'string') {
+			error(400, 'role must be a string');
+		}
+		role = body.role;
+	}
 	const result = await createInvitation(
 		{
 			email: body.email,
-			role: typeof body.role === 'string' ? body.role : undefined
+			role
 		},
 		locals.accessToken,
 		locals.tenantId,

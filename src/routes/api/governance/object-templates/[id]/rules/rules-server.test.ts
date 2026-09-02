@@ -121,6 +121,34 @@ describe('POST /api/governance/object-templates/:id/rules', () => {
 		expect(createTemplateRule).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised time_from, time_to, and time_reference', async () => {
+		vi.mocked(createTemplateRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					rule_type: 'default',
+					target_attribute: 'department',
+					expression: "'Engineering'",
+					time_from: '2026-01-01T00:00:00Z',
+					time_to: '2026-12-31T00:00:00Z',
+					time_reference: 'absolute'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTemplateRule).toHaveBeenCalledWith(
+			't1',
+			expect.objectContaining({
+				time_from: '2026-01-01T00:00:00Z',
+				time_to: '2026-12-31T00:00:00Z',
+				time_reference: 'absolute'
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create when expression is missing', async () => {
 		await expect(
 			POST(

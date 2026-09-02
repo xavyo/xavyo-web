@@ -151,6 +151,22 @@ describe('POST /api/nhi/certification/campaigns', () => {
 		);
 	});
 
+	it('does not create when scope is by_type without nhi_type_filter', async () => {
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'By type', scope: 'by_type' })) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createNhiCertCampaignV2).not.toHaveBeenCalled();
+	});
+
+	it('does not create when scope is specific without specific_nhi_ids', async () => {
+		const response = await POST(
+			makeEvent(JSON.stringify({ name: 'Specific', scope: 'specific' })) as any
+		);
+		expect(response.status).toBe(400);
+		expect(createNhiCertCampaignV2).not.toHaveBeenCalled();
+	});
+
 	it('does not create on invalid JSON', async () => {
 		const response = await POST(makeEvent('{not json') as any);
 		expect(response.status).toBe(400);

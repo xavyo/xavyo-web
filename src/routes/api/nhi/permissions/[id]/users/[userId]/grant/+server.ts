@@ -21,6 +21,13 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (typeof body.permission_type !== 'string' || body.permission_type.length === 0) {
 		error(400, 'permission_type is required');
 	}
+	let expires_at: string | undefined;
+	if (body.expires_at !== undefined) {
+		if (typeof body.expires_at !== 'string' || body.expires_at.length === 0) {
+			error(400, 'expires_at must be a non-empty string');
+		}
+		expires_at = body.expires_at;
+	}
 
 	try {
 		const result = await grantUserPermission(
@@ -28,7 +35,7 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 			params.userId,
 			{
 				permission_type: body.permission_type,
-				expires_at: typeof body.expires_at === 'string' ? body.expires_at : undefined
+				expires_at
 			},
 			locals.accessToken,
 			locals.tenantId,
