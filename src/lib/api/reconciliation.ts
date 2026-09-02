@@ -295,13 +295,44 @@ export async function listReconciliationActions(
 	});
 }
 
+const NAMED_FREQUENCIES = ['hourly', 'daily', 'weekly', 'monthly', 'cron'] as const;
+
+export function mapReconciliationSchedule(
+	raw: ReconciliationSchedule
+): ReconciliationSchedule {
+	const frequency = raw.frequency;
+	if (
+		frequency &&
+		!(NAMED_FREQUENCIES as readonly string[]).includes(frequency)
+	) {
+		return {
+			...raw,
+			frequency: 'cron',
+			cron_expression: raw.cron_expression ?? frequency
+		};
+	}
+	return {
+		...raw,
+		cron_expression: raw.cron_expression ?? null
+	};
+}
+
+export function mapReconciliationScheduleList(
+	raw: ReconciliationScheduleListResponse
+): ReconciliationScheduleListResponse {
+	return {
+		...raw,
+		schedules: (raw.schedules ?? []).map(mapReconciliationSchedule)
+	};
+}
+
 export async function getSchedule(
 	connectorId: string,
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof fetch
 ): Promise<ReconciliationSchedule> {
-	return apiClient<ReconciliationSchedule>(
+	const raw = await apiClient<ReconciliationSchedule>(
 		`/connectors/${connectorId}/reconciliation/schedule`,
 		{
 			method: 'GET',
@@ -310,6 +341,7 @@ export async function getSchedule(
 			fetch: fetchFn
 		}
 	);
+	return mapReconciliationSchedule(raw);
 }
 
 export async function upsertSchedule(
@@ -319,7 +351,7 @@ export async function upsertSchedule(
 	tenantId: string,
 	fetchFn?: typeof fetch
 ): Promise<ReconciliationSchedule> {
-	return apiClient<ReconciliationSchedule>(
+	const raw = await apiClient<ReconciliationSchedule>(
 		`/connectors/${connectorId}/reconciliation/schedule`,
 		{
 			method: 'PUT',
@@ -329,6 +361,7 @@ export async function upsertSchedule(
 			fetch: fetchFn
 		}
 	);
+	return mapReconciliationSchedule(raw);
 }
 
 export async function deleteSchedule(
@@ -387,12 +420,13 @@ export async function listAllSchedules(
 	tenantId: string,
 	fetchFn?: typeof fetch
 ): Promise<ReconciliationScheduleListResponse> {
-	return apiClient<ReconciliationScheduleListResponse>('/reconciliation/schedules', {
+	const raw = await apiClient<ReconciliationScheduleListResponse>('/reconciliation/schedules', {
 		method: 'GET',
 		token,
 		tenantId,
 		fetch: fetchFn
 	});
+	return mapReconciliationScheduleList(raw);
 }
 
 export async function getDiscrepancyTrend(

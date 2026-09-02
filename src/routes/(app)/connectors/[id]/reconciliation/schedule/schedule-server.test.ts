@@ -151,6 +151,48 @@ describe('Reconciliation schedule +page.server', () => {
 		expect(upsertSchedule).not.toHaveBeenCalled();
 	});
 
+	it('forwards advertised cron_expression on save', async () => {
+		vi.mocked(upsertSchedule).mockResolvedValue({} as any);
+		const result: any = await actions.save({
+			params: { id: 'conn-1' },
+			request: makeFormData({
+				mode: 'full',
+				frequency: 'cron',
+				cron_expression: '0 2 * * *',
+				hour_of_day: '2',
+				enabled: 'on'
+			}),
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+		expect(result.success).toBe(true);
+		expect(upsertSchedule).toHaveBeenCalledWith(
+			'conn-1',
+			expect.objectContaining({
+				frequency: 'cron',
+				cron_expression: '0 2 * * *'
+			}),
+			'tok',
+			'tid',
+			expect.any(Function)
+		);
+	});
+
+	it('rejects cron frequency without cron_expression', async () => {
+		const result: any = await actions.save({
+			params: { id: 'conn-1' },
+			request: makeFormData({
+				mode: 'full',
+				frequency: 'cron',
+				hour_of_day: '2'
+			}),
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+		expect(result.status).toBe(400);
+		expect(upsertSchedule).not.toHaveBeenCalled();
+	});
+
 	it('rejects non-numeric hour_of_day instead of posting NaN', async () => {
 		const result: any = await actions.save({
 			params: { id: 'conn-1' },

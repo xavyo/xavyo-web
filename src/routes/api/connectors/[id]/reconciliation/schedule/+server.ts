@@ -58,6 +58,17 @@ export const PUT: RequestHandler = async ({ params, request, locals, fetch }) =>
 		hour_of_day,
 		enabled: body.enabled
 	};
+	if (body.frequency === 'cron') {
+		if (typeof body.cron_expression !== 'string' || body.cron_expression.trim().length === 0) {
+			error(400, 'cron_expression is required');
+		}
+		data.cron_expression = body.cron_expression;
+	} else if (body.cron_expression !== undefined) {
+		if (body.cron_expression !== null && typeof body.cron_expression !== 'string') {
+			error(400, 'cron_expression must be a string');
+		}
+		data.cron_expression = body.cron_expression as string | null;
+	}
 	if (body.day_of_week !== undefined) {
 		try {
 			data.day_of_week = parseBoundedInteger(body.day_of_week, 0, 6, 'day_of_week');
