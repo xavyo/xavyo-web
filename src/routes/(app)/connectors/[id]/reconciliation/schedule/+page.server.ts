@@ -31,8 +31,14 @@ export const actions: Actions = {
 		const mode = fd.get('mode') as string;
 		const frequency = fd.get('frequency') as string;
 		const enabled = fd.get('enabled') === 'on';
+		const cronRaw = fd.get('cron_expression');
+		const cron_expression =
+			typeof cronRaw === 'string' && cronRaw.trim().length > 0 ? cronRaw.trim() : undefined;
 
 		try {
+			if (frequency === 'cron' && !cron_expression) {
+				return fail(400, { error: 'cron_expression is required' });
+			}
 			const day_of_week = parseOptionalBoundedInteger(fd.get('day_of_week'), 0, 6, 'day_of_week');
 			const day_of_month = parseOptionalBoundedInteger(
 				fd.get('day_of_month'),
@@ -47,6 +53,7 @@ export const actions: Actions = {
 				{
 					mode: mode as 'full' | 'delta',
 					frequency: frequency as 'hourly' | 'daily' | 'weekly' | 'monthly' | 'cron',
+					cron_expression,
 					day_of_week,
 					day_of_month,
 					hour_of_day,

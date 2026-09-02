@@ -46,6 +46,48 @@ describe('PUT /api/connectors/:id/reconciliation/schedule', () => {
 		expect(upsertSchedule).toHaveBeenCalled();
 	});
 
+	it('forwards advertised cron_expression when frequency is cron', async () => {
+		vi.mocked(upsertSchedule).mockResolvedValue({ id: 'sch1' } as any);
+		const response = await PUT(
+			makeEvent(
+				JSON.stringify({
+					mode: 'full',
+					frequency: 'cron',
+					cron_expression: '0 2 * * *',
+					hour_of_day: 2,
+					enabled: true
+				})
+			) as any
+		);
+		expect(response.status).toBe(200);
+		expect(upsertSchedule).toHaveBeenCalledWith(
+			'c1',
+			expect.objectContaining({
+				frequency: 'cron',
+				cron_expression: '0 2 * * *'
+			}),
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
+	it('does not upsert cron frequency without cron_expression', async () => {
+		await expect(
+			PUT(
+				makeEvent(
+					JSON.stringify({
+						mode: 'full',
+						frequency: 'cron',
+						hour_of_day: 2,
+						enabled: true
+					})
+				) as any
+			)
+		).rejects.toMatchObject({ status: 400 });
+		expect(upsertSchedule).not.toHaveBeenCalled();
+	});
+
 	it('does not upsert on invalid JSON', async () => {
 		await expect(PUT(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(upsertSchedule).not.toHaveBeenCalled();

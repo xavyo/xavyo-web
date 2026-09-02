@@ -3002,6 +3002,7 @@ export interface ReconciliationScheduleListResponse {
 export interface UpsertScheduleRequest {
 	mode: ReconciliationMode;
 	frequency: ReconciliationScheduleFrequency;
+	cron_expression?: string | null;
 	day_of_week?: number;
 	day_of_month?: number;
 	hour_of_day: number;
