@@ -5232,6 +5232,7 @@ export interface LifecycleTransition {
 	from_state_id: string;
 	to_state_id: string;
 	requires_approval: boolean;
+	approval_workflow_id: string | null;
 	grace_period_hours: number | null;
 	created_at: string;
 }
@@ -5308,6 +5309,7 @@ export interface CreateLifecycleTransitionRequest {
 	from_state_id: string;
 	to_state_id: string;
 	requires_approval?: boolean;
+	approval_workflow_id?: string;
 	grace_period_hours?: number;
 }
 

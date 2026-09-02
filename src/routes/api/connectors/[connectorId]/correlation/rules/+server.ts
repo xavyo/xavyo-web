@@ -59,6 +59,16 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 	if (typeof body.is_definitive !== 'boolean' || typeof body.normalize !== 'boolean') {
 		error(400, 'is_definitive and normalize are required');
 	}
+	if (
+		body.algorithm !== undefined &&
+		body.algorithm !== 'levenshtein' &&
+		body.algorithm !== 'jaro_winkler'
+	) {
+		error(400, 'algorithm must be levenshtein or jaro_winkler');
+	}
+	if (body.expression !== undefined && typeof body.expression !== 'string') {
+		error(400, 'expression must be a string');
+	}
 	const result = await createCorrelationRule(
 		params.connectorId,
 		{
@@ -66,8 +76,13 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 			source_attribute: body.source_attribute,
 			target_attribute: body.target_attribute,
 			match_type: body.match_type,
+			algorithm:
+				body.algorithm === 'levenshtein' || body.algorithm === 'jaro_winkler'
+					? body.algorithm
+					: undefined,
 			threshold,
 			weight,
+			expression: typeof body.expression === 'string' ? body.expression : undefined,
 			tier,
 			is_definitive: body.is_definitive,
 			normalize: body.normalize,

@@ -43,6 +43,35 @@ describe('POST /api/governance/lifecycle/configs/:configId/transitions', () => {
 		expect(createTransition).toHaveBeenCalled();
 	});
 
+	it('forwards advertised approval_workflow_id', async () => {
+		vi.mocked(createTransition).mockResolvedValue({ id: 'tr1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'hire',
+					from_state_id: 's1',
+					to_state_id: 's2',
+					requires_approval: true,
+					approval_workflow_id: 'wf-1'
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createTransition).toHaveBeenCalledWith(
+			'cfg1',
+			{
+				name: 'hire',
+				from_state_id: 's1',
+				to_state_id: 's2',
+				requires_approval: true,
+				approval_workflow_id: 'wf-1'
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(createTransition).not.toHaveBeenCalled();
