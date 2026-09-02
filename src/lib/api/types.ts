@@ -1222,6 +1222,12 @@ export interface CertificationCampaignResponse {
 	created_by: string;
 	created_at: string;
 	updated_at: string;
+	total_items?: number;
+	pending_items?: number;
+	approved_items?: number;
+	revoked_items?: number;
+	completion_percentage?: number;
+	progress?: CampaignProgressResponse;
 }
 
 export interface CertificationCampaignListResponse {
@@ -5398,6 +5404,8 @@ export interface MiningJobListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface CreateMiningJobRequest {
@@ -5424,6 +5432,8 @@ export interface RoleCandidateListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface PromoteCandidateRequest {
@@ -5450,6 +5460,8 @@ export interface AccessPatternListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface ExcessivePrivilege {
@@ -5473,6 +5485,8 @@ export interface ExcessivePrivilegeListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface ReviewExcessivePrivilegeRequest {
@@ -5499,6 +5513,8 @@ export interface ConsolidationSuggestionListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface DismissConsolidationRequest {
@@ -5537,6 +5553,8 @@ export interface SimulationListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface CreateSimulationRequest {
@@ -5571,6 +5589,8 @@ export interface RoleMetricsListResponse {
 	total: number;
 	page: number;
 	page_size: number;
+	limit?: number;
+	offset?: number;
 }
 
 export interface CalculateMetricsRequest {
@@ -6570,7 +6590,7 @@ export interface NhiCertCampaignSummary {
 	flagged: number;
 }
 
-export type NhiCertItemDecision = 'certify' | 'revoke' | 'flag';
+export type NhiCertItemDecision = 'certify' | 'revoke' | 'delegate';
 
 export interface DecideNhiCertItemBody {
 	decision: NhiCertItemDecision;

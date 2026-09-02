@@ -95,11 +95,18 @@ describe('decideNhiCertItemSchema', () => {
 		expect(result.success).toBe(true);
 	});
 
-	it('accepts flag decision', () => {
+	it('accepts delegate decision', () => {
+		const result = decideNhiCertItemSchema.safeParse({
+			decision: 'delegate'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('rejects flag decision', () => {
 		const result = decideNhiCertItemSchema.safeParse({
 			decision: 'flag'
 		});
-		expect(result.success).toBe(true);
+		expect(result.success).toBe(false);
 	});
 
 	it('accepts decision with optional notes', () => {

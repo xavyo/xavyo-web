@@ -40,7 +40,7 @@
 	const decisionVariants: Record<string, string> = {
 		certify: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
 		revoke: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-		flag: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+		delegate: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
 	};
 </script>
 
@@ -52,7 +52,7 @@
 			<span class="text-sm font-medium">{selectedIds.length} selected</span>
 			<Button size="sm" variant="default" onclick={() => onBulkDecide(selectedIds, 'certify')}>Certify Selected</Button>
 			<Button size="sm" variant="destructive" onclick={() => onBulkDecide(selectedIds, 'revoke')}>Revoke Selected</Button>
-			<Button size="sm" variant="outline" onclick={() => onBulkDecide(selectedIds, 'flag')}>Flag Selected</Button>
+			<Button size="sm" variant="outline" onclick={() => onBulkDecide(selectedIds, 'delegate')}>Delegate Selected</Button>
 		</div>
 	{/if}
 	<div class="rounded-md border">
@@ -101,7 +101,7 @@
 									<div class="flex gap-1">
 										<Button size="sm" variant="outline" onclick={() => onDecide(item.id, 'certify')}>Certify</Button>
 										<Button size="sm" variant="destructive" onclick={() => onDecide(item.id, 'revoke')}>Revoke</Button>
-										<Button size="sm" variant="ghost" onclick={() => onDecide(item.id, 'flag')}>Flag</Button>
+										<Button size="sm" variant="ghost" onclick={() => onDecide(item.id, 'delegate')}>Delegate</Button>
 									</div>
 								{/if}
 							</td>

@@ -62,4 +62,23 @@ describe('POST /api/nhi/certification/items/:itemId/decide', () => {
 		expect(response.status).toBe(400);
 		expect(decideNhiCertItem).not.toHaveBeenCalled();
 	});
+
+	it('does not forward advertised flag to the API', async () => {
+		const response = await POST(makeEvent(JSON.stringify({ decision: 'flag' })) as any);
+		expect(response.status).toBe(400);
+		expect(decideNhiCertItem).not.toHaveBeenCalled();
+	});
+
+	it('forwards delegate to the API', async () => {
+		vi.mocked(decideNhiCertItem).mockResolvedValue({ id: 'item-1' } as any);
+		const response = await POST(makeEvent(JSON.stringify({ decision: 'delegate' })) as any);
+		expect(response.status).toBe(200);
+		expect(decideNhiCertItem).toHaveBeenCalledWith(
+			'item-1',
+			{ decision: 'delegate', notes: undefined },
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
 });

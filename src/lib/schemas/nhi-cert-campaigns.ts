@@ -2,7 +2,7 @@ import { z } from 'zod/v3';
 
 export const NHI_CERT_CAMPAIGN_SCOPES = ['all', 'by_type', 'specific'] as const;
 export const NHI_CERT_TYPE_FILTERS = ['service_account', 'ai_agent', 'tool'] as const;
-export const NHI_CERT_DECISIONS = ['certify', 'revoke', 'flag'] as const;
+export const NHI_CERT_DECISIONS = ['certify', 'revoke', 'delegate'] as const;
 
 export const createNhiCertCampaignV2Schema = z.object({
 	name: z.string().min(1, 'Name is required').max(200),
