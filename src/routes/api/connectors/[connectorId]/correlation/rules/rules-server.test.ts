@@ -57,6 +57,49 @@ describe('POST /api/connectors/:connectorId/correlation/rules', () => {
 		expect(createCorrelationRule).toHaveBeenCalled();
 	});
 
+	it('forwards advertised algorithm and expression', async () => {
+		vi.mocked(createCorrelationRule).mockResolvedValue({ id: 'r1' } as any);
+		const response = await POST(
+			makeEvent(
+				JSON.stringify({
+					name: 'n',
+					source_attribute: 'email',
+					target_attribute: 'mail',
+					match_type: 'fuzzy',
+					algorithm: 'jaro_winkler',
+					threshold: 0.8,
+					weight: 1,
+					expression: 'source.split("@")[0]',
+					tier: 1,
+					is_definitive: false,
+					normalize: true,
+					priority: 1
+				})
+			) as any
+		);
+		expect(response.status).toBe(201);
+		expect(createCorrelationRule).toHaveBeenCalledWith(
+			'conn-1',
+			{
+				name: 'n',
+				source_attribute: 'email',
+				target_attribute: 'mail',
+				match_type: 'fuzzy',
+				algorithm: 'jaro_winkler',
+				threshold: 0.8,
+				weight: 1,
+				expression: 'source.split("@")[0]',
+				tier: 1,
+				is_definitive: false,
+				normalize: true,
+				priority: 1
+			},
+			TOKEN,
+			TENANT,
+			expect.any(Function)
+		);
+	});
+
 	it('does not create on invalid JSON', async () => {
 		await expect(POST(makeEvent('{not json') as any)).rejects.toMatchObject({ status: 400 });
 		expect(createCorrelationRule).not.toHaveBeenCalled();

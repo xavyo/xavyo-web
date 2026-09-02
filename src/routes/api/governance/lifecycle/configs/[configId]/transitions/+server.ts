@@ -36,6 +36,12 @@ export const POST: RequestHandler = async ({ params, request, locals, fetch }) =
 		}
 		data.requires_approval = body.requires_approval;
 	}
+	if (body.approval_workflow_id !== undefined) {
+		if (typeof body.approval_workflow_id !== 'string') {
+			error(400, 'approval_workflow_id must be a string');
+		}
+		data.approval_workflow_id = body.approval_workflow_id;
+	}
 	if (body.grace_period_hours !== undefined) {
 		try {
 			data.grace_period_hours = parseBoundedInteger(
