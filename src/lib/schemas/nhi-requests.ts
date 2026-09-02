@@ -5,7 +5,11 @@ export const submitNhiRequestSchema = z.object({
 	purpose: z.string().min(10, 'Purpose must be at least 10 characters'),
 	requested_permissions: z.string().optional().default(''),
 	requested_expiration: z.string().optional().default(''),
-	rotation_interval_days: z.coerce.number().min(1).max(365).optional()
+	rotation_interval_days: z.coerce.number().min(1).max(365).optional(),
+	nhi_type: z.preprocess(
+		(value) => (value === '' || value === undefined ? undefined : value),
+		z.enum(['service_account', 'agent', 'tool']).optional()
+	)
 });
 
 export type SubmitNhiRequestFormData = z.infer<typeof submitNhiRequestSchema>;

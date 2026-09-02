@@ -64,6 +64,17 @@
 			</div>
 
 			<div class="space-y-2">
+				<Label for="nhi_type">NHI Type (optional)</Label>
+				<select id="nhi_type" name="nhi_type" class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" bind:value={$form.nhi_type}>
+					<option value="">Select type</option>
+					<option value="service_account">Service account</option>
+					<option value="agent">Agent</option>
+					<option value="tool">Tool</option>
+				</select>
+				{#if $errors.nhi_type}<p class="text-sm text-destructive">{$errors.nhi_type}</p>{/if}
+			</div>
+
+			<div class="space-y-2">
 				<Label for="rotation_interval_days">Credential Rotation Interval (days, optional)</Label>
 				<Input id="rotation_interval_days" name="rotation_interval_days" type="number" min="1" max="365" placeholder="e.g. 90" bind:value={$form.rotation_interval_days} />
 				{#if $errors.rotation_interval_days}<p class="text-sm text-destructive">{$errors.rotation_interval_days}</p>{/if}

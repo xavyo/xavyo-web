@@ -75,7 +75,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			fetch
 		);
 		const normalized = normalizeComplianceReport(raw as unknown as Record<string, unknown>);
-		return json(normalized);
+		return json({ ...(raw as Record<string, unknown>), ...normalized });
 	} catch (e) {
 		if (e instanceof JsonObjectError) {
 			return json({ error: e.message }, { status: 400 });
