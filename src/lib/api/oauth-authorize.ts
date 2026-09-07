@@ -13,6 +13,8 @@ export interface AuthorizeGrantResponse {
 	authorization_code: string;
 	state: string;
 	redirect_uri: string;
+	/** RFC 9207 issuer identifier, echoed to the client on the redirect. */
+	iss?: string;
 }
 
 export async function getAuthorizeInfo(

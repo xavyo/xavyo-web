@@ -138,6 +138,10 @@ export const actions: Actions = {
 			if (result.state) {
 				redirectUrl.searchParams.set('state', result.state);
 			}
+			// RFC 9207: echo the issuer so the client can detect mix-up attacks.
+			if (result.iss) {
+				redirectUrl.searchParams.set('iss', result.iss);
+			}
 
 			redirect(302, redirectUrl.toString());
 		} catch (e) {
