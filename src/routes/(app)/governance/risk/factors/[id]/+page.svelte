@@ -157,7 +157,7 @@
 							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {factor.category ===
 							'static'
 								? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-								: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'}"
+								: 'bg-primary/15 text-primary'}"
 						>
 							{factor.category}
 						</span>

@@ -10,7 +10,7 @@
 
 	const sections = $derived([
 		{ label: 'Source Only', items: preview.source_only, color: 'border-blue-200 dark:border-blue-800' },
-		{ label: 'Target Only', items: preview.target_only, color: 'border-purple-200 dark:border-purple-800' },
+		{ label: 'Target Only', items: preview.target_only, color: 'border-primary/25' },
 		{ label: 'Common', items: preview.common, color: 'border-green-200 dark:border-green-800' },
 		{ label: 'Merged Result', items: preview.merged, color: 'border-foreground/20' }
 	]);

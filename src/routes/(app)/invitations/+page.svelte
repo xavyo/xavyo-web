@@ -87,7 +87,7 @@
 
 	function roleBadgeColor(role: string): string {
 		return role === 'admin'
-			? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+			? 'bg-primary/15 text-primary'
 			: 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200';
 	}
 

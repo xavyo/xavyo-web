@@ -52,7 +52,7 @@
 			case 'rejected':
 				return 'border-transparent bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
 			case 'identity_created':
-				return 'border-transparent bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+				return 'border-transparent bg-primary/15 text-primary';
 			default:
 				return '';
 		}

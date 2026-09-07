@@ -291,7 +291,7 @@
 									: level.target_type === 'manager' || level.target_type === 'manager_chain'
 										? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
 										: level.target_type === 'approval_group'
-											? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+											? 'bg-primary/15 text-primary'
 											: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}"
 							>
 								{targetTypeLabels[level.target_type] ?? level.target_type}

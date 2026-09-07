@@ -7,7 +7,7 @@ export function nhiTypeClass(t: string): string {
 		case 'tool':
 			return 'bg-blue-600 text-white hover:bg-blue-600/80';
 		case 'agent':
-			return 'bg-purple-600 text-white hover:bg-purple-600/80';
+			return 'bg-primary text-primary-foreground hover:bg-primary/80';
 		case 'service_account':
 			return 'bg-teal-600 text-white hover:bg-teal-600/80';
 		default:

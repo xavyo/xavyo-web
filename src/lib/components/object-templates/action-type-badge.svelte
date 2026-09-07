@@ -14,7 +14,7 @@
 
 	const colors: Record<string, string> = {
 		default: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-		computed: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+		computed: 'bg-primary/15 text-primary',
 		validation: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
 		normalization: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400'
 	};

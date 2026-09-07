@@ -124,6 +124,6 @@ describe('MergePolicySelect', () => {
 		const policies = [makePolicy({ strategy: 'timestamp_wins' })];
 		render(MergePolicySelect, { props: { policies } });
 		const badge = screen.getByText('Timestamp Wins');
-		expect(badge.className).toContain('bg-purple-100');
+		expect(badge.className).toContain('bg-primary/15');
 	});
 });

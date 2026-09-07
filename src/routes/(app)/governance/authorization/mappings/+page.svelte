@@ -105,7 +105,7 @@
 						</td>
 						<td class="px-4 py-3">
 							<span
-								class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-200"
+								class="inline-flex items-center rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-primary"
 							>
 								{mapping.action}
 							</span>
