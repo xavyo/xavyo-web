@@ -61,6 +61,11 @@ export interface ResetPasswordResponse {
 export interface VerifyEmailResponse {
 	message: string;
 	already_verified: boolean;
+	// Present only on a fresh verification: a session for automatic sign-in.
+	access_token?: string;
+	refresh_token?: string;
+	token_type?: string;
+	expires_in?: number;
 }
 
 // Tenant Types
