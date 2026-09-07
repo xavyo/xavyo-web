@@ -13,6 +13,8 @@
 	const { form, errors, enhance, message } = superForm(data.form);
 
 	const validation = $derived(data.validation);
+	// Preserve tenant context so the invited user can log in after accepting.
+	const loginHref = $derived(data.tenant ? `/login?tenant=${data.tenant}` : '/login');
 </script>
 
 {#if validation.valid}
@@ -73,7 +75,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				Already have an account? <a href="/login" class="text-primary underline-offset-4 hover:underline">Log in</a>
+				Already have an account? <a href={loginHref} class="text-primary underline-offset-4 hover:underline">Log in</a>
 			</p>
 		</CardFooter>
 	</Card>
@@ -90,7 +92,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
+				<a href={loginHref} class="text-primary underline-offset-4 hover:underline">Go to login</a>
 			</p>
 		</CardFooter>
 	</Card>
@@ -107,7 +109,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
+				<a href={loginHref} class="text-primary underline-offset-4 hover:underline">Go to login</a>
 			</p>
 		</CardFooter>
 	</Card>
@@ -124,7 +126,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
+				<a href={loginHref} class="text-primary underline-offset-4 hover:underline">Go to login</a>
 			</p>
 		</CardFooter>
 	</Card>
