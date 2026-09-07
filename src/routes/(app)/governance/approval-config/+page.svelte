@@ -100,12 +100,10 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
+<PageHeader
 		title="Approval Configuration"
 		description="Manage approval workflows, groups, and escalation policies"
 	/>
-</div>
 
 <!-- Tab navigation -->
 <div class="border-b border-border">

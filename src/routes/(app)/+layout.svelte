@@ -176,14 +176,14 @@
 				onclick={closeSidebar}
 				aria-label="Close sidebar"
 			></button>
-			<div class="relative z-50 h-full w-64 animate-in slide-in-from-left duration-200">
+			<div class="relative z-50 h-full w-64 shadow-xl transition-transform duration-200">
 				<Sidebar sections={navSections} currentPath={$page.url.pathname} onNavigate={closeSidebar} />
 			</div>
 		</div>
 	{/if}
 
 	<!-- Main content -->
-	<div class="flex flex-1 flex-col overflow-hidden">
+	<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
 		<Header email={data.user?.email ?? ''} onToggleSidebar={toggleSidebar} />
 		{#if data.currentAssumption?.is_assuming && data.currentAssumption.donor_id}
 			<div class="px-4 pt-2 sm:px-6">
@@ -199,8 +199,10 @@
 				<ContextIndicator personaName={data.personaContext.active_persona.name ?? 'Unknown'} isActive={true} />
 			</div>
 		{/if}
-		<main class="flex-1 overflow-y-auto p-4 sm:p-6">
-			{@render children()}
+		<main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+			<div class="mx-auto w-full max-w-[1400px] [animation:fade-in_0.25s_ease-out]">
+				{@render children()}
+			</div>
 		</main>
 		<AppFooter version={data.appVersion} />
 	</div>

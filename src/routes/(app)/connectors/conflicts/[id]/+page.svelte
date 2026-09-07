@@ -41,7 +41,7 @@
 			case 'superseded':
 				return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200 dark:border-blue-800';
 			case 'merged':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800';
+				return 'bg-primary/15 text-primary border-primary/25';
 			case 'rejected':
 				return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800';
 			default:

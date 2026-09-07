@@ -37,7 +37,7 @@
 			case 'time_window':
 				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
 			case 'user_attribute':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+				return 'bg-primary/15 text-primary';
 			case 'entitlement_check':
 				return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
 			default:

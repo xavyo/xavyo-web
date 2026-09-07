@@ -848,7 +848,7 @@
 							<tr class="border-b last:border-0 hover:bg-muted/30">
 								<td class="px-4 py-3">{rule.pool_name ?? resolvePoolName(rule.license_pool_id)}</td>
 								<td class="px-4 py-3">
-									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {rule.trigger_type === 'inactivity' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'}">
+									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {rule.trigger_type === 'inactivity' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-primary/15 text-primary'}">
 										{displayLabel(rule.trigger_type)}
 									</span>
 								</td>

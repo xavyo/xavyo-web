@@ -9,9 +9,9 @@
 		service_now: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
 		Jira: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
 		jira: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-		Webhook: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-		webhook: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-		custom_webhook: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+		Webhook: 'bg-primary/15 text-primary',
+		webhook: 'bg-primary/15 text-primary',
+		custom_webhook: 'bg-primary/15 text-primary'
 	};
 
 	const labels: Record<string, string> = {

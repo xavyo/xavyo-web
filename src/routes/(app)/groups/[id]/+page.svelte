@@ -83,15 +83,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title={data.group.display_name} description="Group details" />
+<PageHeader title={data.group.display_name} description="Group details">
 	<a
 		href="/groups"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to Groups
 	</a>
-</div>
+</PageHeader>
 
 {#if isEditing}
 	<Card class="max-w-lg">
@@ -214,7 +213,7 @@
 					</table>
 				</div>
 			{:else}
-				<EmptyState title="No members" description="Add members to this group." icon="👥" />
+				<EmptyState title="No members" description="Add members to this group." />
 			{/if}
 
 			<Separator />

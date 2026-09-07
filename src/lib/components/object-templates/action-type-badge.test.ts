@@ -32,7 +32,7 @@ describe('ActionTypeBadge', () => {
 
 	it('applies purple styles for computed', () => {
 		render(ActionTypeBadge, { props: { ruleType: 'computed' } });
-		expect(screen.getByText('Computed').className).toContain('bg-purple-100');
+		expect(screen.getByText('Computed').className).toContain('bg-primary/15');
 	});
 
 	it('applies amber styles for validation', () => {

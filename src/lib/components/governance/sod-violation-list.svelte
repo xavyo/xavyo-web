@@ -63,7 +63,6 @@
 		</div>
 	{:else if violations.length === 0}
 		<EmptyState
-			icon="✅"
 			title="No SoD violations"
 			description="No separation of duties violations have been detected."
 		/>

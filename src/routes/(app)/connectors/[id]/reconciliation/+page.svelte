@@ -105,29 +105,26 @@
 </script>
 
 <!-- Header -->
-<div class="flex items-center justify-between">
-	<PageHeader title="Reconciliation Runs" description={connectorName} />
-	<div class="flex items-center gap-2">
-		<a
+<PageHeader title="Reconciliation Runs" description={connectorName}>
+	<a
 			href="/connectors/{data.connectorId}/reconciliation/discrepancies"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Discrepancies
 		</a>
 		<a
 			href="/connectors/{data.connectorId}/reconciliation/schedule"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Schedule
 		</a>
 		<a
 			href="/connectors/{data.connectorId}"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Back to Connector
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 <!-- Trigger Run Form -->
 <Card class="mt-6 max-w-lg">
@@ -203,7 +200,6 @@
 		<EmptyState
 			title="No runs match your filters"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -221,7 +217,6 @@
 		<EmptyState
 			title="No reconciliation runs"
 			description="Trigger a reconciliation run above to compare accounts between Xavyo and the target system."
-			icon="inbox"
 		/>
 	{/if}
 {:else}

@@ -94,22 +94,20 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Users" description="Manage users in your organization" />
+<PageHeader title="Users" description="Find people, check status, and manage access.">
 	<a
 		href="/users/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create user
 	</a>
-</div>
+</PageHeader>
 
 {#snippet emptyState()}
 	{#if hasSearchFilter}
 		<EmptyState
 			title="No users match your search"
-			description="Try adjusting your search term."
-			icon="🔍"
+			description="Try a different email or clear the filter."
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -122,8 +120,7 @@
 	{:else}
 		<EmptyState
 			title="No users yet"
-			description="Create your first user to get started."
-			icon="👥"
+			description="Create the first user to start managing access."
 			actionLabel="Create user"
 			actionHref="/users/create"
 		/>
@@ -138,6 +135,7 @@
 	onPaginationChange={handlePaginationChange}
 	{searchValue}
 	onSearchChange={handleSearchChange}
+	searchPlaceholder="Search by email..."
 	{isLoading}
 	{emptyState}
 />

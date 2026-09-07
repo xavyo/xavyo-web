@@ -18,7 +18,7 @@
 	const typeLabel = $derived(item.item_type.charAt(0).toUpperCase() + item.item_type.slice(1));
 </script>
 
-<div class="rounded-lg border bg-card p-4 transition-shadow hover:shadow-md" data-testid="catalog-item-card">
+<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs transition-colors hover:bg-accent/30" data-testid="catalog-item-card">
 	<div class="mb-2 flex items-start justify-between">
 		<div class="flex-1">
 			<h3 class="font-semibold text-card-foreground">{item.name}</h3>

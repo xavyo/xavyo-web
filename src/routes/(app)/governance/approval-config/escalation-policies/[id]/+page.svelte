@@ -71,10 +71,8 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title={data.policy.name} description="Escalation policy details" />
-	<div class="flex items-center gap-2">
-		{#if data.policy.is_default}
+<PageHeader title={data.policy.name} description="Escalation policy details">
+	{#if data.policy.is_default}
 			<span
 				class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
 				>Default</span
@@ -82,12 +80,11 @@
 		{/if}
 		<a
 			href="/governance/approval-config"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Back to Approval Config
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 <!-- Policy Info -->
 <Card class="mt-6 max-w-lg">
@@ -294,7 +291,7 @@
 									: level.target_type === 'manager' || level.target_type === 'manager_chain'
 										? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
 										: level.target_type === 'approval_group'
-											? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+											? 'bg-primary/15 text-primary'
 											: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}"
 							>
 								{targetTypeLabels[level.target_type] ?? level.target_type}

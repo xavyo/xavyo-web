@@ -24,7 +24,7 @@
 
 	const strategyColors: Record<string, string> = {
 		source_precedence: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-		timestamp_wins: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+		timestamp_wins: 'bg-primary/15 text-primary',
 		concatenate_unique: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
 		first_wins: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
 		manual_only: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'

@@ -211,7 +211,7 @@
 												{step.approver_type === 'manager'
 												? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
 												: step.approver_type === 'entitlement_owner'
-													? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
+													? 'bg-primary/15 text-primary'
 													: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}"
 										>
 											{approverTypeLabels[step.approver_type] ?? step.approver_type}

@@ -49,7 +49,7 @@
 				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
 			case 'role_not_found':
 			case 'group_error':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+				return 'bg-primary/15 text-primary';
 			case 'attribute_error':
 				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
 			case 'system':

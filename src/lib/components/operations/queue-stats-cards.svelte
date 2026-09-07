@@ -19,7 +19,7 @@
 		{ label: 'Completed', key: 'completed', dotColor: 'bg-green-500' },
 		{ label: 'Failed', key: 'failed', dotColor: 'bg-red-500' },
 		{ label: 'Dead Letter', key: 'dead_letter', dotColor: 'bg-amber-500' },
-		{ label: 'Awaiting System', key: 'awaiting_system', dotColor: 'bg-purple-500' },
+		{ label: 'Awaiting System', key: 'awaiting_system', dotColor: 'bg-primary' },
 		{ label: 'Avg Time', key: null, dotColor: 'bg-cyan-500' }
 	];
 

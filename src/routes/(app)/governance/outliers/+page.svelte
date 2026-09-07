@@ -508,12 +508,10 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
+<PageHeader
 		title="Outlier Detection"
 		description="Detect users with anomalous entitlement assignments compared to their peers"
 	/>
-</div>
 
 <!-- Tab navigation -->
 <div class="border-b border-border">
@@ -621,7 +619,6 @@
 			<EmptyState
 				title="No outlier data yet"
 				description="Run your first outlier detection analysis to see results here."
-				icon="search"
 			/>
 		{/if}
 
@@ -648,7 +645,7 @@
 		</div>
 
 		{#snippet analysisEmptyState()}
-			<EmptyState title="No analyses yet" description="Trigger your first outlier detection analysis." icon="search" />
+			<EmptyState title="No analyses yet" description="Trigger your first outlier detection analysis." />
 		{/snippet}
 
 		<DataTable columns={analysisColumns} data={analysisData} pageCount={analysisPageCount} pagination={analysisPagination} onPaginationChange={handleAnalysisPaginationChange} isLoading={analysisLoading} emptyState={analysisEmptyState} />
@@ -674,7 +671,7 @@
 		</div>
 
 		{#snippet resultEmptyState()}
-			<EmptyState title="No outlier results" description="Run an analysis to detect outliers." icon="search" />
+			<EmptyState title="No outlier results" description="Run an analysis to detect outliers." />
 		{/snippet}
 
 		<DataTable columns={resultColumns} data={resultData} pageCount={resultPageCount} pagination={resultPagination} onPaginationChange={handleResultPaginationChange} isLoading={resultLoading} emptyState={resultEmptyState} />
@@ -693,7 +690,7 @@
 		</div>
 
 		{#snippet alertEmptyState()}
-			<EmptyState title="No alerts" description="Alerts will appear when outliers are detected." icon="bell" />
+			<EmptyState title="No alerts" description="Alerts will appear when outliers are detected." />
 		{/snippet}
 
 		<DataTable columns={alertColumns} data={alertData} pageCount={alertPageCount} pagination={alertPagination} onPaginationChange={handleAlertPaginationChange} isLoading={alertLoading} emptyState={alertEmptyState} />
@@ -712,7 +709,7 @@
 		</div>
 
 		{#snippet dispEmptyState()}
-			<EmptyState title="No dispositions" description="Dispositions track admin decisions on outlier findings." icon="clipboard" />
+			<EmptyState title="No dispositions" description="Dispositions track admin decisions on outlier findings." />
 		{/snippet}
 
 		<DataTable columns={dispColumns} data={dispData} pageCount={dispPageCount} pagination={dispPagination} onPaginationChange={handleDispPaginationChange} isLoading={dispLoading} emptyState={dispEmptyState} />
@@ -848,7 +845,7 @@
 				{/if}
 			</div>
 		{:else}
-			<EmptyState title="Configuration not available" description="Unable to load outlier detection configuration." icon="settings" />
+			<EmptyState title="Configuration not available" description="Unable to load outlier detection configuration." />
 		{/if}
 	{/if}
 </div>

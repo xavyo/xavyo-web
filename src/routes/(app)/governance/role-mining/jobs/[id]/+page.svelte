@@ -205,7 +205,7 @@
 					<p class="text-sm text-muted-foreground">Excessive Privileges</p>
 				</div>
 				<div class="rounded-lg border p-4 text-center">
-					<p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+					<p class="text-2xl font-bold text-primary">
 						{job.consolidation_suggestion_count}
 					</p>
 					<p class="text-sm text-muted-foreground">Consolidation Suggestions</p>

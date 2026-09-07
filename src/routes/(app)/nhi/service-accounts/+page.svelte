@@ -112,23 +112,20 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="NHI Service Accounts" description="Manage machine-to-machine credentials" />
-	<div class="flex items-center gap-2">
-		<a
+<PageHeader title="NHI Service Accounts" description="Manage machine-to-machine credentials">
+	<a
 			href="/nhi"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Back to NHI
 		</a>
 		<a
 			href="/nhi/service-accounts/create"
-			class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+			class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 		>
 			Create Service Account
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -147,7 +144,6 @@
 		<EmptyState
 			title="No service accounts match your filters"
 			description="Try adjusting your filter criteria."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -161,7 +157,6 @@
 		<EmptyState
 			title="No service accounts yet"
 			description="Create your first machine-to-machine credential."
-			icon="🔑"
 		/>
 	{/if}
 {/snippet}

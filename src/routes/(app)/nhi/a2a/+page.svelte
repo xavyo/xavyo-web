@@ -66,15 +66,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="A2A Tasks" description="View and manage agent-to-agent task delegations" />
+<PageHeader title="A2A Tasks" description="View and manage agent-to-agent task delegations">
 	<a
 		href="/nhi/a2a/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create Task
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -93,7 +92,6 @@
 		<EmptyState
 			title="No tasks match your filter"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -110,7 +108,6 @@
 		<EmptyState
 			title="No A2A tasks yet"
 			description="Create your first agent-to-agent task."
-			icon="inbox"
 		/>
 	{/if}
 {:else}

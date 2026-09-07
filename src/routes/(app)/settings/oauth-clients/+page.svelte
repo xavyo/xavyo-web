@@ -59,24 +59,20 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="OAuth Clients"
-		description="Manage registered OAuth/OIDC client applications"
-	/>
+<PageHeader title="OAuth Clients"
+		description="Manage registered OAuth/OIDC client applications">
 	<a
 		href="/settings/oauth-clients/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create Client
 	</a>
-</div>
+</PageHeader>
 
 {#snippet emptyState()}
 	<EmptyState
 		title="No OAuth clients"
 		description="Create your first OAuth client application to get started."
-		icon="🔑"
 	/>
 {/snippet}
 

@@ -376,7 +376,7 @@ describe('Correlation hub rendering logic', () => {
 		function triggerTypeBadgeClass(type: string): string {
 			switch (type) {
 				case 'import':
-					return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+					return 'bg-primary/15 text-primary';
 				case 'reconciliation':
 					return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
 				case 'manual':
@@ -409,7 +409,7 @@ describe('Correlation hub rendering logic', () => {
 				case 'reject':
 					return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
 				case 'create_identity':
-					return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+					return 'bg-primary/15 text-primary';
 				case 'reassign':
 					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
 				default:

@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
 	import { onMount } from 'svelte';
-	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import type { PageData, ActionData } from './$types';
@@ -40,46 +39,44 @@
 	);
 </script>
 
-<Card>
-	<CardHeader>
+<div class="space-y-6">
+	<div>
 		<h1 class="text-2xl font-semibold tracking-tight">Check your email</h1>
-		<p class="text-sm text-muted-foreground">Verify your email address to continue</p>
-	</CardHeader>
-	<CardContent class="space-y-4">
-		{#if actionResult?.success}
-			<Alert>
-				<AlertDescription>Verification email sent. Please check your inbox.</AlertDescription>
-			</Alert>
-		{/if}
+		<p class="mt-1 text-sm text-muted-foreground">Verify your email address to continue</p>
+	</div>
 
-		<p class="text-sm text-foreground">
-			We've sent a verification link to {#if email}<strong>{email}</strong>{:else}your email address{/if}. Please check your inbox and click the link to verify your account.
-		</p>
-		<p class="text-sm text-muted-foreground">
-			Didn't receive it? Check your spam folder or resend the verification email.
-		</p>
+	{#if actionResult?.success}
+		<Alert>
+			<AlertDescription>Verification email sent. Please check your inbox.</AlertDescription>
+		</Alert>
+	{/if}
 
-		<form method="POST" action="?/resend" use:enhance={() => {
-			resending = true;
-			return async ({ update }) => {
-				resending = false;
-				startCooldown();
-				await update();
-			};
-		}}>
-			<input type="hidden" name="email" value={email} />
-			<Button type="submit" variant="outline" class="w-full" disabled={!canResend}>
-				{#if resending}
-					Sending...
-				{:else if cooldown > 0}
-					Resend available in {cooldown}s
-				{:else}
-					Resend verification email
-				{/if}
-			</Button>
-		</form>
-	</CardContent>
-	<CardFooter>
-		<a href="/login{tenantParam}" class="text-sm text-primary underline-offset-4 hover:underline">Back to login</a>
-	</CardFooter>
-</Card>
+	<p class="text-sm text-foreground">
+		We've sent a verification link to {#if email}<strong>{email}</strong>{:else}your email address{/if}. Please check your inbox and click the link to verify your account.
+	</p>
+	<p class="text-sm text-muted-foreground">
+		Didn't receive it? Check your spam folder or resend the verification email.
+	</p>
+
+	<form method="POST" action="?/resend" use:enhance={() => {
+		resending = true;
+		return async ({ update }) => {
+			resending = false;
+			startCooldown();
+			await update();
+		};
+	}}>
+		<input type="hidden" name="email" value={email} />
+		<Button type="submit" variant="outline" class="w-full" disabled={!canResend}>
+			{#if resending}
+				Sending...
+			{:else if cooldown > 0}
+				Resend available in {cooldown}s
+			{:else}
+				Resend verification email
+			{/if}
+		</Button>
+	</form>
+
+	<a href="/login{tenantParam}" class="text-sm font-medium text-primary underline-offset-4 hover:underline">Back to login</a>
+</div>

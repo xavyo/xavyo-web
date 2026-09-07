@@ -30,10 +30,11 @@
 	}
 </script>
 
-<PageHeader title="Settings" description="Manage your account settings and preferences" />
+<PageHeader title="Settings" description="Account, security, and preferences." />
 
+<div class="overflow-x-auto">
 <Tabs value={activeTab} onValueChange={handleTabChange}>
-	<TabsList>
+	<TabsList class="min-w-max">
 		<TabsTrigger value="profile"><User class="mr-2 h-4 w-4" />Profile</TabsTrigger>
 		<TabsTrigger value="security"><Shield class="mr-2 h-4 w-4" />Security</TabsTrigger>
 		<TabsTrigger value="sessions"><Monitor class="mr-2 h-4 w-4" />Sessions</TabsTrigger>
@@ -44,28 +45,29 @@
 				<Badge variant="destructive" class="ml-1.5 h-5 min-w-5 px-1 text-xs">{unacknowledgedCount}</Badge>
 			{/if}
 		</TabsTrigger>
-		<TabsTrigger value="login-history"><Clock class="mr-2 h-4 w-4" />Login History</TabsTrigger>
-		<TabsTrigger value="social-connections"><LinkIcon class="mr-2 h-4 w-4" />Social Connections</TabsTrigger>
+		<TabsTrigger value="login-history"><Clock class="mr-2 h-4 w-4" />Login history</TabsTrigger>
+		<TabsTrigger value="social-connections"><LinkIcon class="mr-2 h-4 w-4" />Social</TabsTrigger>
 	</TabsList>
-	<TabsContent value="profile">
+	<TabsContent value="profile" class="mt-6">
 		<ProfileTab profile={data.profile} form={data.form} />
 	</TabsContent>
-	<TabsContent value="security">
+	<TabsContent value="security" class="mt-6">
 		<SecurityTab securityOverview={data.securityOverview} mfaStatus={data.mfaStatus} />
 	</TabsContent>
-	<TabsContent value="sessions">
+	<TabsContent value="sessions" class="mt-6">
 		<SessionsTab />
 	</TabsContent>
-	<TabsContent value="devices">
+	<TabsContent value="devices" class="mt-6">
 		<DevicesTab />
 	</TabsContent>
-	<TabsContent value="alerts">
+	<TabsContent value="alerts" class="mt-6">
 		<AlertsTab onUnacknowledgedCountChange={handleUnacknowledgedCountChange} />
 	</TabsContent>
-	<TabsContent value="login-history">
+	<TabsContent value="login-history" class="mt-6">
 		<LoginHistoryTab />
 	</TabsContent>
-	<TabsContent value="social-connections">
+	<TabsContent value="social-connections" class="mt-6">
 		<SocialConnectionsTab />
 	</TabsContent>
 </Tabs>
+</div>

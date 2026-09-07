@@ -101,16 +101,18 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Applications"
-		description="Manage governance applications"
-	/>
-</div>
+<PageHeader title="Applications"
+		description="Manage governance applications">
+	<a
+		href="/governance/applications/create"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+	>
+		Create application
+	</a>
+</PageHeader>
 
-<div class="mb-4 flex items-center justify-between">
-	<div class="flex gap-3">
-		<select
+<div class="mb-4 flex flex-wrap gap-3">
+	<select
 			class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
 			bind:value={statusFilter}
 			onchange={() => { pagination = { ...pagination, pageIndex: 0 }; }}
@@ -128,23 +130,16 @@
 				<option value={opt.value}>{opt.label}</option>
 			{/each}
 		</select>
-	</div>
-	<a
-		href="/governance/applications/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
-	>
-		Create application
-	</a>
 </div>
 
 {#snippet emptyState()}
 	{#if statusFilter || typeFilter}
-		<EmptyState title="No applications match your filters" description="Try adjusting your filter criteria." icon="🔍" />
+		<EmptyState title="No applications match your filters" description="Try adjusting your filter criteria." />
 		<div class="flex justify-center pb-4">
 			<button onclick={() => { statusFilter = ''; typeFilter = ''; }} class="text-sm font-medium text-primary hover:underline">Clear filters</button>
 		</div>
 	{:else}
-		<EmptyState title="No applications yet" description="Create your first application to start managing entitlements." icon="📦" />
+		<EmptyState title="No applications yet" description="Create your first application to start managing entitlements." />
 	{/if}
 {/snippet}
 
