@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
@@ -16,10 +15,10 @@
 </script>
 
 {#if validation.valid}
-	<Card>
-		<CardHeader>
+	<div class="space-y-6">
+		<div>
 			<h1 class="text-2xl font-semibold tracking-tight">Accept your invitation</h1>
-			<p class="text-sm text-muted-foreground">
+			<p class="mt-1 text-sm text-muted-foreground">
 				{#if validation.tenant_name}
 					You've been invited to join <span class="font-medium text-foreground">{validation.tenant_name}</span>
 				{:else}
@@ -27,105 +26,97 @@
 				{/if}
 			</p>
 			{#if validation.email}
-				<p class="text-sm text-muted-foreground">
+				<p class="mt-1 text-sm text-muted-foreground">
 					Signing up as <span class="font-medium text-foreground">{validation.email}</span>
 				</p>
 			{/if}
-		</CardHeader>
-		<CardContent>
-			{#if $message}
-				<Alert variant="destructive" class="mb-4">
-					<AlertDescription>{$message}</AlertDescription>
-				</Alert>
-			{/if}
+		</div>
 
-			<form method="POST" use:enhance class="space-y-4">
-				<div class="space-y-2">
-					<Label for="password">Password</Label>
-					<Input
-						id="password"
-						name="password"
-						type="password"
-						placeholder="Min. 8 characters"
-						value={String($form.password ?? '')}
-					/>
-					{#if $errors.password}
-						<p class="text-sm text-destructive">{$errors.password}</p>
-					{/if}
-				</div>
+		{#if $message}
+			<Alert variant="destructive">
+				<AlertDescription>{$message}</AlertDescription>
+			</Alert>
+		{/if}
 
-				<div class="space-y-2">
-					<Label for="confirm_password">Confirm password</Label>
-					<Input
-						id="confirm_password"
-						name="confirm_password"
-						type="password"
-						placeholder="Repeat your password"
-						value={String($form.confirm_password ?? '')}
-					/>
-					{#if $errors.confirm_password}
-						<p class="text-sm text-destructive">{$errors.confirm_password}</p>
-					{/if}
-				</div>
+		<form method="POST" use:enhance class="space-y-4">
+			<div class="space-y-2">
+				<Label for="password">Password</Label>
+				<Input
+					id="password"
+					name="password"
+					type="password"
+					placeholder="Min. 8 characters"
+					value={String($form.password ?? '')}
+				/>
+				{#if $errors.password}
+					<p class="text-sm text-destructive">{$errors.password}</p>
+				{/if}
+			</div>
 
-				<Button type="submit" class="w-full">Create account</Button>
-			</form>
-		</CardContent>
-		<CardFooter>
-			<p class="text-sm text-muted-foreground">
-				Already have an account? <a href="/login" class="text-primary underline-offset-4 hover:underline">Log in</a>
-			</p>
-		</CardFooter>
-	</Card>
+			<div class="space-y-2">
+				<Label for="confirm_password">Confirm password</Label>
+				<Input
+					id="confirm_password"
+					name="confirm_password"
+					type="password"
+					placeholder="Repeat your password"
+					value={String($form.confirm_password ?? '')}
+				/>
+				{#if $errors.confirm_password}
+					<p class="text-sm text-destructive">{$errors.confirm_password}</p>
+				{/if}
+			</div>
+
+			<Button type="submit" class="w-full">Create account</Button>
+		</form>
+
+		<p class="text-sm text-muted-foreground">
+			Already have an account? <a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Log in</a>
+		</p>
+	</div>
 {:else if validation.reason === 'expired'}
-	<Card>
-		<CardHeader>
+	<div class="space-y-6">
+		<div>
 			<h1 class="text-2xl font-semibold tracking-tight">Invitation expired</h1>
-			<p class="text-sm text-muted-foreground">This invitation has expired</p>
-		</CardHeader>
-		<CardContent>
-			<p class="text-sm text-muted-foreground">
-				{validation.message ?? 'Please contact your administrator to request a new invitation.'}
-			</p>
-		</CardContent>
-		<CardFooter>
-			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
-			</p>
-		</CardFooter>
-	</Card>
+			<p class="mt-1 text-sm text-muted-foreground">This invitation has expired</p>
+		</div>
+
+		<p class="text-sm text-muted-foreground">
+			{validation.message ?? 'Please contact your administrator to request a new invitation.'}
+		</p>
+
+		<p class="text-sm text-muted-foreground">
+			<a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
+		</p>
+	</div>
 {:else if validation.reason === 'already_accepted'}
-	<Card>
-		<CardHeader>
+	<div class="space-y-6">
+		<div>
 			<h1 class="text-2xl font-semibold tracking-tight">Invitation already used</h1>
-			<p class="text-sm text-muted-foreground">This invitation has already been accepted</p>
-		</CardHeader>
-		<CardContent>
-			<p class="text-sm text-muted-foreground">
-				If you already created your account, you can log in below.
-			</p>
-		</CardContent>
-		<CardFooter>
-			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
-			</p>
-		</CardFooter>
-	</Card>
+			<p class="mt-1 text-sm text-muted-foreground">This invitation has already been accepted</p>
+		</div>
+
+		<p class="text-sm text-muted-foreground">
+			If you already created your account, you can log in below.
+		</p>
+
+		<p class="text-sm text-muted-foreground">
+			<a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
+		</p>
+	</div>
 {:else}
-	<Card>
-		<CardHeader>
+	<div class="space-y-6">
+		<div>
 			<h1 class="text-2xl font-semibold tracking-tight">Invalid invitation</h1>
-			<p class="text-sm text-muted-foreground">This invitation link is not valid</p>
-		</CardHeader>
-		<CardContent>
-			<p class="text-sm text-muted-foreground">
-				The invitation link may be malformed or does not exist. Please check the link and try again, or contact your administrator.
-			</p>
-		</CardContent>
-		<CardFooter>
-			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
-			</p>
-		</CardFooter>
-	</Card>
+			<p class="mt-1 text-sm text-muted-foreground">This invitation link is not valid</p>
+		</div>
+
+		<p class="text-sm text-muted-foreground">
+			The invitation link may be malformed or does not exist. Please check the link and try again, or contact your administrator.
+		</p>
+
+		<p class="text-sm text-muted-foreground">
+			<a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
+		</p>
+	</div>
 {/if}
