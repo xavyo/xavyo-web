@@ -37,18 +37,15 @@
 	let deleteMappingId: string | null = $state(null);
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Entitlement-Action Mappings"
-		description="Map entitlements to actions and resource types for authorization"
-	/>
+<PageHeader title="Entitlement-Action Mappings"
+		description="Map entitlements to actions and resource types for authorization">
 	<a
 		href="/governance/authorization/mappings/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create Mapping
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-6 flex gap-4 border-b">
 	<a
@@ -76,7 +73,6 @@
 	<EmptyState
 		title="No mappings yet"
 		description="Create entitlement-to-action mappings to define what actions entitlements grant."
-		icon="🔑"
 	/>
 {:else}
 	<div class="rounded-md border">

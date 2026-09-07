@@ -116,15 +116,14 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="My Requests" description="View and manage your access requests" />
+<PageHeader title="My requests" description="Track access you have requested.">
 	<a
 		href="/my-requests/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
-		New Request
+		New request
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -145,7 +144,6 @@
 		<EmptyState
 			title="No requests match your filter"
 			description="Try adjusting your filter criteria."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -161,7 +159,6 @@
 		<EmptyState
 			title="No access requests yet"
 			description="Submit your first access request to get started."
-			icon="📋"
 		/>
 	{/if}
 {/snippet}

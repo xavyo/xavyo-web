@@ -45,14 +45,12 @@
 </script>
 
 <PageHeader title="Risk Factors" description="Manage risk scoring factors">
-	<div class="flex gap-2">
-		<a href="/governance/risk">
+	<a href="/governance/risk">
 			<Button variant="outline">Back to Risk Dashboard</Button>
 		</a>
 		<a href="/governance/risk/factors/create">
 			<Button>Create Factor</Button>
 		</a>
-	</div>
 </PageHeader>
 
 <!-- Filters -->

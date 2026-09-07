@@ -53,15 +53,14 @@
 	const isArchived = $derived(data.persona.status === 'archived');
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title={data.persona.persona_name} description="Persona details" />
+<PageHeader title={data.persona.persona_name} description="Persona details">
 	<a
 		href="/personas"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to personas
 	</a>
-</div>
+</PageHeader>
 
 {#if isEditing}
 	<Card class="max-w-lg">

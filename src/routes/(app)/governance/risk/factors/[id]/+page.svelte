@@ -32,12 +32,10 @@
 </script>
 
 <PageHeader title={factor.name} description="Risk factor details">
-	<div class="flex gap-2">
-		{#if !isEditing}
+	{#if !isEditing}
 			<Button variant="outline" onclick={() => (isEditing = true)}>Edit</Button>
 		{/if}
 		<Button variant="destructive" onclick={() => (deleteOpen = true)}>Delete</Button>
-	</div>
 </PageHeader>
 
 {#if isEditing}

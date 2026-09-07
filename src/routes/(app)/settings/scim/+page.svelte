@@ -184,7 +184,6 @@
 		<EmptyState
 			title="No SCIM tokens"
 			description="Create a SCIM bearer token to allow identity providers to provision users."
-			icon="🔑"
 		/>
 	{:else}
 		<div class="rounded-md border">
@@ -257,7 +256,6 @@
 		<EmptyState
 			title="No SCIM attribute mappings"
 			description="No attribute mappings are configured for this tenant."
-			icon="🔗"
 		/>
 	{:else}
 		<form

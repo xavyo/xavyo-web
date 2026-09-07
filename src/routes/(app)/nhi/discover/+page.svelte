@@ -171,18 +171,15 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Discover MCP Tools"
-		description="Discover tools from AgentGateway and import them as NHI identities"
-	/>
+<PageHeader title="Discover MCP Tools"
+		description="Discover tools from AgentGateway and import them as NHI identities">
 	<a
 		href="/nhi"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to NHI
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-6 flex items-end gap-3">
 	<div class="flex flex-col gap-1">

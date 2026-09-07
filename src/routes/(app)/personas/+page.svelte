@@ -141,19 +141,18 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Personas" description="Manage persona identities" />
+<PageHeader title="Personas" description="Temporary or alternate identities for people.">
 	<a
 		href="/personas/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create persona
 	</a>
-</div>
+</PageHeader>
 
-<div class="mb-4 flex gap-3">
+<div class="mb-4 flex flex-wrap gap-3">
 	<select
-		class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+		class="h-10 rounded-md border border-input bg-card px-3 text-sm shadow-xs focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
 		bind:value={statusFilter}
 		onchange={() => { pagination = { ...pagination, pageIndex: 0 }; }}
 	>
@@ -163,7 +162,7 @@
 	</select>
 
 	<select
-		class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+		class="h-10 rounded-md border border-input bg-card px-3 text-sm shadow-xs focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
 		bind:value={archetypeFilter}
 		onchange={() => { pagination = { ...pagination, pageIndex: 0 }; }}
 	>
@@ -179,7 +178,6 @@
 		<EmptyState
 			title="No personas match your filters"
 			description="Try adjusting your filter criteria."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -193,7 +191,6 @@
 		<EmptyState
 			title="No personas yet"
 			description="Create your first persona to get started."
-			icon="🎭"
 			actionLabel="Create persona"
 			actionHref="/personas/create"
 		/>

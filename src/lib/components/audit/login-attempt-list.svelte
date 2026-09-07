@@ -214,7 +214,7 @@
 			{/each}
 		</div>
 	{:else if items.length === 0}
-		<EmptyState icon="📋" title="No login activity" description="No login attempts match your current filters." />
+		<EmptyState title="No login activity" description="No login attempts match your current filters." />
 	{:else}
 		<!-- Login attempt list -->
 		<div class="space-y-2">

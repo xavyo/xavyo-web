@@ -559,12 +559,12 @@
 
 		{#snippet entEmptyState()}
 			{#if entHasFilters}
-				<EmptyState title="No entitlements match your filters" description="Try adjusting your filter criteria." icon="🔍" />
+				<EmptyState title="No entitlements match your filters" description="Try adjusting your filter criteria." />
 				<div class="flex justify-center pb-4">
 					<button onclick={() => { riskLevelFilter = ''; classificationFilter = ''; }} class="text-sm font-medium text-primary hover:underline">Clear filters</button>
 				</div>
 			{:else}
-				<EmptyState title="No entitlements yet" description="Create your first entitlement to define access rights." icon="🛡️" />
+				<EmptyState title="No entitlements yet" description="Create your first entitlement to define access rights." />
 			{/if}
 		{/snippet}
 
@@ -586,7 +586,7 @@
 		</div>
 
 		{#snippet arEmptyState()}
-			<EmptyState title="No access requests" description="Access requests from users will appear here." icon="📋" />
+			<EmptyState title="No access requests" description="Access requests from users will appear here." />
 		{/snippet}
 
 		<DataTable columns={arColumns} data={arData} pageCount={arPageCount} pagination={arPagination} onPaginationChange={handleArPaginationChange} isLoading={arLoading} emptyState={arEmptyState} />
@@ -636,7 +636,7 @@
 
 		{#if sodSubTab === 'rules'}
 			{#snippet sodEmptyState()}
-				<EmptyState title="No SoD rules yet" description="Create rules to define incompatible entitlement pairs." icon="⚖️" />
+				<EmptyState title="No SoD rules yet" description="Create rules to define incompatible entitlement pairs." />
 			{/snippet}
 			<DataTable columns={sodColumns} data={sodData} pageCount={sodPageCount} pagination={sodPagination} onPaginationChange={handleSodPaginationChange} isLoading={sodLoading} emptyState={sodEmptyState} />
 		{:else if sodSubTab === 'violations'}
@@ -665,7 +665,7 @@
 					{/each}
 				</div>
 			{:else if exemptions.length === 0}
-				<EmptyState title="No SoD exemptions" description="Create exemptions to allow legitimate SoD rule violations." icon="🛡️" />
+				<EmptyState title="No SoD exemptions" description="Create exemptions to allow legitimate SoD rule violations." />
 			{:else}
 				<div class="overflow-x-auto rounded-lg border border-border">
 					<table class="w-full text-sm">
@@ -734,7 +734,7 @@
 		</div>
 
 		{#snippet campEmptyState()}
-			<EmptyState title="No certification campaigns" description="Create a campaign to review user access." icon="📝" />
+			<EmptyState title="No certification campaigns" description="Create a campaign to review user access." />
 		{/snippet}
 
 		<DataTable columns={campColumns} data={campData} pageCount={campPageCount} pagination={campPagination} onPaginationChange={handleCampPaginationChange} isLoading={campLoading} emptyState={campEmptyState} />
@@ -755,7 +755,7 @@
 		<h3 class="mb-3 text-lg font-semibold">Top Risk Users</h3>
 
 		{#snippet riskEmptyState()}
-			<EmptyState title="No risk scores" description="Risk scores will appear when users have entitlements." icon="📊" />
+			<EmptyState title="No risk scores" description="Risk scores will appear when users have entitlements." />
 		{/snippet}
 
 		<DataTable columns={riskColumns} data={riskData} pageCount={riskPageCount} pagination={riskPagination} onPaginationChange={handleRiskPaginationChange} isLoading={riskLoading} emptyState={riskEmptyState} />

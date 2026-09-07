@@ -52,15 +52,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Dead Letter Queue" description="Operations that exceeded maximum retries" />
+<PageHeader title="Dead Letter Queue" description="Operations that exceeded maximum retries">
 	<a
 		href="/connectors/operations"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to Operations
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -79,7 +78,6 @@
 	<EmptyState
 		title="No dead-letter operations"
 		description="No operations have exceeded their maximum retries. The queue is healthy."
-		icon="inbox"
 	/>
 {:else}
 	<div class="rounded-md border">

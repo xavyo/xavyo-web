@@ -39,7 +39,7 @@
 {#if securityOverview}
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
 		<!-- MFA Status -->
-		<div class="rounded-lg border bg-card p-4">
+		<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 			<div class="flex items-center gap-3">
 				<div class="rounded-full bg-muted p-2">
 					<Shield class="h-4 w-4 text-muted-foreground" />
@@ -60,7 +60,7 @@
 		</div>
 
 		<!-- Trusted Devices -->
-		<div class="rounded-lg border bg-card p-4">
+		<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 			<div class="flex items-center gap-3">
 				<div class="rounded-full bg-muted p-2">
 					<Smartphone class="h-4 w-4 text-muted-foreground" />
@@ -73,7 +73,7 @@
 		</div>
 
 		<!-- Active Sessions -->
-		<div class="rounded-lg border bg-card p-4">
+		<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 			<div class="flex items-center gap-3">
 				<div class="rounded-full bg-muted p-2">
 					<Monitor class="h-4 w-4 text-muted-foreground" />
@@ -86,7 +86,7 @@
 		</div>
 
 		<!-- Last Password Change -->
-		<div class="rounded-lg border bg-card p-4">
+		<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 			<div class="flex items-center gap-3">
 				<div class="rounded-full bg-muted p-2">
 					<Key class="h-4 w-4 text-muted-foreground" />
@@ -99,7 +99,7 @@
 		</div>
 
 		<!-- Password Expiry -->
-		<div class="rounded-lg border bg-card p-4">
+		<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 			<div class="flex items-center gap-3">
 				<div class="rounded-full bg-muted p-2">
 					<Clock class="h-4 w-4 text-muted-foreground" />
@@ -112,7 +112,7 @@
 		</div>
 
 		<!-- Security Alerts -->
-		<div class="rounded-lg border bg-card p-4">
+		<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 			<div class="flex items-center gap-3">
 				<div class="rounded-full bg-muted p-2">
 					<AlertTriangle class="h-4 w-4 text-muted-foreground" />
@@ -135,7 +135,7 @@
 	<!-- Skeleton/placeholder state when securityOverview is null -->
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
 		{#each Array(6) as _}
-			<div class="rounded-lg border bg-card p-4">
+			<div class="rounded-lg border border-border/80 bg-card p-4 shadow-xs">
 				<div class="flex items-center gap-3">
 					<div class="h-8 w-8 animate-pulse rounded-full bg-muted"></div>
 					<div class="flex-1 space-y-2">

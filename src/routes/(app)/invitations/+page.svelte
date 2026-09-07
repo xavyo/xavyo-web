@@ -100,15 +100,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Invitations" description="Manage user invitations to your organization" />
+<PageHeader title="Invitations" description="Invite people and track acceptance.">
 	<a
 		href="/invitations/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
-		Invite User
+		Invite user
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<input
@@ -134,7 +133,6 @@
 		<EmptyState
 			title="No invitations match your filter"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -152,7 +150,6 @@
 		<EmptyState
 			title="No invitations yet"
 			description="Invite users to join your organization."
-			icon="inbox"
 		/>
 	{/if}
 {:else}

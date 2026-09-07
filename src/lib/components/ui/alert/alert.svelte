@@ -14,16 +14,16 @@
 	let { variant = 'default', class: className, children, ...restProps }: Props = $props();
 
 	const variantClasses: Record<Variant, string> = {
-		default: 'bg-background text-foreground',
+		default: 'border-border/80 bg-card text-foreground',
 		destructive:
-			'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive'
+			'border-destructive/40 bg-destructive/5 text-destructive dark:border-destructive/50 [&>svg]:text-destructive'
 	};
 </script>
 
 <div
 	role="alert"
 	class={cn(
-		'relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg~*]:pl-7',
+		'relative w-full rounded-lg border px-4 py-3 text-sm shadow-xs [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg~*]:pl-7',
 		variantClasses[variant],
 		className
 	)}

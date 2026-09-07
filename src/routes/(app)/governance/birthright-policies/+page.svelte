@@ -40,17 +40,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Birthright Policies" description="Manage automatic entitlement assignment policies" />
-	<div class="flex gap-2">
-		<Button variant="outline" onclick={() => showSimulateAll = !showSimulateAll}>
+<PageHeader title="Birthright Policies" description="Manage automatic entitlement assignment policies">
+	<Button variant="outline" onclick={() => showSimulateAll = !showSimulateAll}>
 			<Play class="mr-1.5 h-3.5 w-3.5" />Simulate All
 		</Button>
 		<a href="/governance/birthright-policies/create">
 			<Button><Plus class="mr-1.5 h-3.5 w-3.5" />New Policy</Button>
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 <div class="mt-4 flex gap-3">
 	<select bind:value={statusFilter} onchange={filterByStatus} class="rounded-md border bg-background px-3 py-2 text-sm">

@@ -24,14 +24,14 @@
 	};
 
 	const avatarColors = [
-		'bg-blue-600',
-		'bg-emerald-600',
-		'bg-violet-600',
-		'bg-amber-600',
-		'bg-rose-600',
-		'bg-cyan-600',
-		'bg-pink-600',
-		'bg-indigo-600'
+		'bg-[oklch(0.45_0.09_205)]',
+		'bg-[oklch(0.42_0.08_230)]',
+		'bg-[oklch(0.48_0.08_195)]',
+		'bg-[oklch(0.44_0.07_250)]',
+		'bg-[oklch(0.46_0.09_165)]',
+		'bg-[oklch(0.43_0.06_280)]',
+		'bg-[oklch(0.47_0.08_145)]',
+		'bg-[oklch(0.41_0.07_220)]'
 	];
 
 	function getInitials(): string {

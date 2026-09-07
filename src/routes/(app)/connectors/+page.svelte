@@ -45,13 +45,13 @@
 	function typeBadgeClass(type: string): string {
 		switch (type) {
 			case 'ldap':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'database':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+				return 'bg-secondary text-secondary-foreground';
 			case 'rest':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	}
 
@@ -71,13 +71,13 @@
 	function statusBadgeClass(status: string): string {
 		switch (status) {
 			case 'active':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'inactive':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 			case 'error':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	}
 
@@ -132,15 +132,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Connectors" description="Manage identity connectors for your organization" />
+<PageHeader title="Connectors" description="Sync identities from LDAP, databases, and APIs.">
 	<a
 		href="/connectors/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
-		Create Connector
+		Create connector
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<input
@@ -175,7 +174,6 @@
 		<EmptyState
 			title="No connectors match your filter"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -194,7 +192,6 @@
 		<EmptyState
 			title="No connectors yet"
 			description="Create a connector to integrate with external identity sources."
-			icon="inbox"
 			actionLabel="Create Connector"
 			actionHref="/connectors/create"
 		/>

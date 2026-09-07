@@ -104,15 +104,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Power of Attorney" description="Manage identity delegation grants" />
+<PageHeader title="Power of Attorney" description="Manage identity delegation grants">
 	<a
 		href="/governance/power-of-attorney/grant"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Grant PoA
 	</a>
-</div>
+</PageHeader>
 
 <!-- Tabs -->
 <div class="mt-4 flex gap-2 border-b border-border">

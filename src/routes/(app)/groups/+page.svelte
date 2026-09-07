@@ -82,22 +82,20 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Groups" description="Manage user groups in your organization" />
+<PageHeader title="Groups" description="Organize users into groups for shared access.">
 	<a
 		href="/groups/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
-		Create Group
+		Create group
 	</a>
-</div>
+</PageHeader>
 
 {#snippet emptyState()}
 	<EmptyState
 		title="No groups yet"
-		description="Create your first group to get started."
-		icon="👥"
-		actionLabel="Create Group"
+		description="Create a group to assign access in bulk."
+		actionLabel="Create group"
 		actionHref="/groups/create"
 	/>
 {/snippet}

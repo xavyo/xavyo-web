@@ -67,7 +67,6 @@
 			<EmptyState
 				title="No reconciliation schedules"
 				description="No connectors have reconciliation schedules configured yet."
-				icon="calendar"
 			/>
 		{:else}
 			<div class="mt-4 rounded-md border">
@@ -195,7 +194,6 @@
 				<EmptyState
 					title="No trend data"
 					description="No discrepancy trend data is available for the selected filters. Run some reconciliations to generate trend data."
-					icon="chart"
 				/>
 			{/if}
 		</div>

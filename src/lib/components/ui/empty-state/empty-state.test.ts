@@ -26,8 +26,8 @@ describe('EmptyState', () => {
 	});
 
 	it('renders icon when provided', () => {
-		render(EmptyState, { props: { title: 'No users yet', icon: '👥' } });
-		expect(screen.getByText('👥')).toBeTruthy();
+		render(EmptyState, { props: { title: 'No users yet', icon: 'XY' } });
+		expect(screen.getByText('XY')).toBeTruthy();
 	});
 
 	it('does not render icon when not provided', () => {

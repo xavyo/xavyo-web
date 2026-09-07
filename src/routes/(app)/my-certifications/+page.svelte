@@ -118,7 +118,7 @@
 	let canNextPage = $derived(pagination.pageIndex < totalPages - 1);
 </script>
 
-<PageHeader title="My Certifications" description="Review and certify or revoke user access" />
+<PageHeader title="My certifications" description="Certify or revoke access under review." />
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -143,7 +143,6 @@
 		<EmptyState
 			title="No certifications match your filter"
 			description="Try adjusting your filter criteria."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -159,7 +158,6 @@
 		<EmptyState
 			title="No certification items"
 			description="You have no certification reviews assigned to you."
-			icon="📋"
 		/>
 	{/if}
 {:else}

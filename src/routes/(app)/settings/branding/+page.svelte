@@ -215,7 +215,7 @@
 					id="font_family"
 					name="font_family"
 					type="text"
-					placeholder="Inter, system-ui, sans-serif"
+					placeholder="Plus Jakarta Sans, system-ui, sans-serif"
 					value={String($form.font_family ?? '')}
 					oninput={handleInput('font_family')}
 					class={inputClass}
