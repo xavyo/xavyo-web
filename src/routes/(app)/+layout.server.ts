@@ -18,13 +18,23 @@ export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
 		redirect(302, `/login?redirectTo=${redirectTo}`);
 	}
 
-	// Redirect system-tenant users to onboarding (unless already there or logging out)
-	if (
-		(!locals.tenantId || locals.tenantId === SYSTEM_TENANT_ID) &&
-		!url.pathname.startsWith('/onboarding') &&
-		!url.pathname.startsWith('/logout')
-	) {
-		redirect(302, '/onboarding');
+	// System-tenant users have not provisioned an organization yet. They must go
+	// through onboarding first, and we must NOT issue tenant-scoped/admin-only
+	// context calls for them (alerts/assumption/context) — those 403 for a
+	// non-admin and would break the onboarding page entirely.
+	const inSystemTenant = !locals.tenantId || locals.tenantId === SYSTEM_TENANT_ID;
+	if (inSystemTenant && !url.pathname.startsWith('/logout')) {
+		if (!url.pathname.startsWith('/onboarding')) {
+			redirect(302, '/onboarding');
+		}
+		return {
+			user: locals.user,
+			unacknowledgedAlertCount: 0,
+			isAdmin: hasAdminRole(locals.user.roles),
+			currentAssumption: null,
+			personaContext: null,
+			appVersion: env.APP_VERSION || 'dev'
+		};
 	}
 
 	try {
