@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import { listUsers } from '$lib/api/users';
 import { listPersonas } from '$lib/api/personas';
 import { listNhi } from '$lib/api/nhi';
@@ -7,9 +7,17 @@ import { fetchAdminLoginAttempts } from '$lib/api/audit';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ parent, locals, fetch }) => {
-	const { user } = await parent();
+	const { user, isAdmin } = await parent();
 
 	if (!locals.accessToken || !locals.tenantId) error(401, 'Unauthorized');
+
+	// The dashboard is an admin overview: its metrics come from tenant-wide admin
+	// APIs (users, personas, NHI, login history) that 403 for non-admins. Rather
+	// than trap a role-less user (e.g. a freshly JIT-provisioned SSO user) on a
+	// 403 page, send them to their self-service home.
+	if (!isAdmin) {
+		redirect(302, '/governance/catalog');
+	}
 
 	try {
 		const [usersResult, personasResult, nhiResult, activityResult] = await Promise.all([
