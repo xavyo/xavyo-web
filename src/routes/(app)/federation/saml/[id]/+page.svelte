@@ -12,6 +12,7 @@
 	import { addToast } from '$lib/stores/toast.svelte';
 	import { CheckCircle, XCircle, Copy } from 'lucide-svelte';
 	import { parseMappingObject } from '$lib/utils/attribute-mapping';
+	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -55,8 +56,13 @@
 		data.sp.attribute_mapping ? parseMappingObject(data.sp.attribute_mapping) : null
 	);
 
+	// Browser-navigable IdP-initiated SSO URL (frontend route that logs in if
+	// needed, then auto-POSTs the assertion to the SP's ACS). The tenant is
+	// required so the SSO resolves the correct tenant's IdP.
 	let idpInitiateUrl = $derived(
-		data.idpInfo?.initiate_base_url ? `${data.idpInfo.initiate_base_url}/${data.sp.id}` : null
+		data.tenantId
+			? `${$page.url.origin}/saml/initiate?sp=${data.sp.id}&tenant=${data.tenantId}`
+			: `${$page.url.origin}/saml/initiate?sp=${data.sp.id}`
 	);
 </script>
 
