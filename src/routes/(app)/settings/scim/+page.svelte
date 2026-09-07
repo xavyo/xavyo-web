@@ -113,6 +113,40 @@
 	class="mt-6"
 	class:hidden={activeTab !== 'tokens'}
 >
+	<!-- Connection details -->
+	{#if data.scimBaseUrl}
+		<div class="mb-6 rounded-lg border border-border bg-muted/30 p-4">
+			<h3 class="text-sm font-semibold">Connection details</h3>
+			<p class="mt-1 text-sm text-muted-foreground">
+				Configure your identity provider (Okta, Azure AD, OneLogin, …) to provision users and
+				groups into this tenant using the SCIM 2.0 base URL below and a bearer token created here.
+			</p>
+			<div class="mt-3 space-y-1">
+				<span class="text-xs font-medium text-muted-foreground">SCIM 2.0 Base URL</span>
+				<div class="flex items-center gap-2">
+					<code class="flex-1 overflow-x-auto rounded bg-background px-3 py-2 text-sm">
+						{data.scimBaseUrl}
+					</code>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onclick={() => {
+							navigator.clipboard.writeText(data.scimBaseUrl);
+							addToast('success', 'SCIM base URL copied');
+						}}
+					>
+						Copy
+					</Button>
+				</div>
+			</div>
+			<p class="mt-2 text-xs text-muted-foreground">
+				Authentication: <code>Authorization: Bearer &lt;token&gt;</code>. Endpoints:
+				<code>/Users</code> and <code>/Groups</code> under the base URL.
+			</p>
+		</div>
+	{/if}
+
 	<!-- Created Token Banner -->
 	{#if showCreatedToken && createdTokenData}
 		<div

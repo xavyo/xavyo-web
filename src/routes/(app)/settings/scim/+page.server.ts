@@ -13,6 +13,7 @@ import {
 	updateScimMappings
 } from '$lib/api/scim';
 import { ApiError } from '$lib/api/client';
+import { env } from '$env/dynamic/private';
 import type { MappingRequest } from '$lib/api/types';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
@@ -23,7 +24,10 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 			listScimTokens(locals.accessToken!, locals.tenantId!, fetch),
 			listScimMappings(locals.accessToken!, locals.tenantId!, fetch)
 		]);
-		return { form, tokens, mappings };
+		// Base URL an external IdP (Okta/Azure AD/OneLogin) points its SCIM
+		// connector at. Derived from the backend API base; strip any trailing slash.
+		const scimBaseUrl = `${(env.API_BASE_URL ?? '').replace(/\/$/, '')}/scim/v2`;
+		return { form, tokens, mappings, scimBaseUrl };
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);
 		error(500, 'Failed to load SCIM settings');
