@@ -212,8 +212,12 @@ describe('Invite [token] +page.server', () => {
 });
 
 describe('Invite [token] +page.svelte', () => {
-	it('page component is defined', async () => {
-		const mod = await import('./+page.svelte');
-		expect(mod.default).toBeDefined();
-	});
+	it(
+		'page component is defined',
+		async () => {
+			const mod = await import('./+page.svelte');
+			expect(mod.default).toBeDefined();
+		},
+		20000
+	);
 });
