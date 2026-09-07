@@ -168,6 +168,12 @@
 					{#if $errors.grant_types}
 						<p class="text-sm text-destructive">{$errors.grant_types}</p>
 					{/if}
+					<p class="text-xs text-muted-foreground">
+						Supported: authorization_code, client_credentials, refresh_token,
+						urn:ietf:params:oauth:grant-type:device_code,
+						urn:ietf:params:oauth:grant-type:token-exchange. The deprecated implicit flow is not
+						supported.
+					</p>
 				</div>
 
 				<div class="space-y-2">
