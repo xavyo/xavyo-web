@@ -8,6 +8,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import { Separator } from '$lib/components/ui/separator';
+	import { Github } from 'lucide-svelte';
 	import type { PageData } from './$types';
 	import { safeInternalPath } from '$lib/utils/redirect';
 
@@ -33,6 +34,15 @@
 			? `?tenant=${$page.url.searchParams.get('tenant')}`
 			: ''
 	);
+
+	function socialHref(provider: string): string {
+		const params = new URLSearchParams();
+		const tenant = $page.url.searchParams.get('tenant');
+		if (tenant) params.set('tenant', tenant);
+		if (data.redirectTo) params.set('redirectTo', data.redirectTo);
+		const qs = params.toString();
+		return `/api/auth/social/${provider}/authorize${qs ? `?${qs}` : ''}`;
+	}
 </script>
 
 <Card>
@@ -67,6 +77,31 @@
 			<Button type="submit" class="w-full">Log in</Button>
 		</form>
 	</CardContent>
+	{#if data.socialProviders?.length}
+		<div class="px-6 pb-2">
+			<Separator class="mb-4" />
+			<p class="mb-3 text-center text-sm text-muted-foreground">Or continue with</p>
+			<div class="flex flex-col gap-2">
+				{#each data.socialProviders as sp (sp.provider)}
+					<a
+						href={socialHref(sp.provider)}
+						data-sveltekit-reload
+						class="inline-flex w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+					>
+						{#if sp.provider === 'github'}
+							<Github class="h-4 w-4" aria-hidden="true" />
+						{:else}
+							<span
+								class="flex h-4 w-4 items-center justify-center rounded-full bg-muted text-[10px] font-semibold"
+								aria-hidden="true">{sp.name.charAt(0)}</span
+							>
+						{/if}
+						Continue with {sp.name}
+					</a>
+				{/each}
+			</div>
+		</div>
+	{/if}
 	{#if data.availableMethods?.magic_link || data.availableMethods?.email_otp}
 		<div class="px-6 pb-2">
 			<Separator class="mb-4" />

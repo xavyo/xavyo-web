@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
 import { login, getAvailableMethods } from '$lib/api/auth';
+import { getAvailableSocialProviders } from '$lib/api/social';
 import {
 	setCookies,
 	setMfaPartialToken,
@@ -45,10 +46,20 @@ export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 		error(500, 'Failed to load available login methods');
 	}
 
+	// Social providers are best-effort: a failure here must not break password login.
+	let socialProviders: { provider: string; name: string }[] = [];
+	try {
+		const res = await getAvailableSocialProviders(tenantId, fetch);
+		socialProviders = res.providers.map((p) => ({ provider: p.provider, name: p.name }));
+	} catch {
+		socialProviders = [];
+	}
+
 	return {
 		form,
 		redirectTo: safeInternalPath(url.searchParams.get('redirectTo'), url.origin) ?? '',
-		availableMethods
+		availableMethods,
+		socialProviders
 	};
 };
 

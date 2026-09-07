@@ -950,6 +950,17 @@ export interface SocialProviderListResponse {
 	providers: SocialProviderConfig[];
 }
 
+/** A social provider enabled for login on the current tenant. */
+export interface AvailableSocialProvider {
+	provider: string;
+	name: string;
+	authorize_url: string;
+}
+
+export interface AvailableSocialProvidersResponse {
+	providers: AvailableSocialProvider[];
+}
+
 export interface UpdateSocialProviderRequest {
 	enabled?: boolean;
 	client_id?: string;
