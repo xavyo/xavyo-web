@@ -66,18 +66,18 @@ describe('User detail +page.server', () => {
 		expect(result.lifecycleStatus).toBeNull();
 	});
 
-	it('fails closed when lifecycle API throws 500', async () => {
+	it('degrades gracefully when the lifecycle API errors (page still loads)', async () => {
+		// Lifecycle status is supplementary; a backend error there must not take down
+		// the whole user detail/edit page (which is where role management lives).
 		vi.mocked(getUserLifecycleStatus).mockRejectedValue(new ApiError('boom', 500));
 
-		try {
-			await load({
-				params: { id: 'user-1' },
-				locals: mockLocals(),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should have thrown');
-		} catch (e: any) {
-			expect(e.status).toBe(500);
-		}
+		const result: any = await load({
+			params: { id: 'user-1' },
+			locals: mockLocals(),
+			fetch: vi.fn()
+		} as any);
+
+		expect(result.user).toBeDefined();
+		expect(result.lifecycleStatus).toBeNull();
 	});
 });
