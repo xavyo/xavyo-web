@@ -78,13 +78,13 @@ describe('App layout +layout.server', () => {
 		expect(result.isAdmin).toBe(true);
 	});
 
-	it('fails closed when assumption API throws', async () => {
+	it('fails closed when assumption API throws (admin)', async () => {
 		vi.mocked(getCurrentAssumption).mockRejectedValue(new Error('network'));
 
 		try {
 			await load({
 				locals: {
-					user: { id: 'u1', roles: ['user'] },
+					user: { id: 'u1', roles: ['admin'] },
 					accessToken: 'tok',
 					tenantId
 				},
@@ -97,13 +97,13 @@ describe('App layout +layout.server', () => {
 		}
 	});
 
-	it('fails closed when persona context API throws', async () => {
+	it('fails closed when persona context API throws (admin)', async () => {
 		vi.mocked(getCurrentContext).mockRejectedValue(new Error('network'));
 
 		try {
 			await load({
 				locals: {
-					user: { id: 'u1', roles: ['user'] },
+					user: { id: 'u1', roles: ['admin'] },
 					accessToken: 'tok',
 					tenantId
 				},
@@ -114,6 +114,26 @@ describe('App layout +layout.server', () => {
 		} catch (e: any) {
 			expect(e.status).toBe(500);
 		}
+	});
+
+	it('skips admin-only context calls for non-admin users and still loads', async () => {
+		const result = (await load({
+			locals: {
+				user: { id: 'u1', roles: [] },
+				accessToken: 'tok',
+				tenantId
+			},
+			url: new URL('http://localhost/governance/catalog'),
+			fetch: vi.fn()
+		} as any)) as any;
+
+		expect(getCurrentAssumption).not.toHaveBeenCalled();
+		expect(getCurrentContext).not.toHaveBeenCalled();
+		expect(fetchAlerts).toHaveBeenCalled();
+		expect(result.isAdmin).toBe(false);
+		expect(result.currentAssumption).toBeNull();
+		expect(result.personaContext).toBeNull();
+		expect(result.unacknowledgedAlertCount).toBe(2);
 	});
 
 	it('propagates ApiError status from alerts', async () => {
