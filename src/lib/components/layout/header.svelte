@@ -13,7 +13,9 @@
 	let { email, name, onToggleSidebar }: Props = $props();
 </script>
 
-<header class="flex h-14 items-center justify-between border-b bg-card px-4">
+<header
+	class="flex h-14 items-center justify-between border-b border-border/80 bg-card/80 px-4 backdrop-blur-sm supports-[backdrop-filter]:bg-card/70"
+>
 	<div class="flex items-center gap-3">
 		{#if onToggleSidebar}
 			<button
@@ -25,15 +27,17 @@
 			</button>
 		{/if}
 	</div>
-	<div class="flex items-center gap-2">
+	<div class="flex items-center gap-1.5">
 		<ThemeToggle />
 
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
-				class="flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+				class="flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
 			>
 				<Avatar {name} {email} size="sm" />
-				<span class="hidden text-sm font-medium text-foreground sm:inline">{name || email}</span>
+				<span class="hidden max-w-[10rem] truncate text-sm font-medium text-foreground sm:inline"
+					>{name || email}</span
+				>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content class="w-56">
 				<DropdownMenu.Group>

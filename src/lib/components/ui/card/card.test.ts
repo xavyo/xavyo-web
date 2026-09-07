@@ -14,21 +14,22 @@ describe('Card', () => {
 		render(Card);
 		const card =
 			document.querySelector('[data-testid="card"]') ??
-			document.querySelector('.rounded-xl');
+			document.querySelector('.rounded-lg');
 		expect(card).toBeTruthy();
 	});
 
 	it('has border and shadow styling', () => {
 		render(Card);
-		const card = document.querySelector('.rounded-xl');
+		const card = document.querySelector('.rounded-lg');
 		expect(card).toBeTruthy();
-		expect(card?.className).toContain('rounded-xl');
+		expect(card?.className).toContain('rounded-lg');
 		expect(card?.className).toContain('border');
+		expect(card?.className).toContain('shadow-xs');
 	});
 
 	it('accepts custom class', () => {
 		render(Card, { props: { class: 'custom-card' } });
-		const card = document.querySelector('.rounded-xl');
+		const card = document.querySelector('.rounded-lg');
 		expect(card?.className).toContain('custom-card');
 	});
 });

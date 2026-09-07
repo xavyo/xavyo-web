@@ -502,19 +502,19 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
+<div class="mb-1">
 	<PageHeader
 		title="Governance"
-		description="Manage entitlements, access requests, SoD rules, certifications, and risk"
+		description="Entitlements, requests, SoD, certifications, and risk — one place."
 	/>
 </div>
 
 <!-- Tab navigation -->
-<div class="border-b border-border">
-	<nav class="-mb-px flex gap-4" aria-label="Tabs">
-		{#each tabs as tab}
+<div class="mb-5 border-b border-border">
+	<nav class="-mb-px flex gap-1 overflow-x-auto" aria-label="Tabs">
+		{#each tabs as tab (tab.id)}
 			<button
-				class="border-b-2 px-1 py-3 text-sm font-medium transition-colors {activeTab === tab.id
+				class="shrink-0 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors {activeTab === tab.id
 					? 'border-primary text-primary'
 					: 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'}"
 				onclick={() => (activeTab = tab.id)}

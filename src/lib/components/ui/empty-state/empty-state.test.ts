@@ -32,8 +32,8 @@ describe('EmptyState', () => {
 
 	it('does not render icon when not provided', () => {
 		const { container } = render(EmptyState, { props: { title: 'No data' } });
-		const spans = container.querySelectorAll('span');
-		expect(spans.length).toBe(0);
+		// Default decorative mark is present when no icon prop is passed
+		expect(container.textContent).toContain('—');
 	});
 
 	it('renders action link when actionLabel and actionHref provided', () => {

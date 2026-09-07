@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { superForm } from 'sveltekit-superforms';
-	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
@@ -16,8 +15,6 @@
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult: ({ result, cancel }) => {
-			// When login succeeds and we have a redirectTo target (e.g. SAML callback),
-			// cancel superForm's default redirect handling and navigate manually.
 			const origin = $page.url.origin;
 			const safe = safeInternalPath(data.redirectTo, origin);
 			if (result.type === 'redirect' && safe) {
@@ -35,47 +32,75 @@
 	);
 </script>
 
-<Card>
-	<CardHeader>
-		<h1 class="text-2xl font-semibold tracking-tight">{b?.login_page_title ?? 'Welcome back'}</h1>
-		<p class="text-sm text-muted-foreground">Enter your credentials to log in</p>
-	</CardHeader>
-	<CardContent>
-		{#if $message}
-			<Alert variant="destructive" class="mb-4">
-				<AlertDescription>{$message}</AlertDescription>
-			</Alert>
-		{/if}
+<div class="space-y-6">
+	<div>
+		<h1 class="text-2xl font-semibold tracking-tight">
+			{b?.login_page_title ?? 'Welcome back'}
+		</h1>
+		<p class="mt-1 text-sm text-muted-foreground">Sign in with your work email</p>
+	</div>
 
-		<form method="POST" action="/login{data.redirectTo ? `?redirectTo=${encodeURIComponent(data.redirectTo)}` : ''}" use:enhance class="space-y-4">
-			<div class="space-y-2">
-				<Label for="email">Email</Label>
-				<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($form.email ?? '')} />
-				{#if $errors.email}
-					<p class="text-sm text-destructive">{$errors.email}</p>
-				{/if}
-			</div>
+	{#if $message}
+		<Alert variant="destructive">
+			<AlertDescription>{$message}</AlertDescription>
+		</Alert>
+	{/if}
 
-			<div class="space-y-2">
+	<form
+		method="POST"
+		action="/login{data.redirectTo ? `?redirectTo=${encodeURIComponent(data.redirectTo)}` : ''}"
+		use:enhance
+		class="space-y-4"
+	>
+		<div class="space-y-2">
+			<Label for="email">Work email</Label>
+			<Input
+				id="email"
+				name="email"
+				type="email"
+				placeholder="you@company.com"
+				autocomplete="username"
+				value={String($form.email ?? '')}
+			/>
+			{#if $errors.email}
+				<p class="text-sm text-destructive">{$errors.email}</p>
+			{/if}
+		</div>
+
+		<div class="space-y-2">
+			<div class="flex items-center justify-between gap-2">
 				<Label for="password">Password</Label>
-				<Input id="password" name="password" type="password" value={String($form.password ?? '')} />
-				{#if $errors.password}
-					<p class="text-sm text-destructive">{$errors.password}</p>
-				{/if}
+				<a
+					href="/forgot-password{tenantParam}"
+					class="text-xs font-medium text-primary underline-offset-4 hover:underline"
+				>
+					Forgot password?
+				</a>
 			</div>
+			<Input
+				id="password"
+				name="password"
+				type="password"
+				autocomplete="current-password"
+				value={String($form.password ?? '')}
+			/>
+			{#if $errors.password}
+				<p class="text-sm text-destructive">{$errors.password}</p>
+			{/if}
+		</div>
 
-			<Button type="submit" class="w-full">Log in</Button>
-		</form>
-	</CardContent>
+		<Button type="submit" class="w-full">Sign in</Button>
+	</form>
+
 	{#if data.availableMethods?.magic_link || data.availableMethods?.email_otp}
-		<div class="px-6 pb-2">
+		<div>
 			<Separator class="mb-4" />
-			<p class="mb-2 text-center text-sm text-muted-foreground">Or sign in without a password</p>
+			<p class="mb-3 text-center text-sm text-muted-foreground">Or continue without a password</p>
 			<div class="flex gap-2">
 				{#if data.availableMethods.magic_link}
 					<a
 						href="/passwordless/magic-link{tenantParam}"
-						class="flex-1 inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+						class="inline-flex flex-1 items-center justify-center rounded-md border border-input bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 					>
 						Magic link
 					</a>
@@ -83,7 +108,7 @@
 				{#if data.availableMethods.email_otp}
 					<a
 						href="/passwordless/email-otp{tenantParam}"
-						class="flex-1 inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+						class="inline-flex flex-1 items-center justify-center rounded-md border border-input bg-card px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 					>
 						Email code
 					</a>
@@ -91,12 +116,11 @@
 			</div>
 		</div>
 	{/if}
-	<CardFooter>
-		<div class="flex w-full flex-col gap-2 text-sm text-muted-foreground">
-			<a href="/forgot-password{tenantParam}" class="text-primary underline-offset-4 hover:underline">Forgot your password?</a>
-			<p>
-				Don't have an account? <a href="/signup{tenantParam}" class="text-primary underline-offset-4 hover:underline">Sign up</a>
-			</p>
-		</div>
-	</CardFooter>
-</Card>
+
+	<p class="text-sm text-muted-foreground">
+		Don't have an account?
+		<a href="/signup{tenantParam}" class="font-medium text-primary underline-offset-4 hover:underline"
+			>Sign up</a
+		>
+	</p>
+</div>

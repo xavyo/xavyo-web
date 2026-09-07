@@ -56,15 +56,16 @@
 		saveCollapsedState();
 	}
 
-	// Collect all hrefs for longest-match comparison
 	const allHrefs = $derived(sections.flatMap((s) => s.items.map((i) => i.href)));
 
 	function isActive(href: string): boolean {
 		if (currentPath === href) return true;
 		if (!currentPath.startsWith(href + '/')) return false;
-		// Only highlight if no other nav item has a longer matching prefix
 		return !allHrefs.some(
-			(other) => other !== href && other.length > href.length && (currentPath === other || currentPath.startsWith(other + '/'))
+			(other) =>
+				other !== href &&
+				other.length > href.length &&
+				(currentPath === other || currentPath.startsWith(other + '/'))
 		);
 	}
 
@@ -76,7 +77,22 @@
 		return section.items.some((item) => isActive(item.href));
 	}
 
-	// Auto-expand section containing active route
+	/** Collapse dense admin sections by default; keep the active path open. */
+	function initCollapsedDefaults() {
+		const next = loadCollapsedState();
+		for (const section of sections) {
+			if (!section.collapsible) continue;
+			if (next[section.label] === undefined) {
+				next[section.label] = !sectionContainsActive(section);
+			}
+			if (sectionContainsActive(section)) {
+				next[section.label] = false;
+			}
+		}
+		collapsed = next;
+		saveCollapsedState();
+	}
+
 	function autoExpandActive() {
 		for (const section of sections) {
 			if (section.collapsible && sectionContainsActive(section)) {
@@ -87,29 +103,45 @@
 	}
 
 	onMount(() => {
-		collapsed = loadCollapsedState();
-		autoExpandActive();
+		initCollapsedDefaults();
 	});
 
-	// Re-expand on navigation
 	$effect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		currentPath;
 		autoExpandActive();
 	});
+
+	function itemClasses(href: string): string {
+		const active = isActive(href);
+		return [
+			'group relative flex min-h-[36px] items-center gap-3 rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-150',
+			active
+				? 'bg-primary/20 text-sidebar-accent-foreground shadow-[inset_3px_0_0_0_var(--color-sidebar-ring)]'
+				: 'text-sidebar-muted hover:bg-sidebar-accent/70 hover:text-sidebar-foreground'
+		].join(' ');
+	}
 </script>
 
-<nav class="flex h-full w-64 flex-col border-r bg-card text-card-foreground {className}">
-	<div class="flex h-14 items-center border-b px-4">
-		<span class="text-lg font-bold tracking-tight text-foreground">xavyo</span>
+<nav
+	class="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground [animation:rail-in_0.3s_ease-out] {className}"
+	aria-label="Primary"
+>
+	<div class="flex h-14 items-center gap-2.5 border-b border-sidebar-border px-4">
+		<span
+			class="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-[11px] font-bold tracking-tight text-primary-foreground"
+			aria-hidden="true"
+		>
+			xy
+		</span>
+		<span class="text-[15px] font-semibold tracking-tight text-sidebar-foreground">xavyo</span>
 	</div>
-	<div class="flex-1 overflow-y-auto p-2">
-		{#each sections as section}
+	<div class="flex-1 overflow-y-auto p-2 pb-4">
+		{#each sections as section (section.label)}
 			{#if section.collapsible}
-				<!-- Section header -->
 				<button
 					type="button"
-					class="mt-3 flex w-full items-center gap-1 px-3 py-1.5 first:mt-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70 hover:text-muted-foreground transition-colors"
+					class="mt-3 flex w-full items-center gap-1 px-3 py-1.5 first:mt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-sidebar-muted/80 transition-colors hover:text-sidebar-muted"
 					onclick={() => toggleSection(section.label)}
 					aria-expanded={!collapsed[section.label]}
 				>
@@ -118,24 +150,20 @@
 					{:else}
 						<ChevronDown class="h-3.5 w-3.5 shrink-0" />
 					{/if}
-					<span>{section.label}</span>
+					<span class="truncate">{section.label}</span>
+					<span class="ml-auto tabular-nums text-[10px] opacity-70">{section.items.length}</span>
 				</button>
 				{#if !collapsed[section.label]}
 					<div class="space-y-0.5">
-						{#each section.items as item}
+						{#each section.items as item (item.href)}
 							{@const Icon = item.icon}
-							<a
-								href={item.href}
-								onclick={handleClick}
-								class="flex min-h-[36px] items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150
-									{isActive(item.href)
-									? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary'
-									: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}"
-							>
-								<Icon class="h-4 w-4 shrink-0" />
+							<a href={item.href} onclick={handleClick} class={itemClasses(item.href)}>
+								<Icon class="h-4 w-4 shrink-0 opacity-90" />
 								<span class="truncate">{item.label}</span>
 								{#if item.badge && item.badge > 0}
-									<span class="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground">
+									<span
+										class="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground"
+									>
 										{item.badge}
 									</span>
 								{/if}
@@ -144,21 +172,15 @@
 					</div>
 				{/if}
 			{:else}
-				<!-- Standalone items (Dashboard, Settings) -->
-				{#each section.items as item}
+				{#each section.items as item (item.href)}
 					{@const Icon = item.icon}
-					<a
-						href={item.href}
-						onclick={handleClick}
-						class="flex min-h-[36px] items-center gap-3 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors duration-150
-							{isActive(item.href)
-							? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary'
-							: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'}"
-					>
-						<Icon class="h-4 w-4 shrink-0" />
+					<a href={item.href} onclick={handleClick} class={itemClasses(item.href)}>
+						<Icon class="h-4 w-4 shrink-0 opacity-90" />
 						<span class="truncate">{item.label}</span>
 						{#if item.badge && item.badge > 0}
-							<span class="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground">
+							<span
+								class="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-medium text-destructive-foreground"
+							>
 								{item.badge}
 							</span>
 						{/if}
