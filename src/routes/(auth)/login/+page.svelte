@@ -43,6 +43,41 @@
 		const qs = params.toString();
 		return `/api/auth/social/${provider}/authorize${qs ? `?${qs}` : ''}`;
 	}
+
+	let ssoBusy = $state(false);
+	let ssoError = $state('');
+
+	async function handleSso() {
+		ssoError = '';
+		const email = String($form.email ?? '').trim();
+		if (!email) {
+			ssoError = 'Enter your work email to continue with single sign-on.';
+			return;
+		}
+		ssoBusy = true;
+		try {
+			const res = await fetch('/api/auth/federation/discover', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email })
+			});
+			const result = (await res.json()) as { authentication_method?: string };
+			if (result.authentication_method === 'federated') {
+				const params = new URLSearchParams();
+				params.set('login_hint', email);
+				const tenant = $page.url.searchParams.get('tenant');
+				if (tenant) params.set('tenant', tenant);
+				window.location.href = `/api/auth/federation/authorize?${params.toString()}`;
+			} else {
+				ssoError =
+					'No single sign-on is configured for that email domain. Please sign in with your password.';
+			}
+		} catch {
+			ssoError = 'Could not check single sign-on. Please try again.';
+		} finally {
+			ssoBusy = false;
+		}
+	}
 </script>
 
 <Card>
@@ -60,7 +95,7 @@
 		<form method="POST" action="/login{data.redirectTo ? `?redirectTo=${encodeURIComponent(data.redirectTo)}` : ''}" use:enhance class="space-y-4">
 			<div class="space-y-2">
 				<Label for="email">Email</Label>
-				<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($form.email ?? '')} />
+				<Input id="email" name="email" type="email" placeholder="you@example.com" bind:value={$form.email} />
 				{#if $errors.email}
 					<p class="text-sm text-destructive">{$errors.email}</p>
 				{/if}
@@ -102,6 +137,16 @@
 			</div>
 		</div>
 	{/if}
+	<div class="px-6 pb-2">
+		<Separator class="mb-4" />
+		<p class="mb-2 text-center text-sm text-muted-foreground">Single sign-on</p>
+		{#if ssoError}
+			<p class="mb-2 text-sm text-destructive">{ssoError}</p>
+		{/if}
+		<Button type="button" variant="outline" class="w-full" onclick={handleSso} disabled={ssoBusy}>
+			{ssoBusy ? 'Checking…' : 'Sign in with SSO'}
+		</Button>
+	</div>
 	{#if data.availableMethods?.magic_link || data.availableMethods?.email_otp}
 		<div class="px-6 pb-2">
 			<Separator class="mb-4" />
