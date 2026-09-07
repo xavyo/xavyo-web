@@ -4,11 +4,19 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { emailOtpRequestSchema, emailOtpVerifySchema } from '$lib/schemas/auth';
 import { requestEmailOtp, verifyEmailOtp } from '$lib/api/auth';
-import { setCookies, decodeAccessToken, setMfaPartialToken, requestTenantId } from '$lib/server/auth';
+import {
+	setCookies,
+	decodeAccessToken,
+	setMfaPartialToken,
+	requestTenantId,
+	stampTenantCookieFromQuery
+} from '$lib/server/auth';
 import { dev } from '$app/environment';
 import { ApiError } from '$lib/api/client';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ cookies, url }) => {
+	// Persist ?tenant= so both the request and verify actions keep tenant scope.
+	stampTenantCookieFromQuery(cookies, url);
 	const requestForm = await superValidate(zod(emailOtpRequestSchema), { id: 'request' });
 	const verifyForm = await superValidate(zod(emailOtpVerifySchema), { id: 'verify' });
 	return { requestForm, verifyForm };
