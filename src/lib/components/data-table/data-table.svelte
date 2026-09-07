@@ -66,7 +66,7 @@
 		<DataTableToolbar
 			value={searchValue}
 			onchange={onSearchChange}
-			placeholder="Search..."
+			placeholder={searchPlaceholder}
 		/>
 	{/if}
 

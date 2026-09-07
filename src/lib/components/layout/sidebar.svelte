@@ -77,13 +77,13 @@
 		return section.items.some((item) => isActive(item.href));
 	}
 
-	/** Collapse dense admin sections by default; keep the active path open. */
+	/** Collapse dense sections by default; keep small groups and the active path open. */
 	function initCollapsedDefaults() {
 		const next = loadCollapsedState();
 		for (const section of sections) {
 			if (!section.collapsible) continue;
 			if (next[section.label] === undefined) {
-				next[section.label] = !sectionContainsActive(section);
+				next[section.label] = section.items.length > 4 && !sectionContainsActive(section);
 			}
 			if (sectionContainsActive(section)) {
 				next[section.label] = false;
