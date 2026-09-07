@@ -48,7 +48,10 @@ export const actions: Actions = {
 		const verifyForm = await superValidate(request, zod(emailOtpVerifySchema), { id: 'verify' });
 
 		if (!verifyForm.valid) {
-			return fail(400, { verifyForm });
+			// Stay on the code-entry step so the user can correct the code instead of
+			// being bounced back to the email-request form (which forces a re-send and
+			// trips rate limiting).
+			return fail(400, { verifyForm, codeSent: true, email: verifyForm.data.email });
 		}
 
 		const tenantId = requestTenantId(url, cookies);
@@ -80,10 +83,16 @@ export const actions: Actions = {
 				});
 			}
 		} catch (e) {
-			if (e instanceof ApiError) {
-				return message(verifyForm, e.message, { status: e.status as ErrorStatus });
-			}
-			return message(verifyForm, 'An unexpected error occurred', { status: 500 });
+			// Keep the user on the code-entry step (with the error) rather than
+			// resetting to the email-request form on a wrong/expired code.
+			const status = e instanceof ApiError ? e.status : 500;
+			const errorMessage = e instanceof ApiError ? e.message : 'An unexpected error occurred';
+			return fail(status, {
+				verifyForm,
+				codeSent: true,
+				email: verifyForm.data.email,
+				error: errorMessage
+			});
 		}
 
 		redirect(302, '/dashboard');
