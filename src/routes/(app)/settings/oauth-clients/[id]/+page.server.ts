@@ -6,7 +6,8 @@ import { updateOAuthClientSchema } from '$lib/schemas/oauth-clients';
 import {
 	getOAuthClient,
 	updateOAuthClient,
-	deleteOAuthClient
+	deleteOAuthClient,
+	regenerateOAuthClientSecret
 } from '$lib/api/oauth-clients';
 import { ApiError } from '$lib/api/client';
 import type { UpdateOAuthClientRequest } from '$lib/api/types';
@@ -141,5 +142,22 @@ export const actions: Actions = {
 		}
 
 		redirect(302, '/settings/oauth-clients');
+	},
+
+	regenerateSecret: async ({ params, locals, fetch }) => {
+		try {
+			const result = await regenerateOAuthClientSecret(
+				params.id,
+				locals.accessToken!,
+				locals.tenantId!,
+				fetch
+			);
+			return { success: true, action: 'secretRegenerated', secret: result.client_secret };
+		} catch (e) {
+			if (e instanceof ApiError) {
+				return fail(e.status, { error: e.message });
+			}
+			return fail(500, { error: 'An unexpected error occurred' });
+		}
 	}
 };

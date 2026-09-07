@@ -4,7 +4,8 @@ import type {
 	OAuthClientWithSecret,
 	OAuthClient,
 	CreateOAuthClientRequest,
-	UpdateOAuthClientRequest
+	UpdateOAuthClientRequest,
+	RegenerateSecretResponse
 } from './types';
 
 export async function listOAuthClients(
@@ -73,6 +74,21 @@ export async function deleteOAuthClient(
 ): Promise<void> {
 	await apiClient(`/admin/oauth/clients/${id}`, {
 		method: 'DELETE',
+		token,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+/** Rotate a confidential client's secret. Returns the new secret (shown once). */
+export async function regenerateOAuthClientSecret(
+	id: string,
+	token: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<RegenerateSecretResponse> {
+	return apiClient<RegenerateSecretResponse>(`/admin/oauth/clients/${id}/regenerate-secret`, {
+		method: 'POST',
 		token,
 		tenantId,
 		fetch: fetchFn

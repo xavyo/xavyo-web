@@ -3382,6 +3382,10 @@ export interface OAuthClientWithSecret extends OAuthClient {
 	client_secret: string;
 }
 
+export interface RegenerateSecretResponse {
+	client_secret: string;
+}
+
 export interface OAuthClientListResponse {
 	clients: OAuthClient[];
 	total: number;
