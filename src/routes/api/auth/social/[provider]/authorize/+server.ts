@@ -18,11 +18,13 @@ export const GET: RequestHandler = async ({ params, url, cookies, fetch: svelteK
 	headers.set('X-Tenant-Id', tenantId);
 
 	const target = new URL(`${env.API_BASE_URL}/auth/social/${params.provider}/authorize`);
-	// Carry a post-login destination through the OAuth round-trip when it's safe.
-	const redirectAfter = safeInternalPath(url.searchParams.get('redirectTo'), url.origin);
-	if (redirectAfter) {
-		target.searchParams.set('redirect_after', redirectAfter);
-	}
+	// Land the completed login on the SPA callback so it can establish the session
+	// from the fragment tokens; carry the intended destination along when safe.
+	const redirectTo = safeInternalPath(url.searchParams.get('redirectTo'), url.origin);
+	const callbackPath = redirectTo
+		? `/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`
+		: '/auth/callback';
+	target.searchParams.set('redirect_after', callbackPath);
 
 	const res = await svelteKitFetch(target, {
 		method: 'GET',
