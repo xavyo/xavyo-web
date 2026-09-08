@@ -202,3 +202,33 @@ export async function verifyMfaRecovery(
 		fetch: fetchFn
 	});
 }
+
+// WebAuthn (security key) as a login second factor. Uses the partial MFA token.
+
+export async function startMfaWebauthn(
+	partialToken: string,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<Record<string, unknown>> {
+	return apiClient<Record<string, unknown>>('/auth/mfa/webauthn/authenticate/start', {
+		method: 'POST',
+		token: partialToken,
+		tenantId,
+		fetch: fetchFn
+	});
+}
+
+export async function finishMfaWebauthn(
+	partialToken: string,
+	credential: unknown,
+	tenantId: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<TokenResponse> {
+	return apiClient<TokenResponse>('/auth/mfa/webauthn/authenticate/finish', {
+		method: 'POST',
+		body: credential,
+		token: partialToken,
+		tenantId,
+		fetch: fetchFn
+	});
+}

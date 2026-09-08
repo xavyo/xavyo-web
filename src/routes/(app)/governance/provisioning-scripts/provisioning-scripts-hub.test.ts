@@ -134,7 +134,7 @@ describe('Provisioning Scripts hub +page.server', () => {
 			mockListScripts.mockResolvedValue({ scripts: [], total: 0 });
 			mockListTemplates.mockResolvedValue({ templates: [], total: 0 });
 			mockGetDashboard.mockResolvedValue(makeDashboard());
-			const result = await load({
+			const result: any = await load({
 				locals: mockLocals(false)
 			} as any);
 			expect(result.scripts).toBeDefined();

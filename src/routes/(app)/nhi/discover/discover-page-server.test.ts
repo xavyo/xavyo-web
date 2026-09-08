@@ -21,7 +21,7 @@ describe('NHI discover +page.server', () => {
 	});
 
 	it('does not redirect a non-admin JWT user', async () => {
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()
 		} as any);

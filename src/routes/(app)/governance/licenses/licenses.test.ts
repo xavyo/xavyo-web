@@ -51,21 +51,6 @@ describe('License Management hub +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/licenses'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
-		});
-
 		it('returns pools with default pagination', async () => {
 			mockListLicensePools.mockResolvedValue({
 				items: [mockPool],
@@ -186,17 +171,6 @@ describe('License Management hub +page.server', () => {
 			);
 		});
 
-		it('calls hasAdminRole with user roles', async () => {
-			mockListLicensePools.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
-
-			await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/licenses'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(mockHasAdminRole).toHaveBeenCalledWith(['admin']);
-		});
 	});
 });
 

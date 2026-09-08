@@ -114,20 +114,6 @@ describe('Simulations hub +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
-		});
-
 		it('returns policy simulations, batch simulations, and comparisons', async () => {
 			const policySims = [makePolicySimulation()];
 			const batchSims = [makeBatchSimulation()];

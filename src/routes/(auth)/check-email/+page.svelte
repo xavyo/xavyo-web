@@ -5,6 +5,7 @@
 	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import FunnelSteps from '$lib/components/auth/funnel-steps.svelte';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form: actionResult }: { data: PageData; form: ActionData } = $props();
@@ -42,6 +43,7 @@
 
 <Card>
 	<CardHeader>
+		<FunnelSteps current={2} />
 		<h1 class="text-2xl font-semibold tracking-tight">Check your email</h1>
 		<p class="text-sm text-muted-foreground">Verify your email address to continue</p>
 	</CardHeader>

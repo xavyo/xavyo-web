@@ -22,7 +22,7 @@ describe('Catalog admin hub +page.server', () => {
 		vi.mocked(adminListCategories).mockResolvedValue({ items: [], total: 0 } as any);
 		vi.mocked(adminListItems).mockResolvedValue({ items: [], total: 0 } as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()
 		} as any);

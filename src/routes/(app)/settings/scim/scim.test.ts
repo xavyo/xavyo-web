@@ -107,6 +107,8 @@ describe('SCIM Admin +page.server', () => {
 			expect(result.tokens[0].id).toBe('tok-1');
 			expect(result.mappings).toHaveLength(1);
 			expect(result.mappings[0].scim_path).toBe('userName');
+			// Base URL for the IdP's SCIM connector must be surfaced to the admin.
+			expect(result.scimBaseUrl).toMatch(/\/scim\/v2$/);
 		});
 
 		it('fails closed when API throws', async () => {

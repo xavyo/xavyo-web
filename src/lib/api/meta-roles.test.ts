@@ -117,7 +117,9 @@ describe('Meta-Roles API — CRUD', () => {
 				name: 'Auto Finance',
 				priority: 10,
 				entitlements: [{ entitlement_id: 'e1', permission_type: 'grant' as const }],
-				constraints: [{ constraint_type: 'require_mfa', constraint_value: { required: true } }]
+				constraints: [
+					{ constraint_type: 'require_mfa' as const, constraint_value: { required: true } }
+				]
 			};
 			mockApiClient.mockResolvedValue({ id: META_ROLE_ID });
 

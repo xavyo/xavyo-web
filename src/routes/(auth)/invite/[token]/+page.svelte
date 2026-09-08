@@ -5,6 +5,8 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import { Check } from 'lucide-svelte';
+	import { evaluatePassword } from '$lib/utils/password';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -13,6 +15,14 @@
 	const { form, errors, enhance, message } = superForm(data.form);
 
 	const validation = $derived(data.validation);
+	// Preserve tenant context so the invited user can log in after accepting.
+	const loginHref = $derived(data.tenant ? `/login?tenant=${data.tenant}` : '/login');
+
+	const password = $derived(String($form.password ?? ''));
+	const strength = $derived(evaluatePassword(password));
+	const strengthColor = $derived(
+		['bg-muted', 'bg-destructive', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'][strength.score]
+	);
 </script>
 
 {#if validation.valid}
@@ -47,10 +57,39 @@
 						name="password"
 						type="password"
 						placeholder="Min. 8 characters"
-						value={String($form.password ?? '')}
+						bind:value={$form.password}
 					/>
 					{#if $errors.password}
 						<p class="text-sm text-destructive">{$errors.password}</p>
+					{/if}
+
+					{#if password.length > 0}
+						<div class="space-y-2 pt-1">
+							<div class="flex items-center gap-2">
+								<div class="flex h-1.5 flex-1 gap-1">
+									{#each [1, 2, 3, 4] as seg (seg)}
+										<div
+											class="flex-1 rounded-full transition-colors {seg <= strength.score
+												? strengthColor
+												: 'bg-muted'}"
+										></div>
+									{/each}
+								</div>
+								<span class="w-16 text-right text-xs text-muted-foreground">{strength.label}</span>
+							</div>
+							<ul class="grid grid-cols-1 gap-1 sm:grid-cols-2">
+								{#each strength.checks as check (check.label)}
+									<li
+										class="flex items-center gap-1.5 text-xs {check.met
+											? 'text-green-600'
+											: 'text-muted-foreground'}"
+									>
+										<Check class="h-3 w-3 {check.met ? 'opacity-100' : 'opacity-30'}" />
+										{check.label}
+									</li>
+								{/each}
+							</ul>
+						</div>
 					{/if}
 				</div>
 
@@ -73,7 +112,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				Already have an account? <a href="/login" class="text-primary underline-offset-4 hover:underline">Log in</a>
+				Already have an account? <a href={loginHref} class="text-primary underline-offset-4 hover:underline">Log in</a>
 			</p>
 		</CardFooter>
 	</Card>
@@ -90,7 +129,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
+				<a href={loginHref} class="text-primary underline-offset-4 hover:underline">Go to login</a>
 			</p>
 		</CardFooter>
 	</Card>
@@ -107,7 +146,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
+				<a href={loginHref} class="text-primary underline-offset-4 hover:underline">Go to login</a>
 			</p>
 		</CardFooter>
 	</Card>
@@ -124,7 +163,7 @@
 		</CardContent>
 		<CardFooter>
 			<p class="text-sm text-muted-foreground">
-				<a href="/login" class="text-primary underline-offset-4 hover:underline">Go to login</a>
+				<a href={loginHref} class="text-primary underline-offset-4 hover:underline">Go to login</a>
 			</p>
 		</CardFooter>
 	</Card>

@@ -63,7 +63,7 @@ describe('Certification campaign detail +page.server', () => {
 		vi.mocked(listCampaignItems).mockResolvedValue({ items: [], total: 0 } as any);
 
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'c1' },
 			locals: mockLocals(false),
 			fetch: vi.fn()

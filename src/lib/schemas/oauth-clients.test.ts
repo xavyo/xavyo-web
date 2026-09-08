@@ -150,6 +150,42 @@ describe('createOAuthClientSchema', () => {
 		});
 		expect(result.success).toBe(true);
 	});
+
+	it('rejects the deprecated implicit grant type (backend rejects it too)', () => {
+		const result = createOAuthClientSchema.safeParse({
+			...validInput,
+			grant_types: 'authorization_code,implicit'
+		});
+		expect(result.success).toBe(false);
+		if (!result.success) {
+			expect(result.error.issues.some((i) => i.message.includes('implicit'))).toBe(true);
+		}
+	});
+
+	it('rejects an unknown grant type', () => {
+		const result = createOAuthClientSchema.safeParse({
+			...validInput,
+			grant_types: 'password'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('accepts device_code and token-exchange URN grant types', () => {
+		const result = createOAuthClientSchema.safeParse({
+			...validInput,
+			grant_types:
+				'urn:ietf:params:oauth:grant-type:device_code, urn:ietf:params:oauth:grant-type:token-exchange'
+		});
+		expect(result.success).toBe(true);
+	});
+
+	it('tolerates whitespace around comma-separated grant types', () => {
+		const result = createOAuthClientSchema.safeParse({
+			...validInput,
+			grant_types: ' authorization_code , refresh_token '
+		});
+		expect(result.success).toBe(true);
+	});
 });
 
 describe('updateOAuthClientSchema', () => {
@@ -208,5 +244,12 @@ describe('updateOAuthClientSchema', () => {
 			scopes: 'openid,email'
 		});
 		expect(result.success).toBe(true);
+	});
+
+	it('rejects the deprecated implicit grant type on update', () => {
+		const result = updateOAuthClientSchema.safeParse({
+			grant_types: 'implicit'
+		});
+		expect(result.success).toBe(false);
 	});
 });

@@ -56,7 +56,7 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateServiceProviderSchema)
 	);
 
-	return { sp, form, idpInfo };
+	return { sp, form, idpInfo, tenantId: locals.tenantId };
 };
 
 export const actions: Actions = {

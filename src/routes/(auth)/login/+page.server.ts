@@ -4,6 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
 import { login, getAvailableMethods } from '$lib/api/auth';
+import { getAvailableSocialProviders } from '$lib/api/social';
 import {
 	setCookies,
 	setMfaPartialToken,
@@ -45,10 +46,20 @@ export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 		error(500, 'Failed to load available login methods');
 	}
 
+	// Social providers are best-effort: a failure here must not break password login.
+	let socialProviders: { provider: string; name: string }[] = [];
+	try {
+		const res = await getAvailableSocialProviders(tenantId, fetch);
+		socialProviders = res.providers.map((p) => ({ provider: p.provider, name: p.name }));
+	} catch {
+		socialProviders = [];
+	}
+
 	return {
 		form,
 		redirectTo: safeInternalPath(url.searchParams.get('redirectTo'), url.origin) ?? '',
-		availableMethods
+		availableMethods,
+		socialProviders
 	};
 };
 
@@ -62,8 +73,9 @@ export const actions: Actions = {
 
 		const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
 
+		let result;
 		try {
-			const result = await login(
+			result = await login(
 				{
 					email: form.data.email,
 					password: form.data.password
@@ -71,15 +83,6 @@ export const actions: Actions = {
 				tenantId,
 				fetch
 			);
-
-			// Check if MFA is required (partial_token in response)
-			const asRecord = result as unknown as Record<string, unknown>;
-			if (asRecord.mfa_required && asRecord.partial_token) {
-				setMfaPartialToken(cookies, String(asRecord.partial_token));
-				redirect(302, '/mfa');
-			}
-
-			setCookies(cookies, result);
 		} catch (e) {
 			if (e instanceof ApiError) {
 				// Email not verified — redirect to check-email page
@@ -90,6 +93,17 @@ export const actions: Actions = {
 			}
 			return message(form, 'An unexpected error occurred', { status: 500 });
 		}
+
+		// Redirects below throw, so they must live OUTSIDE the try/catch above —
+		// otherwise the MFA redirect is caught and reported as a generic error,
+		// which blocks every MFA-enabled user from reaching the challenge.
+		const asRecord = result as unknown as Record<string, unknown>;
+		if (asRecord.mfa_required && asRecord.partial_token) {
+			setMfaPartialToken(cookies, String(asRecord.partial_token));
+			redirect(302, '/mfa');
+		}
+
+		setCookies(cookies, result);
 
 		const safe = safeInternalPath(url.searchParams.get('redirectTo'), url.origin);
 		if (safe) {

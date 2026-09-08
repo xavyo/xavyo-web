@@ -32,9 +32,9 @@
 	</CardHeader>
 	<CardContent>
 		{#if codeSent}
-			{#if $verifyMessage}
+			{#if $page.form?.error || $verifyMessage}
 				<Alert variant="destructive" class="mb-4">
-					<AlertDescription>{$verifyMessage}</AlertDescription>
+					<AlertDescription>{($page.form?.error as string) ?? $verifyMessage}</AlertDescription>
 				</Alert>
 			{/if}
 

@@ -2,12 +2,14 @@
 	import { goto } from '$app/navigation';
 	import { createColumnHelper } from '@tanstack/table-core';
 	import type { ColumnDef } from '@tanstack/table-core';
+	import { renderComponent } from '@tanstack/svelte-table';
 	import type { PaginationState, Updater } from '@tanstack/svelte-table';
 	import DataTable from '$lib/components/data-table/data-table.svelte';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import type { UserGroup } from '$lib/api/types';
 	import type { PageData } from './$types';
+	import GroupNameLink from './group-name-link.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -16,7 +18,11 @@
 	const columns = [
 		columnHelper.accessor('display_name', {
 			header: 'Name',
-			cell: (info) => info.getValue()
+			cell: (info) =>
+				renderComponent(GroupNameLink, {
+					name: info.getValue(),
+					href: `/groups/${info.row.original.id}`
+				})
 		}),
 		columnHelper.accessor('description', {
 			header: 'Description',
@@ -111,11 +117,3 @@
 	{isLoading}
 	{emptyState}
 />
-
-{#if groups.length > 0}
-	<div class="sr-only">
-		{#each groups as group}
-			<a href="/groups/{group.id}">{group.display_name}</a>
-		{/each}
-	</div>
-{/if}

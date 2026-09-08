@@ -84,7 +84,7 @@ describe('Meta-Roles Detail +page.server', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
 			vi.mocked(getMetaRole).mockResolvedValue(mockMetaRole as any);
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'mr1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

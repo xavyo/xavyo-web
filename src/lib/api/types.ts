@@ -61,6 +61,11 @@ export interface ResetPasswordResponse {
 export interface VerifyEmailResponse {
 	message: string;
 	already_verified: boolean;
+	// Present only on a fresh verification: a session for automatic sign-in.
+	access_token?: string;
+	refresh_token?: string;
+	token_type?: string;
+	expires_in?: number;
 }
 
 // Tenant Types
@@ -935,7 +940,7 @@ export interface SocialProviderConfig {
 	enabled: boolean;
 	client_id: string | null;
 	has_client_secret: boolean;
-	scopes: string[];
+	scopes: string[] | null;
 	additional_config: Record<string, unknown> | null;
 	created_at: string | null;
 	updated_at: string | null;
@@ -943,6 +948,17 @@ export interface SocialProviderConfig {
 
 export interface SocialProviderListResponse {
 	providers: SocialProviderConfig[];
+}
+
+/** A social provider enabled for login on the current tenant. */
+export interface AvailableSocialProvider {
+	provider: string;
+	name: string;
+	authorize_url: string;
+}
+
+export interface AvailableSocialProvidersResponse {
+	providers: AvailableSocialProvider[];
 }
 
 export interface UpdateSocialProviderRequest {
@@ -3363,6 +3379,10 @@ export interface OAuthClient {
 }
 
 export interface OAuthClientWithSecret extends OAuthClient {
+	client_secret: string;
+}
+
+export interface RegenerateSecretResponse {
 	client_secret: string;
 }
 

@@ -12,9 +12,13 @@
 	import PageHeader from '$lib/components/layout/page-header.svelte';
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
+	import MemberPicker from './member-picker.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	type PickedUser = { user_id: string; email: string };
+	let selectedMembers: PickedUser[] = $state([]);
 
 	// Edit form
 	const {
@@ -47,6 +51,7 @@
 			if (result.type === 'success' && result.data?.type !== 'error') {
 				addToast('success', 'Members added successfully');
 				$addMemberFormData.member_ids = '';
+				selectedMembers = [];
 				invalidateAll();
 			}
 		}
@@ -232,19 +237,21 @@
 				{/if}
 				<form method="POST" action="?/addMember" use:addMemberEnhance class="space-y-3">
 					<div class="space-y-2">
-						<Label for="member_ids">User IDs (comma-separated)</Label>
-						<Input
-							id="member_ids"
-							name="member_ids"
-							type="text"
-							placeholder="e.g. uuid-1, uuid-2, uuid-3"
-							value={String($addMemberFormData.member_ids ?? '')}
+						<Label>Add users</Label>
+						<MemberPicker
+							existingMemberIds={data.members.map((m) => m.user_id)}
+							bind:selected={selectedMembers}
 						/>
 						{#if $addMemberErrors.member_ids}
 							<p class="text-sm text-destructive">{$addMemberErrors.member_ids}</p>
 						{/if}
 					</div>
-					<Button type="submit" size="sm">Add Members</Button>
+					<Button type="submit" size="sm" disabled={selectedMembers.length === 0}>
+						Add {selectedMembers.length > 0 ? `${selectedMembers.length} ` : ''}Member{selectedMembers.length ===
+						1
+							? ''
+							: 's'}
+					</Button>
 				</form>
 			</div>
 		</CardContent>

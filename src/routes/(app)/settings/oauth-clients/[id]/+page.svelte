@@ -29,6 +29,8 @@
 
 	let isEditing: boolean = $state(false);
 	let showDeleteDialog: boolean = $state(false);
+	let showRegenerateDialog: boolean = $state(false);
+	let regeneratedSecret: string | undefined = $state(undefined);
 
 	function startEdit() {
 		$form.name = data.client.name;
@@ -49,6 +51,24 @@
 	function cancelEdit() {
 		isEditing = false;
 	}
+
+	function regenerateEnhance(formEl: HTMLFormElement) {
+		return formEnhance(formEl, () => {
+			return async ({ result }) => {
+				showRegenerateDialog = false;
+				if (result.type === 'success' && result.data?.action === 'secretRegenerated') {
+					regeneratedSecret = result.data.secret as string;
+					addToast('success', 'Client secret regenerated');
+				} else if (result.type === 'failure') {
+					addToast(
+						'error',
+						((result.data as Record<string, unknown>)?.error as string) ??
+							'Failed to regenerate secret'
+					);
+				}
+			};
+		});
+	}
 </script>
 
 <div class="flex items-center justify-between">
@@ -67,6 +87,33 @@
 		Back to Clients
 	</a>
 </div>
+
+{#if regeneratedSecret}
+	<div
+		class="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-600 dark:bg-yellow-950"
+	>
+		<h3 class="font-semibold text-yellow-800 dark:text-yellow-200">
+			New Client Secret (shown once only!)
+		</h3>
+		<p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+			The old secret is now invalid. Copy this new secret now — it will not be shown again.
+		</p>
+		<div class="mt-2 flex items-center gap-2">
+			<code class="flex-1 rounded bg-yellow-100 p-2 text-sm break-all dark:bg-yellow-900">
+				{regeneratedSecret}
+			</code>
+			<button
+				onclick={() => {
+					navigator.clipboard.writeText(regeneratedSecret!);
+					addToast('success', 'Secret copied to clipboard');
+				}}
+				class="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+			>
+				Copy
+			</button>
+		</div>
+	</div>
+{/if}
 
 {#if isEditing}
 	<Card class="max-w-lg">
@@ -373,6 +420,23 @@
 				</form>
 			</div>
 
+			{#if data.client.client_type === 'confidential'}
+				<Separator />
+
+				<div class="flex items-center justify-between">
+					<div>
+						<p class="text-sm font-medium">Regenerate client secret</p>
+						<p class="text-sm text-muted-foreground">
+							Issue a new secret and immediately invalidate the current one. Any integrations
+							using the old secret will stop working until updated.
+						</p>
+					</div>
+					<Button variant="outline" size="sm" onclick={() => (showRegenerateDialog = true)}>
+						Regenerate secret
+					</Button>
+				</div>
+			{/if}
+
 			<Separator />
 
 			<div class="flex items-center justify-between">
@@ -424,6 +488,26 @@
 				}}
 			>
 				<Button type="submit" variant="destructive">Confirm delete</Button>
+			</form>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- Regenerate secret dialog -->
+<Dialog.Root bind:open={showRegenerateDialog}>
+	<Dialog.Content>
+		<Dialog.Header>
+			<Dialog.Title>Regenerate client secret</Dialog.Title>
+			<Dialog.Description>
+				This immediately invalidates the current secret for <strong>{data.client.name}</strong>.
+				The new secret is shown once. Integrations using the old secret will stop working until
+				updated.
+			</Dialog.Description>
+		</Dialog.Header>
+		<Dialog.Footer>
+			<Button variant="outline" onclick={() => (showRegenerateDialog = false)}>Cancel</Button>
+			<form method="POST" action="?/regenerateSecret" use:regenerateEnhance>
+				<Button type="submit" variant="destructive">Regenerate secret</Button>
 			</form>
 		</Dialog.Footer>
 	</Dialog.Content>

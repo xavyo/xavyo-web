@@ -46,7 +46,7 @@ describe('SIEM edit +page.server', () => {
 	});
 
 	it('does not redirect a non-admin JWT user', async () => {
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'd1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

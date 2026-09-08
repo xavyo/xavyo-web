@@ -5,10 +5,13 @@ import { error, fail, isRedirect, redirect } from '@sveltejs/kit';
 import { acceptInvitationSchema } from '$lib/schemas/imports';
 import { validateInvitation, acceptInvitation } from '$lib/api/imports';
 import { ApiError } from '$lib/api/client';
+import { tenantIdFromQuery } from '$lib/server/auth';
 import type { InvitationValidationResponse } from '$lib/api/types';
 
-export const load: PageServerLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ params, url, fetch }) => {
 	const form = await superValidate(zod(acceptInvitationSchema));
+	// The invite link carries the tenant so the post-accept login preserves context.
+	const tenant = tenantIdFromQuery(url.searchParams.get('tenant')) ?? null;
 
 	let validation: InvitationValidationResponse;
 	try {
@@ -29,11 +32,11 @@ export const load: PageServerLoad = async ({ params, fetch }) => {
 		}
 	}
 
-	return { form, validation };
+	return { form, validation, tenant };
 };
 
 export const actions: Actions = {
-	default: async ({ request, params, fetch }) => {
+	default: async ({ request, params, url, fetch }) => {
 		const form = await superValidate(request, zod(acceptInvitationSchema));
 
 		if (!form.valid) {
@@ -44,8 +47,11 @@ export const actions: Actions = {
 			const result = await acceptInvitation(params.token, form.data.password, fetch);
 
 			if (result.success) {
-				// Backend returns /auth/login but our SvelteKit route is /login
-				redirect(302, '/login');
+				// Backend returns /auth/login but our SvelteKit route is /login.
+				// Preserve the tenant so the invited user can actually authenticate
+				// (a new-device accept has no tenant cookie).
+				const tenant = tenantIdFromQuery(url.searchParams.get('tenant'));
+				redirect(302, tenant ? `/login?tenant=${tenant}` : '/login');
 			}
 
 			return message(form, result.message ?? 'Failed to accept invitation', {

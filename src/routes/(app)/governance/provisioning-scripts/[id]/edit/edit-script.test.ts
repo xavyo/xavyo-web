@@ -85,7 +85,7 @@ describe('Edit Script +page.server', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			mockGetScript.mockResolvedValue(makeScript());
-			const result = await load({
+			const result: any = await load({
 				locals: mockLocals(false),
 				params: { id: 'script-1' }
 			} as any);

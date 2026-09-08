@@ -41,7 +41,7 @@ function parseGroupConfig(value: unknown): SpGroupConfig {
 	if (obj.filter === undefined || obj.filter === null) {
 		filter = obj.filter ?? null;
 	} else {
-		filter = requireObject(obj.filter, 'group_config.filter') as SpGroupConfig['filter'];
+		filter = requireObject(obj.filter, 'group_config.filter') as unknown as SpGroupConfig['filter'];
 	}
 	return {
 		attribute_name: obj.attribute_name,
