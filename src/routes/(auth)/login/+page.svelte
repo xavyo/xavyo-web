@@ -95,7 +95,14 @@
 		<form method="POST" action="/login{data.redirectTo ? `?redirectTo=${encodeURIComponent(data.redirectTo)}` : ''}" use:enhance class="space-y-4">
 			<div class="space-y-2">
 				<Label for="email">Email</Label>
-				<Input id="email" name="email" type="email" placeholder="you@example.com" bind:value={$form.email} />
+				<Input
+					id="email"
+					name="email"
+					type="email"
+					autocomplete="username"
+					placeholder="you@example.com"
+					bind:value={$form.email}
+				/>
 				{#if $errors.email}
 					<p class="text-sm text-destructive">{$errors.email}</p>
 				{/if}
@@ -103,7 +110,13 @@
 
 			<div class="space-y-2">
 				<Label for="password">Password</Label>
-				<Input id="password" name="password" type="password" value={String($form.password ?? '')} />
+				<Input
+					id="password"
+					name="password"
+					type="password"
+					autocomplete="current-password"
+					value={String($form.password ?? '')}
+				/>
 				{#if $errors.password}
 					<p class="text-sm text-destructive">{$errors.password}</p>
 				{/if}

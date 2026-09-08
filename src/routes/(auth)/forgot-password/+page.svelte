@@ -35,7 +35,7 @@
 		<form method="POST" use:enhance class="space-y-4">
 			<div class="space-y-2">
 				<Label for="email">Email</Label>
-				<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($form.email ?? '')} />
+				<Input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" value={String($form.email ?? '')} />
 				{#if $errors.email}
 					<p class="text-sm text-destructive">{$errors.email}</p>
 				{/if}

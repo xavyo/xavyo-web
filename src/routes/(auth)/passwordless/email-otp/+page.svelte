@@ -42,7 +42,7 @@
 				<input type="hidden" name="email" value={sentEmail} />
 				<div class="space-y-2">
 					<Label for="code">Verification code</Label>
-					<Input id="code" name="code" type="text" inputmode="numeric" maxlength={6} placeholder="000000" class="text-center text-lg tracking-widest" value={String($verifyForm.code ?? '')} />
+					<Input id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength={6} placeholder="000000" class="text-center text-lg tracking-widest" value={String($verifyForm.code ?? '')} />
 					{#if $verifyErrors.code}
 						<p class="text-sm text-destructive">{$verifyErrors.code}</p>
 					{/if}
@@ -67,7 +67,7 @@
 			<form method="POST" action="?/request" use:requestEnhance class="space-y-4">
 				<div class="space-y-2">
 					<Label for="email">Email</Label>
-					<Input id="email" name="email" type="email" placeholder="you@example.com" value={String($requestForm.email ?? '')} />
+					<Input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" value={String($requestForm.email ?? '')} />
 					{#if $requestErrors.email}
 						<p class="text-sm text-destructive">{$requestErrors.email}</p>
 					{/if}
