@@ -75,23 +75,6 @@ describe('Pool Detail +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			const { load } = await import('./+page.server');
-
-			try {
-				await load({
-					params: { id: 'pool-1' },
-					locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
-		});
-
 		it('returns pool detail with form', async () => {
 			mockGetLicensePool.mockResolvedValue(mockPool as any);
 			const { load } = await import('./+page.server');

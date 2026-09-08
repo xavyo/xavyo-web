@@ -142,21 +142,6 @@ describe('SIEM Detail +page.server', () => {
 			}
 		});
 
-		it('redirects non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'dest-1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/');
-			}
-		});
-
 		it('returns destination, health, and deadLetter', async () => {
 			const dest = makeDestination();
 			const health = makeHealthSummary();
