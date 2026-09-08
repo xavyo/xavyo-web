@@ -5,7 +5,7 @@
 	import SocialConnectionsList from '$lib/components/federation/social-connections-list.svelte';
 	import {
 		listSocialConnections,
-		listSocialProviders,
+		getAvailableSocialProviders,
 		initiateSocialLink,
 		unlinkSocialAccount
 	} from '$lib/api/social-client';
@@ -24,13 +24,12 @@
 		try {
 			const [connectionsRes, providersRes] = await Promise.all([
 				listSocialConnections(),
-				listSocialProviders()
+				getAvailableSocialProviders()
 			]);
 
 			connections = connectionsRes.connections;
-			availableProviders = providersRes.providers
-				.filter((p) => p.enabled)
-				.map((p) => p.provider);
+			// `/auth/social/available` already returns only enabled providers.
+			availableProviders = providersRes.providers.map((p) => p.provider);
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to load social connections. Please try again.';
 		} finally {
