@@ -109,7 +109,7 @@ describe('Event Detail +page.server', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			mockGetEvent.mockResolvedValue(makeEventDetail());
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'evt-1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

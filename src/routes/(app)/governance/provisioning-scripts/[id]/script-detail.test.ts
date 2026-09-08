@@ -159,7 +159,7 @@ describe('Script Detail +page.server', () => {
 			mockListVersions.mockResolvedValue({ versions: [], total: 0 });
 			mockListBindings.mockResolvedValue({ bindings: [], total: 0 });
 			mockListLogs.mockResolvedValue({ logs: [], total: 0 });
-			const result = await load({
+			const result: any = await load({
 				locals: mockLocals(false),
 				params: { id: 'script-1' }
 			} as any);

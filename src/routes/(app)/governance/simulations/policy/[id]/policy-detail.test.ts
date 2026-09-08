@@ -123,7 +123,7 @@ describe('Policy simulation detail +page.server', () => {
 			mockGetPolicySim.mockResolvedValue(makePolicySimulation());
 			mockListResults.mockResolvedValue({ items: [], total: 0, limit: 50, offset: 0 });
 			mockCheckStaleness.mockResolvedValue(makeStalenessCheck());
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'pol-1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

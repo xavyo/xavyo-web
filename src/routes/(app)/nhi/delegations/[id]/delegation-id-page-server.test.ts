@@ -32,7 +32,7 @@ describe('NHI delegation detail +page.server', () => {
 	});
 
 	it('does not 403 a non-admin JWT user on load', async () => {
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'g1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

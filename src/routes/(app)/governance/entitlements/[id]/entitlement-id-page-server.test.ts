@@ -56,7 +56,7 @@ describe('Entitlement detail +page.server', () => {
 			purposes: []
 		} as any);
 
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'ent-1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

@@ -48,7 +48,7 @@ describe('Approval workflow detail +page.server', () => {
 			is_default: false
 		} as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'w1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

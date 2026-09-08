@@ -58,7 +58,7 @@ describe('Risk threshold detail +page.server', () => {
 		} as any);
 
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 't1' },
 			locals: mockLocals(false),
 			fetch: vi.fn()

@@ -35,7 +35,7 @@ describe('SCIM target detail +page.server', () => {
 			status: 'active'
 		} as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'tgt-1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

@@ -31,7 +31,7 @@ describe('NHI SoD rule +page.server', () => {
 
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(getNhiSodRule).mockResolvedValue({ id: 'r1' } as any);
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'r1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

@@ -71,7 +71,7 @@ describe('Bulk Action Detail +page.server', () => {
 			mockHasAdminRole.mockReturnValue(false);
 			mockGetBulkAction.mockResolvedValue(mockBulkAction as any);
 			const { load } = await import('./+page.server');
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'ba1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

@@ -42,7 +42,7 @@ describe('Manual task detail +page.server', () => {
 		vi.mocked(getManualTask).mockResolvedValue({ id: 'task-1', status: 'pending' } as any);
 
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'task-1' },
 			locals: mockLocals(false),
 			fetch: vi.fn()
