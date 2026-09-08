@@ -1,5 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/svelte';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import SocialProviderCard from './social-provider-card.svelte';
 import type { SocialProviderConfig, UpdateSocialProviderRequest } from '$lib/api/types';
 
@@ -40,6 +42,21 @@ describe('SocialProviderCard', () => {
 			})
 		).not.toThrow();
 		expect(screen.getByText('Google')).toBeTruthy();
+	});
+
+	it('words the toggle success toast off the pre-await target state', () => {
+		// The success toast fires AFTER onToggle, which reloads the parent's
+		// provider list, so provider.enabled is already the new value by then.
+		// Reading it there (and with an inverted ternary) produced "disabled" when
+		// enabling and vice-versa. The handler must capture the target state before
+		// awaiting and word the toast off it.
+		const src = readFileSync(
+			join(process.cwd(), 'src/lib/components/federation/social-provider-card.svelte'),
+			'utf-8'
+		);
+		expect(src).toContain('const nextEnabled = !provider.enabled');
+		expect(src).toContain('await onToggle(provider.provider, nextEnabled)');
+		expect(src).toContain("nextEnabled ? 'enabled' : 'disabled'");
 	});
 
 	it('renders provider name and enabled badge', () => {

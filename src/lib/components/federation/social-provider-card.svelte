@@ -118,9 +118,13 @@
 
 	async function handleToggle() {
 		toggling = true;
+		// Capture the target state before awaiting: onToggle reloads the parent's
+		// provider list, so `provider.enabled` is already the new value by the time
+		// the toast fires. Wording it off the pre-await target keeps it correct.
+		const nextEnabled = !provider.enabled;
 		try {
-			await onToggle(provider.provider, !provider.enabled);
-			addToast('success', `${providerDisplayName} ${provider.enabled ? 'disabled' : 'enabled'}`);
+			await onToggle(provider.provider, nextEnabled);
+			addToast('success', `${providerDisplayName} ${nextEnabled ? 'enabled' : 'disabled'}`);
 		} catch (err) {
 			addToast('error', `Failed to toggle ${providerDisplayName}: ${err instanceof Error ? err.message : 'Unknown error'}`);
 		} finally {
