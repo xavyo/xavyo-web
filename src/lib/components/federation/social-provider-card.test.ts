@@ -26,6 +26,22 @@ describe('SocialProviderCard', () => {
 		vi.clearAllMocks();
 	});
 
+	it('renders without crashing when scopes is null (backend returns Option)', () => {
+		// Regression: the backend returns scopes: null for an unconfigured-scope
+		// provider; the card did `provider.scopes.join(...)` and threw
+		// "Cannot read properties of null (reading 'join')", blanking the page.
+		expect(() =>
+			render(SocialProviderCard, {
+				props: {
+					provider: makeProvider({ scopes: null }),
+					onSave: defaultOnSave,
+					onToggle: defaultOnToggle
+				}
+			})
+		).not.toThrow();
+		expect(screen.getByText('Google')).toBeTruthy();
+	});
+
 	it('renders provider name and enabled badge', () => {
 		render(SocialProviderCard, {
 			props: {

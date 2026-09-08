@@ -24,7 +24,7 @@
 	let editedClientId = $state(provider.client_id ?? '');
 	let editedSecret = $state('');
 	// svelte-ignore state_referenced_locally
-	let editedScopes = $state(provider.scopes.join(', '));
+	let editedScopes = $state((provider.scopes ?? []).join(', '));
 	// svelte-ignore state_referenced_locally
 	let editedAzureTenant = $state(
 		(provider.additional_config?.azure_tenant as string) ?? 'common'
@@ -38,7 +38,7 @@
 	$effect(() => {
 		editedClientId = provider.client_id ?? '';
 		editedSecret = '';
-		editedScopes = provider.scopes.join(', ');
+		editedScopes = (provider.scopes ?? []).join(', ');
 		editedAzureTenant = (provider.additional_config?.azure_tenant as string) ?? 'common';
 		editedTeamId = (provider.additional_config?.team_id as string) ?? '';
 		editedKeyId = (provider.additional_config?.key_id as string) ?? '';

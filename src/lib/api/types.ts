@@ -940,7 +940,7 @@ export interface SocialProviderConfig {
 	enabled: boolean;
 	client_id: string | null;
 	has_client_secret: boolean;
-	scopes: string[];
+	scopes: string[] | null;
 	additional_config: Record<string, unknown> | null;
 	created_at: string | null;
 	updated_at: string | null;
