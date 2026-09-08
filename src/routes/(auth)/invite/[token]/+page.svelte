@@ -56,6 +56,7 @@
 						id="password"
 						name="password"
 						type="password"
+						autocomplete="new-password"
 						placeholder="Min. 8 characters"
 						bind:value={$form.password}
 					/>
@@ -99,6 +100,7 @@
 						id="confirm_password"
 						name="confirm_password"
 						type="password"
+						autocomplete="new-password"
 						placeholder="Repeat your password"
 						value={String($form.confirm_password ?? '')}
 					/>
