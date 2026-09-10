@@ -20,7 +20,16 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			getConnector(params.id, locals.accessToken!, locals.tenantId!, fetch),
 			getConnectorHealth(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(
 				(healthErr) => {
-					if (healthErr instanceof ApiError && healthErr.status === 404) return null;
+					// Health is supplementary. It's absent for a brand-new connector
+					// (404) and the backend also returns 400 "Health service not
+					// configured" when no health monitoring is set up. Neither should
+					// break the connector detail page — degrade to null and let the UI
+					// show "Health data not available yet".
+					if (
+						healthErr instanceof ApiError &&
+						(healthErr.status === 404 || healthErr.status === 400)
+					)
+						return null;
 					throw healthErr;
 				}
 			),
@@ -31,7 +40,16 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 				locals.tenantId!,
 				fetch
 			),
-			getCorrelationThresholds(params.id, locals.accessToken!, locals.tenantId!, fetch)
+			getCorrelationThresholds(params.id, locals.accessToken!, locals.tenantId!, fetch).catch(
+				(thrErr) => {
+					// A connector that has no correlation thresholds configured yet
+					// (e.g. a brand-new one) returns 404 here. That's a normal state,
+					// not a page failure — degrade to null so the detail page still
+					// renders. Without this the whole connector detail 404'd.
+					if (thrErr instanceof ApiError && thrErr.status === 404) return null;
+					throw thrErr;
+				}
+			)
 		]);
 		return {
 			connector,
