@@ -12,6 +12,7 @@
 
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message: formMessage } = superForm(data.form, {
+		dataType: 'json',
 		validators: zodClient(createTemplateSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'redirect') {

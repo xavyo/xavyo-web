@@ -184,13 +184,24 @@
 	</a>
 </div>
 
+{#if data.notConfigured}
+	<div class="mb-6 rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+		<p class="font-medium">No MCP gateway is configured</p>
+		<p class="mt-1">
+			{data.configHint ||
+				'Configure an AgentGateway URL in tenant settings (or set AGENTGATEWAY_MCP_URL) to discover MCP tools.'}
+		</p>
+	</div>
+{/if}
+
 <div class="mb-6 flex items-end gap-3">
 	<div class="flex flex-col gap-1">
 		<label for="gateway-select" class="text-sm font-medium">Gateway</label>
 		<select
 			id="gateway-select"
-			class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+			class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 			bind:value={selectedGateway}
+			disabled={data.notConfigured}
 		>
 			<option value="">All Gateways</option>
 			{#each data.gateways as gw}
@@ -198,7 +209,7 @@
 			{/each}
 		</select>
 	</div>
-	<Button onclick={discover} disabled={isDiscovering}>
+	<Button onclick={discover} disabled={isDiscovering || data.notConfigured}>
 		{#if isDiscovering}
 			<svg class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -209,7 +220,7 @@
 			Discover
 		{/if}
 	</Button>
-	<Button variant="outline" onclick={doSyncCheck} disabled={isSyncChecking}>
+	<Button variant="outline" onclick={doSyncCheck} disabled={isSyncChecking || data.notConfigured}>
 		{#if isSyncChecking}
 			<svg class="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
 				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
