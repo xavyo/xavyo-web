@@ -38,9 +38,9 @@
 	}
 
 	const decisionVariants: Record<string, string> = {
-		certify: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-		revoke: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-		delegate: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+		certify: 'bg-success/15 text-success',
+		revoke: 'bg-destructive/15 text-destructive',
+		delegate: 'bg-warning/15 text-warning'
 	};
 </script>
 
@@ -55,7 +55,7 @@
 			<Button size="sm" variant="outline" onclick={() => onBulkDecide(selectedIds, 'delegate')}>Delegate Selected</Button>
 		</div>
 	{/if}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

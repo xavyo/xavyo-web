@@ -79,15 +79,15 @@
 	</div>
 	<div class="rounded-lg border border-border bg-card p-4">
 		<p class="text-sm font-medium text-muted-foreground">Critical</p>
-		<p class="mt-1 text-2xl font-semibold text-red-600 dark:text-red-400">{getSeverityCount('critical')}</p>
+		<p class="mt-1 text-2xl font-semibold text-destructive">{getSeverityCount('critical')}</p>
 	</div>
 	<div class="rounded-lg border border-border bg-card p-4">
 		<p class="text-sm font-medium text-muted-foreground">Warning</p>
-		<p class="mt-1 text-2xl font-semibold text-yellow-600 dark:text-yellow-400">{getSeverityCount('warning')}</p>
+		<p class="mt-1 text-2xl font-semibold text-warning">{getSeverityCount('warning')}</p>
 	</div>
 	<div class="rounded-lg border border-border bg-card p-4">
 		<p class="text-sm font-medium text-muted-foreground">Info</p>
-		<p class="mt-1 text-2xl font-semibold text-blue-600 dark:text-blue-400">{getSeverityCount('info')}</p>
+		<p class="mt-1 text-2xl font-semibold text-info">{getSeverityCount('info')}</p>
 	</div>
 </div>
 
@@ -149,11 +149,11 @@
 						<td class="px-4 py-3 text-foreground">{alert.score_at_alert}</td>
 						<td class="px-4 py-3">
 							{#if alert.acknowledged}
-								<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+								<span class="inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success ">
 									Yes
 								</span>
 							{:else}
-								<span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+								<span class="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground ">
 									No
 								</span>
 							{/if}

@@ -8,7 +8,7 @@
 {#if records.length === 0}
 	<EmptyState title="No usage records" description="No usage activity has been recorded for this entity." />
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

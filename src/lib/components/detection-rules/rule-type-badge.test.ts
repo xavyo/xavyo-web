@@ -28,13 +28,13 @@ describe('RuleTypeBadge', () => {
 	it('applies orange class for NoManager', () => {
 		render(RuleTypeBadge, { props: { ruleType: 'no_manager' } });
 		const badge = document.querySelector('span');
-		expect(badge?.className).toContain('bg-orange-100');
+		expect(badge?.className).toContain('bg-warning/20');
 	});
 
 	it('applies red class for Terminated', () => {
 		render(RuleTypeBadge, { props: { ruleType: 'terminated' } });
 		const badge = document.querySelector('span');
-		expect(badge?.className).toContain('bg-red-100');
+		expect(badge?.className).toContain('bg-destructive/15');
 	});
 
 	it('applies indigo class for Custom', () => {

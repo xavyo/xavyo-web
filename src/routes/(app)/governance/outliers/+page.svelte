@@ -546,7 +546,7 @@
 				</div>
 				<div class="rounded-lg border border-border bg-card p-4">
 					<p class="text-sm text-muted-foreground">Outliers Detected</p>
-					<p class="text-2xl font-bold text-red-600 dark:text-red-400">{summary.outlier_count}</p>
+					<p class="text-2xl font-bold text-destructive">{summary.outlier_count}</p>
 				</div>
 				<div class="rounded-lg border border-border bg-card p-4">
 					<p class="text-sm text-muted-foreground">Average Score</p>
@@ -554,7 +554,7 @@
 				</div>
 				<div class="rounded-lg border border-border bg-card p-4">
 					<p class="text-sm text-muted-foreground">Max Score</p>
-					<p class="text-2xl font-bold text-orange-600 dark:text-orange-400">{summary.max_score.toFixed(1)}</p>
+					<p class="text-2xl font-bold text-warning">{summary.max_score.toFixed(1)}</p>
 				</div>
 			</div>
 
@@ -567,19 +567,19 @@
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Unread</p>
-						<p class="text-xl font-bold text-blue-600 dark:text-blue-400">{alertSummary.unread_count}</p>
+						<p class="text-xl font-bold text-info">{alertSummary.unread_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Critical</p>
-						<p class="text-xl font-bold text-red-600 dark:text-red-400">{alertSummary.critical_count}</p>
+						<p class="text-xl font-bold text-destructive">{alertSummary.critical_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">High</p>
-						<p class="text-xl font-bold text-orange-600 dark:text-orange-400">{alertSummary.high_count}</p>
+						<p class="text-xl font-bold text-warning">{alertSummary.high_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Medium</p>
-						<p class="text-xl font-bold text-yellow-600 dark:text-yellow-400">{alertSummary.medium_count}</p>
+						<p class="text-xl font-bold text-warning">{alertSummary.medium_count}</p>
 					</div>
 				</div>
 			{/if}
@@ -589,23 +589,23 @@
 				<div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">New</p>
-						<p class="text-xl font-bold text-blue-600 dark:text-blue-400">{dispositionSummary.new_count}</p>
+						<p class="text-xl font-bold text-info">{dispositionSummary.new_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Legitimate</p>
-						<p class="text-xl font-bold text-green-600 dark:text-green-400">{dispositionSummary.legitimate_count}</p>
+						<p class="text-xl font-bold text-success">{dispositionSummary.legitimate_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Needs Remediation</p>
-						<p class="text-xl font-bold text-red-600 dark:text-red-400">{dispositionSummary.requires_remediation_count}</p>
+						<p class="text-xl font-bold text-destructive">{dispositionSummary.requires_remediation_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Investigating</p>
-						<p class="text-xl font-bold text-yellow-600 dark:text-yellow-400">{dispositionSummary.under_investigation_count}</p>
+						<p class="text-xl font-bold text-warning">{dispositionSummary.under_investigation_count}</p>
 					</div>
 					<div class="rounded-lg border border-border bg-card p-4">
 						<p class="text-sm text-muted-foreground">Remediated</p>
-						<p class="text-xl font-bold text-gray-600 dark:text-gray-400">{dispositionSummary.remediated_count}</p>
+						<p class="text-xl font-bold text-muted-foreground ">{dispositionSummary.remediated_count}</p>
 					</div>
 				</div>
 			{/if}
@@ -731,11 +731,11 @@
 						</p>
 					</div>
 					<div class="flex items-center gap-3">
-						<span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {config.is_enabled ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}">
+						<span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {config.is_enabled ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}">
 							{config.is_enabled ? 'Enabled' : 'Disabled'}
 						</span>
 						<button
-							class="rounded-md px-3 py-1.5 text-sm font-medium {config.is_enabled ? 'bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400'} disabled:opacity-50"
+							class="rounded-md px-3 py-1.5 text-sm font-medium {config.is_enabled ? 'bg-destructive/15 text-destructive hover:bg-red-200 ' : 'bg-success/15 text-success hover:bg-green-200 '} disabled:opacity-50"
 							onclick={toggleDetection}
 							disabled={togglingConfig}
 						>

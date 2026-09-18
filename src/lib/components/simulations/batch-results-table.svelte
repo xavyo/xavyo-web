@@ -51,7 +51,7 @@
 								{#if result.access_gained.length > 0}
 									<div class="space-y-1">
 										{#each result.access_gained as item}
-											<span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800 dark:bg-green-900 dark:text-green-200">
+											<span class="inline-flex items-center rounded-full bg-success/15 px-2 py-0.5 text-xs text-success ">
 												{item.name}
 											</span>
 										{/each}
@@ -64,7 +64,7 @@
 								{#if result.access_lost.length > 0}
 									<div class="space-y-1">
 										{#each result.access_lost as item}
-											<span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800 dark:bg-red-900 dark:text-red-200">
+											<span class="inline-flex items-center rounded-full bg-destructive/15 px-2 py-0.5 text-xs text-destructive ">
 												{item.name}
 											</span>
 										{/each}
@@ -77,7 +77,7 @@
 								{#if result.warnings.length > 0}
 									<div class="space-y-1">
 										{#each result.warnings as warning}
-											<p class="text-xs text-yellow-600 dark:text-yellow-400">{warning}</p>
+											<p class="text-xs text-warning">{warning}</p>
 										{/each}
 									</div>
 								{:else}

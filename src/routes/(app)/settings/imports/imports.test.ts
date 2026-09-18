@@ -459,42 +459,42 @@ describe('Import status badge color logic', () => {
 	const statusBadgeColor = (status: string): string => {
 		switch (status) {
 			case 'pending':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'processing':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'completed':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'failed':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			case 'cancelled':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	};
 
 	it('pending is yellow', () => {
-		expect(statusBadgeColor('pending')).toContain('yellow');
+		expect(statusBadgeColor('pending')).toContain('warning');
 	});
 
 	it('processing is blue', () => {
-		expect(statusBadgeColor('processing')).toContain('blue');
+		expect(statusBadgeColor('processing')).toContain('info');
 	});
 
 	it('completed is green', () => {
-		expect(statusBadgeColor('completed')).toContain('green');
+		expect(statusBadgeColor('completed')).toContain('success');
 	});
 
 	it('failed is red', () => {
-		expect(statusBadgeColor('failed')).toContain('red');
+		expect(statusBadgeColor('failed')).toContain('destructive');
 	});
 
 	it('cancelled is gray', () => {
-		expect(statusBadgeColor('cancelled')).toContain('gray');
+		expect(statusBadgeColor('cancelled')).toContain('muted');
 	});
 
 	it('unknown status defaults to gray', () => {
-		expect(statusBadgeColor('unknown')).toContain('gray');
+		expect(statusBadgeColor('unknown')).toContain('muted');
 	});
 });
 

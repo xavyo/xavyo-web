@@ -250,7 +250,7 @@
 <div class="space-y-6 p-6">
 	<PageHeader
 		title="Governance Operations"
-		description="Manage SLA policies, ticketing integrations, bulk actions, failed operations, and scheduled transitions."
+		description="SLAs, tickets, bulk actions, and retries."
 	/>
 
 	<div class="border-b border-border">
@@ -320,9 +320,9 @@
 										<td class="px-4 py-3 text-sm">{policy.warning_threshold_percent}%</td>
 										<td class="px-4 py-3 text-sm">
 											{#if policy.breach_notification_enabled}
-												<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400">Yes</span>
+												<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-success /20 ">Yes</span>
 											{:else}
-												<span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-900/20 dark:text-gray-400">No</span>
+												<span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-muted-foreground /20 ">No</span>
 											{/if}
 										</td>
 										<td class="px-4 py-3 text-sm">
@@ -378,9 +378,9 @@
 										<td class="px-4 py-3 text-sm">{config.polling_interval_seconds}s</td>
 										<td class="px-4 py-3 text-sm">
 											{#if config.is_active}
-												<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900/20 dark:text-green-400">Yes</span>
+												<span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-success /20 ">Yes</span>
 											{:else}
-												<span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-900/20 dark:text-gray-400">No</span>
+												<span class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-muted-foreground /20 ">No</span>
 											{/if}
 										</td>
 										<td class="px-4 py-3 text-sm">
@@ -555,7 +555,7 @@
 											<span class="ml-1 text-xs text-muted-foreground">({op.progress_percent}%)</span>
 										</td>
 										<td class="px-4 py-3 text-sm">
-											<span class="text-green-600 dark:text-green-400">{op.success_count}</span> / <span class="text-red-600 dark:text-red-400">{op.failure_count}</span>
+											<span class="text-success">{op.success_count}</span> / <span class="text-destructive">{op.failure_count}</span>
 										</td>
 										<td class="px-4 py-3 text-sm">{formatDate(op.created_at)}</td>
 										<td class="px-4 py-3 text-sm">

@@ -47,14 +47,14 @@
 	});
 
 	const statusStyles: Record<string, string> = {
-		pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-		pending_approval: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-		approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+		pending: 'bg-warning/15 text-warning',
+		pending_approval: 'bg-info/15 text-info',
+		approved: 'bg-success/15 text-success',
 		provisioned: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300',
-		rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-		cancelled: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-		expired: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-		failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+		rejected: 'bg-destructive/15 text-destructive',
+		cancelled: 'bg-muted text-muted-foreground ',
+		expired: 'bg-warning/15 text-warning',
+		failed: 'bg-destructive/15 text-destructive'
 	};
 
 	const statusLabels: Record<string, string> = {
@@ -111,7 +111,7 @@
 					<dt class="text-sm font-medium text-muted-foreground">Status</dt>
 					<dd class="mt-1">
 						<span
-							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusStyles[data.request.status] ?? 'bg-gray-100 text-gray-800'}"
+							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusStyles[data.request.status] ?? 'bg-muted text-muted-foreground'}"
 						>
 							{statusLabels[data.request.status] ?? data.request.status}
 						</span>
@@ -150,7 +150,7 @@
 		{#if data.request.has_sod_warning}
 			<Card>
 				<CardHeader>
-					<h2 class="text-xl font-semibold text-orange-600 dark:text-orange-400">
+					<h2 class="text-xl font-semibold text-warning">
 						SoD Warning
 					</h2>
 				</CardHeader>
@@ -170,12 +170,12 @@
 										<span
 											class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
 												{violation.severity === 'critical'
-												? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+												? 'bg-destructive/15 text-destructive'
 												: violation.severity === 'high'
-													? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+													? 'bg-warning/15 text-warning'
 													: violation.severity === 'medium'
-														? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-														: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}"
+														? 'bg-warning/15 text-warning'
+														: 'bg-muted text-muted-foreground '}"
 										>
 											{violation.severity}
 										</span>
@@ -264,11 +264,11 @@
 				{#each data.escalationHistory.events as entry}
 					<div class="flex gap-3 rounded-md border border-border p-3">
 						<div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full
-							{entry.event_type === 'escalated' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
-							 entry.event_type === 'auto_approved' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-							 entry.event_type === 'auto_rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
-							 entry.event_type === 'reassigned' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' :
-							 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}">
+							{entry.event_type === 'escalated' ? 'bg-warning/15 text-warning' :
+							 entry.event_type === 'auto_approved' ? 'bg-success/15 text-success' :
+							 entry.event_type === 'auto_rejected' ? 'bg-destructive/15 text-destructive' :
+							 entry.event_type === 'reassigned' ? 'bg-info/15 text-info' :
+							 'bg-muted text-muted-foreground '}">
 							<span class="text-xs font-bold">
 								{entry.event_type === 'escalated' ? 'E' :
 								 entry.event_type === 'auto_approved' ? 'A' :

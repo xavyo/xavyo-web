@@ -74,7 +74,7 @@
 <PageHeader title={data.policy.name} description="Escalation policy details">
 	{#if data.policy.is_default}
 			<span
-				class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+				class="inline-flex items-center rounded-full bg-info/15 px-2.5 py-0.5 text-xs font-medium text-info "
 				>Default</span
 			>
 		{/if}
@@ -109,12 +109,12 @@
 			<span
 				class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
 					{data.policy.final_fallback === 'auto_reject'
-					? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+					? 'bg-destructive/15 text-destructive'
 					: data.policy.final_fallback === 'auto_approve'
-						? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+						? 'bg-success/15 text-success'
 						: data.policy.final_fallback === 'escalate_admin'
-							? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-							: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'}"
+							? 'bg-warning/15 text-warning'
+							: 'bg-info/15 text-info'}"
 			>
 				{fallbackLabels[data.policy.final_fallback] ?? data.policy.final_fallback}
 			</span>
@@ -124,8 +124,8 @@
 			<span
 				class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {data
 					.policy.is_active
-					? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-					: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'}"
+					? 'bg-success/15 text-success'
+					: 'bg-muted text-muted-foreground '}"
 			>
 				{data.policy.is_active ? 'Active' : 'Inactive'}
 			</span>
@@ -287,12 +287,12 @@
 							<span
 								class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
 									{level.target_type === 'tenant_admin'
-									? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+									? 'bg-destructive/15 text-destructive'
 									: level.target_type === 'manager' || level.target_type === 'manager_chain'
-										? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+										? 'bg-info/15 text-info'
 										: level.target_type === 'approval_group'
 											? 'bg-primary/15 text-primary'
-											: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}"
+											: 'bg-warning/15 text-warning'}"
 							>
 								{targetTypeLabels[level.target_type] ?? level.target_type}
 							</span>

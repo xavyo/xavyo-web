@@ -27,8 +27,8 @@
 	{#if result}
 		<div class="mt-4 space-y-2">
 			{#if result.success}
-				<Alert class="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20">
-					<AlertDescription class="text-green-800 dark:text-green-400">
+				<Alert class="border-green-200 bg-green-50 dark:border-green-800 /20">
+					<AlertDescription class="text-success ">
 						<p class="font-medium">Success ({result.duration_ms}ms)</p>
 					</AlertDescription>
 				</Alert>

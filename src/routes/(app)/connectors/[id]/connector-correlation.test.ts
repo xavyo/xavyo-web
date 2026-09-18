@@ -365,7 +365,7 @@ describe('Correlation rules rendering logic', () => {
 		function matchTypeBadgeClass(matchType: string): string {
 			switch (matchType) {
 				case 'exact':
-					return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+					return 'bg-info/15 text-info';
 				case 'fuzzy':
 					return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
 				case 'expression':
@@ -376,7 +376,7 @@ describe('Correlation rules rendering logic', () => {
 		}
 
 		it('exact match gets blue badge', () => {
-			expect(matchTypeBadgeClass('exact')).toContain('blue');
+			expect(matchTypeBadgeClass('exact')).toContain('info');
 		});
 
 		it('fuzzy match gets amber badge', () => {
@@ -562,26 +562,26 @@ describe('Job status rendering logic', () => {
 		function statusBadgeClass(status: string): string {
 			switch (status) {
 				case 'running':
-					return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+					return 'bg-warning/15 text-warning';
 				case 'completed':
-					return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+					return 'bg-success/15 text-success';
 				case 'failed':
-					return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+					return 'bg-destructive/15 text-destructive';
 				default:
 					return '';
 			}
 		}
 
 		it('running gets yellow badge', () => {
-			expect(statusBadgeClass('running')).toContain('yellow');
+			expect(statusBadgeClass('running')).toContain('warning');
 		});
 
 		it('completed gets green badge', () => {
-			expect(statusBadgeClass('completed')).toContain('green');
+			expect(statusBadgeClass('completed')).toContain('success');
 		});
 
 		it('failed gets red badge', () => {
-			expect(statusBadgeClass('failed')).toContain('red');
+			expect(statusBadgeClass('failed')).toContain('destructive');
 		});
 	});
 

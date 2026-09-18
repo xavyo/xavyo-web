@@ -67,7 +67,7 @@
 		<textarea
 			id="sim-attributes"
 			class="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-			placeholder={'{\n  "department": "Engineering",\n  "location": "US"\n}'}
+			placeholder={'{\n "department": "Engineering",\n "location": "US"\n}'}
 			bind:value={attributesJson}
 		></textarea>
 		{#if error}
@@ -82,7 +82,7 @@
 	{#if singleResult}
 		<div class="rounded-md border p-4">
 			<div class="mb-2 flex items-center gap-2">
-				<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {singleResult.matches ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+				<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {singleResult.matches ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}">
 					{singleResult.matches ? 'Match' : 'No Match'}
 				</span>
 			</div>
@@ -92,7 +92,7 @@
 					<ul class="space-y-1 text-sm">
 						{#each singleResult.condition_results as cr}
 							<li class="flex items-center gap-2">
-								<span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-xs {cr.matched ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+								<span class="inline-flex h-4 w-4 items-center justify-center rounded-full text-xs {cr.matched ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}">
 									{cr.matched ? '✓' : '✗'}
 								</span>
 								<span class="text-muted-foreground">{cr.attribute} {cr.operator} {JSON.stringify(cr.expected)}</span>

@@ -4,10 +4,10 @@
 	let { classification }: { classification: DataProtectionClassification } = $props();
 
 	const styles: Record<DataProtectionClassification, string> = {
-		none: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-		personal: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-		sensitive: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-		special_category: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+		none: 'bg-muted text-muted-foreground ',
+		personal: 'bg-info/15 text-info',
+		sensitive: 'bg-warning/15 text-warning',
+		special_category: 'bg-destructive/15 text-destructive'
 	};
 
 	const labels: Record<DataProtectionClassification, string> = {

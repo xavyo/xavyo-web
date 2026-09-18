@@ -33,12 +33,12 @@ describe('TaskStatusBadge', () => {
 	it('applies correct class for pending', () => {
 		render(TaskStatusBadge, { props: { status: 'pending' } });
 		const badge = document.querySelector('span');
-		expect(badge?.className).toContain('bg-yellow-100');
+		expect(badge?.className).toContain('bg-warning/15');
 	});
 
 	it('applies correct class for completed', () => {
 		render(TaskStatusBadge, { props: { status: 'completed' } });
 		const badge = document.querySelector('span');
-		expect(badge?.className).toContain('bg-green-100');
+		expect(badge?.className).toContain('bg-success/15');
 	});
 });

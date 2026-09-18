@@ -148,12 +148,12 @@
 				<dt class="text-sm font-medium text-muted-foreground">Flags</dt>
 				<dd class="mt-1 flex gap-2">
 					{#if certification.escalated}
-						<span class="rounded bg-orange-100 px-2 py-0.5 text-xs text-orange-800 dark:bg-orange-900/30 dark:text-orange-400">
+						<span class="rounded bg-warning/20 px-2 py-0.5 text-xs text-warning-foreground ">
 							Escalated
 						</span>
 					{/if}
 					{#if certification.past_deadline}
-						<span class="rounded bg-red-100 px-2 py-0.5 text-xs text-red-800 dark:bg-red-900/30 dark:text-red-400">
+						<span class="rounded bg-destructive/15 px-2 py-0.5 text-xs text-destructive ">
 							Overdue
 						</span>
 					{/if}

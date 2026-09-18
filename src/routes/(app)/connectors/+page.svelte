@@ -88,11 +88,11 @@
 	function healthDotClass(status: string | undefined): string {
 		switch (status) {
 			case 'healthy':
-				return 'bg-green-500';
+				return 'bg-success';
 			case 'degraded':
-				return 'bg-yellow-500';
+				return 'bg-warning';
 			case 'unhealthy':
-				return 'bg-red-500';
+				return 'bg-destructive';
 			default:
 				return 'bg-gray-400';
 		}
@@ -197,7 +197,7 @@
 		/>
 	{/if}
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

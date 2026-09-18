@@ -20,7 +20,7 @@ describe('attribute-mapping utility', () => {
 		});
 
 		it('returns null for whitespace-only string', () => {
-			expect(parseMapping('   ')).toBeNull();
+			expect(parseMapping(' ')).toBeNull();
 		});
 
 		it('returns null for invalid JSON', () => {

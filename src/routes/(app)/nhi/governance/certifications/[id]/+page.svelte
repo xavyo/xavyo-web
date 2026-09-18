@@ -36,9 +36,9 @@
 	function decisionBadgeClass(decision: string | null): string {
 		switch (decision) {
 			case 'certify':
-				return 'bg-green-600 text-white hover:bg-green-600/80';
+				return 'bg-success text-success-foreground hover:bg-success/80';
 			case 'revoke':
-				return 'bg-red-500 text-white hover:bg-red-500/80';
+				return 'bg-destructive text-white hover:bg-destructive/80';
 			default:
 				return '';
 		}

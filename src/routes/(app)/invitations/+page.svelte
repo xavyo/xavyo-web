@@ -36,17 +36,17 @@
 
 	function statusBadgeColor(invitation: { status: string; expires_at: string }): string {
 		if (isExpired(invitation)) {
-			return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+			return 'bg-warning/15 text-warning';
 		}
 		switch (invitation.status) {
 			case 'sent':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'cancelled':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 			case 'accepted':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	}
 
@@ -153,7 +153,7 @@
 		/>
 	{/if}
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

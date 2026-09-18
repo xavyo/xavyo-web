@@ -7,9 +7,9 @@
 	let { score, size = 'md' }: Props = $props();
 
 	const badgeClass = $derived(() => {
-		if (score >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-		if (score >= 50) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-		return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+		if (score >= 80) return 'bg-success/15 text-success';
+		if (score >= 50) return 'bg-warning/15 text-warning';
+		return 'bg-muted text-muted-foreground ';
 	});
 
 	const sizeClass = $derived(size === 'sm' ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1');

@@ -11,19 +11,19 @@ describe('ConfidenceBadge', () => {
 	it('applies green class for high scores (>= 80)', () => {
 		render(ConfidenceBadge, { props: { score: 92 } });
 		const badge = screen.getByTestId('confidence-badge');
-		expect(badge.className).toContain('green');
+		expect(badge.className).toContain('success');
 	});
 
 	it('applies yellow class for medium scores (50-79)', () => {
 		render(ConfidenceBadge, { props: { score: 65 } });
 		const badge = screen.getByTestId('confidence-badge');
-		expect(badge.className).toContain('yellow');
+		expect(badge.className).toContain('warning');
 	});
 
 	it('applies gray class for low scores (< 50)', () => {
 		render(ConfidenceBadge, { props: { score: 30 } });
 		const badge = screen.getByTestId('confidence-badge');
-		expect(badge.className).toContain('gray');
+		expect(badge.className).toContain('muted');
 	});
 
 	it('renders small size', () => {

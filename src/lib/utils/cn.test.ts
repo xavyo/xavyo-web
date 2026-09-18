@@ -43,6 +43,6 @@ describe('cn', () => {
 	});
 
 	it('resolves complex Tailwind conflicts', () => {
-		expect(cn('bg-red-500 text-white', 'bg-blue-500')).toBe('text-white bg-blue-500');
+		expect(cn('bg-destructive text-white', 'bg-info')).toBe('text-white bg-info');
 	});
 });

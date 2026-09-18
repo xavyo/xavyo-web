@@ -57,7 +57,7 @@
 {#if personas.length === 0}
 	<EmptyState title="No expiring personas" description="No personas are expiring within the next 30 days." />
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">
@@ -79,7 +79,7 @@
 						<td class="px-4 py-3 text-muted-foreground">{persona.assigned_user_name ?? '—'}</td>
 						<td class="px-4 py-3">{new Date(persona.valid_until).toLocaleDateString()}</td>
 						<td class="px-4 py-3">
-							<Badge class={persona.days_until_expiry <= 7 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}>
+							<Badge class={persona.days_until_expiry <= 7 ? 'bg-destructive/15 text-destructive' : 'bg-warning/15 text-warning'}>
 								{persona.days_until_expiry} days
 							</Badge>
 						</td>

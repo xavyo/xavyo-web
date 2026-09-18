@@ -28,17 +28,17 @@
 			{#each comparisons as comp}
 				<tr class="border-b border-border/50">
 					<td class="py-2 pr-4 font-medium text-foreground">{comp.attribute}</td>
-					<td class="py-2 pr-4 text-foreground {comp.is_different ? 'bg-red-50 dark:bg-red-900/10' : ''}">
+					<td class="py-2 pr-4 text-foreground {comp.is_different ? 'bg-red-50 /10' : ''}">
 						{comp.value_a ?? '—'}
 					</td>
-					<td class="py-2 pr-4 text-foreground {comp.is_different ? 'bg-red-50 dark:bg-red-900/10' : ''}">
+					<td class="py-2 pr-4 text-foreground {comp.is_different ? 'bg-red-50 /10' : ''}">
 						{comp.value_b ?? '—'}
 					</td>
 					<td class="py-2">
 						{#if comp.is_different}
-							<span class="text-red-600 dark:text-red-400">Different</span>
+							<span class="text-destructive">Different</span>
 						{:else}
-							<span class="text-green-600 dark:text-green-400">Match</span>
+							<span class="text-success">Match</span>
 						{/if}
 					</td>
 				</tr>

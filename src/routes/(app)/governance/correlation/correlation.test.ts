@@ -339,36 +339,36 @@ describe('Correlation hub rendering logic', () => {
 		function caseStatusBadgeClass(status: string): string {
 			switch (status) {
 				case 'pending':
-					return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+					return 'bg-warning/15 text-warning';
 				case 'confirmed':
-					return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+					return 'bg-success/15 text-success';
 				case 'rejected':
-					return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+					return 'bg-destructive/15 text-destructive';
 				case 'identity_created':
-					return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+					return 'bg-info/15 text-info';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('pending status gets yellow badge', () => {
-			expect(caseStatusBadgeClass('pending')).toContain('yellow');
+			expect(caseStatusBadgeClass('pending')).toContain('warning');
 		});
 
 		it('confirmed status gets green badge', () => {
-			expect(caseStatusBadgeClass('confirmed')).toContain('green');
+			expect(caseStatusBadgeClass('confirmed')).toContain('success');
 		});
 
 		it('rejected status gets red badge', () => {
-			expect(caseStatusBadgeClass('rejected')).toContain('red');
+			expect(caseStatusBadgeClass('rejected')).toContain('destructive');
 		});
 
 		it('identity_created status gets blue badge', () => {
-			expect(caseStatusBadgeClass('identity_created')).toContain('blue');
+			expect(caseStatusBadgeClass('identity_created')).toContain('info');
 		});
 
 		it('unknown status gets gray badge', () => {
-			expect(caseStatusBadgeClass('unknown')).toContain('gray');
+			expect(caseStatusBadgeClass('unknown')).toContain('muted');
 		});
 	});
 
@@ -380,9 +380,9 @@ describe('Correlation hub rendering logic', () => {
 				case 'reconciliation':
 					return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
 				case 'manual':
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
@@ -395,7 +395,7 @@ describe('Correlation hub rendering logic', () => {
 		});
 
 		it('manual gets gray badge', () => {
-			expect(triggerTypeBadgeClass('manual')).toContain('gray');
+			expect(triggerTypeBadgeClass('manual')).toContain('muted');
 		});
 	});
 
@@ -403,30 +403,30 @@ describe('Correlation hub rendering logic', () => {
 		function eventTypeBadgeClass(type: string): string {
 			switch (type) {
 				case 'auto_confirm':
-					return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+					return 'bg-success/15 text-success';
 				case 'manual_confirm':
-					return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+					return 'bg-info/15 text-info';
 				case 'reject':
-					return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+					return 'bg-destructive/15 text-destructive';
 				case 'create_identity':
 					return 'bg-primary/15 text-primary';
 				case 'reassign':
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('auto_confirm gets green badge', () => {
-			expect(eventTypeBadgeClass('auto_confirm')).toContain('green');
+			expect(eventTypeBadgeClass('auto_confirm')).toContain('success');
 		});
 
 		it('manual_confirm gets blue badge', () => {
-			expect(eventTypeBadgeClass('manual_confirm')).toContain('blue');
+			expect(eventTypeBadgeClass('manual_confirm')).toContain('info');
 		});
 
 		it('reject gets red badge', () => {
-			expect(eventTypeBadgeClass('reject')).toContain('red');
+			expect(eventTypeBadgeClass('reject')).toContain('destructive');
 		});
 
 		it('create_identity gets primary badge', () => {
@@ -434,23 +434,23 @@ describe('Correlation hub rendering logic', () => {
 		});
 
 		it('reassign gets gray badge', () => {
-			expect(eventTypeBadgeClass('reassign')).toContain('gray');
+			expect(eventTypeBadgeClass('reassign')).toContain('muted');
 		});
 	});
 
 	describe('outcome badge class', () => {
 		function outcomeBadgeClass(outcome: string): string {
 			return outcome === 'success'
-				? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-				: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				? 'bg-success/15 text-success'
+				: 'bg-destructive/15 text-destructive';
 		}
 
 		it('success gets green badge', () => {
-			expect(outcomeBadgeClass('success')).toContain('green');
+			expect(outcomeBadgeClass('success')).toContain('success');
 		});
 
 		it('failure gets red badge', () => {
-			expect(outcomeBadgeClass('failure')).toContain('red');
+			expect(outcomeBadgeClass('failure')).toContain('destructive');
 		});
 	});
 

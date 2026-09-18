@@ -254,21 +254,21 @@
 			<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 				<div>
 					<div class="mb-2 flex items-center gap-1.5">
-						<ShieldPlus class="h-4 w-4 text-green-600 dark:text-green-400" />
+						<ShieldPlus class="h-4 w-4 text-success" />
 						<h3 class="text-sm font-semibold">Access Gained</h3>
 					</div>
 					<pre
-						class="max-h-60 overflow-auto rounded-md border bg-gray-50 p-3 text-xs dark:border-gray-700 dark:bg-gray-900">{formatJson(
+						class="max-h-60 overflow-auto rounded-md border bg-gray-50 p-3 text-xs dark:border-gray-700 ">{formatJson(
 							simulation.access_gained
 						)}</pre>
 				</div>
 				<div>
 					<div class="mb-2 flex items-center gap-1.5">
-						<ShieldMinus class="h-4 w-4 text-red-600 dark:text-red-400" />
+						<ShieldMinus class="h-4 w-4 text-destructive" />
 						<h3 class="text-sm font-semibold">Access Lost</h3>
 					</div>
 					<pre
-						class="max-h-60 overflow-auto rounded-md border bg-gray-50 p-3 text-xs dark:border-gray-700 dark:bg-gray-900">{formatJson(
+						class="max-h-60 overflow-auto rounded-md border bg-gray-50 p-3 text-xs dark:border-gray-700 ">{formatJson(
 							simulation.access_lost
 						)}</pre>
 				</div>

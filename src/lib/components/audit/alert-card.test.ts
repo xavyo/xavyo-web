@@ -80,7 +80,7 @@ describe('AlertCard', () => {
 		const { container } = render(AlertCard, {
 			props: { alert: makeAlert({ severity: 'info' }) }
 		});
-		const severityIcon = container.querySelector('.bg-blue-100');
+		const severityIcon = container.querySelector('.bg-info/15');
 		expect(severityIcon).toBeTruthy();
 	});
 
@@ -96,7 +96,7 @@ describe('AlertCard', () => {
 		const { container } = render(AlertCard, {
 			props: { alert: makeAlert({ severity: 'critical' }) }
 		});
-		const severityIcon = container.querySelector('.bg-red-100');
+		const severityIcon = container.querySelector('.bg-destructive/15');
 		expect(severityIcon).toBeTruthy();
 	});
 

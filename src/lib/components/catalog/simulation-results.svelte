@@ -15,11 +15,11 @@
 		<div class="rounded-lg border p-4">
 			<div class="mb-3 flex items-center gap-2">
 				{#if singleResult.matches}
-					<CheckCircle2 class="h-5 w-5 text-green-600" />
-					<span class="font-semibold text-green-700 dark:text-green-400">Match</span>
+					<CheckCircle2 class="h-5 w-5 text-success" />
+					<span class="font-semibold text-success ">Match</span>
 				{:else}
-					<XCircle class="h-5 w-5 text-red-500" />
-					<span class="font-semibold text-red-600 dark:text-red-400">No Match</span>
+					<XCircle class="h-5 w-5 text-destructive" />
+					<span class="font-semibold text-destructive">No Match</span>
 				{/if}
 			</div>
 			{#if singleResult.condition_results.length > 0}
@@ -42,9 +42,9 @@
 								<td class="py-2">{cr.actual !== null && cr.actual !== undefined ? JSON.stringify(cr.actual) : '—'}</td>
 								<td class="py-2">
 									{#if cr.matched}
-										<CheckCircle2 class="h-4 w-4 text-green-600" />
+										<CheckCircle2 class="h-4 w-4 text-success" />
 									{:else}
-										<XCircle class="h-4 w-4 text-red-500" />
+										<XCircle class="h-4 w-4 text-destructive" />
 									{/if}
 								</td>
 							</tr>

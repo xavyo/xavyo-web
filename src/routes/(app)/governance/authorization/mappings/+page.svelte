@@ -75,7 +75,7 @@
 		description="Create entitlement-to-action mappings to define what actions entitlements grant."
 	/>
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">
@@ -98,7 +98,7 @@
 						</td>
 						<td class="px-4 py-3">
 							<span
-								class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+								class="inline-flex items-center rounded-full bg-info/15 px-2.5 py-0.5 text-xs font-medium text-info "
 							>
 								{mapping.resource_type}
 							</span>

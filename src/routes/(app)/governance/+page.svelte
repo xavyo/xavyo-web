@@ -686,9 +686,9 @@
 									<td class="px-4 py-3 font-mono text-xs">{exemption.user_id.substring(0, 8)}...</td>
 									<td class="px-4 py-3">
 										<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
-											{exemption.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
-											 exemption.status === 'revoked' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
-											 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}">
+											{exemption.status === 'active' ? 'bg-success/15 text-success' :
+											 exemption.status === 'revoked' ? 'bg-destructive/15 text-destructive' :
+											 'bg-muted text-muted-foreground '}">
 											{exemption.status}
 										</span>
 									</td>

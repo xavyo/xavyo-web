@@ -130,7 +130,7 @@
 		{#if entries.length === 0}
 			<EmptyState title="No stale entities" description="All NHI entities have recent activity." />
 		{:else}
-			<div class="rounded-md border">
+			<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b bg-muted/50">
@@ -150,7 +150,7 @@
 								<td class="px-4 py-3"><Badge variant="outline">{entry.state}</Badge></td>
 								<td class="px-4 py-3 text-muted-foreground">{entry.last_activity_at ? new Date(entry.last_activity_at).toLocaleDateString() : 'Never'}</td>
 								<td class="px-4 py-3">
-									<Badge class={entry.days_inactive > 90 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : entry.days_inactive > 30 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}>
+									<Badge class={entry.days_inactive > 90 ? 'bg-destructive/15 text-destructive' : entry.days_inactive > 30 ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success'}>
 										{entry.days_inactive} days
 									</Badge>
 								</td>
@@ -196,7 +196,7 @@
 		{:else if orphans.length === 0}
 			<EmptyState title="No orphans found" description="All NHI entities have active owners." />
 		{:else}
-			<div class="rounded-md border">
+			<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b bg-muted/50">
@@ -221,7 +221,7 @@
 								</td>
 								<td class="px-4 py-3">
 									{#if orphan.days_inactive !== null}
-										<Badge class={orphan.days_inactive > 90 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : orphan.days_inactive > 30 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}>
+										<Badge class={orphan.days_inactive > 90 ? 'bg-destructive/15 text-destructive' : orphan.days_inactive > 30 ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success'}>
 											{orphan.days_inactive} days
 										</Badge>
 									{:else}
@@ -285,7 +285,7 @@
 			<div class="space-y-4 py-4">
 				{#if suspendResult.suspended.length > 0}
 					<div>
-						<p class="text-sm font-medium text-green-700 dark:text-green-400">
+						<p class="text-sm font-medium text-success ">
 							Suspended ({suspendResult.suspended.length})
 						</p>
 						<ul class="mt-1 space-y-1">
@@ -297,14 +297,14 @@
 				{/if}
 				{#if suspendResult.failed.length > 0}
 					<div>
-						<p class="text-sm font-medium text-red-700 dark:text-red-400">
+						<p class="text-sm font-medium text-destructive ">
 							Failed ({suspendResult.failed.length})
 						</p>
 						<ul class="mt-1 space-y-1">
 							{#each suspendResult.failed as failure}
 								<li class="text-xs">
 									<span class="font-mono text-muted-foreground" title={failure.id}>{truncateId(failure.id, 24)}</span>
-									<span class="ml-2 text-red-600 dark:text-red-400">{failure.error}</span>
+									<span class="ml-2 text-destructive">{failure.error}</span>
 								</li>
 							{/each}
 						</ul>

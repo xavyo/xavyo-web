@@ -62,7 +62,7 @@
 		description="All webhook deliveries have been processed successfully. Failed deliveries that exhaust retries will appear here."
 	/>
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">
@@ -78,7 +78,7 @@
 				{#each data.entries as entry}
 					<tr class="border-b transition-colors hover:bg-muted/50">
 						<td class="px-4 py-3 font-medium">
-							<span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+							<span class="inline-flex items-center rounded-full bg-info/15 px-2.5 py-0.5 text-xs font-medium text-info ">
 								{entry.event_type}
 							</span>
 						</td>

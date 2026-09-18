@@ -349,21 +349,21 @@ describe('SIEM hub rendering logic', () => {
 
 	describe('circuit state colors', () => {
 		const circuitStateColors: Record<string, string> = {
-			closed: 'text-green-600 dark:text-green-400',
-			open: 'text-red-600 dark:text-red-400',
-			half_open: 'text-yellow-600 dark:text-yellow-400'
+			closed: 'text-success',
+			open: 'text-destructive',
+			half_open: 'text-warning'
 		};
 
 		it('closed gets green color', () => {
-			expect(circuitStateColors['closed']).toContain('green');
+			expect(circuitStateColors['closed']).toContain('success');
 		});
 
 		it('open gets red color', () => {
-			expect(circuitStateColors['open']).toContain('red');
+			expect(circuitStateColors['open']).toContain('destructive');
 		});
 
 		it('half_open gets yellow color', () => {
-			expect(circuitStateColors['half_open']).toContain('yellow');
+			expect(circuitStateColors['half_open']).toContain('warning');
 		});
 	});
 
@@ -396,26 +396,26 @@ describe('SIEM hub rendering logic', () => {
 
 	describe('export status badge classes', () => {
 		const exportStatusBadgeClass: Record<string, string> = {
-			pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-			processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-			completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-			failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+			pending: 'bg-warning/15 text-warning',
+			processing: 'bg-info/15 text-info',
+			completed: 'bg-success/15 text-success',
+			failed: 'bg-destructive/15 text-destructive'
 		};
 
 		it('completed gets green badge', () => {
-			expect(exportStatusBadgeClass['completed']).toContain('green');
+			expect(exportStatusBadgeClass['completed']).toContain('success');
 		});
 
 		it('pending gets yellow badge', () => {
-			expect(exportStatusBadgeClass['pending']).toContain('yellow');
+			expect(exportStatusBadgeClass['pending']).toContain('warning');
 		});
 
 		it('processing gets blue badge', () => {
-			expect(exportStatusBadgeClass['processing']).toContain('blue');
+			expect(exportStatusBadgeClass['processing']).toContain('info');
 		});
 
 		it('failed gets red badge', () => {
-			expect(exportStatusBadgeClass['failed']).toContain('red');
+			expect(exportStatusBadgeClass['failed']).toContain('destructive');
 		});
 	});
 

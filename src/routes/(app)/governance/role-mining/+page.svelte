@@ -102,7 +102,7 @@
 
 <PageHeader
 	title="Role Mining"
-	description="Discover role candidates, access patterns, excessive privileges, and consolidation opportunities"
+	description="Find roles, unused access, and roles you can merge."
 />
 
 <div class="-mb-px flex gap-4 overflow-x-auto border-b border-border" role="tablist" aria-label="Role Mining tabs">
@@ -199,7 +199,7 @@
 										{/if}
 										{#if job.status === 'running'}
 											<button
-												class="rounded px-2 py-1 text-xs text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-950"
+												class="rounded px-2 py-1 text-xs text-warning hover:bg-yellow-50 dark:hover:bg-yellow-950"
 												onclick={() => handleCancel(job.id)}
 											>
 												Cancel
@@ -207,7 +207,7 @@
 										{/if}
 										{#if job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled'}
 											<button
-												class="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+												class="rounded px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:hover:bg-red-950"
 												onclick={() => confirmDelete(job.id, job.name)}
 											>
 												Delete

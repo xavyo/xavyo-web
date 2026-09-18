@@ -5,7 +5,7 @@
 </script>
 
 {#if isInitial}
-	<Badge variant="default" class="bg-blue-600">Initial</Badge>
+	<Badge variant="default" class="bg-info text-info-foreground">Initial</Badge>
 {:else if isTerminal}
 	<Badge variant="destructive">Terminal</Badge>
 {:else}

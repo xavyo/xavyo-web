@@ -24,8 +24,8 @@
 		<PageHeader title={config.name} description="Ticketing configuration details" />
 		<span
 			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {config.is_active
-				? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-				: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}"
+				? 'bg-success/15 text-success'
+				: 'bg-muted text-muted-foreground'}"
 		>
 			{config.ticketing_type}
 		</span>
@@ -109,8 +109,8 @@
 				<span class="text-sm text-muted-foreground">Active</span>
 				<span
 					class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {config.is_active
-						? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-						: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}"
+						? 'bg-success/15 text-success'
+						: 'bg-muted text-muted-foreground'}"
 				>
 					{config.is_active ? 'Yes' : 'No'}
 				</span>

@@ -84,7 +84,7 @@
 	function statusClass(status: string): string {
 		switch (status) {
 			case 'active':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'inactive':
 				return '';
 			case 'error':
@@ -108,7 +108,7 @@
 	}
 
 	function healthDotColor(isOnline: boolean): string {
-		return isOnline ? 'bg-green-500' : 'bg-red-500';
+		return isOnline ? 'bg-success' : 'bg-destructive';
 	}
 
 	async function loadStatistics() {
@@ -206,7 +206,7 @@
 {#if testResult}
 	<div class="mt-4 max-w-lg rounded-md border p-4 {testResult.success ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'}">
 		<div class="flex items-center gap-2">
-			<span class="font-medium {testResult.success ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}">
+			<span class="font-medium {testResult.success ? 'text-success ' : 'text-destructive '}">
 				{testResult.success ? 'Connection Successful' : 'Connection Failed'}
 			</span>
 		</div>

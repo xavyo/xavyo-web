@@ -19,7 +19,7 @@ describe('TriggerRuleBadge', () => {
 		render(TriggerRuleBadge, { props: { type: 'trigger', value: 'manager_change' } });
 		const badge = screen.getByTestId('trigger-rule-badge');
 		expect(badge.textContent).toContain('Manager Change');
-		expect(badge.className).toContain('red');
+		expect(badge.className).toContain('destructive');
 	});
 
 	it('renders periodic_recert trigger type', () => {

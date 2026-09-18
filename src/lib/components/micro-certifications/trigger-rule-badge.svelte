@@ -10,10 +10,10 @@
 
 	const triggerColorMap: Record<string, string> = {
 		high_risk_assignment: 'bg-primary/15 text-primary',
-		sod_violation: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-		manager_change: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+		sod_violation: 'bg-info/15 text-info',
+		manager_change: 'bg-destructive/15 text-destructive',
 		periodic_recert: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
-		manual: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+		manual: 'bg-muted text-muted-foreground '
 	};
 
 	const scopeColorMap: Record<string, string> = {
@@ -34,7 +34,7 @@
 	};
 
 	const colorMap = $derived(type === 'trigger' ? triggerColorMap : scopeColorMap);
-	const badgeColor = $derived(colorMap[value] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400');
+	const badgeColor = $derived(colorMap[value] ?? 'bg-muted text-muted-foreground ');
 </script>
 
 <span class="inline-flex items-center rounded-full text-xs px-2 py-0.5 font-medium {badgeColor}" data-testid="trigger-rule-badge">

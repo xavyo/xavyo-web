@@ -47,7 +47,7 @@
 				<div class="flex-1">
 					<p class="text-sm text-muted-foreground">MFA Status</p>
 					{#if securityOverview.mfa_enabled}
-						<p class="text-lg font-semibold text-green-600 dark:text-green-400">Enabled</p>
+						<p class="text-lg font-semibold text-success">Enabled</p>
 						{#if securityOverview.mfa_methods.length > 0}
 							<p class="text-xs text-muted-foreground">{securityOverview.mfa_methods.join(', ')}</p>
 						{/if}

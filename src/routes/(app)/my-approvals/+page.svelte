@@ -35,9 +35,9 @@
 	];
 
 	const statusStyles: Record<string, string> = {
-		pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-		approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-		rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+		pending: 'bg-warning/15 text-warning',
+		approved: 'bg-success/15 text-success',
+		rejected: 'bg-destructive/15 text-destructive'
 	};
 
 	const statusLabels: Record<string, string> = {
@@ -226,7 +226,7 @@
 					</div>
 					<div class="ml-4 shrink-0">
 						<span
-							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusStyles[approval.status] ?? 'bg-gray-100 text-gray-800'}"
+							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusStyles[approval.status] ?? 'bg-muted text-muted-foreground'}"
 						>
 							{statusLabels[approval.status] ?? approval.status}
 						</span>
@@ -236,13 +236,13 @@
 					<div class="mt-3 flex gap-2">
 						<button
 							onclick={() => openApproveDialog(approval.id)}
-							class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+							class="rounded-md bg-success px-3 py-1.5 text-sm font-medium text-success-foreground hover:bg-success/90"
 						>
 							Approve
 						</button>
 						<button
 							onclick={() => openRejectDialog(approval.id)}
-							class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600"
+							class="rounded-md bg-destructive px-3 py-1.5 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
 						>
 							Reject
 						</button>
@@ -303,7 +303,7 @@
 		></textarea>
 		<DialogFooter>
 			<Button variant="outline" onclick={closeApproveDialog} disabled={isSubmitting}>Cancel</Button>
-			<Button onclick={handleApprove} disabled={isSubmitting} class="bg-green-600 text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600">
+			<Button onclick={handleApprove} disabled={isSubmitting} class="bg-success text-success-foreground hover:bg-success/90">
 				{isSubmitting ? 'Approving...' : 'Approve'}
 			</Button>
 		</DialogFooter>

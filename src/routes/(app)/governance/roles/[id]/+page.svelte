@@ -966,7 +966,7 @@
 								</div>
 								<div class="flex items-center gap-2">
 									<button
-										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {ind.is_enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}"
+										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {ind.is_enabled ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground '}"
 										onclick={() => handleToggleInducement(ind)}
 									>
 										{ind.is_enabled ? 'Enabled' : 'Disabled'}

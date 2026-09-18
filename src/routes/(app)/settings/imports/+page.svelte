@@ -34,17 +34,17 @@
 	function statusBadgeColor(status: ImportJobStatus): string {
 		switch (status) {
 			case 'pending':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'processing':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'completed':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'failed':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			case 'cancelled':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	}
 
@@ -114,7 +114,7 @@
 		description="Upload a CSV file to start importing users."
 	/>
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">
@@ -152,8 +152,8 @@
 							</span>
 						</td>
 						<td class="px-4 py-3 text-muted-foreground">{job.total_rows}</td>
-						<td class="px-4 py-3 text-green-600 dark:text-green-400">{job.success_count}</td>
-						<td class="px-4 py-3 text-red-600 dark:text-red-400">{job.error_count}</td>
+						<td class="px-4 py-3 text-success">{job.success_count}</td>
+						<td class="px-4 py-3 text-destructive">{job.error_count}</td>
 						<td class="px-4 py-3 text-muted-foreground">{job.skip_count}</td>
 						<td class="px-4 py-3 text-muted-foreground">{formatDate(job.created_at)}</td>
 					</tr>

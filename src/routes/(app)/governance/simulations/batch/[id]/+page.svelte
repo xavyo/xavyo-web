@@ -220,7 +220,7 @@
 	<div
 		class="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-950"
 	>
-		<p class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+		<p class="text-sm font-medium text-warning-foreground ">
 			Scope Warning: This batch simulation affects a large number of users. Review the results
 			carefully before applying changes to production.
 		</p>
@@ -427,7 +427,7 @@
 									<div class="space-y-1">
 										{#each result.access_gained as item}
 											<span
-												class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+												class="inline-flex items-center rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success "
 											>
 												+{item.name}
 											</span>
@@ -442,7 +442,7 @@
 									<div class="space-y-1">
 										{#each result.access_lost as item}
 											<span
-												class="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+												class="inline-flex items-center rounded-full bg-warning/20 px-2 py-0.5 text-xs font-medium text-warning-foreground "
 											>
 												-{item.name}
 											</span>
@@ -456,7 +456,7 @@
 								{#if result.warnings.length > 0}
 									<div class="space-y-1">
 										{#each result.warnings as warning}
-											<p class="text-xs text-yellow-600 dark:text-yellow-400">{warning}</p>
+											<p class="text-xs text-warning">{warning}</p>
 										{/each}
 									</div>
 								{:else}

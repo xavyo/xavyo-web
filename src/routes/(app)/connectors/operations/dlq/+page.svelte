@@ -80,7 +80,7 @@
 		description="No operations have exceeded their maximum retries. The queue is healthy."
 	/>
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

@@ -144,7 +144,7 @@
 					<div class="flex items-center gap-3">
 						<span class="text-sm font-medium text-muted-foreground">Decision:</span>
 						{#if result.allowed}
-							<Badge class="bg-green-600 text-white hover:bg-green-600/80">Allowed</Badge>
+							<Badge class="bg-success text-success-foreground hover:bg-success/80">Allowed</Badge>
 						{:else}
 							<Badge variant="destructive">Denied</Badge>
 						{/if}

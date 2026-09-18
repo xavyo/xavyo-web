@@ -16,25 +16,25 @@
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Active</p>
-				<p class="text-2xl font-bold text-green-600 dark:text-green-400">{summary.active}</p>
+				<p class="text-2xl font-bold text-success">{summary.active}</p>
 			</CardContent>
 		</Card>
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Expired</p>
-				<p class="text-2xl font-bold text-red-600 dark:text-red-400">{summary.expired}</p>
+				<p class="text-2xl font-bold text-destructive">{summary.expired}</p>
 			</CardContent>
 		</Card>
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Suspended</p>
-				<p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{summary.suspended}</p>
+				<p class="text-2xl font-bold text-warning">{summary.suspended}</p>
 			</CardContent>
 		</Card>
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Needs Cert</p>
-				<p class="text-2xl font-bold text-orange-600 dark:text-orange-400">{summary.needs_certification}</p>
+				<p class="text-2xl font-bold text-warning">{summary.needs_certification}</p>
 			</CardContent>
 		</Card>
 		<Card>
@@ -46,7 +46,7 @@
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Inactive</p>
-				<p class="text-2xl font-bold text-gray-600 dark:text-gray-400">{summary.inactive}</p>
+				<p class="text-2xl font-bold text-muted-foreground ">{summary.inactive}</p>
 			</CardContent>
 		</Card>
 	</div>

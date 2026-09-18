@@ -9,13 +9,13 @@
 	let { status, size = 'md' }: Props = $props();
 
 	const colorMap: Record<MicroCertificationStatus, string> = {
-		pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-		approved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-		revoked: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-		auto_revoked: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-		flagged_for_review: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-		skipped: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
-		expired: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+		pending: 'bg-warning/15 text-warning',
+		approved: 'bg-success/15 text-success',
+		revoked: 'bg-destructive/15 text-destructive',
+		auto_revoked: 'bg-destructive/15 text-destructive',
+		flagged_for_review: 'bg-warning/15 text-warning',
+		skipped: 'bg-muted text-muted-foreground ',
+		expired: 'bg-warning/15 text-warning'
 	};
 
 	const labelMap: Record<MicroCertificationStatus, string> = {
@@ -28,7 +28,7 @@
 		expired: 'Expired'
 	};
 
-	const badgeColor = $derived(colorMap[status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400');
+	const badgeColor = $derived(colorMap[status] ?? 'bg-muted text-muted-foreground ');
 	const sizeClass = $derived(size === 'sm' ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1');
 </script>
 

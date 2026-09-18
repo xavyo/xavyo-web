@@ -108,7 +108,7 @@
 						<td class="px-4 py-3"><RuleTypeBadge ruleType={rule.rule_type} /></td>
 						<td class="px-4 py-3 text-foreground">{rule.priority}</td>
 						<td class="px-4 py-3">
-							<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {rule.is_enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}">
+							<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {rule.is_enabled ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground'}">
 								{rule.is_enabled ? 'Enabled' : 'Disabled'}
 							</span>
 						</td>

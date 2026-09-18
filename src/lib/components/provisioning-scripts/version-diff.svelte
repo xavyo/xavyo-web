@@ -16,9 +16,9 @@
 						{#each diff.diff_lines as line}
 							<tr
 								class={line.change_type === 'added'
-									? 'bg-green-50 dark:bg-green-900/20'
+									? 'bg-green-50 /20'
 									: line.change_type === 'removed'
-										? 'bg-red-50 dark:bg-red-900/20'
+										? 'bg-red-50 /20'
 										: ''}
 							>
 								<td class="px-2 py-0.5 text-right text-muted-foreground select-none w-12 border-r">
@@ -26,9 +26,9 @@
 								</td>
 								<td class="px-2 py-0.5 select-none w-6 text-center">
 									{#if line.change_type === 'added'}
-										<span class="text-green-600 dark:text-green-400">+</span>
+										<span class="text-success">+</span>
 									{:else if line.change_type === 'removed'}
-										<span class="text-red-600 dark:text-red-400">-</span>
+										<span class="text-destructive">-</span>
 									{:else}
 										<span class="text-muted-foreground">&nbsp;</span>
 									{/if}

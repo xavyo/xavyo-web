@@ -48,9 +48,9 @@
 	};
 
 	const circuitStateBadgeClass: Record<string, string> = {
-		closed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		open: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-		half_open: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+		closed: 'bg-success/15 text-success',
+		open: 'bg-destructive/15 text-destructive',
+		half_open: 'bg-warning/15 text-warning'
 	};
 
 	const circuitStateLabels: Record<string, string> = {
@@ -131,19 +131,19 @@
 	<div class="flex items-center gap-3">
 		<PageHeader title={dest.name} description="SIEM destination details" />
 		<span
-			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {circuitStateBadgeClass[dest.circuit_state] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}"
+			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {circuitStateBadgeClass[dest.circuit_state] ?? 'bg-muted text-muted-foreground '}"
 		>
 			{circuitStateLabels[dest.circuit_state] ?? dest.circuit_state}
 		</span>
 		{#if dest.enabled}
 			<span
-				class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+				class="inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success "
 			>
 				Enabled
 			</span>
 		{:else}
 			<span
-				class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+				class="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground "
 			>
 				Disabled
 			</span>
@@ -218,7 +218,7 @@
 			? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
 			: 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'}"
 	>
-		<p class="text-sm font-medium {testResult.success ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}">
+		<p class="text-sm font-medium {testResult.success ? 'text-success ' : 'text-destructive '}">
 			{#if testResult.success}
 				Connection test passed{testResult.latency_ms != null ? ` (${testResult.latency_ms}ms latency)` : ''}
 			{:else}
@@ -243,7 +243,7 @@
 		>
 			{tab.label}
 			{#if tab.id === 'dead-letter' && deadLetter.total > 0}
-				<span class="ml-1.5 inline-flex items-center rounded-full bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">
+				<span class="ml-1.5 inline-flex items-center rounded-full bg-destructive/15 px-1.5 py-0.5 text-xs font-medium text-destructive ">
 					{deadLetter.total}
 				</span>
 			{/if}
@@ -320,7 +320,7 @@
 					<div class="flex justify-between">
 						<span class="text-sm text-muted-foreground">Circuit State</span>
 						<span
-							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {circuitStateBadgeClass[dest.circuit_state] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}"
+							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {circuitStateBadgeClass[dest.circuit_state] ?? 'bg-muted text-muted-foreground '}"
 						>
 							{circuitStateLabels[dest.circuit_state] ?? dest.circuit_state}
 						</span>
@@ -399,7 +399,7 @@
 				<Card>
 					<CardContent class="pt-6">
 						<p class="text-sm text-muted-foreground">Delivered</p>
-						<p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">
+						<p class="mt-1 text-2xl font-bold text-success">
 							{health.total_events_delivered.toLocaleString()}
 						</p>
 					</CardContent>
@@ -407,7 +407,7 @@
 				<Card>
 					<CardContent class="pt-6">
 						<p class="text-sm text-muted-foreground">Failed</p>
-						<p class="mt-1 text-2xl font-bold text-red-600 dark:text-red-400">
+						<p class="mt-1 text-2xl font-bold text-destructive">
 							{health.total_events_failed.toLocaleString()}
 						</p>
 					</CardContent>
@@ -415,7 +415,7 @@
 				<Card>
 					<CardContent class="pt-6">
 						<p class="text-sm text-muted-foreground">Dropped</p>
-						<p class="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+						<p class="mt-1 text-2xl font-bold text-warning">
 							{health.total_events_dropped.toLocaleString()}
 						</p>
 					</CardContent>
@@ -442,7 +442,7 @@
 				<Card>
 					<CardContent class="pt-6">
 						<p class="text-sm text-muted-foreground">Dead Letter Count</p>
-						<p class="mt-1 text-2xl font-bold {health.dead_letter_count > 0 ? 'text-red-600 dark:text-red-400' : ''}">
+						<p class="mt-1 text-2xl font-bold {health.dead_letter_count > 0 ? 'text-destructive' : ''}">
 							{health.dead_letter_count.toLocaleString()}
 						</p>
 					</CardContent>
@@ -452,7 +452,7 @@
 						<p class="text-sm text-muted-foreground">Circuit State</p>
 						<p class="mt-1">
 							<span
-								class="inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {circuitStateBadgeClass[health.circuit_state] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}"
+								class="inline-flex items-center rounded-full px-2.5 py-0.5 text-sm font-medium {circuitStateBadgeClass[health.circuit_state] ?? 'bg-muted text-muted-foreground '}"
 							>
 								{circuitStateLabels[health.circuit_state] ?? health.circuit_state}
 							</span>

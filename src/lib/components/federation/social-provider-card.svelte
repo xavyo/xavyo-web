@@ -150,7 +150,7 @@
 					<h3 class="text-base font-medium">{providerDisplayName}</h3>
 					<div class="mt-0.5">
 						{#if provider.enabled}
-							<Badge class="border-transparent bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+							<Badge class="border-transparent bg-success/15 text-success">
 								Enabled
 							</Badge>
 						{:else}

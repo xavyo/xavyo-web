@@ -92,14 +92,14 @@
 	<div
 		class="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-600 dark:bg-yellow-950"
 	>
-		<h3 class="font-semibold text-yellow-800 dark:text-yellow-200">
+		<h3 class="font-semibold text-warning-foreground ">
 			New Client Secret (shown once only!)
 		</h3>
-		<p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+		<p class="mt-1 text-sm text-warning-foreground ">
 			The old secret is now invalid. Copy this new secret now — it will not be shown again.
 		</p>
 		<div class="mt-2 flex items-center gap-2">
-			<code class="flex-1 rounded bg-yellow-100 p-2 text-sm break-all dark:bg-yellow-900">
+			<code class="flex-1 rounded bg-warning/20 p-2 text-sm break-all ">
 				{regeneratedSecret}
 			</code>
 			<button

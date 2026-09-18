@@ -203,7 +203,7 @@
 			};
 		}}>
 			<div class="py-4">
-				<label for="reject-reason" class="text-sm font-medium text-foreground">Reason <span class="text-red-500">*</span></label>
+				<label for="reject-reason" class="text-sm font-medium text-foreground">Reason <span class="text-destructive">*</span></label>
 				<textarea
 					id="reject-reason"
 					name="reason"

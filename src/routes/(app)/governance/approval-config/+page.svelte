@@ -170,8 +170,8 @@
 								<td class="px-4 py-3">
 									<span
 										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {workflow.is_active
-											? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-											: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'}"
+											? 'bg-success/15 text-success'
+											: 'bg-muted text-muted-foreground '}"
 									>
 										{workflow.is_active ? 'Active' : 'Inactive'}
 									</span>
@@ -179,7 +179,7 @@
 								<td class="px-4 py-3">
 									{#if workflow.is_default}
 										<span
-											class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+											class="inline-flex items-center rounded-full bg-info/15 px-2 py-0.5 text-xs font-medium text-info "
 										>
 											Default
 										</span>
@@ -243,8 +243,8 @@
 								<td class="px-4 py-3">
 									<span
 										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {group.is_active
-											? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-											: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'}"
+											? 'bg-success/15 text-success'
+											: 'bg-muted text-muted-foreground '}"
 									>
 										{group.is_active ? 'Active' : 'Disabled'}
 									</span>
@@ -308,8 +308,8 @@
 								<td class="px-4 py-3">
 									<span
 										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {policy.is_active
-											? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-											: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'}"
+											? 'bg-success/15 text-success'
+											: 'bg-muted text-muted-foreground '}"
 									>
 										{policy.is_active ? 'Active' : 'Inactive'}
 									</span>
@@ -318,10 +318,10 @@
 									<span
 										class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
 											{policy.final_fallback === 'auto_reject'
-											? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+											? 'bg-destructive/15 text-destructive'
 											: policy.final_fallback === 'auto_approve'
-												? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-												: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'}"
+												? 'bg-success/15 text-success'
+												: 'bg-info/15 text-info'}"
 									>
 										{fallbackLabels[policy.final_fallback] ?? policy.final_fallback}
 									</span>

@@ -78,26 +78,26 @@
 	function policyStatusClass(status: string): string {
 		switch (status) {
 			case 'active':
-				return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+				return 'bg-success/15 text-success';
 			case 'inactive':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+				return 'bg-warning/15 text-warning';
 			case 'archived':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+				return 'bg-muted text-muted-foreground ';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
 	function eventTypeBadgeClass(type: string): string {
 		switch (type) {
 			case 'joiner':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'bg-info/15 text-info';
 			case 'mover':
 				return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
 			case 'leaver':
-				return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'bg-destructive/15 text-destructive';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
@@ -107,8 +107,8 @@
 
 	function eventStatusClass(event: LifecycleEvent): string {
 		return event.processed_at
-			? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-			: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+			? 'bg-success/15 text-success'
+			: 'bg-warning/15 text-warning';
 	}
 
 	function truncateId(id: string): string {
@@ -201,7 +201,7 @@
 
 <PageHeader
 		title="Birthright Access"
-		description="Manage birthright policies and lifecycle events for automated entitlement provisioning"
+		description="Policies, events, and automatic access."
 	/>
 
 <!-- Tab navigation -->

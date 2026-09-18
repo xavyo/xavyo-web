@@ -33,7 +33,7 @@ describe('DashboardMetricCard', () => {
 			props: { label: 'At Risk', value: 3, variant: 'warning' }
 		});
 		const valueEl = container.querySelector('.text-2xl');
-		expect(valueEl?.className).toContain('text-orange-600');
+		expect(valueEl?.className).toContain('text-warning');
 	});
 
 	it('applies text-red class for danger variant', () => {
@@ -41,7 +41,7 @@ describe('DashboardMetricCard', () => {
 			props: { label: 'Breached', value: 1, variant: 'danger' }
 		});
 		const valueEl = container.querySelector('.text-2xl');
-		expect(valueEl?.className).toContain('text-red-600');
+		expect(valueEl?.className).toContain('text-destructive');
 	});
 
 	it('applies text-green class for success variant', () => {
@@ -49,7 +49,7 @@ describe('DashboardMetricCard', () => {
 			props: { label: 'Completed', value: 25, variant: 'success' }
 		});
 		const valueEl = container.querySelector('.text-2xl');
-		expect(valueEl?.className).toContain('text-green-600');
+		expect(valueEl?.className).toContain('text-success');
 	});
 
 	it('renders inside a bordered card container', () => {

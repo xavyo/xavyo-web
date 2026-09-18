@@ -173,7 +173,7 @@
 						id="filter_metadata"
 						name="filter_metadata"
 						class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-						placeholder={'{\n  "location": "US"\n}'}
+						placeholder={'{\n "location": "US"\n}'}
 						value={String($form.filter_metadata ?? '')}
 					></textarea>
 					{#if $errors.filter_metadata}

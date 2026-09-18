@@ -6,18 +6,18 @@
 	let { status }: Props = $props();
 
 	const statusColors: Record<string, string> = {
-		pending: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-		in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-		completed: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-		failed: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+		pending: 'bg-muted text-muted-foreground ',
+		in_progress: 'bg-info/15 text-info',
+		completed: 'bg-success/15 text-success',
+		failed: 'bg-destructive/15 text-destructive',
 		dead_letter: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
 		awaiting_system: 'bg-primary/15 text-primary',
 		resolved: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
-		cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
+		cancelled: 'bg-muted text-muted-foreground '
 	};
 
 	const colorClass = $derived(
-		statusColors[status] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+		statusColors[status] ?? 'bg-muted text-muted-foreground '
 	);
 
 	const displayText = $derived(

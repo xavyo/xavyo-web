@@ -27,7 +27,7 @@ describe('ActionTypeBadge', () => {
 
 	it('applies blue styles for default', () => {
 		render(ActionTypeBadge, { props: { ruleType: 'default' } });
-		expect(screen.getByText('Default').className).toContain('bg-blue-100');
+		expect(screen.getByText('Default').className).toContain('bg-info/15');
 	});
 
 	it('applies purple styles for computed', () => {

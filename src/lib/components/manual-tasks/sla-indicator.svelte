@@ -12,9 +12,9 @@
 	);
 
 	const config: Record<string, { label: string; class: string }> = {
-		breached: { label: 'SLA Breached', class: 'text-red-600 dark:text-red-400' },
-		'at-risk': { label: 'SLA At Risk', class: 'text-orange-600 dark:text-orange-400' },
-		normal: { label: 'On Track', class: 'text-green-600 dark:text-green-400' }
+		breached: { label: 'SLA Breached', class: 'text-destructive' },
+		'at-risk': { label: 'SLA At Risk', class: 'text-warning' },
+		normal: { label: 'On Track', class: 'text-success' }
 	};
 
 	const current = $derived(config[status]);

@@ -112,7 +112,7 @@
 							<span
 								class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {factor.category ===
 								'static'
-									? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+									? 'bg-info/15 text-info'
 									: 'bg-primary/15 text-primary'}"
 							>
 								{factor.category}
@@ -123,8 +123,8 @@
 						<td class="px-4 py-3">
 							<span
 								class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {factor.is_enabled
-									? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-									: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}"
+									? 'bg-success/15 text-success'
+									: 'bg-muted text-muted-foreground'}"
 							>
 								{factor.is_enabled ? 'Enabled' : 'Disabled'}
 							</span>

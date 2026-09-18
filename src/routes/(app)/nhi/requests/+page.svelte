@@ -35,25 +35,25 @@
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Pending</p>
-				<p class="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{summary.pending}</p>
+				<p class="text-2xl font-bold text-warning">{summary.pending}</p>
 			</CardContent>
 		</Card>
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Approved</p>
-				<p class="text-2xl font-bold text-green-600 dark:text-green-400">{summary.approved}</p>
+				<p class="text-2xl font-bold text-success">{summary.approved}</p>
 			</CardContent>
 		</Card>
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Rejected</p>
-				<p class="text-2xl font-bold text-red-600 dark:text-red-400">{summary.rejected}</p>
+				<p class="text-2xl font-bold text-destructive">{summary.rejected}</p>
 			</CardContent>
 		</Card>
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Cancelled</p>
-				<p class="text-2xl font-bold text-gray-600 dark:text-gray-400">{summary.cancelled}</p>
+				<p class="text-2xl font-bold text-muted-foreground ">{summary.cancelled}</p>
 			</CardContent>
 		</Card>
 	</div>
@@ -72,7 +72,7 @@
 {#if requests.length === 0}
 	<EmptyState title="No requests found" description="No NHI access requests match your filters." actionLabel="Submit a Request" actionHref="/nhi/requests/create" />
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

@@ -261,7 +261,7 @@
 		</a>
 		<button
 			onclick={handleDelete}
-			class="rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+			class="rounded-md bg-destructive px-3 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
 		>
 			Delete
 		</button>
@@ -283,7 +283,7 @@
 				aria-selected={activeTab === tab.id}
 				onclick={() => activeTab = tab.id}
 				class="border-b-2 px-1 py-3 text-sm font-medium transition-colors {activeTab === tab.id
-					? 'border-blue-500 text-blue-600 dark:text-blue-400'
+					? 'border-blue-500 text-info'
 					: 'border-transparent text-zinc-500 hover:border-zinc-300 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'}"
 			>
 				{tab.label}
@@ -349,7 +349,7 @@
 		<div class="space-y-4">
 			<button
 				onclick={() => showAddRule = !showAddRule}
-				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+				class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 			>
 				{showAddRule ? 'Cancel' : 'Add Rule'}
 			</button>
@@ -387,22 +387,22 @@
 									<span class="max-w-xs truncate text-xs font-mono text-zinc-500">{rule.expression}</span>
 									<span class="text-xs text-zinc-400">{strengthLabels[rule.strength] ?? rule.strength}</span>
 									{#if rule.authoritative}
-										<span class="rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-400">Auth</span>
+										<span class="rounded bg-success/15 px-1.5 py-0.5 text-xs text-success ">Auth</span>
 									{/if}
 									{#if rule.exclusive}
-										<span class="rounded bg-red-100 px-1.5 py-0.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-400">Excl</span>
+										<span class="rounded bg-destructive/15 px-1.5 py-0.5 text-xs text-destructive ">Excl</span>
 									{/if}
 								</div>
 								<div class="flex gap-2">
 									<button
 										onclick={() => editingRuleId = rule.id}
-										class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+										class="text-sm text-info hover:underline "
 									>
 										Edit
 									</button>
 									<button
 										onclick={() => handleDeleteRule(rule.id)}
-										class="text-sm text-red-600 hover:underline dark:text-red-400"
+										class="text-sm text-destructive hover:underline "
 									>
 										Delete
 									</button>
@@ -419,7 +419,7 @@
 		<div class="space-y-4">
 			<button
 				onclick={() => showAddScope = !showAddScope}
-				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+				class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 			>
 				{showAddScope ? 'Cancel' : 'Add Scope'}
 			</button>
@@ -468,7 +468,7 @@
 					<div class="flex gap-2">
 						<button
 							onclick={handleAddScope}
-							class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+							class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 						>
 							Add Scope
 						</button>
@@ -496,7 +496,7 @@
 							</div>
 							<button
 								onclick={() => handleDeleteScope(scope.id)}
-								class="text-sm text-red-600 hover:underline dark:text-red-400"
+								class="text-sm text-destructive hover:underline "
 							>
 								Delete
 							</button>

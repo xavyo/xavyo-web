@@ -23,13 +23,13 @@ describe('TemplateStatusBadge', () => {
 	it('applies blue styles for draft', () => {
 		render(TemplateStatusBadge, { props: { status: 'draft' } });
 		const badge = screen.getByText('Draft');
-		expect(badge.className).toContain('bg-blue-100');
+		expect(badge.className).toContain('bg-info/15');
 	});
 
 	it('applies green styles for active', () => {
 		render(TemplateStatusBadge, { props: { status: 'active' } });
 		const badge = screen.getByText('Active');
-		expect(badge.className).toContain('bg-green-100');
+		expect(badge.className).toContain('bg-success/15');
 	});
 
 	it('applies zinc styles for disabled', () => {

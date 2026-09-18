@@ -91,7 +91,7 @@
 					id="policy_config"
 					name="policy_config"
 					class="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-					placeholder={'{\n  "rules": [],\n  "scope": "all_users"\n}'}
+					placeholder={'{\n "rules": [],\n "scope": "all_users"\n}'}
 					value={String($form.policy_config ?? '')}
 				></textarea>
 				{#if $errors.policy_config}

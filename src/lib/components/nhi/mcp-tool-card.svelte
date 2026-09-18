@@ -31,9 +31,9 @@
 
 	const statusClass = $derived(
 		tool.status === 'active'
-			? 'bg-green-600 text-white hover:bg-green-600/80'
+			? 'bg-success text-success-foreground hover:bg-success/80'
 			: tool.status === 'deprecated'
-				? 'bg-yellow-500 text-white hover:bg-yellow-500/80'
+				? 'bg-warning text-white hover:bg-warning/80'
 				: ''
 	);
 
@@ -85,7 +85,7 @@
 						{tool.status}
 					</Badge>
 					{#if tool.deprecated}
-						<Badge variant="outline" class="text-yellow-600">deprecated</Badge>
+						<Badge variant="outline" class="text-warning">deprecated</Badge>
 					{/if}
 				</div>
 				{#if tool.description && !expanded}

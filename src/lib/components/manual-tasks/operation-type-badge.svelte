@@ -11,7 +11,7 @@
 		modify: { label: 'Modify', class: 'bg-primary/15 text-primary' }
 	};
 
-	const current = $derived(config[operationType] ?? { label: operationType, class: 'bg-gray-100 text-gray-800' });
+	const current = $derived(config[operationType] ?? { label: operationType, class: 'bg-muted text-muted-foreground' });
 </script>
 
 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {current.class}">

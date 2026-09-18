@@ -20,13 +20,13 @@
 	function eventTypeBadgeClass(type: string): string {
 		switch (type) {
 			case 'joiner':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'bg-info/15 text-info';
 			case 'mover':
 				return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
 			case 'leaver':
-				return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'bg-destructive/15 text-destructive';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
@@ -109,11 +109,11 @@
 			<div>
 				<p class="text-sm font-medium text-muted-foreground">Status</p>
 				{#if isProcessed}
-					<span class="mt-1 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+					<span class="mt-1 inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success ">
 						processed
 					</span>
 				{:else}
-					<span class="mt-1 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+					<span class="mt-1 inline-flex items-center rounded-full bg-warning/20 px-2.5 py-0.5 text-xs font-medium text-warning-foreground ">
 						pending
 					</span>
 				{/if}
@@ -131,15 +131,15 @@
 		<CardContent>
 			<div class="grid grid-cols-2 gap-4 md:grid-cols-4">
 				<div class="rounded-lg border border-border p-4 text-center">
-					<p class="text-2xl font-bold text-green-600 dark:text-green-400">{processSummary.provisioned}</p>
+					<p class="text-2xl font-bold text-success">{processSummary.provisioned}</p>
 					<p class="text-sm text-muted-foreground">Provisioned</p>
 				</div>
 				<div class="rounded-lg border border-border p-4 text-center">
-					<p class="text-2xl font-bold text-red-600 dark:text-red-400">{processSummary.revoked}</p>
+					<p class="text-2xl font-bold text-destructive">{processSummary.revoked}</p>
 					<p class="text-sm text-muted-foreground">Revoked</p>
 				</div>
 				<div class="rounded-lg border border-border p-4 text-center">
-					<p class="text-2xl font-bold text-gray-600 dark:text-gray-400">{processSummary.skipped}</p>
+					<p class="text-2xl font-bold text-muted-foreground ">{processSummary.skipped}</p>
 					<p class="text-sm text-muted-foreground">Skipped</p>
 				</div>
 				<div class="rounded-lg border border-border p-4 text-center">

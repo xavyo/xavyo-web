@@ -56,7 +56,7 @@
 		<PageHeader title={data.idp.name} description="Identity provider details" />
 		<div class="flex gap-1.5">
 			{#if data.idp.is_enabled}
-				<Badge class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+				<Badge class="bg-success/15 text-success">
 					<CheckCircle class="mr-1 h-3 w-3" />Enabled
 				</Badge>
 			{:else}
@@ -65,7 +65,7 @@
 				</Badge>
 			{/if}
 			{#if data.idp.validation_status === 'valid'}
-				<Badge class="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">Valid</Badge>
+				<Badge class="bg-info/15 text-info">Valid</Badge>
 			{:else if data.idp.validation_status === 'invalid'}
 				<Badge variant="destructive">Invalid</Badge>
 			{/if}

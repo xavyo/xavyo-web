@@ -23,7 +23,7 @@
 {:else if status === 'expired'}
 	<Badge variant="destructive">{labelMap[status]}</Badge>
 {:else if status === 'suspended'}
-	<Badge class="border-transparent bg-orange-500 text-white shadow-xs hover:bg-orange-500/80">{labelMap[status]}</Badge>
+	<Badge class="border-transparent bg-warning text-white shadow-xs hover:bg-warning/80">{labelMap[status]}</Badge>
 {:else if status === 'archived'}
 	<Badge variant="secondary">{labelMap[status]}</Badge>
 {/if}

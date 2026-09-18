@@ -33,13 +33,13 @@ describe('RiskLevelBadge', () => {
 	it('applies green styling for low', () => {
 		render(RiskLevelBadge, { props: { level: 'low' } });
 		const el = screen.getByText('Low');
-		expect(el.className).toContain('bg-green-100');
+		expect(el.className).toContain('bg-success/15');
 	});
 
 	it('applies red styling for critical', () => {
 		render(RiskLevelBadge, { props: { level: 'critical' } });
 		const el = screen.getByText('Critical');
-		expect(el.className).toContain('bg-red-100');
+		expect(el.className).toContain('bg-destructive/15');
 	});
 });
 
@@ -69,13 +69,13 @@ describe('ClassificationBadge', () => {
 	it('applies gray styling for none', () => {
 		render(ClassificationBadge, { props: { classification: 'none' } });
 		const el = screen.getByText('None');
-		expect(el.className).toContain('bg-gray-100');
+		expect(el.className).toContain('bg-muted');
 	});
 
 	it('applies red styling for special_category', () => {
 		render(ClassificationBadge, { props: { classification: 'special_category' } });
 		const el = screen.getByText('Special Category');
-		expect(el.className).toContain('bg-red-100');
+		expect(el.className).toContain('bg-destructive/15');
 	});
 });
 
@@ -105,13 +105,13 @@ describe('StatusBadge', () => {
 	it('applies green styling for active', () => {
 		render(StatusBadge, { props: { status: 'active' } });
 		const el = screen.getByText('Active');
-		expect(el.className).toContain('bg-green-100');
+		expect(el.className).toContain('bg-success/15');
 	});
 
 	it('applies fallback styling for unknown status', () => {
 		render(StatusBadge, { props: { status: 'unknown' } });
 		const el = screen.getByText('unknown');
-		expect(el.className).toContain('bg-gray-100');
+		expect(el.className).toContain('bg-muted');
 	});
 });
 

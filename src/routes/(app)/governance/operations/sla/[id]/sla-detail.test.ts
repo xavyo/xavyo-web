@@ -173,16 +173,16 @@ describe('SLA Detail rendering logic', () => {
 	describe('statusBadgeColor', () => {
 		function statusBadgeColor(active: boolean): string {
 			return active
-				? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-				: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				? 'bg-success/15 text-success'
+				: 'bg-muted text-muted-foreground';
 		}
 
 		it('active status gets green badge', () => {
-			expect(statusBadgeColor(true)).toContain('green');
+			expect(statusBadgeColor(true)).toContain('success');
 		});
 
 		it('inactive status gets gray badge', () => {
-			expect(statusBadgeColor(false)).toContain('gray');
+			expect(statusBadgeColor(false)).toContain('muted');
 		});
 	});
 

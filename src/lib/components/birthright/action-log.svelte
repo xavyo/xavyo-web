@@ -8,11 +8,11 @@
 	let { actions }: Props = $props();
 
 	const actionTypeBadgeClass: Record<string, string> = {
-		provision: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		revoke: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+		provision: 'bg-success/15 text-success',
+		revoke: 'bg-destructive/15 text-destructive',
 		schedule_revoke: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
-		cancel_revoke: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-		skip: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+		cancel_revoke: 'bg-info/15 text-info',
+		skip: 'bg-muted text-muted-foreground'
 	};
 
 	function formatActionType(type: string): string {
@@ -31,7 +31,7 @@
 	{#if actions.length === 0}
 		<p class="text-sm text-muted-foreground">No actions recorded.</p>
 	{:else}
-		<div class="rounded-md border">
+		<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 			<table class="w-full text-sm">
 				<thead>
 					<tr class="border-b bg-muted/50">
@@ -47,7 +47,7 @@
 					{#each actions as action}
 						<tr class="border-b last:border-0">
 							<td class="px-3 py-2">
-								<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {actionTypeBadgeClass[action.action_type] ?? 'bg-gray-100 text-gray-800'}">
+								<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {actionTypeBadgeClass[action.action_type] ?? 'bg-muted text-muted-foreground'}">
 									{formatActionType(action.action_type)}
 								</span>
 							</td>

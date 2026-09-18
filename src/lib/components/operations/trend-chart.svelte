@@ -28,11 +28,11 @@
 </script>
 
 {#if dataPoints.length === 0}
-	<p class="text-sm text-gray-500 dark:text-gray-400">No trend data available.</p>
+	<p class="text-sm text-muted-foreground ">No trend data available.</p>
 {:else}
 	<div class="flex gap-2">
 		<!-- Y-axis labels -->
-		<div class="flex flex-col justify-between py-1 text-xs text-gray-500 dark:text-gray-400 w-8 text-right shrink-0">
+		<div class="flex flex-col justify-between py-1 text-xs text-muted-foreground w-8 text-right shrink-0">
 			<span>{maxValue}</span>
 			<span>0</span>
 		</div>
@@ -43,7 +43,7 @@
 			<div class="flex items-end gap-1 h-48">
 				{#each dataPoints as point}
 					<div
-						class="flex-1 rounded-t bg-blue-500 dark:bg-blue-400 transition-all min-w-1"
+						class="flex-1 rounded-t bg-info dark:bg-blue-400 transition-all min-w-1"
 						style="height: {barHeight(point.total)}"
 						title="{point.date}: {point.total}"
 					></div>
@@ -55,7 +55,7 @@
 				{#each dataPoints as point}
 					<div class="flex-1 min-w-1">
 						<span
-							class="block text-xs text-gray-500 dark:text-gray-400 origin-top-left rotate-45 whitespace-nowrap"
+							class="block text-xs text-muted-foreground origin-top-left rotate-45 whitespace-nowrap"
 						>
 							{formatDate(point.date)}
 						</span>

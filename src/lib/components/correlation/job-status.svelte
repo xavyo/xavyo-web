@@ -33,11 +33,11 @@
 	function statusBadgeClass(status: string): string {
 		switch (status) {
 			case 'running':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'completed':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'failed':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			default:
 				return '';
 		}
@@ -124,11 +124,11 @@
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-2">
 					{#if currentJob.status === 'running'}
-						<Loader2 class="h-4 w-4 animate-spin text-yellow-600 dark:text-yellow-400" />
+						<Loader2 class="h-4 w-4 animate-spin text-warning" />
 					{:else if currentJob.status === 'completed'}
-						<CheckCircle class="h-4 w-4 text-green-600 dark:text-green-400" />
+						<CheckCircle class="h-4 w-4 text-success" />
 					{:else}
-						<XCircle class="h-4 w-4 text-red-600 dark:text-red-400" />
+						<XCircle class="h-4 w-4 text-destructive" />
 					{/if}
 					<Badge class={statusBadgeClass(currentJob.status)}>{currentJob.status}</Badge>
 				</div>
@@ -162,8 +162,8 @@
 				<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 					<div class="rounded-md border bg-green-50 p-3 dark:bg-green-950">
 						<div class="flex items-center gap-1.5">
-							<CheckCircle class="h-4 w-4 text-green-600 dark:text-green-400" />
-							<span class="text-xs font-medium text-green-800 dark:text-green-200">Auto-Confirmed</span>
+							<CheckCircle class="h-4 w-4 text-success" />
+							<span class="text-xs font-medium text-success ">Auto-Confirmed</span>
 						</div>
 						<p class="mt-1 text-2xl font-bold text-green-900 dark:text-green-100">{currentJob.auto_confirmed}</p>
 					</div>
@@ -174,17 +174,17 @@
 						</div>
 						<p class="mt-1 text-2xl font-bold text-amber-900 dark:text-amber-100">{currentJob.queued_for_review}</p>
 					</div>
-					<div class="rounded-md border bg-gray-50 p-3 dark:bg-gray-900">
+					<div class="rounded-md border bg-gray-50 p-3 ">
 						<div class="flex items-center gap-1.5">
-							<HelpCircle class="h-4 w-4 text-gray-500 dark:text-gray-400" />
-							<span class="text-xs font-medium text-gray-700 dark:text-gray-300">No Match</span>
+							<HelpCircle class="h-4 w-4 text-muted-foreground " />
+							<span class="text-xs font-medium text-muted-foreground ">No Match</span>
 						</div>
 						<p class="mt-1 text-2xl font-bold text-gray-900 dark:text-gray-100">{currentJob.no_match}</p>
 					</div>
 					<div class="rounded-md border bg-red-50 p-3 dark:bg-red-950">
 						<div class="flex items-center gap-1.5">
-							<AlertTriangle class="h-4 w-4 text-red-600 dark:text-red-400" />
-							<span class="text-xs font-medium text-red-800 dark:text-red-200">Errors</span>
+							<AlertTriangle class="h-4 w-4 text-destructive" />
+							<span class="text-xs font-medium text-destructive ">Errors</span>
 						</div>
 						<p class="mt-1 text-2xl font-bold text-red-900 dark:text-red-100">{currentJob.errors}</p>
 					</div>

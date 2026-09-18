@@ -276,7 +276,7 @@
 									<Pencil class="h-3.5 w-3.5" />
 								</button>
 								{#if device.is_current}
-									<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+									<span class="inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success ">
 										Current device
 									</span>
 								{/if}
@@ -299,7 +299,7 @@
 
 							<div class="mt-2 flex flex-wrap items-center gap-2">
 								{#if device.is_trusted}
-									<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+									<span class="inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success ">
 										Trusted
 									</span>
 									<span class="text-xs text-muted-foreground">

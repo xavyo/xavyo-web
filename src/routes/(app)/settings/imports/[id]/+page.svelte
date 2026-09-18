@@ -26,36 +26,36 @@
 	function statusBadgeColor(status: ImportJobStatus): string {
 		switch (status) {
 			case 'pending':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'processing':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'completed':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'failed':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			case 'cancelled':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	}
 
 	function errorTypeBadgeColor(errorType: ImportErrorType): string {
 		switch (errorType) {
 			case 'validation':
-				return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+				return 'bg-warning/15 text-warning';
 			case 'duplicate_in_file':
 			case 'duplicate_in_tenant':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'role_not_found':
 			case 'group_error':
 				return 'bg-primary/15 text-primary';
 			case 'attribute_error':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'system':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	}
 
@@ -157,13 +157,13 @@
 
 			<div class="flex justify-between">
 				<span class="text-sm text-muted-foreground">Successful</span>
-				<span class="text-sm font-medium text-green-600 dark:text-green-400">
+				<span class="text-sm font-medium text-success">
 					{job.success_count}
 				</span>
 			</div>
 			<div class="flex justify-between">
 				<span class="text-sm text-muted-foreground">Errors</span>
-				<span class="text-sm font-medium text-red-600 dark:text-red-400">
+				<span class="text-sm font-medium text-destructive">
 					{job.error_count}
 				</span>
 			</div>
@@ -176,7 +176,7 @@
 				<Separator />
 				<div>
 					<span class="text-sm text-muted-foreground">Error Message</span>
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{job.error_message}</p>
+					<p class="mt-1 text-sm text-destructive">{job.error_message}</p>
 				</div>
 			{/if}
 
@@ -210,7 +210,7 @@
 			</div>
 		</CardHeader>
 		<CardContent>
-			<div class="rounded-md border">
+			<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b bg-muted/50">

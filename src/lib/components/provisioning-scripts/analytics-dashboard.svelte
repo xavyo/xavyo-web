@@ -52,7 +52,7 @@
 	{#if dashboard.scripts.length > 0}
 		<div class="mt-6">
 			<h3 class="text-sm font-medium mb-3">Per-Script Summary</h3>
-			<div class="rounded-md border">
+			<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b bg-muted/50">
@@ -72,8 +72,8 @@
 									</a>
 								</td>
 								<td class="px-4 py-2 text-right">{script.total_executions}</td>
-								<td class="px-4 py-2 text-right text-green-600 dark:text-green-400">{script.success_count}</td>
-								<td class="px-4 py-2 text-right text-red-600 dark:text-red-400">{script.failure_count}</td>
+								<td class="px-4 py-2 text-right text-success">{script.success_count}</td>
+								<td class="px-4 py-2 text-right text-destructive">{script.failure_count}</td>
 								<td class="px-4 py-2 text-right">{Number(script.avg_duration_ms).toFixed(0)}ms</td>
 							</tr>
 						{/each}

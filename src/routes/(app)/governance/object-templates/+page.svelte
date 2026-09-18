@@ -47,7 +47,7 @@
 
 <PageHeader
 	title="Object Templates"
-	description="Manage templates that automatically apply rules to identity objects during their lifecycle."
+	description="Rules applied automatically as identities change."
 />
 
 <div class="space-y-4">
@@ -77,7 +77,7 @@
 
 		<a
 			href="/governance/object-templates/create"
-			class="ml-auto rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+			class="ml-auto rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 		>
 			Create Template
 		</a>
@@ -102,7 +102,7 @@
 					{#each templates as template}
 						<tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
 							<td class="px-4 py-3">
-								<a href="/governance/object-templates/{template.id}" class="font-medium text-blue-600 hover:underline dark:text-blue-400">
+								<a href="/governance/object-templates/{template.id}" class="font-medium text-info hover:underline ">
 									{template.name}
 								</a>
 								{#if template.description}

@@ -11,9 +11,9 @@ const TENANT = 'tid';
 
 const xml = `<?xml version="1.0"?>
 <EntityDescriptor entityID="https://idp.example">
-  <IDPSSODescriptor>
-    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp.example/saml/sso"/>
-  </IDPSSODescriptor>
+ <IDPSSODescriptor>
+ <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://idp.example/saml/sso"/>
+ </IDPSSODescriptor>
 </EntityDescriptor>`;
 
 describe('GET /api/federation/saml/idp-info', () => {
