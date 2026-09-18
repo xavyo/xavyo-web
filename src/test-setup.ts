@@ -4,9 +4,9 @@ import { afterEach, afterAll } from 'vitest';
 // `document` still exists.
 //
 // bits-ui dialogs schedule teardown asynchronously when they close/unmount:
-// - `animations-complete` queues a `requestAnimationFrame`, and
-// - `body-scroll-lock` schedules a ~24ms `setTimeout` whose callback touches
-// `document.body` to restore styles.
+//   - `animations-complete` queues a `requestAnimationFrame`, and
+//   - `body-scroll-lock` schedules a ~24ms `setTimeout` whose callback touches
+//     `document.body` to restore styles.
 // Under full-suite timing, a continuation scheduled by the *last* test in a file
 // can otherwise fire after that file's jsdom environment has been torn down,
 // producing a flaky "ReferenceError: document is not defined" unhandled error
