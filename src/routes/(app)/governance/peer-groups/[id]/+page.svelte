@@ -16,75 +16,70 @@
 	};
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title={group.name} description="Peer group details" />
-	<div class="flex gap-2">
+<PageHeader title={group.name} description="Peer group details">
+	<form
+		method="POST"
+		action="?/refresh"
+		use:enhance={() => {
+			refreshing = true;
+			return async ({ result, update }) => {
+				refreshing = false;
+				if (result.type === 'success') {
+					addToast('success', 'Peer group refreshed');
+					await update();
+				} else {
+					addToast('error', 'Failed to refresh');
+				}
+			};
+		}}
+	>
+		<button
+			type="submit"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+			disabled={refreshing}
+		>
+			{refreshing ? 'Refreshing...' : 'Refresh stats'}
+		</button>
+	</form>
+	{#if !confirmDelete}
+		<button
+			class="inline-flex h-10 items-center justify-center rounded-md bg-destructive px-4 text-sm font-medium text-destructive-foreground transition-colors hover:bg-destructive/90"
+			onclick={() => (confirmDelete = true)}
+		>
+			Delete
+		</button>
+	{:else}
 		<form
 			method="POST"
-			action="?/refresh"
+			action="?/delete"
 			use:enhance={() => {
-				refreshing = true;
 				return async ({ result, update }) => {
-					refreshing = false;
-					if (result.type === 'success') {
-						addToast('success', 'Peer group refreshed');
+					if (result.type === 'redirect') {
+						addToast('success', 'Peer group deleted');
 						await update();
 					} else {
-						addToast('error', 'Failed to refresh');
+						addToast('error', 'Failed to delete');
+						confirmDelete = false;
 					}
 				};
 			}}
 		>
 			<button
 				type="submit"
-				class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-				disabled={refreshing}
+				class="inline-flex h-10 items-center justify-center rounded-md bg-destructive px-4 text-sm font-medium text-destructive-foreground transition-colors hover:bg-destructive/90"
 			>
-				{refreshing ? 'Refreshing...' : 'Refresh Stats'}
+				Confirm delete
+			</button>
+			<button
+				type="button"
+				class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+				onclick={() => (confirmDelete = false)}
+			>
+				Cancel
 			</button>
 		</form>
-		{#if !confirmDelete}
-			<button
-				class="inline-flex items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground ring-offset-background transition-colors hover:bg-destructive/90"
-				onclick={() => (confirmDelete = true)}
-			>
-				Delete
-			</button>
-		{:else}
-			<form
-				method="POST"
-				action="?/delete"
-				use:enhance={() => {
-					return async ({ result, update }) => {
-						if (result.type === 'redirect') {
-							addToast('success', 'Peer group deleted');
-							await update();
-						} else {
-							addToast('error', 'Failed to delete');
-							confirmDelete = false;
-						}
-					};
-				}}
-			>
-				<div class="flex gap-2">
-					<button
-						type="submit"
-						class="inline-flex items-center justify-center rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground ring-offset-background transition-colors hover:bg-destructive/90"
-					>
-						Confirm Delete
-					</button>
-					<button
-						type="button"
-						class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
-						onclick={() => (confirmDelete = false)}
-					>
-						Cancel
-					</button>
-				</div>
-			</form>
-		{/if}
-	</div>
-</div>
+	{/if}
+</PageHeader>
 
 <div class="mt-6 max-w-2xl space-y-6">
 	<div class="rounded-lg border border-border bg-card p-6">

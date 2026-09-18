@@ -45,14 +45,14 @@ describe('Button', () => {
 	it('renders with lg size', () => {
 		render(Button, { props: { size: 'lg' } });
 		const btn = screen.getByRole('button');
-		expect(btn.className).toContain('h-10');
+		expect(btn.className).toContain('h-11');
 	});
 
 	it('renders with icon size', () => {
 		render(Button, { props: { size: 'icon' } });
 		const btn = screen.getByRole('button');
-		expect(btn.className).toContain('h-9');
-		expect(btn.className).toContain('w-9');
+		expect(btn.className).toContain('h-10');
+		expect(btn.className).toContain('w-10');
 	});
 
 	it('accepts custom class', () => {

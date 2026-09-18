@@ -13,7 +13,7 @@
 
 <Tabs.List
 	class={cn(
-		'inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground',
+		'inline-flex h-10 w-full items-center justify-start gap-1 border-b border-border bg-transparent p-0 text-muted-foreground',
 		className
 	)}
 >

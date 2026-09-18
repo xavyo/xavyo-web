@@ -15,7 +15,7 @@ describe('nhiTypeClass', () => {
 	});
 
 	it('returns purple for agent', () => {
-		expect(nhiTypeClass('agent')).toContain('bg-purple-600');
+		expect(nhiTypeClass('agent')).toContain('bg-primary');
 	});
 
 	it('returns teal for service_account', () => {

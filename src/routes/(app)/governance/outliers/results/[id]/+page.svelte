@@ -47,20 +47,15 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Outlier Result Detail"
-		description="User: {result.user_id.substring(0, 8)}..."
-	/>
-	<div class="flex gap-2">
-		<button
-			class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+<PageHeader title="Outlier Result Detail"
+		description="User: {result.user_id.substring(0, 8)}...">
+	<button
+			class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 			onclick={() => (showDispositionForm = !showDispositionForm)}
 		>
 			{showDispositionForm ? 'Cancel' : 'Add Disposition'}
 		</button>
-	</div>
-</div>
+</PageHeader>
 
 {#if showDispositionForm}
 	<div class="mb-6 rounded-lg border border-border bg-card p-4">

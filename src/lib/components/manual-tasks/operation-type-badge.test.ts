@@ -37,8 +37,8 @@ describe('OperationTypeBadge', () => {
 	it('applies purple class for modify', () => {
 		render(OperationTypeBadge, { props: { operationType: 'modify' } });
 		const badge = document.querySelector('span');
-		expect(badge?.className).toContain('bg-purple-100');
-		expect(badge?.className).toContain('text-purple-800');
+		expect(badge?.className).toContain('bg-primary/15');
+		expect(badge?.className).toContain('text-primary');
 	});
 
 	it('renders as a span element with badge styling', () => {

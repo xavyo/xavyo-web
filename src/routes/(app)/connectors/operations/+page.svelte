@@ -98,23 +98,20 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Operations Queue" description="Monitor provisioning operations across all connectors" />
-	<div class="flex gap-2">
-		<a
+<PageHeader title="Operations Queue" description="Monitor provisioning operations across all connectors">
+	<a
 			href="/connectors/operations/dlq"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Dead Letter Queue
 		</a>
 		<a
 			href="/connectors/conflicts"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Conflicts
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 {#if stats}
 	<div class="mb-6">
@@ -172,7 +169,6 @@
 		<EmptyState
 			title="No operations match your filters"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -193,7 +189,6 @@
 		<EmptyState
 			title="No operations"
 			description="No provisioning operations have been recorded yet."
-			icon="inbox"
 		/>
 	{/if}
 {:else}

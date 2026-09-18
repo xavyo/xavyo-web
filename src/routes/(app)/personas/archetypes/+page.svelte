@@ -98,22 +98,20 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Archetypes" description="Manage persona archetypes" />
+<PageHeader title="Archetypes" description="Manage persona archetypes">
 	<a
 		href="/personas/archetypes/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create archetype
 	</a>
-</div>
+</PageHeader>
 
 {#snippet emptyState()}
 	{#if hasSearchFilter}
 		<EmptyState
 			title="No archetypes match your search"
 			description="Try adjusting your search term."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -127,7 +125,6 @@
 		<EmptyState
 			title="No archetypes yet"
 			description="Create your first archetype to get started."
-			icon="🏛️"
 			actionLabel="Create archetype"
 			actionHref="/personas/archetypes/create"
 		/>

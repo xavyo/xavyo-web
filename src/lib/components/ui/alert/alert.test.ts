@@ -17,7 +17,7 @@ describe('Alert', () => {
 	it('has default variant styling', () => {
 		render(Alert);
 		const alert = document.querySelector('[role="alert"]');
-		expect(alert?.className).toContain('bg-background');
+		expect(alert?.className).toContain('bg-card');
 	});
 
 	it('renders with destructive variant', () => {

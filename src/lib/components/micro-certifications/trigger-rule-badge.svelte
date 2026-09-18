@@ -9,7 +9,7 @@
 	let { type, value }: Props = $props();
 
 	const triggerColorMap: Record<string, string> = {
-		high_risk_assignment: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+		high_risk_assignment: 'bg-primary/15 text-primary',
 		sod_violation: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
 		manager_change: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 		periodic_recert: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',

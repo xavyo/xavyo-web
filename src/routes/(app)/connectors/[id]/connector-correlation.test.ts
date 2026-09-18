@@ -369,7 +369,7 @@ describe('Correlation rules rendering logic', () => {
 				case 'fuzzy':
 					return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
 				case 'expression':
-					return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+					return 'bg-primary/15 text-primary';
 				default:
 					return '';
 			}
@@ -383,8 +383,8 @@ describe('Correlation rules rendering logic', () => {
 			expect(matchTypeBadgeClass('fuzzy')).toContain('amber');
 		});
 
-		it('expression match gets purple badge', () => {
-			expect(matchTypeBadgeClass('expression')).toContain('purple');
+		it('expression match gets primary badge', () => {
+			expect(matchTypeBadgeClass('expression')).toContain('primary');
 		});
 
 		it('unknown match type returns empty string', () => {

@@ -16,7 +16,7 @@
 			case 'gdpr':
 				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
 			case 'hipaa':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+				return 'bg-primary/15 text-primary';
 			case 'custom':
 				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
 			default:

@@ -44,14 +44,12 @@
 </script>
 
 <PageHeader title="Detection Rules" description="Manage orphan account detection rules">
-	<div class="flex gap-2">
-		<form method="POST" action="?/seed" use:enhance={() => ({ result }) => handleResult(result)}>
+	<form method="POST" action="?/seed" use:enhance={() => ({ result }) => handleResult(result)}>
 			<Button variant="outline" type="submit">Seed Defaults</Button>
 		</form>
 		<a href="/governance/detection-rules/create">
 			<Button>Create Rule</Button>
 		</a>
-	</div>
 </PageHeader>
 
 <!-- Filters -->

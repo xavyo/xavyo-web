@@ -156,7 +156,7 @@
 	let canNextPage = $derived(pagination.pageIndex < totalPages - 1);
 </script>
 
-<PageHeader title="My Approvals" description="Review and act on pending approval requests" />
+<PageHeader title="My approvals" description="Decide on requests waiting for you." />
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -181,7 +181,6 @@
 		<EmptyState
 			title="No approvals match your filter"
 			description="Try adjusting your filter criteria."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -197,7 +196,6 @@
 		<EmptyState
 			title="No approval requests"
 			description="You have no approval requests assigned to you."
-			icon="✅"
 		/>
 	{/if}
 {:else}

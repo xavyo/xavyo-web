@@ -27,8 +27,7 @@
 </script>
 
 <PageHeader title={rule.name} description="Detection rule details">
-	<div class="flex gap-2">
-		<a href="/governance/detection-rules/{rule.id}/edit">
+	<a href="/governance/detection-rules/{rule.id}/edit">
 			<Button variant="outline">Edit</Button>
 		</a>
 		{#if rule.is_enabled}
@@ -41,7 +40,6 @@
 			</form>
 		{/if}
 		<Button variant="destructive" onclick={() => (deleteOpen = true)}>Delete</Button>
-	</div>
 </PageHeader>
 
 <div class="grid gap-6 lg:grid-cols-2">

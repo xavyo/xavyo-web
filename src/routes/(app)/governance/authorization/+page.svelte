@@ -49,18 +49,15 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Authorization Policies"
-		description="Manage authorization policies for your organization"
-	/>
+<PageHeader title="Authorization Policies"
+		description="Manage authorization policies for your organization">
 	<a
 		href="/governance/authorization/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create Policy
 	</a>
-</div>
+</PageHeader>
 
 <!-- Navigation Tabs -->
 <div class="mb-4 flex gap-1 border-b">
@@ -94,7 +91,6 @@
 	<EmptyState
 		title="No policies yet"
 		description="Create authorization policies to control access to resources."
-		icon="🛡️"
 	/>
 {:else}
 	<div class="rounded-md border">

@@ -130,20 +130,19 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Non-Human Identities" description="Manage tools, agents, and service accounts" />
-	<div class="flex items-center gap-2">
+<PageHeader title="Non-human identities" description="Tools, agents, and service accounts.">
+	<div class="flex flex-wrap items-center gap-2">
 		<a
 			href="/nhi/discover"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-card px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
-			Discover from Gateway
+			Discover
 		</a>
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
-				class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+				class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 			>
-				Create NHI
+				Create
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				<DropdownMenu.Item>
@@ -153,12 +152,12 @@
 					<a href="/nhi/agents/create" class="w-full">Agent</a>
 				</DropdownMenu.Item>
 				<DropdownMenu.Item>
-					<a href="/nhi/service-accounts/create" class="w-full">Service Account</a>
+					<a href="/nhi/service-accounts/create" class="w-full">Service account</a>
 				</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>
-</div>
+</PageHeader>
 
 {#if data.summary}
 	<div class="mb-4">
@@ -166,9 +165,9 @@
 	</div>
 {/if}
 
-<div class="mb-4 flex gap-3">
+<div class="mb-4 flex flex-wrap gap-3">
 	<select
-		class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+		class="h-10 rounded-md border border-input bg-card px-3 text-sm shadow-xs focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
 		bind:value={nhiTypeFilter}
 		onchange={() => { pagination = { ...pagination, pageIndex: 0 }; }}
 	>
@@ -178,7 +177,7 @@
 	</select>
 
 	<select
-		class="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+		class="h-10 rounded-md border border-input bg-card px-3 text-sm shadow-xs focus-visible:outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
 		bind:value={lifecycleStateFilter}
 		onchange={() => { pagination = { ...pagination, pageIndex: 0 }; }}
 	>
@@ -193,7 +192,6 @@
 		<EmptyState
 			title="No identities match your filters"
 			description="Try adjusting your filter criteria."
-			icon="🔍"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -207,7 +205,6 @@
 		<EmptyState
 			title="No non-human identities yet"
 			description="Create your first tool, agent, or service account."
-			icon="🤖"
 		/>
 	{/if}
 {/snippet}

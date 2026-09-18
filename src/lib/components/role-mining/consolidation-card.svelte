@@ -30,7 +30,7 @@
 <div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
 	<div class="mb-3 flex items-start justify-between">
 		<div class="flex items-center gap-2">
-			<GitMerge class="h-4 w-4 text-purple-500" />
+			<GitMerge class="h-4 w-4 text-primary" />
 			<span class="text-sm font-medium text-gray-900 dark:text-gray-100">Role Consolidation</span>
 		</div>
 		<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusConfig.class}">

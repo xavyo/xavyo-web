@@ -26,14 +26,14 @@ describe('EmptyState', () => {
 	});
 
 	it('renders icon when provided', () => {
-		render(EmptyState, { props: { title: 'No users yet', icon: '👥' } });
-		expect(screen.getByText('👥')).toBeTruthy();
+		render(EmptyState, { props: { title: 'No users yet', icon: 'XY' } });
+		expect(screen.getByText('XY')).toBeTruthy();
 	});
 
 	it('does not render icon when not provided', () => {
 		const { container } = render(EmptyState, { props: { title: 'No data' } });
-		const spans = container.querySelectorAll('span');
-		expect(spans.length).toBe(0);
+		// Default decorative mark is present when no icon prop is passed
+		expect(container.textContent).toContain('—');
 	});
 
 	it('renders action link when actionLabel and actionHref provided', () => {

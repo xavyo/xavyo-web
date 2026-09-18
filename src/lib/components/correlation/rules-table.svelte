@@ -86,7 +86,7 @@
 			case 'fuzzy':
 				return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
 			case 'expression':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+				return 'bg-primary/15 text-primary';
 			default:
 				return '';
 		}

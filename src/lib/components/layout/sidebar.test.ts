@@ -43,7 +43,7 @@ describe('Sidebar', () => {
 	it('does not highlight inactive item', () => {
 		render(Sidebar, { props: { sections: testSections, currentPath: '/dashboard' } });
 		const usersLink = screen.getByText('Users').closest('a');
-		expect(usersLink?.className).toContain('text-muted-foreground');
+		expect(usersLink?.className).toContain('text-sidebar-muted');
 	});
 
 	it('calls onNavigate when a nav item is clicked', async () => {

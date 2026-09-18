@@ -18,6 +18,7 @@
 		onPaginationChange,
 		searchValue,
 		onSearchChange,
+		searchPlaceholder = 'Search...',
 		isLoading = false,
 		emptyMessage = 'No results found',
 		emptyState,
@@ -30,6 +31,7 @@
 		onPaginationChange: OnChangeFn<PaginationState>;
 		searchValue?: string;
 		onSearchChange?: (value: string) => void;
+		searchPlaceholder?: string;
 		isLoading?: boolean;
 		emptyMessage?: string;
 		emptyState?: Snippet;
@@ -64,17 +66,17 @@
 		<DataTableToolbar
 			value={searchValue}
 			onchange={onSearchChange}
-			placeholder="Search..."
+			placeholder={searchPlaceholder}
 		/>
 	{/if}
 
-	<div class="overflow-x-auto rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full caption-bottom text-sm">
-			<thead class="[&_tr]:border-b">
-				{#each table.getHeaderGroups() as headerGroup}
-					<tr class="border-b transition-colors hover:bg-muted/50">
-						{#each headerGroup.headers as header}
-							<th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+			<thead class="bg-muted/40 [&_tr]:border-b">
+				{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+					<tr class="border-b transition-colors">
+						{#each headerGroup.headers as header (header.id)}
+							<th class="h-11 px-4 text-left align-middle text-xs font-semibold uppercase tracking-wide text-muted-foreground">
 								{#if !header.isPlaceholder}
 									<FlexRender
 										content={header.column.columnDef.header}
@@ -88,9 +90,9 @@
 			</thead>
 			<tbody class="[&_tr:last-child]:border-0">
 				{#if isLoading}
-					{#each Array(skeletonRows) as _}
+					{#each Array(skeletonRows) as _, rowIndex (rowIndex)}
 						<tr class="border-b">
-							{#each columns as _col}
+							{#each columns as _col, colIndex (colIndex)}
 								<td class="p-4 align-middle">
 									<Skeleton class="h-4 w-full" />
 								</td>
@@ -110,9 +112,9 @@
 						</td>
 					</tr>
 				{:else}
-					{#each table.getRowModel().rows as row}
-						<tr class="border-b transition-colors hover:bg-muted/50">
-							{#each row.getVisibleCells() as cell}
+					{#each table.getRowModel().rows as row (row.id)}
+						<tr class="border-b transition-colors hover:bg-muted/40">
+							{#each row.getVisibleCells() as cell (cell.id)}
 								<td class="p-4 align-middle">
 									<FlexRender
 										content={cell.column.columnDef.cell}

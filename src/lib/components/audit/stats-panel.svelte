@@ -91,7 +91,7 @@
 			</Card>
 			<Card>
 				<CardContent class="flex items-center gap-3 p-4">
-					<MapPin class="h-5 w-5 text-purple-600 dark:text-purple-400" />
+					<MapPin class="h-5 w-5 text-primary" />
 					<div>
 						<p class="text-sm text-muted-foreground">New Location Logins</p>
 						<p class="text-lg font-semibold">{stats.new_location_logins.toLocaleString()}</p>

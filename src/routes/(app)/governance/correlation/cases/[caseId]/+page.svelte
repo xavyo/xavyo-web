@@ -50,7 +50,7 @@
 	function triggerTypeBadgeClass(type: string): string {
 		switch (type) {
 			case 'import':
-				return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+				return 'bg-primary/15 text-primary';
 			case 'reconciliation':
 				return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
 			case 'manual':

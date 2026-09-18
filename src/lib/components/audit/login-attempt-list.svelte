@@ -214,7 +214,7 @@
 			{/each}
 		</div>
 	{:else if items.length === 0}
-		<EmptyState icon="📋" title="No login activity" description="No login attempts match your current filters." />
+		<EmptyState title="No login activity" description="No login attempts match your current filters." />
 	{:else}
 		<!-- Login attempt list -->
 		<div class="space-y-2">
@@ -241,7 +241,7 @@
 										</Badge>
 									{/if}
 									{#if attempt.is_new_location}
-										<Badge variant="secondary" class="text-xs bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+										<Badge variant="secondary" class="text-xs bg-primary/15 text-primary">
 											<MapPin class="mr-1 h-3 w-3" />New location
 										</Badge>
 									{/if}

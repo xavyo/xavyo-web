@@ -155,7 +155,7 @@
 			{/each}
 		</div>
 	{:else if items.length === 0}
-		<EmptyState icon="🔔" title="No security alerts" description="No alerts match your current filters." />
+		<EmptyState title="No security alerts" description="No alerts match your current filters." />
 	{:else}
 		<!-- Alert list -->
 		<div class="space-y-3">

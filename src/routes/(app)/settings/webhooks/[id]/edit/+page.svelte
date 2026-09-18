@@ -51,18 +51,15 @@
 	const eventTypesValue = $derived(Array.from(selectedEventTypes).join(','));
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Edit Webhook Subscription"
-		description="Update the subscription configuration"
-	/>
+<PageHeader title="Edit Webhook Subscription"
+		description="Update the subscription configuration">
 	<a
 		href="/settings/webhooks/{data.subscription.id}"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to Details
 	</a>
-</div>
+</PageHeader>
 
 <Card class="max-w-2xl">
 	<CardHeader>

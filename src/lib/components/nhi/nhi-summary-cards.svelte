@@ -40,7 +40,7 @@
 		<Card>
 			<CardContent class="pt-4">
 				<p class="text-sm text-muted-foreground">Needs Rotation</p>
-				<p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{summary.needs_rotation}</p>
+				<p class="text-2xl font-bold text-primary">{summary.needs_rotation}</p>
 			</CardContent>
 		</Card>
 		<Card>

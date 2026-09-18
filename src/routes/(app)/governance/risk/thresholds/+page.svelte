@@ -54,12 +54,10 @@
 </script>
 
 <PageHeader title="Risk Thresholds" description="Manage risk score thresholds and automated actions">
-	<div class="flex gap-2">
-		<a href="/governance/risk" class="text-sm text-muted-foreground hover:text-foreground hover:underline self-center">&larr; Back to Risk Dashboard</a>
+	<a href="/governance/risk" class="text-sm text-muted-foreground hover:text-foreground hover:underline self-center">&larr; Back to Risk Dashboard</a>
 		<a href="/governance/risk/thresholds/create">
 			<Button>Create Threshold</Button>
 		</a>
-	</div>
 </PageHeader>
 
 <!-- Filters -->

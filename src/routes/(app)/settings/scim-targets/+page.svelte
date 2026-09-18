@@ -75,15 +75,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="SCIM Targets" description="Manage outbound SCIM provisioning targets" />
+<PageHeader title="SCIM Targets" description="Manage outbound SCIM provisioning targets">
 	<a
 		href="/settings/scim-targets/create"
-		class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
 		Create Target
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -102,7 +101,6 @@
 		<EmptyState
 			title="No targets match your filter"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -119,7 +117,6 @@
 		<EmptyState
 			title="No SCIM targets yet"
 			description="Create a SCIM target to provision identities to external SCIM-enabled services."
-			icon="inbox"
 			actionLabel="Create Target"
 			actionHref="/settings/scim-targets/create"
 		/>

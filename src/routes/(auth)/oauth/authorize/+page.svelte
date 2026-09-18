@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
-	import { Card, CardHeader, CardContent, CardFooter } from '$lib/components/ui/card';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import type { PageData, ActionData } from './$types';
@@ -52,33 +51,32 @@
 </script>
 
 {#if data.error}
-	<Card class="max-w-md">
-		<CardHeader>
-			<h2 class="text-xl font-semibold text-destructive">Authorization Error</h2>
-		</CardHeader>
-		<CardContent class="space-y-4">
-			<Alert variant="destructive">
-				<AlertDescription>
-					{data.errorDescription ?? 'An error occurred with the authorization request.'}
-				</AlertDescription>
-			</Alert>
-			<p class="text-sm text-muted-foreground">
-				Please check the authorization request parameters and try again, or contact the
-				application administrator.
-			</p>
-		</CardContent>
-		<CardFooter>
-			<a
-				href="/login{tenantParam}"
-				class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
-			>
-				Back to login
-			</a>
-		</CardFooter>
-	</Card>
+	<div class="space-y-6">
+		<div>
+			<h1 class="text-2xl font-semibold tracking-tight text-destructive">Authorization Error</h1>
+		</div>
+
+		<Alert variant="destructive">
+			<AlertDescription>
+				{data.errorDescription ?? 'An error occurred with the authorization request.'}
+			</AlertDescription>
+		</Alert>
+
+		<p class="text-sm text-muted-foreground">
+			Please check the authorization request parameters and try again, or contact the
+			application administrator.
+		</p>
+
+		<a
+			href="/login{tenantParam}"
+			class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+		>
+			Back to login
+		</a>
+	</div>
 {:else if data.clientInfo}
-	<Card class="max-w-md">
-		<CardHeader class="text-center">
+	<div class="space-y-6">
+		<div class="text-center">
 			{#if data.clientInfo.client_logo_url}
 				<div class="mb-3 flex justify-center">
 					<img
@@ -88,8 +86,8 @@
 					/>
 				</div>
 			{/if}
-			<h2 class="text-xl font-semibold tracking-tight">{consentTitle}</h2>
-			<p class="text-sm text-muted-foreground">
+			<h1 class="text-2xl font-semibold tracking-tight">{consentTitle}</h1>
+			<p class="mt-1 text-sm text-muted-foreground">
 				{getConsentSubtitle()}
 			</p>
 			{#if data.clientInfo.client_description}
@@ -97,53 +95,53 @@
 					{data.clientInfo.client_description}
 				</p>
 			{/if}
-		</CardHeader>
-		<CardContent class="space-y-4">
-			{#if actionData?.error}
-				<Alert variant="destructive">
-					<AlertDescription>{actionData.error}</AlertDescription>
-				</Alert>
-			{/if}
+		</div>
 
-			{#if data.clientInfo.scopes.length > 0}
-				<div class="rounded-lg border bg-muted/50 p-4">
-					<p class="mb-2 text-sm font-medium text-foreground">
-						This application will be able to:
-					</p>
-					<ul class="space-y-2">
-						{#each data.clientInfo.scopes as scope}
-							<li class="flex items-center gap-2 text-sm text-muted-foreground">
-								<svg
-									class="h-4 w-4 shrink-0 text-primary"
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<path d="M9 12l2 2 4-4" />
-									<circle cx="12" cy="12" r="10" />
-								</svg>
-								{getScopeLabel(scope)}
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{:else}
-				<div class="rounded-lg border bg-muted/50 p-4">
-					<p class="text-sm text-muted-foreground">
-						This application is requesting basic access to your account.
-					</p>
-				</div>
-			{/if}
+		{#if actionData?.error}
+			<Alert variant="destructive">
+				<AlertDescription>{actionData.error}</AlertDescription>
+			</Alert>
+		{/if}
 
-			<p class="text-xs text-muted-foreground">
-				Signed in as <span class="font-medium">{data.userEmail}</span>
-			</p>
-		</CardContent>
-		<CardFooter class="flex gap-3">
+		{#if data.clientInfo.scopes.length > 0}
+			<div class="rounded-lg border bg-muted/50 p-4">
+				<p class="mb-2 text-sm font-medium text-foreground">
+					This application will be able to:
+				</p>
+				<ul class="space-y-2">
+					{#each data.clientInfo.scopes as scope}
+						<li class="flex items-center gap-2 text-sm text-muted-foreground">
+							<svg
+								class="h-4 w-4 shrink-0 text-primary"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M9 12l2 2 4-4" />
+								<circle cx="12" cy="12" r="10" />
+							</svg>
+							{getScopeLabel(scope)}
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{:else}
+			<div class="rounded-lg border bg-muted/50 p-4">
+				<p class="text-sm text-muted-foreground">
+					This application is requesting basic access to your account.
+				</p>
+			</div>
+		{/if}
+
+		<p class="text-xs text-muted-foreground">
+			Signed in as <span class="font-medium">{data.userEmail}</span>
+		</p>
+
+		<div class="flex gap-3">
 			<form method="POST" action="?/deny" class="flex-1" use:enhance={handleSubmit('deny')}>
 				<input type="hidden" name="client_id" value={data.oauthParams.client_id} />
 				<input type="hidden" name="redirect_uri" value={data.oauthParams.redirect_uri} />
@@ -181,6 +179,6 @@
 					{submitting === 'approve' ? `${approveLabel}...` : approveLabel}
 				</Button>
 			</form>
-		</CardFooter>
-	</Card>
+		</div>
+	</div>
 {/if}

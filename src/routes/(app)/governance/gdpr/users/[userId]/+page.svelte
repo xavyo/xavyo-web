@@ -7,18 +7,15 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="User Data Protection"
-		description="Data protection summary for user {data.userId}"
-	/>
+<PageHeader title="User Data Protection"
+		description="Data protection summary for user {data.userId}">
 	<a
 		href="/governance/gdpr"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to GDPR
 	</a>
-</div>
+</PageHeader>
 
 <!-- Summary -->
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">

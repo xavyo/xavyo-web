@@ -115,14 +115,10 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Peer Groups"
-		description="Manage peer groups for outlier detection comparison"
-	/>
-	<div class="flex gap-2">
-		<button
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+<PageHeader title="Peer Groups"
+		description="Manage peer groups for outlier detection comparison">
+	<button
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
 			onclick={refreshAll}
 			disabled={refreshingAll}
 		>
@@ -130,12 +126,11 @@
 		</button>
 		<a
 			href="/governance/peer-groups/create"
-			class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+			class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 		>
 			Create Peer Group
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex gap-3">
 	<select
@@ -150,7 +145,7 @@
 </div>
 
 {#snippet emptyState()}
-	<EmptyState title="No peer groups" description="Create peer groups to enable access pattern comparison." icon="users" />
+	<EmptyState title="No peer groups" description="Create peer groups to enable access pattern comparison." />
 {/snippet}
 
 <DataTable {columns} {data} {pageCount} {pagination} onPaginationChange={handlePaginationChange} {isLoading} {emptyState} />

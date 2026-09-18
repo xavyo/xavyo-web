@@ -7,7 +7,7 @@ describe('DestinationTypeBadge', () => {
 		const { container } = render(DestinationTypeBadge, { props: { type: 'syslog_tcp_tls' } });
 		expect(screen.getByText('Syslog TLS')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('purple');
+		expect(badge.className).toContain('primary');
 	});
 
 	it('renders "Syslog UDP" for syslog_udp', () => {

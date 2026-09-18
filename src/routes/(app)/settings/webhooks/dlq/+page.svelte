@@ -60,7 +60,6 @@
 	<EmptyState
 		title="No failed deliveries"
 		description="All webhook deliveries have been processed successfully. Failed deliveries that exhaust retries will appear here."
-		icon="📬"
 	/>
 {:else}
 	<div class="rounded-md border">

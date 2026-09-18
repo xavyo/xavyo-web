@@ -25,29 +25,24 @@
 	];
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
-		title="Provisioning Scripts"
-		description="Manage automation scripts for provisioning operations"
-	/>
-	<div class="flex gap-2">
-		{#if activeTab === 'scripts'}
+<PageHeader title="Provisioning Scripts"
+		description="Manage automation scripts for provisioning operations">
+	{#if activeTab === 'scripts'}
 			<a
 				href="/governance/provisioning-scripts/create"
-				class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+				class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 			>
 				Create Script
 			</a>
 		{:else if activeTab === 'templates'}
 			<a
 				href="/governance/provisioning-scripts/templates/create"
-				class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+				class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 			>
 				Create Template
 			</a>
 		{/if}
-	</div>
-</div>
+</PageHeader>
 
 <!-- Tab navigation -->
 <div class="mt-6 border-b" role="tablist">

@@ -11,7 +11,7 @@
 		completed: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
 		failed: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
 		dead_letter: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
-		awaiting_system: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
+		awaiting_system: 'bg-primary/15 text-primary',
 		resolved: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
 		cancelled: 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400'
 	};

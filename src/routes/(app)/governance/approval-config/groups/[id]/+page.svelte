@@ -50,10 +50,8 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title={data.group.name} description="Approval group details" />
-	<div class="flex items-center gap-2">
-		<span
+<PageHeader title={data.group.name} description="Approval group details">
+	<span
 			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {data.group
 				.is_active
 				? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
@@ -63,12 +61,11 @@
 		</span>
 		<a
 			href="/governance/approval-config"
-			class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+			class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 		>
 			Back to Approval Config
 		</a>
-	</div>
-</div>
+</PageHeader>
 
 <div class="mt-6 grid gap-6 lg:grid-cols-2">
 	<!-- Edit Form -->

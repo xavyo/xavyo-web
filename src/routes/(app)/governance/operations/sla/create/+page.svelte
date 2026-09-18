@@ -27,15 +27,14 @@
 	});
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Create SLA Policy" description="Define a new SLA policy for governance operations." />
+<PageHeader title="Create SLA Policy" description="Define a new SLA policy for governance operations.">
 	<a
 		href="/governance/operations"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back
 	</a>
-</div>
+</PageHeader>
 
 <Card class="mt-6 max-w-2xl">
 	<CardHeader>

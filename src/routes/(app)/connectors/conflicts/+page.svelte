@@ -61,15 +61,14 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Provisioning Conflicts" description="Review and resolve attribute conflicts between provisioning operations" />
+<PageHeader title="Provisioning Conflicts" description="Review and resolve attribute conflicts between provisioning operations">
 	<a
 		href="/connectors/operations"
-		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
+		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
 		Back to Operations
 	</a>
-</div>
+</PageHeader>
 
 <div class="mb-4 flex flex-wrap items-center gap-3">
 	<input
@@ -95,7 +94,6 @@
 		<EmptyState
 			title="No conflicts match your filters"
 			description="Try adjusting your filter criteria."
-			icon="search"
 		/>
 		<div class="flex justify-center pb-4">
 			<button
@@ -113,7 +111,6 @@
 		<EmptyState
 			title="No provisioning conflicts"
 			description="No conflicts have been detected between provisioning operations."
-			icon="inbox"
 		/>
 	{/if}
 {:else}

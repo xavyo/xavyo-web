@@ -60,8 +60,7 @@
 </script>
 
 <PageHeader title="Risk Alerts Dashboard" description="Monitor and manage identity risk alerts across your organization">
-	<div class="flex gap-2">
-		<a href="/governance/risk/scores">
+	<a href="/governance/risk/scores">
 			<Button variant="outline">Scores</Button>
 		</a>
 		<a href="/governance/risk/factors">
@@ -70,7 +69,6 @@
 		<a href="/governance/risk/thresholds">
 			<Button variant="outline">Thresholds</Button>
 		</a>
-	</div>
 </PageHeader>
 
 <!-- Summary Cards -->

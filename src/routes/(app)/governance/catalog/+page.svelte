@@ -54,10 +54,9 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader title="Request Catalog" description="Browse and request access to roles, entitlements, and resources" />
+<PageHeader title="Request Catalog" description="Browse and request access to roles, entitlements, and resources">
 	<CartBadge count={cartItemCount} />
-</div>
+</PageHeader>
 
 <div class="mt-6 flex gap-6">
 	<!-- Sidebar -->

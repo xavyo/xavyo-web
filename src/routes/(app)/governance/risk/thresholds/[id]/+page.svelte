@@ -53,8 +53,7 @@
 </script>
 
 <PageHeader title={threshold.name} description="Risk threshold details">
-	<div class="flex gap-2">
-		{#if !editing}
+	{#if !editing}
 			<Button variant="outline" onclick={() => (editing = true)}>Edit</Button>
 		{/if}
 		{#if threshold.is_enabled}
@@ -75,7 +74,6 @@
 			</form>
 		{/if}
 		<Button variant="destructive" onclick={() => (deleteOpen = true)}>Delete</Button>
-	</div>
 </PageHeader>
 
 {#if editing}

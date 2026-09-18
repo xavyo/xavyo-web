@@ -199,12 +199,10 @@
 	}
 </script>
 
-<div class="flex items-center justify-between">
-	<PageHeader
+<PageHeader
 		title="Birthright Access"
 		description="Manage birthright policies and lifecycle events for automated entitlement provisioning"
 	/>
-</div>
 
 <!-- Tab navigation -->
 <div class="border-b border-border" role="tablist" aria-label="Birthright tabs">
@@ -275,7 +273,6 @@
 				<EmptyState
 					title="No birthright policies yet"
 					description="Create your first policy to automate entitlement provisioning based on user attributes."
-					icon="shield"
 				/>
 				<div class="flex justify-center pb-4">
 					<a
@@ -423,7 +420,6 @@
 				<EmptyState
 					title="No lifecycle events"
 					description="Lifecycle events will appear here when joiner, mover, or leaver events are triggered."
-					icon="activity"
 				/>
 			{:else}
 				<div class="overflow-x-auto rounded-lg border border-border">
