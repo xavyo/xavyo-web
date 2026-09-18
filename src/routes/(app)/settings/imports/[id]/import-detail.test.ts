@@ -389,11 +389,11 @@ describe('Error type badge color logic', () => {
 	});
 
 	it('role_not_found is purple', () => {
-		expect(errorTypeBadgeColor('role_not_found')).toContain('purple');
+		expect(errorTypeBadgeColor('role_not_found')).toContain('primary');
 	});
 
 	it('group_error is purple', () => {
-		expect(errorTypeBadgeColor('group_error')).toContain('purple');
+		expect(errorTypeBadgeColor('group_error')).toContain('primary');
 	});
 
 	it('attribute_error is blue', () => {

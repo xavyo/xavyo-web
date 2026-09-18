@@ -383,8 +383,8 @@ describe('Correlation rules rendering logic', () => {
 			expect(matchTypeBadgeClass('fuzzy')).toContain('amber');
 		});
 
-		it('expression match gets purple badge', () => {
-			expect(matchTypeBadgeClass('expression')).toContain('purple');
+		it('expression match gets primary badge', () => {
+			expect(matchTypeBadgeClass('expression')).toContain('primary');
 		});
 
 		it('unknown match type returns empty string', () => {

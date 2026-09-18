@@ -284,8 +284,8 @@ describe('Correlation case detail rendering logic', () => {
 			}
 		}
 
-		it('import gets purple badge', () => {
-			expect(triggerTypeBadgeClass('import')).toContain('purple');
+		it('import gets primary badge', () => {
+			expect(triggerTypeBadgeClass('import')).toContain('primary');
 		});
 
 		it('reconciliation gets indigo badge', () => {

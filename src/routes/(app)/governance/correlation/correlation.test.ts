@@ -386,8 +386,8 @@ describe('Correlation hub rendering logic', () => {
 			}
 		}
 
-		it('import gets purple badge', () => {
-			expect(triggerTypeBadgeClass('import')).toContain('purple');
+		it('import gets primary badge', () => {
+			expect(triggerTypeBadgeClass('import')).toContain('primary');
 		});
 
 		it('reconciliation gets indigo badge', () => {
@@ -429,8 +429,8 @@ describe('Correlation hub rendering logic', () => {
 			expect(eventTypeBadgeClass('reject')).toContain('red');
 		});
 
-		it('create_identity gets purple badge', () => {
-			expect(eventTypeBadgeClass('create_identity')).toContain('purple');
+		it('create_identity gets primary badge', () => {
+			expect(eventTypeBadgeClass('create_identity')).toContain('primary');
 		});
 
 		it('reassign gets gray badge', () => {

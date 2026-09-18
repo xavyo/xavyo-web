@@ -7,7 +7,7 @@ describe('TriggerRuleBadge', () => {
 		render(TriggerRuleBadge, { props: { type: 'trigger', value: 'high_risk_assignment' } });
 		const badge = screen.getByTestId('trigger-rule-badge');
 		expect(badge.textContent).toContain('High Risk');
-		expect(badge.className).toContain('purple');
+		expect(badge.className).toContain('primary');
 	});
 
 	it('renders sod_violation trigger type', () => {
