@@ -2,7 +2,8 @@ import type {
 	SocialProviderListResponse,
 	UpdateSocialProviderRequest,
 	SocialProviderConfig,
-	SocialConnectionsResponse
+	SocialConnectionsResponse,
+	AvailableSocialProvidersResponse
 } from './types';
 
 export async function listSocialProviders(
@@ -10,6 +11,19 @@ export async function listSocialProviders(
 ): Promise<SocialProviderListResponse> {
 	const res = await fetchFn('/api/federation/social/providers');
 	if (!res.ok) throw new Error(`Failed to fetch social providers: ${res.status}`);
+	return res.json();
+}
+
+/**
+ * User-level list of the tenant's *enabled* social providers (for self-service
+ * account linking). Unlike {@link listSocialProviders}, this does not require the
+ * admin role — it is backed by the public `/auth/social/available` endpoint.
+ */
+export async function getAvailableSocialProviders(
+	fetchFn: typeof fetch = fetch
+): Promise<AvailableSocialProvidersResponse> {
+	const res = await fetchFn('/api/federation/social/available');
+	if (!res.ok) throw new Error(`Failed to fetch available social providers: ${res.status}`);
 	return res.json();
 }
 

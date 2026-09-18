@@ -30,7 +30,7 @@ describe('GDPR user protection +page.server', () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(getUserDataProtection).mockResolvedValue({ user_id: 'u1' } as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { userId: 'u1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

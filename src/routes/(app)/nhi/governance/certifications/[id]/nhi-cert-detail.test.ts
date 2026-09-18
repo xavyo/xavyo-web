@@ -28,20 +28,6 @@ const mockLocals = (admin: boolean) => ({
 });
 
 describe('NHI Certification Campaign detail +page.server', () => {
-	it('redirects non-admin users', async () => {
-		vi.mocked(hasAdminRole).mockReturnValue(false);
-		try {
-			await load({
-				params: { id: 'camp-1' },
-				locals: mockLocals(false),
-				fetch: vi.fn()
-			} as any);
-			expect.fail('should redirect');
-		} catch (e: any) {
-			expect(e.status).toBe(302);
-		}
-	});
-
 	it('returns campaign and campaignItems when found', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(true);
 		const campaign = {

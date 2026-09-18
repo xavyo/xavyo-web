@@ -62,7 +62,7 @@ export function enforcementClass(e: string): string {
 		: 'bg-yellow-500 text-white hover:bg-yellow-500/80';
 }
 
-export function formatNhiDate(d: string | null): string {
+export function formatNhiDate(d: string | null | undefined): string {
 	if (!d) return '—';
 	return new Date(d).toLocaleDateString();
 }

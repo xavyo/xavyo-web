@@ -22,7 +22,7 @@ describe('Governance Roles list +page.server', () => {
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(listRoles).mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 } as any);
-		const result = await load({
+		const result: any = await load({
 			locals: mockLocals(false),
 			url: new URL('http://localhost/governance/roles'),
 			fetch: vi.fn()
@@ -36,7 +36,7 @@ describe('Governance Roles list +page.server', () => {
 		const mockResponse = { items: [{ id: 'r1', name: 'Role 1' }], total: 1, limit: 20, offset: 0 };
 		vi.mocked(listRoles).mockResolvedValue(mockResponse as any);
 
-		const result = await load({
+		const result: any = await load({
 			locals: mockLocals(true),
 			url: new URL('http://localhost/governance/roles'),
 			fetch: vi.fn()
@@ -56,7 +56,7 @@ describe('Governance Roles list +page.server', () => {
 		const mockResponse = { items: [], total: 50, limit: 10, offset: 40 };
 		vi.mocked(listRoles).mockResolvedValue(mockResponse as any);
 
-		const result = await load({
+		const result: any = await load({
 			locals: mockLocals(true),
 			url: new URL('http://localhost/governance/roles?offset=40&limit=10'),
 			fetch: vi.fn()

@@ -4,7 +4,7 @@ import { render, screen, cleanup, fireEvent } from '@testing-library/svelte';
 // Mock the social-client module
 vi.mock('$lib/api/social-client', () => ({
 	listSocialConnections: vi.fn(),
-	listSocialProviders: vi.fn(),
+	getAvailableSocialProviders: vi.fn(),
 	initiateSocialLink: vi.fn(),
 	unlinkSocialAccount: vi.fn()
 }));
@@ -12,7 +12,7 @@ vi.mock('$lib/api/social-client', () => ({
 import SocialConnectionsTab from './social-connections-tab.svelte';
 import {
 	listSocialConnections,
-	listSocialProviders
+	getAvailableSocialProviders
 } from '$lib/api/social-client';
 
 const mockConnections = {
@@ -28,35 +28,19 @@ const mockConnections = {
 	]
 };
 
+// The self-service tab uses the user-level available-providers endpoint, which
+// returns only enabled providers as { provider, name, authorize_url }.
 const mockProviders = {
 	providers: [
-		{
-			provider: 'google',
-			enabled: true,
-			client_id: 'google-id',
-			has_client_secret: true,
-			scopes: ['openid'],
-			additional_config: null,
-			created_at: '2024-01-01T00:00:00Z',
-			updated_at: '2024-01-01T00:00:00Z'
-		},
-		{
-			provider: 'github',
-			enabled: true,
-			client_id: 'github-id',
-			has_client_secret: true,
-			scopes: ['user'],
-			additional_config: null,
-			created_at: '2024-01-01T00:00:00Z',
-			updated_at: '2024-01-01T00:00:00Z'
-		}
+		{ provider: 'google', name: 'Google', authorize_url: '/api/auth/social/google/authorize' },
+		{ provider: 'github', name: 'GitHub', authorize_url: '/api/auth/social/github/authorize' }
 	]
 };
 
 describe('SocialConnectionsTab', () => {
 	beforeEach(() => {
 		vi.mocked(listSocialConnections).mockResolvedValue(mockConnections);
-		vi.mocked(listSocialProviders).mockResolvedValue(mockProviders);
+		vi.mocked(getAvailableSocialProviders).mockResolvedValue(mockProviders);
 	});
 
 	afterEach(() => {
@@ -67,7 +51,7 @@ describe('SocialConnectionsTab', () => {
 	it('shows loading state initially', () => {
 		// Make the promises never resolve to keep loading state
 		vi.mocked(listSocialConnections).mockReturnValue(new Promise(() => {}));
-		vi.mocked(listSocialProviders).mockReturnValue(new Promise(() => {}));
+		vi.mocked(getAvailableSocialProviders).mockReturnValue(new Promise(() => {}));
 
 		const { container } = render(SocialConnectionsTab);
 		const pulsingElements = container.querySelectorAll('.animate-pulse');
@@ -103,7 +87,7 @@ describe('SocialConnectionsTab', () => {
 
 		// Now make it succeed
 		vi.mocked(listSocialConnections).mockResolvedValue(mockConnections);
-		vi.mocked(listSocialProviders).mockResolvedValue(mockProviders);
+		vi.mocked(getAvailableSocialProviders).mockResolvedValue(mockProviders);
 
 		const retryBtn = screen.getByText('Retry');
 		await fireEvent.click(retryBtn);

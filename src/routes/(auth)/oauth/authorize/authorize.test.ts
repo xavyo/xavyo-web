@@ -13,3 +13,9 @@ describe('OAuth authorize tenant', () => {
 		expect(src).toContain('Missing tenant context');
 	});
 });
+
+describe('OAuth authorize redirect', () => {
+	it('echoes the RFC 9207 issuer (iss) on the success redirect', () => {
+		expect(src).toContain("redirectUrl.searchParams.set('iss', result.iss)");
+	});
+});

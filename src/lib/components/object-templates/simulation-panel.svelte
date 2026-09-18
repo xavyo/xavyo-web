@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { TemplateSimulationResult } from '$lib/api/types';
-	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
+	import { JsonObjectError, parseJsonRecord } from '$lib/utils/json-record';
 
 	interface Props {
 		result?: TemplateSimulationResult | null;
@@ -19,7 +19,7 @@
 		try {
 			parseJsonRecord(sampleObjectInput);
 		} catch (e) {
-			jsonError = isJsonParseError(e)
+			jsonError = e instanceof JsonObjectError
 				? 'Sample object must be a JSON object'
 				: 'Invalid JSON. Please check your input.';
 			return;

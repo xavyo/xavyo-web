@@ -27,7 +27,7 @@ describe('Connectors +page.server', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
 			vi.mocked(listConnectors).mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 } as any);
-			const result = await load({
+			const result: any = await load({
 				locals: mockLocals(false),
 				url: new URL('http://localhost/connectors'),
 				fetch: vi.fn()

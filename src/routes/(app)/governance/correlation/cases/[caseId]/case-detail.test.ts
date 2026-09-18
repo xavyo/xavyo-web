@@ -116,7 +116,7 @@ describe('Correlation case detail +page.server', () => {
 		it('does not 403 a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			mockGetCase.mockResolvedValue(makeCaseDetail());
-			const result = await load({
+			const result: any = await load({
 				params: { caseId: 'case-1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

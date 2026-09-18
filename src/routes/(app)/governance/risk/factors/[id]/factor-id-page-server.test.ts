@@ -50,7 +50,7 @@ describe('Risk factor detail +page.server', () => {
 			is_enabled: true
 		} as any);
 
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'fac-1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

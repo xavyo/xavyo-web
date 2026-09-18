@@ -38,6 +38,22 @@ describe('social-client', () => {
 		});
 	});
 
+	describe('getAvailableSocialProviders', () => {
+		it('fetches the user-level /available endpoint (not the admin providers list)', async () => {
+			// Regression: the self-service "Social connections" tab called the
+			// admin-only providers list and 500'd ("Admin role required") for
+			// non-admins. It must use the user-level available-providers endpoint.
+			const data = { providers: [{ provider: 'google', name: 'Google', authorize_url: 'x' }] };
+			mockFetch.mockResolvedValueOnce(mockResponse(data));
+			const { getAvailableSocialProviders } = await import('./social-client');
+
+			const result = await getAvailableSocialProviders(mockFetch);
+
+			expect(mockFetch).toHaveBeenCalledWith('/api/federation/social/available');
+			expect(result).toEqual(data);
+		});
+	});
+
 	describe('updateSocialProvider', () => {
 		it('sends PUT to /api/federation/social/providers/:provider with body', async () => {
 			const updateData = { enabled: true, client_id: 'new-id', client_secret: 'new-secret' };

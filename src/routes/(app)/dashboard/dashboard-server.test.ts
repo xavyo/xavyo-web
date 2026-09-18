@@ -33,7 +33,7 @@ import { listNhi } from '$lib/api/nhi';
 import { fetchAdminLoginAttempts } from '$lib/api/audit';
 import { ApiError } from '$lib/api/client';
 
-const parent = async () => ({ user: { id: 'u1' } });
+const parent = async () => ({ user: { id: 'u1' }, isAdmin: true });
 
 describe('Dashboard +page.server', () => {
 	beforeEach(() => {
@@ -58,6 +58,21 @@ describe('Dashboard +page.server', () => {
 		} catch (e: any) {
 			expect(e.status).toBe(401);
 		}
+	});
+
+	it('redirects non-admins to the self-service home', async () => {
+		try {
+			await load({
+				parent: async () => ({ user: { id: 'u1' }, isAdmin: false }),
+				locals: { accessToken: 'tok', tenantId: 'tid' },
+				fetch: vi.fn()
+			} as any);
+			expect.fail('should have redirected');
+		} catch (e: any) {
+			expect(e.status).toBe(302);
+			expect(e.location).toBe('/governance/catalog');
+		}
+		expect(listUsers).not.toHaveBeenCalled();
 	});
 
 	it('returns counts', async () => {

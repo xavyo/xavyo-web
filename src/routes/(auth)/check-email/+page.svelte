@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import FunnelSteps from '$lib/components/auth/funnel-steps.svelte';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form: actionResult }: { data: PageData; form: ActionData } = $props();
@@ -41,6 +42,7 @@
 
 <div class="space-y-6">
 	<div>
+		<FunnelSteps current={2} />
 		<h1 class="text-2xl font-semibold tracking-tight">Check your email</h1>
 		<p class="mt-1 text-sm text-muted-foreground">Verify your email address to continue</p>
 	</div>

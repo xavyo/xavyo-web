@@ -70,7 +70,7 @@ describe('SLA Edit +page.server', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			mockHasAdminRole.mockReturnValue(false);
 			mockGetSlaPolicy.mockResolvedValue(mockPolicy as any);
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'p1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

@@ -18,7 +18,7 @@ describe('SCIM target create +page.server', () => {
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } }
 		} as any);
 		expect(result.form).toBeDefined();

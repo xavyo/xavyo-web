@@ -14,7 +14,7 @@ describe('Governance hub +page.server', () => {
 	});
 
 	it('does not redirect a non-admin JWT user', async () => {
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			url: new URL('http://localhost/governance?tab=campaigns')
 		} as any);

@@ -30,7 +30,7 @@ describe('Object templates +page.server', () => {
 
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(listObjectTemplates).mockResolvedValue({ items: [], total: 0 } as any);
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			url: new URL('http://localhost/governance/object-templates')
 		} as any);

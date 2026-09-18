@@ -34,7 +34,7 @@ describe('User risk score +page.server', () => {
 			total_score: 42
 		} as any);
 
-		const result = await load({
+		const result: any = await load({
 			params: { userId: 'user-1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

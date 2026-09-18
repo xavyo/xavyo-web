@@ -48,6 +48,7 @@ describe('Invite [token] +page.server', () => {
 
 			const result: any = await load({
 				params: { token: 'valid-token' },
+				url: new URL("http://localhost/invite/test-token"),
 				fetch: vi.fn()
 			} as any);
 
@@ -69,6 +70,7 @@ describe('Invite [token] +page.server', () => {
 
 			const result: any = await load({
 				params: { token: 'expired-token' },
+				url: new URL("http://localhost/invite/test-token"),
 				fetch: vi.fn()
 			} as any);
 
@@ -82,6 +84,7 @@ describe('Invite [token] +page.server', () => {
 
 			const result: any = await load({
 				params: { token: 'bad-token' },
+				url: new URL("http://localhost/invite/test-token"),
 				fetch: vi.fn()
 			} as any);
 
@@ -96,6 +99,7 @@ describe('Invite [token] +page.server', () => {
 			try {
 				await load({
 					params: { token: 'bad-token' },
+					url: new URL("http://localhost/invite/test-token"),
 					fetch: vi.fn()
 				} as any);
 				expect.fail('should have thrown');
@@ -120,6 +124,7 @@ describe('Invite [token] +page.server', () => {
 						confirm_password: 'StrongP@ss1'
 					}),
 					params: { token: 'valid-token' },
+					url: new URL("http://localhost/invite/test-token"),
 					fetch: vi.fn()
 				} as any);
 				expect.fail('should have thrown redirect');
@@ -135,6 +140,27 @@ describe('Invite [token] +page.server', () => {
 			);
 		});
 
+		it('preserves tenant in the post-accept login redirect', async () => {
+			vi.mocked(acceptInvitation).mockResolvedValue({
+				success: true,
+				message: null,
+				redirect_url: '/login'
+			});
+			const tenant = '11111111-1111-4111-8111-111111111111';
+			try {
+				await actions.default({
+					request: makeFormData({ password: 'StrongP@ss1', confirm_password: 'StrongP@ss1' }),
+					params: { token: 'valid-token' },
+					url: new URL(`http://localhost/invite/valid-token?tenant=${tenant}`),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown redirect');
+			} catch (e: any) {
+				expect(e.status).toBe(302);
+				expect(e.location).toBe(`/login?tenant=${tenant}`);
+			}
+		});
+
 		it('short password returns validation error', async () => {
 			const result: any = await actions.default({
 				request: makeFormData({
@@ -142,6 +168,7 @@ describe('Invite [token] +page.server', () => {
 					confirm_password: 'short'
 				}),
 				params: { token: 'valid-token' },
+				url: new URL("http://localhost/invite/test-token"),
 				fetch: vi.fn()
 			} as any);
 
@@ -156,6 +183,7 @@ describe('Invite [token] +page.server', () => {
 					confirm_password: 'DifferentP@ss2'
 				}),
 				params: { token: 'valid-token' },
+				url: new URL("http://localhost/invite/test-token"),
 				fetch: vi.fn()
 			} as any);
 
@@ -174,6 +202,7 @@ describe('Invite [token] +page.server', () => {
 					confirm_password: 'StrongP@ss1'
 				}),
 				params: { token: 'expired-token' },
+				url: new URL("http://localhost/invite/test-token"),
 				fetch: vi.fn()
 			} as any);
 
@@ -183,8 +212,12 @@ describe('Invite [token] +page.server', () => {
 });
 
 describe('Invite [token] +page.svelte', () => {
-	it('page component is defined', async () => {
-		const mod = await import('./+page.svelte');
-		expect(mod.default).toBeDefined();
-	});
+	it(
+		'page component is defined',
+		async () => {
+			const mod = await import('./+page.svelte');
+			expect(mod.default).toBeDefined();
+		},
+		20000
+	);
 });

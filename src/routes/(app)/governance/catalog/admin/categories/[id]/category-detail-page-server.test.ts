@@ -33,7 +33,7 @@ describe('Catalog admin category detail +page.server', () => {
 		const { adminListCategories } = await import('$lib/api/catalog');
 		vi.mocked(adminListCategories).mockResolvedValue({ items: [], total: 0 } as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'c1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

@@ -24,7 +24,7 @@ describe('Applications +page.server', () => {
 			total: 1
 		} as any);
 
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn(),
 			url: new URL('http://localhost/governance/applications')

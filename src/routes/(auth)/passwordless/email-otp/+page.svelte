@@ -30,13 +30,13 @@
 		</p>
 	</div>
 
-	{#if codeSent}
-		{#if $verifyMessage}
-			<Alert variant="destructive">
-				<AlertDescription>{$verifyMessage}</AlertDescription>
-			</Alert>
-		{/if}
+	{#if codeSent && ($page.form?.error || $verifyMessage)}
+		<Alert variant="destructive">
+			<AlertDescription>{($page.form?.error as string) ?? $verifyMessage}</AlertDescription>
+		</Alert>
+	{/if}
 
+	{#if codeSent}
 		<form method="POST" action="?/verify" use:verifyEnhance class="space-y-4">
 			<input type="hidden" name="email" value={sentEmail} />
 			<div class="space-y-2">

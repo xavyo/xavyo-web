@@ -4,7 +4,7 @@
 	import { addToast } from '$lib/stores/toast.svelte';
 	import type { SimulatePolicyResponse, SimulateAllPoliciesResponse } from '$lib/api/types';
 	import { simulatePolicyClient, simulateAllPoliciesClient } from '$lib/api/birthright-client';
-	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
+	import { JsonObjectError, parseJsonRecord } from '$lib/utils/json-record';
 	import { FlaskConical } from 'lucide-svelte';
 
 	interface Props {
@@ -34,7 +34,10 @@
 		try {
 			parsed = parseJsonRecord(attributesJson);
 		} catch (e) {
-			error = isJsonParseError(e) ? 'Must be a valid JSON object' : 'Invalid JSON format';
+			// A valid-but-non-object value (JsonObjectError) vs genuinely malformed
+			// JSON (SyntaxError) get distinct messages — previously both collapsed to
+			// the object message, leaving the malformed message unreachable.
+			error = e instanceof JsonObjectError ? 'Must be a valid JSON object' : 'Invalid JSON format';
 			return;
 		}
 

@@ -28,6 +28,8 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 		zod(updateUserSchema)
 	);
 
+	// Lifecycle status is supplementary; a failure here must not take down the
+	// whole user detail/edit page (which is where role management lives).
 	let lifecycleStatus: UserLifecycleStatus | null = null;
 	try {
 		lifecycleStatus = await getUserLifecycleStatus(
@@ -37,16 +39,17 @@ export const load: PageServerLoad = async ({ params, locals, fetch }) => {
 			fetch
 		);
 	} catch (e) {
-		if (!(e instanceof ApiError && e.status === 404)) {
-			if (e instanceof ApiError) error(e.status, e.message);
-			error(500, 'Failed to load user lifecycle status');
+		if (!(e instanceof ApiError)) {
+			throw e;
 		}
+		// 404 (no lifecycle model) and transient/server errors both degrade to null.
 	}
 
 	return {
 		user,
 		form,
 		currentUserId: locals.user!.id,
+		isSuperAdmin: (locals.user!.roles ?? []).includes('super_admin'),
 		lifecycleStatus
 	};
 };

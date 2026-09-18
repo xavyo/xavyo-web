@@ -24,7 +24,7 @@
 	let editedClientId = $state(provider.client_id ?? '');
 	let editedSecret = $state('');
 	// svelte-ignore state_referenced_locally
-	let editedScopes = $state(provider.scopes.join(', '));
+	let editedScopes = $state((provider.scopes ?? []).join(', '));
 	// svelte-ignore state_referenced_locally
 	let editedAzureTenant = $state(
 		(provider.additional_config?.azure_tenant as string) ?? 'common'
@@ -38,7 +38,7 @@
 	$effect(() => {
 		editedClientId = provider.client_id ?? '';
 		editedSecret = '';
-		editedScopes = provider.scopes.join(', ');
+		editedScopes = (provider.scopes ?? []).join(', ');
 		editedAzureTenant = (provider.additional_config?.azure_tenant as string) ?? 'common';
 		editedTeamId = (provider.additional_config?.team_id as string) ?? '';
 		editedKeyId = (provider.additional_config?.key_id as string) ?? '';
@@ -118,9 +118,13 @@
 
 	async function handleToggle() {
 		toggling = true;
+		// Capture the target state before awaiting: onToggle reloads the parent's
+		// provider list, so `provider.enabled` is already the new value by the time
+		// the toast fires. Wording it off the pre-await target keeps it correct.
+		const nextEnabled = !provider.enabled;
 		try {
-			await onToggle(provider.provider, !provider.enabled);
-			addToast('success', `${providerDisplayName} ${provider.enabled ? 'disabled' : 'enabled'}`);
+			await onToggle(provider.provider, nextEnabled);
+			addToast('success', `${providerDisplayName} ${nextEnabled ? 'enabled' : 'disabled'}`);
 		} catch (err) {
 			addToast('error', `Failed to toggle ${providerDisplayName}: ${err instanceof Error ? err.message : 'Unknown error'}`);
 		} finally {

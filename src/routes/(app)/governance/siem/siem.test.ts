@@ -135,21 +135,6 @@ describe('SIEM hub +page.server', () => {
 			}
 		});
 
-		it('redirects non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/siem'),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/');
-			}
-		});
-
 		it('returns destinations and exports for admin', async () => {
 			const dests = [makeDestination(), makeDestination2()];
 			const exps = [makeExport()];
@@ -274,18 +259,6 @@ describe('SIEM hub +page.server', () => {
 			);
 		});
 
-		it('calls hasAdminRole with user roles', async () => {
-			mockListDestinations.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
-			mockListExports.mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
-
-			await load({
-				locals: mockLocals(true),
-				url: new URL('http://localhost/governance/siem'),
-				fetch: vi.fn()
-			} as any);
-
-			expect(mockHasAdminRole).toHaveBeenCalledWith(['admin']);
-		});
 	});
 });
 

@@ -32,7 +32,7 @@ describe('NHI certification campaign +page.server', () => {
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(getNhiCertCampaign).mockResolvedValue({ id: 'c1' } as any);
 		vi.mocked(listNhiCertCampaignItems).mockResolvedValue({ items: [] } as any);
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'c1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

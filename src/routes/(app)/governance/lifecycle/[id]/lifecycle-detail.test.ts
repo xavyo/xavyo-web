@@ -104,10 +104,11 @@ function makeTransition(overrides: Partial<LifecycleTransition> = {}): Lifecycle
 		from_state_id: 's1',
 		to_state_id: 's2',
 		requires_approval: false,
+		approval_workflow_id: null,
 		grace_period_hours: null,
 		created_at: '2024-01-01T00:00:00Z',
 		...overrides
-	};
+	} as LifecycleTransition;
 }
 
 function makeConfig(overrides: Partial<LifecycleConfigDetail> = {}): LifecycleConfigDetail {

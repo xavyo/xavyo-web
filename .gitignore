@@ -13,3 +13,6 @@ Thumbs.db
 .vscode/
 .idea/
 coverage/
+
+# graphify knowledge-graph output (build artifact; config lives in .cursor/)
+graphify-out/

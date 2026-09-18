@@ -80,7 +80,7 @@ describe('Connector Edit +page.server', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
 			vi.mocked(getConnector).mockResolvedValue(makeConnector());
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'conn-1' },
 				locals: mockLocals(false),
 				fetch: vi.fn()

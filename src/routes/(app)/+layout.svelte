@@ -33,11 +33,6 @@
 	const navSections: NavSection[] = $derived.by(() => {
 		const sections: NavSection[] = [
 			{
-				label: 'Dashboard',
-				collapsible: false,
-				items: [{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }]
-			},
-			{
 				label: 'Self-Service',
 				collapsible: true,
 				items: [
@@ -50,6 +45,13 @@
 		];
 
 		if (data.isAdmin) {
+			// The dashboard is an admin overview (tenant-wide metrics); only admins
+			// can load it, so it leads the nav for them and is hidden for others.
+			sections.unshift({
+				label: 'Dashboard',
+				collapsible: false,
+				items: [{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }]
+			});
 			sections.push(
 				{
 					label: 'Identity',

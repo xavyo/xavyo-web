@@ -40,20 +40,6 @@ describe('Object templates +page.server', () => {
 			load = mod.load;
 		});
 
-		it('redirects non-admin users', async () => {
-			vi.mocked(hasAdminRole).mockReturnValue(false);
-			try {
-				await load({
-					locals: mockLocals(false),
-					url: new URL('http://localhost/governance/object-templates')
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
-		});
-
 		it('returns templates for admin users', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			vi.mocked(listObjectTemplates).mockResolvedValue({

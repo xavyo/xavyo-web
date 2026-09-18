@@ -27,7 +27,7 @@ describe('Micro-cert manual trigger +page.server', () => {
 	});
 
 	it('does not redirect a non-admin JWT user', async () => {
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } }
 		} as any);
 		expect(result.form).toBeDefined();

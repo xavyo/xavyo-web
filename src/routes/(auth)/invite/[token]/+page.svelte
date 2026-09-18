@@ -4,6 +4,8 @@
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
+	import { Check } from 'lucide-svelte';
+	import { evaluatePassword } from '$lib/utils/password';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -12,6 +14,14 @@
 	const { form, errors, enhance, message } = superForm(data.form);
 
 	const validation = $derived(data.validation);
+	// Preserve tenant context so the invited user can log in after accepting.
+	const loginHref = $derived(data.tenant ? `/login?tenant=${data.tenant}` : '/login');
+
+	const password = $derived(String($form.password ?? ''));
+	const strength = $derived(evaluatePassword(password));
+	const strengthColor = $derived(
+		['bg-muted', 'bg-destructive', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'][strength.score]
+	);
 </script>
 
 {#if validation.valid}
@@ -45,9 +55,41 @@
 					id="password"
 					name="password"
 					type="password"
-					placeholder="Min. 8 characters"
-					value={String($form.password ?? '')}
+					autocomplete="new-password"
+					placeholder="Create a strong password"
+					value={password}
+					oninput={(e) => {
+						$form.password = e.currentTarget.value;
+					}}
 				/>
+				{#if password.length > 0}
+					<div class="space-y-2 pt-1">
+						<div class="flex items-center gap-2">
+							<div class="flex h-1.5 flex-1 gap-1">
+								{#each [1, 2, 3, 4] as seg (seg)}
+									<div
+										class="flex-1 rounded-full transition-colors {seg <= strength.score
+											? strengthColor
+											: 'bg-muted'}"
+									></div>
+								{/each}
+							</div>
+							<span class="w-16 text-right text-xs text-muted-foreground">{strength.label}</span>
+						</div>
+						<ul class="grid grid-cols-1 gap-1 sm:grid-cols-2">
+							{#each strength.checks as check (check.label)}
+								<li
+									class="flex items-center gap-1.5 text-xs {check.met
+										? 'text-green-600'
+										: 'text-muted-foreground'}"
+								>
+									<Check class="h-3 w-3 {check.met ? 'opacity-100' : 'opacity-30'}" />
+									{check.label}
+								</li>
+							{/each}
+						</ul>
+					</div>
+				{/if}
 				{#if $errors.password}
 					<p class="text-sm text-destructive">{$errors.password}</p>
 				{/if}
@@ -59,6 +101,7 @@
 					id="confirm_password"
 					name="confirm_password"
 					type="password"
+					autocomplete="new-password"
 					placeholder="Repeat your password"
 					value={String($form.confirm_password ?? '')}
 				/>
@@ -71,7 +114,8 @@
 		</form>
 
 		<p class="text-sm text-muted-foreground">
-			Already have an account? <a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Log in</a>
+			Already have an account?
+			<a href={loginHref} class="font-medium text-primary underline-offset-4 hover:underline">Log in</a>
 		</p>
 	</div>
 {:else if validation.reason === 'expired'}
@@ -80,13 +124,11 @@
 			<h1 class="text-2xl font-semibold tracking-tight">Invitation expired</h1>
 			<p class="mt-1 text-sm text-muted-foreground">This invitation has expired</p>
 		</div>
-
 		<p class="text-sm text-muted-foreground">
 			{validation.message ?? 'Please contact your administrator to request a new invitation.'}
 		</p>
-
 		<p class="text-sm text-muted-foreground">
-			<a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
+			<a href={loginHref} class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
 		</p>
 	</div>
 {:else if validation.reason === 'already_accepted'}
@@ -95,13 +137,11 @@
 			<h1 class="text-2xl font-semibold tracking-tight">Invitation already used</h1>
 			<p class="mt-1 text-sm text-muted-foreground">This invitation has already been accepted</p>
 		</div>
-
 		<p class="text-sm text-muted-foreground">
 			If you already created your account, you can log in below.
 		</p>
-
 		<p class="text-sm text-muted-foreground">
-			<a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
+			<a href={loginHref} class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
 		</p>
 	</div>
 {:else}
@@ -110,13 +150,11 @@
 			<h1 class="text-2xl font-semibold tracking-tight">Invalid invitation</h1>
 			<p class="mt-1 text-sm text-muted-foreground">This invitation link is not valid</p>
 		</div>
-
 		<p class="text-sm text-muted-foreground">
 			The invitation link may be malformed or does not exist. Please check the link and try again, or contact your administrator.
 		</p>
-
 		<p class="text-sm text-muted-foreground">
-			<a href="/login" class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
+			<a href={loginHref} class="font-medium text-primary underline-offset-4 hover:underline">Go to login</a>
 		</p>
 	</div>
 {/if}

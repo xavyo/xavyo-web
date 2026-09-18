@@ -4,10 +4,12 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { magicLinkRequestSchema } from '$lib/schemas/auth';
 import { requestMagicLink } from '$lib/api/auth';
-import { requestTenantId } from '$lib/server/auth';
+import { requestTenantId, stampTenantCookieFromQuery } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ cookies, url }) => {
+	// Persist ?tenant= so the request action (and later navigation) keep tenant scope.
+	stampTenantCookieFromQuery(cookies, url);
 	const form = await superValidate(zod(magicLinkRequestSchema));
 	return { form };
 };
@@ -31,6 +33,7 @@ export const actions: Actions = {
 			return message(form, 'An unexpected error occurred', { status: 500 });
 		}
 
-		redirect(302, '/passwordless/magic-link/sent');
+		const tenantParam = tenantId ? `?tenant=${tenantId}` : '';
+		redirect(302, `/passwordless/magic-link/sent${tenantParam}`);
 	}
 };

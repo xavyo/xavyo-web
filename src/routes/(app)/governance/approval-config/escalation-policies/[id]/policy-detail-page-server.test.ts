@@ -50,7 +50,7 @@ describe('Escalation policy detail +page.server', () => {
 			levels: []
 		} as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'p1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

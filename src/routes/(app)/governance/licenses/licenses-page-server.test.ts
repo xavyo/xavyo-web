@@ -30,7 +30,7 @@ describe('Licenses +page.server', () => {
 
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(listLicensePools).mockResolvedValue({ items: [], total: 0 } as any);
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn(),
 			url: new URL('http://localhost/governance/licenses')

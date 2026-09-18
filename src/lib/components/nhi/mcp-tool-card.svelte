@@ -6,7 +6,7 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
 	import JsonDisplay from './json-display.svelte';
-	import { isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
+	import { JsonObjectError, parseJsonRecord } from '$lib/utils/json-record';
 
 	interface Props {
 		tool: McpTool;
@@ -50,7 +50,9 @@
 			const params = parseJsonRecord(parametersJson);
 			invokeResult = await invokeMcpTool(tool.name, nhiId, params);
 		} catch (err: unknown) {
-			if (isJsonParseError(err)) {
+			if (err instanceof SyntaxError) {
+				invokeError = 'Invalid JSON parameters';
+			} else if (err instanceof JsonObjectError) {
 				invokeError = 'Parameters must be a JSON object';
 			} else if (
 				err &&

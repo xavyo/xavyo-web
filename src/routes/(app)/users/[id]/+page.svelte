@@ -20,6 +20,10 @@
 
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
+		// Submit the roles array from the store (not just checked checkboxes) so
+		// roles the editor can't manage (e.g. super_admin) are preserved instead of
+		// being silently dropped by the backend's replace-all update.
+		dataType: 'json',
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.type !== 'error') {
 				addToast('success', 'User updated successfully');
@@ -37,7 +41,15 @@
 
 	const isSelf = $derived(data.user.id === data.currentUserId);
 
-	const availableRoles = ['admin', 'user'];
+	// Roles this editor can assign, aligned with the backend allowlist
+	// (user, member, admin, super_admin). super_admin is only manageable by a
+	// super_admin; a target's existing super_admin role is preserved regardless
+	// (it stays in $form.roles and is submitted via the json dataType).
+	const availableRoles = $derived(
+		data.isSuperAdmin
+			? ['user', 'member', 'admin', 'super_admin']
+			: ['user', 'member', 'admin']
+	);
 
 	function toggleRole(role: string) {
 		const current = $form.roles ?? [];

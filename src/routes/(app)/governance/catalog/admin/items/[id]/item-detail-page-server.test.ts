@@ -34,7 +34,7 @@ describe('Catalog admin item detail +page.server', () => {
 		vi.mocked(getCatalogItem).mockResolvedValue({ id: 'i1', name: 'Item' } as any);
 		vi.mocked(adminListCategories).mockResolvedValue({ items: [], total: 0 } as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'i1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

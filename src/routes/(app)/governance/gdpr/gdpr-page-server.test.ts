@@ -30,7 +30,7 @@ describe('GDPR report +page.server', () => {
 		vi.mocked(hasAdminRole).mockReturnValue(false);
 		vi.mocked(getGdprReport).mockResolvedValue({ items: [] } as any);
 		const { load } = await import('./+page.server');
-		const result = await load({
+		const result: any = await load({
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()
 		} as any);

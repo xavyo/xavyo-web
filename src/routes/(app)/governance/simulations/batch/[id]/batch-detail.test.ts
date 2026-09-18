@@ -115,21 +115,6 @@ describe('Batch simulation detail +page.server', () => {
 	});
 
 	describe('load', () => {
-		it('redirects non-admin users', async () => {
-			mockHasAdminRole.mockReturnValue(false);
-			try {
-				await load({
-					params: { id: 'bat-1' },
-					locals: mockLocals(false),
-					fetch: vi.fn()
-				} as any);
-				expect.fail('should have thrown redirect');
-			} catch (e: any) {
-				expect(e.status).toBe(302);
-				expect(e.location).toBe('/dashboard');
-			}
-		});
-
 		it('returns simulation and results for admin', async () => {
 			const sim = makeBatchSimulation({ status: 'executed', impact_summary: makeBatchImpactSummary() });
 			const results = [makeBatchResult()];

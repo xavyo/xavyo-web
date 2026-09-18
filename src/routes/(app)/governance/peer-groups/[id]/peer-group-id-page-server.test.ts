@@ -33,7 +33,7 @@ describe('Peer group detail +page.server', () => {
 	it('does not redirect a non-admin JWT user', async () => {
 		vi.mocked(getPeerGroup).mockResolvedValue({ id: 'pg-1', name: 'Finance' } as any);
 
-		const result = await load({
+		const result: any = await load({
 			params: { id: 'pg-1' },
 			locals: { accessToken: 'tok', tenantId: 'tid', user: { roles: ['user'] } },
 			fetch: vi.fn()

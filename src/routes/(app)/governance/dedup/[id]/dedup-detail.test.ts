@@ -62,7 +62,7 @@ describe('dedup detail page server', () => {
 			mockHasAdminRole.mockReturnValue(false);
 			mockGetDuplicate.mockResolvedValue(mockDuplicate);
 			const { load } = await import('./+page.server');
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'dup-1' },
 				locals: { user: { roles: ['user'] }, accessToken: 'tok', tenantId: 'tid' },
 				fetch: vi.fn()
@@ -74,7 +74,7 @@ describe('dedup detail page server', () => {
 			mockGetDuplicate.mockResolvedValue(mockDuplicate);
 			const { load } = await import('./+page.server');
 
-			const result = await load({
+			const result: any = await load({
 				params: { id: 'dup-1' },
 				locals: { user: { roles: ['admin'] }, accessToken: 'tok', tenantId: 'tid' },
 				fetch: vi.fn()
