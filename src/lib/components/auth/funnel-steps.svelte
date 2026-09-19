@@ -4,25 +4,23 @@
 	const steps = ['Workspace', 'Verify email'];
 </script>
 
-<ol class="mb-6 flex items-center gap-2" aria-label="Sign-up progress">
+<ol class="mb-8 flex items-center gap-3" aria-label="Sign-up progress">
 	{#each steps as label, i (label)}
 		{@const n = i + 1}
 		{@const state = n < current ? 'done' : n === current ? 'current' : 'upcoming'}
-		<li class="flex flex-1 items-center gap-2 last:flex-none">
+		<li class="flex items-center gap-2">
 			<span
-				class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-medium transition-colors"
-				class:border-primary={state !== 'upcoming'}
-				class:bg-primary={state === 'done'}
-				class:text-primary-foreground={state === 'done'}
-				class:text-primary={state === 'current'}
-				class:border-muted={state === 'upcoming'}
+				class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
+				class:bg-primary={state !== 'upcoming'}
+				class:text-primary-foreground={state !== 'upcoming'}
+				class:bg-muted={state === 'upcoming'}
 				class:text-muted-foreground={state === 'upcoming'}
 				aria-current={state === 'current' ? 'step' : undefined}
 			>
 				{#if state === 'done'}✓{:else}{n}{/if}
 			</span>
 			<span
-				class="hidden text-xs font-medium sm:inline"
+				class="text-xs font-medium"
 				class:text-foreground={state !== 'upcoming'}
 				class:text-muted-foreground={state === 'upcoming'}
 			>
@@ -30,7 +28,7 @@
 			</span>
 			{#if n < steps.length}
 				<span
-					class="h-px flex-1"
+					class="mx-1 h-px w-8 sm:w-12"
 					class:bg-primary={state === 'done'}
 					class:bg-border={state !== 'done'}
 				></span>

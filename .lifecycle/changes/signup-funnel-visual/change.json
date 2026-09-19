@@ -1,0 +1,71 @@
+{
+  "id": "signup-funnel-visual",
+  "state": "implementing",
+  "objective": "Restyle the public tenant-signup funnel (create organization → check email) from Mobbin B2B references without changing POST /tenants/signup or form fields.",
+  "non_goals": [
+    "Do not change POST /tenants/signup request or response",
+    "Do not change login, invite, MFA, or SSO pages",
+    "Do not add social signup to this funnel",
+    "Do not touch frozen apps/idp-web"
+  ],
+  "project": {
+    "field": "brownfield",
+    "baseline_revision": "dfd8f14d684b67b8603198ccdc5b9fcd63204cb2",
+    "invariants": [
+      "signup action still calls signupTenant() → POST /tenants/signup",
+      "Form fields stay organizationName, email, password, displayName",
+      "check-email still posts ?/resend",
+      "Existing signup and tenants unit tests stay green"
+    ],
+    "rollback": "Revert the visual PR. API contract is unchanged."
+  },
+  "grill": {
+    "mode": "autonomous",
+    "notes": [
+      "Pascal required Mobbin before UI; #25 skipped that. No user-only gaps: visual-only, keep the API.",
+      "Assumed Amplitude create-org card + WorkOS trust ticks + Deel inbox + TravelPerk steps. Shared auth layout stays so login is untouched.",
+      "Pre-mortem: copy or markup changes break source-reading tests. Continuity is the existing signup/tenants/hooks tests."
+    ]
+  },
+  "risk": {
+    "tier": "structured",
+    "signals": ["x-design"],
+    "rationale": "Public-facing auth funnel restyle; no API, auth, or validation change."
+  },
+  "acceptance": [
+    {
+      "id": "signup-still-posts-tenants-signup",
+      "criterion": "Web signup still posts org+admin to POST /tenants/signup and redirects to check-email.",
+      "verification": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/routes/(auth)/signup src/lib/api/tenants.test.ts",
+      "continuity": true
+    },
+    {
+      "id": "mobbin-visual",
+      "criterion": "Signup looks like a create-organization card; check-email is an inbox confirmation with envelope and resend.",
+      "verification": "Browser screenshots of /signup and /check-email after the change"
+    }
+  ],
+  "execution": {
+    "mode": "sequential",
+    "rationale": "Two Svelte pages plus the shared step component share one visual language."
+  },
+  "tasks": [
+    {
+      "id": "visual",
+      "outcome": "Restyle funnel-steps, signup, and check-email from the chosen Mobbin screens.",
+      "write_scope": [
+        "src/lib/components/auth/funnel-steps.svelte",
+        "src/routes/(auth)/signup/+page.svelte",
+        "src/routes/(auth)/check-email/+page.svelte"
+      ]
+    },
+    {
+      "id": "verify",
+      "outcome": "Autofixer, unit tests, and screenshots."
+    }
+  ],
+  "approvals": {
+    "contract": true,
+    "critical_actions": false
+  }
+}
