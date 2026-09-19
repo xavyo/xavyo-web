@@ -105,6 +105,19 @@ export async function verifyEmail(
 	});
 }
 
+export async function resendVerification(
+	email: string,
+	tenantId?: string,
+	fetchFn?: typeof globalThis.fetch
+): Promise<void> {
+	await apiClient('/auth/resend-verification', {
+		method: 'POST',
+		body: { email },
+		...tenantHeader(tenantId),
+		fetch: fetchFn
+	});
+}
+
 // Passwordless authentication
 
 export async function requestMagicLink(

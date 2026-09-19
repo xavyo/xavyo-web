@@ -7,6 +7,7 @@ import {
 	forgotPassword,
 	resetPassword,
 	verifyEmail,
+	resendVerification,
 	verifyMfaTotp,
 	verifyMfaRecovery
 } from './auth';
@@ -214,6 +215,21 @@ describe('auth API functions', () => {
 				fetch: mockFetch
 			});
 			expect(result).toEqual(mockResponse);
+		});
+	});
+
+	describe('resendVerification', () => {
+		it('calls POST /auth/resend-verification with email and tenant', async () => {
+			mockApiClient.mockResolvedValue(undefined);
+
+			await resendVerification('admin@acme.com', 'tid-1', mockFetch);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/auth/resend-verification', {
+				method: 'POST',
+				body: { email: 'admin@acme.com' },
+				tenantId: 'tid-1',
+				fetch: mockFetch
+			});
 		});
 	});
 });

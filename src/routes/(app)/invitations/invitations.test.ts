@@ -10,6 +10,14 @@ vi.mock('$lib/api/invitations', () => ({
 	cancelInvitation: vi.fn()
 }));
 
+vi.mock('$lib/api/auth', () => ({
+	resendVerification: vi.fn()
+}));
+
+vi.mock('$lib/server/email-verified', () => ({
+	currentUserEmailVerified: vi.fn()
+}));
+
 vi.mock('$lib/api/client', () => ({
 	ApiError: class ApiError extends Error {
 		status: number;
@@ -23,17 +31,23 @@ vi.mock('$lib/api/client', () => ({
 import { load, actions } from './+page.server';
 import { hasAdminRole } from '$lib/server/auth';
 import { listInvitations, resendInvitation, cancelInvitation } from '$lib/api/invitations';
+import { resendVerification } from '$lib/api/auth';
+import { currentUserEmailVerified } from '$lib/server/email-verified';
 import { ApiError } from '$lib/api/client';
 
 const mockLocals = (admin: boolean) => ({
 	accessToken: 'tok',
 	tenantId: 'tid',
-	user: { roles: admin ? ['admin'] : ['user'] }
+	user: { roles: admin ? ['admin'] : ['user'], email: 'admin@example.com' }
 });
 
 describe('Invitations +page.server', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(currentUserEmailVerified).mockResolvedValue({
+			emailVerified: true,
+			email: 'admin@example.com'
+		});
 	});
 
 	describe('load', () => {
@@ -150,6 +164,24 @@ describe('Invitations +page.server', () => {
 			} catch (e: any) {
 				expect(e.status).toBe(500);
 			}
+		});
+
+		it('returns confirm-email state and skips the list when unverified', async () => {
+			vi.mocked(currentUserEmailVerified).mockResolvedValue({
+				emailVerified: false,
+				email: 'admin@example.com'
+			});
+
+			const result = (await load({
+				locals: mockLocals(true),
+				url: new URL('http://localhost/invitations'),
+				fetch: vi.fn()
+			} as any)) as any;
+
+			expect(result.emailVerified).toBe(false);
+			expect(result.profileEmail).toBe('admin@example.com');
+			expect(result.invitations).toEqual([]);
+			expect(listInvitations).not.toHaveBeenCalled();
 		});
 
 		it('passes status and email filters through to data', async () => {
@@ -273,6 +305,43 @@ describe('Invitations +page.server', () => {
 			expect(result).toEqual({ success: false, error: 'Invitation not found' });
 		});
 
+		it('resend action is blocked when the admin is unverified', async () => {
+			vi.mocked(currentUserEmailVerified).mockResolvedValue({
+				emailVerified: false,
+				email: 'admin@example.com'
+			});
+			const formData = new FormData();
+			formData.set('id', 'inv-123');
+
+			const result = await actions.resend({
+				request: { formData: () => Promise.resolve(formData) },
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+
+			expect(result).toEqual({
+				success: false,
+				error: 'Confirm your email before inviting others'
+			});
+			expect(resendInvitation).not.toHaveBeenCalled();
+		});
+
+		it('resendVerification action calls the auth resend endpoint', async () => {
+			vi.mocked(resendVerification).mockResolvedValue(undefined);
+
+			const result = await actions.resendVerification({
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+
+			expect(resendVerification).toHaveBeenCalledWith(
+				'admin@example.com',
+				'tid',
+				expect.any(Function)
+			);
+			expect(result).toEqual({ success: true, action: 'resendVerification' });
+		});
+
 		it('cancel action returns generic error for non-ApiError', async () => {
 			vi.mocked(cancelInvitation).mockRejectedValue(new Error('network error'));
 
@@ -291,8 +360,12 @@ describe('Invitations +page.server', () => {
 });
 
 describe('Invitations +page.svelte', () => {
-	it('is defined as a module', async () => {
-		const mod = await import('./+page.svelte');
-		expect(mod.default).toBeDefined();
-	}, 15000);
+	it('shows confirm-email state instead of the invite form when unverified', async () => {
+		const { readFileSync } = await import('node:fs');
+		const src = readFileSync('src/routes/(app)/invitations/+page.svelte', 'utf8');
+		expect(src).toContain('Confirm your email');
+		expect(src).toContain('?/resendVerification');
+		expect(src).toContain('!data.emailVerified');
+		expect(src).toContain('Invite user');
+	});
 });
