@@ -25,27 +25,23 @@ describe('ScriptStatusBadge', () => {
 		expect(screen.getByText('archived')).toBeTruthy();
 	});
 
-	it('applies yellow styling for draft status', () => {
+	it('applies warning styling for draft status', () => {
 		const { container } = render(ScriptStatusBadge, { props: { status: 'draft' } });
-		const badge = container.querySelector('[class*="bg-yellow"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-warning/15');
 	});
 
-	it('applies green styling for active status', () => {
+	it('applies success styling for active status', () => {
 		const { container } = render(ScriptStatusBadge, { props: { status: 'active' } });
-		const badge = container.querySelector('[class*="bg-green"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-success/15');
 	});
 
-	it('applies gray styling for inactive status', () => {
+	it('applies muted styling for inactive status', () => {
 		const { container } = render(ScriptStatusBadge, { props: { status: 'inactive' } });
-		const badge = container.querySelector('[class*="bg-gray"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-muted');
 	});
 
 	it('falls back to draft styling for unknown status', () => {
 		const { container } = render(ScriptStatusBadge, { props: { status: 'unknown_status' } });
-		const badge = container.querySelector('[class*="bg-yellow"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-warning/15');
 	});
 });

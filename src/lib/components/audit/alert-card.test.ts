@@ -80,8 +80,7 @@ describe('AlertCard', () => {
 		const { container } = render(AlertCard, {
 			props: { alert: makeAlert({ severity: 'info' }) }
 		});
-		const severityIcon = container.querySelector('.bg-info/15');
-		expect(severityIcon).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-info/15');
 	});
 
 	it('renders warning severity with amber styling', () => {
@@ -96,8 +95,7 @@ describe('AlertCard', () => {
 		const { container } = render(AlertCard, {
 			props: { alert: makeAlert({ severity: 'critical' }) }
 		});
-		const severityIcon = container.querySelector('.bg-destructive/15');
-		expect(severityIcon).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-destructive/15');
 	});
 
 	it('reduces opacity when acknowledged', () => {

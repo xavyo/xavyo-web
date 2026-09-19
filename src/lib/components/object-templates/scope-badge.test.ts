@@ -65,6 +65,6 @@ describe('ScopeBadge', () => {
 	it('applies orange styles for condition', () => {
 		render(ScopeBadge, { props: { scopeType: 'condition', scopeValue: 'expr' } });
 		const badge = screen.getByText('Condition').parentElement;
-		expect(badge?.className).toContain('bg-warning/20');
+		expect(badge?.className).toContain('bg-warning/15');
 	});
 });

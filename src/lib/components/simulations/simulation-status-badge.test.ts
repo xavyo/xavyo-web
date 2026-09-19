@@ -112,13 +112,13 @@ describe('SimulationStatusBadge', () => {
 	it('applies orange CSS class for high severity', () => {
 		render(SimulationStatusBadge, { props: { value: 'high', type: 'severity' } });
 		const badge = screen.getByText('high');
-		expect(badge.className).toContain('bg-warning/20');
+		expect(badge.className).toContain('bg-warning/15');
 	});
 
 	it('applies yellow CSS class for medium severity', () => {
 		render(SimulationStatusBadge, { props: { value: 'medium', type: 'severity' } });
 		const badge = screen.getByText('medium');
-		expect(badge.className).toContain('bg-warning/20');
+		expect(badge.className).toContain('bg-warning/15');
 	});
 
 	it('applies green CSS class for low severity', () => {

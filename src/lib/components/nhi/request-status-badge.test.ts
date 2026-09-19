@@ -30,33 +30,28 @@ describe('RequestStatusBadge', () => {
 		expect(screen.getByText('some_unknown')).toBeTruthy();
 	});
 
-	it('applies yellow variant classes for pending', () => {
+	it('applies warning variant classes for pending', () => {
 		const { container } = render(RequestStatusBadge, { props: { status: 'pending' } });
-		const badge = container.querySelector('[class*="yellow"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-warning/15');
 	});
 
-	it('applies green variant classes for approved', () => {
+	it('applies success variant classes for approved', () => {
 		const { container } = render(RequestStatusBadge, { props: { status: 'approved' } });
-		const badge = container.querySelector('[class*="green"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-success/15');
 	});
 
-	it('applies red variant classes for rejected', () => {
+	it('applies destructive variant classes for rejected', () => {
 		const { container } = render(RequestStatusBadge, { props: { status: 'rejected' } });
-		const badge = container.querySelector('[class*="red"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-destructive/15');
 	});
 
-	it('applies gray variant classes for cancelled', () => {
+	it('applies muted variant classes for cancelled', () => {
 		const { container } = render(RequestStatusBadge, { props: { status: 'cancelled' } });
-		const badge = container.querySelector('[class*="gray"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-muted');
 	});
 
 	it('falls back to pending variant for unknown status', () => {
 		const { container } = render(RequestStatusBadge, { props: { status: 'xyz' } });
-		const badge = container.querySelector('[class*="yellow"]');
-		expect(badge).toBeTruthy();
+		expect(container.innerHTML).toContain('bg-warning/15');
 	});
 });

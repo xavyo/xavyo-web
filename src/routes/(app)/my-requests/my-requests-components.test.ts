@@ -54,7 +54,7 @@ describe('AccessRequestStatusBadge', () => {
 	it('applies yellow styling for pending', () => {
 		render(AccessRequestStatusBadge, { props: { status: 'pending' } });
 		const el = screen.getByText('Pending');
-		expect(el.className).toContain('bg-warning/20');
+		expect(el.className).toContain('bg-warning/15');
 	});
 
 	it('applies green styling for approved', () => {

@@ -28,7 +28,7 @@ describe('RuleTypeBadge', () => {
 	it('applies orange class for NoManager', () => {
 		render(RuleTypeBadge, { props: { ruleType: 'no_manager' } });
 		const badge = document.querySelector('span');
-		expect(badge?.className).toContain('bg-warning/20');
+		expect(badge?.className).toContain('bg-warning/15');
 	});
 
 	it('applies red class for Terminated', () => {
