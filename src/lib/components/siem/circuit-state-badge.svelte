@@ -10,12 +10,12 @@
 	};
 
 	const colors: Record<string, string> = {
-		closed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-		open: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-		half_open: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+		closed: 'bg-success/15 text-success',
+		open: 'bg-destructive/15 text-destructive',
+		half_open: 'bg-warning/15 text-warning'
 	};
 </script>
 
-<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {colors[state] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}">
+<span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {colors[state] ?? 'bg-muted text-muted-foreground'}">
 	{labels[state] ?? state}
 </span>

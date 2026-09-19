@@ -95,7 +95,7 @@ describe('sessionUserFromClaims', () => {
 				iat: 1,
 				jti: 'j',
 				roles: [],
-				name: '   '
+				name: ' '
 			}).display_name
 		).toBeNull();
 	});

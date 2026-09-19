@@ -7,28 +7,28 @@ describe('ExportStatusBadge', () => {
 		const { container } = render(ExportStatusBadge, { props: { status: 'pending' } });
 		expect(screen.getByText('Pending')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('gray');
+		expect(badge.className).toContain('muted');
 	});
 
 	it('renders "Processing" with blue styling', () => {
 		const { container } = render(ExportStatusBadge, { props: { status: 'processing' } });
 		expect(screen.getByText('Processing')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('blue');
+		expect(badge.className).toContain('info');
 	});
 
 	it('renders "Completed" with green styling', () => {
 		const { container } = render(ExportStatusBadge, { props: { status: 'completed' } });
 		expect(screen.getByText('Completed')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('green');
+		expect(badge.className).toContain('success');
 	});
 
 	it('renders "Failed" with red styling', () => {
 		const { container } = render(ExportStatusBadge, { props: { status: 'failed' } });
 		expect(screen.getByText('Failed')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('red');
+		expect(badge.className).toContain('destructive');
 	});
 
 	it('handles unknown status gracefully', () => {
@@ -37,6 +37,6 @@ describe('ExportStatusBadge', () => {
 		});
 		expect(screen.getByText('unknown_status')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('gray');
+		expect(badge.className).toContain('muted');
 	});
 });

@@ -182,11 +182,11 @@
 	function statusBadgeClass(status: string): string {
 		switch (status) {
 			case 'active':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'inactive':
 				return '';
 			case 'unreachable':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'error':
 				return '';
 			default:
@@ -275,7 +275,7 @@
 	{@const ok = isHealthOk(healthResult.status)}
 	<div class="mt-4 max-w-lg rounded-md border p-4 {ok ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'}">
 		<div class="flex items-center gap-2">
-			<span class="font-medium {ok ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'}">
+			<span class="font-medium {ok ? 'text-success ' : 'text-destructive '}">
 				Health Check: {healthResult.status}
 			</span>
 		</div>
@@ -395,7 +395,7 @@
 						<span class="text-sm text-muted-foreground">Status</span>
 						<div class="flex items-center gap-2">
 							<span
-								class="inline-block h-2.5 w-2.5 rounded-full {data.target.status === 'active' ? 'bg-green-500' : data.target.status === 'unreachable' ? 'bg-yellow-500' : 'bg-red-500'}"
+								class="inline-block h-2.5 w-2.5 rounded-full {data.target.status === 'active' ? 'bg-success' : data.target.status === 'unreachable' ? 'bg-warning' : 'bg-destructive'}"
 							></span>
 							<span class="text-sm font-medium">{data.target.status}</span>
 						</div>
@@ -454,7 +454,7 @@
 							</div>
 						</CardHeader>
 						<CardContent>
-							<div class="rounded-md border">
+							<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 								<table class="w-full text-sm">
 									<thead>
 										<tr class="border-b bg-muted/50">
@@ -536,7 +536,7 @@
 			{:else if syncRuns.length === 0}
 				<p class="text-sm text-muted-foreground">No sync runs yet. Trigger a sync to see run history.</p>
 			{:else}
-				<div class="rounded-md border">
+				<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 					<table class="w-full text-sm">
 						<thead>
 							<tr class="border-b bg-muted/50">
@@ -554,7 +554,7 @@
 								<tr class="border-b transition-colors hover:bg-muted/50">
 									<td class="px-4 py-3">{run.sync_type}</td>
 									<td class="px-4 py-3">
-										<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {run.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : run.status === 'failed' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'}">
+										<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {run.status === 'completed' ? 'bg-success/15 text-success' : run.status === 'failed' ? 'bg-destructive/15 text-destructive' : 'bg-info/15 text-info'}">
 											{run.status}
 										</span>
 									</td>
@@ -590,7 +590,7 @@
 			{:else if provLogs.length === 0}
 				<p class="text-sm text-muted-foreground">No provisioning log entries yet.</p>
 			{:else}
-				<div class="rounded-md border">
+				<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 					<table class="w-full text-sm">
 						<thead>
 							<tr class="border-b bg-muted/50">
@@ -611,7 +611,7 @@
 									<td class="px-4 py-3 font-mono text-xs">{log.http_method ?? '—'}</td>
 									<td class="px-4 py-3">
 										{#if log.http_status}
-											<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {log.http_status >= 200 && log.http_status < 300 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}">
+											<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {log.http_status >= 200 && log.http_status < 300 ? 'bg-success/15 text-success' : 'bg-destructive/15 text-destructive'}">
 												{log.http_status}
 											</span>
 										{:else}

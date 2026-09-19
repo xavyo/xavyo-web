@@ -69,10 +69,10 @@
 
 	function statusBadgeClass(status: string): string {
 		switch (status) {
-			case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-			case 'merged': return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
-			case 'dismissed': return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
-			default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+			case 'pending': return 'bg-warning/15 text-warning';
+			case 'merged': return 'bg-success/15 text-success';
+			case 'dismissed': return 'bg-muted text-muted-foreground ';
+			default: return 'bg-muted text-muted-foreground ';
 		}
 	}
 

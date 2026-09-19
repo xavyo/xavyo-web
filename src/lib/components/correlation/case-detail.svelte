@@ -46,11 +46,11 @@
 	function statusClass(status: string): string {
 		switch (status) {
 			case 'pending':
-				return 'border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+				return 'border-transparent bg-warning/15 text-warning';
 			case 'confirmed':
-				return 'border-transparent bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+				return 'border-transparent bg-success/15 text-success';
 			case 'rejected':
-				return 'border-transparent bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'border-transparent bg-destructive/15 text-destructive';
 			case 'identity_created':
 				return 'border-transparent bg-primary/15 text-primary';
 			default:
@@ -61,11 +61,11 @@
 	function triggerClass(trigger: string): string {
 		switch (trigger) {
 			case 'import':
-				return 'border-transparent bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'border-transparent bg-info/15 text-info';
 			case 'reconciliation':
 				return 'border-transparent bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
 			case 'manual':
-				return 'border-transparent bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'border-transparent bg-muted text-muted-foreground ';
 			default:
 				return '';
 		}

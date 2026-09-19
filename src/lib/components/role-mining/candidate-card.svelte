@@ -11,20 +11,20 @@
 	let { candidate, onPromote, onDismiss }: Props = $props();
 
 	const statusConfig = $derived({
-		pending: { label: 'Pending', class: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
-		promoted: { label: 'Promoted', class: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
-		dismissed: { label: 'Dismissed', class: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' }
+		pending: { label: 'Pending', class: 'bg-muted text-muted-foreground ' },
+		promoted: { label: 'Promoted', class: 'bg-success/15 text-success' },
+		dismissed: { label: 'Dismissed', class: 'bg-destructive/15 text-destructive' }
 	}[candidate.promotion_status]);
 
 	const confidenceColor = $derived(
-		candidate.confidence_score >= 75 ? 'bg-green-500' :
-		candidate.confidence_score >= 50 ? 'bg-yellow-500' :
-		candidate.confidence_score >= 25 ? 'bg-orange-500' :
-		'bg-red-500'
+		candidate.confidence_score >= 75 ? 'bg-success' :
+		candidate.confidence_score >= 50 ? 'bg-warning' :
+		candidate.confidence_score >= 25 ? 'bg-warning' :
+		'bg-destructive'
 	);
 </script>
 
-<div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+<div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 ">
 	<div class="mb-3 flex items-start justify-between">
 		<h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{candidate.proposed_name}</h3>
 		<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusConfig.class}">
@@ -33,7 +33,7 @@
 	</div>
 
 	<div class="mb-3">
-		<div class="mb-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+		<div class="mb-1 flex items-center justify-between text-xs text-muted-foreground ">
 			<span>Confidence</span>
 			<span class="font-mono">{candidate.confidence_score.toFixed(1)}%</span>
 		</div>
@@ -45,7 +45,7 @@
 		</div>
 	</div>
 
-	<div class="mb-3 flex items-center gap-4 text-xs text-gray-600 dark:text-gray-400">
+	<div class="mb-3 flex items-center gap-4 text-xs text-muted-foreground ">
 		<span class="inline-flex items-center gap-1">
 			<Users class="h-3.5 w-3.5" />
 			{candidate.member_count} members
@@ -62,7 +62,7 @@
 				<button
 					type="button"
 					onclick={() => onPromote?.(candidate.id)}
-					class="rounded-md bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700"
+					class="rounded-md bg-success px-3 py-1.5 text-xs font-medium text-success-foreground hover:bg-success/90"
 				>
 					Promote
 				</button>
@@ -71,7 +71,7 @@
 				<button
 					type="button"
 					onclick={() => onDismiss?.(candidate.id)}
-					class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+					class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
 				>
 					Dismiss
 				</button>

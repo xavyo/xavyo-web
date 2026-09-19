@@ -11,7 +11,7 @@ import {
 
 describe('nhiTypeClass', () => {
 	it('returns blue for tool', () => {
-		expect(nhiTypeClass('tool')).toContain('bg-blue-600');
+		expect(nhiTypeClass('tool')).toContain('bg-info');
 	});
 
 	it('returns purple for agent', () => {
@@ -47,19 +47,19 @@ describe('nhiTypeLabel', () => {
 
 describe('riskLevelClass', () => {
 	it('returns red for critical', () => {
-		expect(riskLevelClass('critical')).toContain('bg-red-600');
+		expect(riskLevelClass('critical')).toContain('bg-destructive');
 	});
 
 	it('returns orange for high', () => {
-		expect(riskLevelClass('high')).toContain('bg-orange-500');
+		expect(riskLevelClass('high')).toContain('bg-warning');
 	});
 
 	it('returns yellow for medium', () => {
-		expect(riskLevelClass('medium')).toContain('bg-yellow-500');
+		expect(riskLevelClass('medium')).toContain('bg-warning');
 	});
 
 	it('returns green for low', () => {
-		expect(riskLevelClass('low')).toContain('bg-green-600');
+		expect(riskLevelClass('low')).toContain('bg-success');
 	});
 
 	it('returns empty for unknown level', () => {
@@ -69,15 +69,15 @@ describe('riskLevelClass', () => {
 
 describe('campaignStatusClass', () => {
 	it('returns green for active', () => {
-		expect(campaignStatusClass('active')).toContain('bg-green-600');
+		expect(campaignStatusClass('active')).toContain('bg-success');
 	});
 
 	it('returns blue for completed', () => {
-		expect(campaignStatusClass('completed')).toContain('bg-blue-600');
+		expect(campaignStatusClass('completed')).toContain('bg-info');
 	});
 
 	it('returns red for cancelled', () => {
-		expect(campaignStatusClass('cancelled')).toContain('bg-red-500');
+		expect(campaignStatusClass('cancelled')).toContain('bg-destructive');
 	});
 
 	it('returns empty for unknown status', () => {
@@ -87,11 +87,11 @@ describe('campaignStatusClass', () => {
 
 describe('enforcementClass', () => {
 	it('returns red for prevent', () => {
-		expect(enforcementClass('prevent')).toContain('bg-red-600');
+		expect(enforcementClass('prevent')).toContain('bg-destructive');
 	});
 
 	it('returns yellow for warn', () => {
-		expect(enforcementClass('warn')).toContain('bg-yellow-500');
+		expect(enforcementClass('warn')).toContain('bg-warning');
 	});
 });
 

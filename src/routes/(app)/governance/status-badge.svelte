@@ -2,9 +2,9 @@
 	let { status }: { status: string } = $props();
 
 	const styles: Record<string, string> = {
-		active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-		inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-		suspended: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+		active: 'bg-success/15 text-success',
+		inactive: 'bg-muted text-muted-foreground ',
+		suspended: 'bg-warning/15 text-warning'
 	};
 
 	const labels: Record<string, string> = {
@@ -15,6 +15,6 @@
 </script>
 
 <span
-	class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {styles[status] ?? 'bg-gray-100 text-gray-800'}"
+	class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {styles[status] ?? 'bg-muted text-muted-foreground'}"
 	>{labels[status] ?? status}</span
 >

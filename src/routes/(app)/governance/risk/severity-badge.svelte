@@ -4,9 +4,9 @@
 	let { severity }: { severity: AlertSeverity } = $props();
 
 	const styles: Record<AlertSeverity, string> = {
-		info: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-		warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-		critical: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+		info: 'bg-info/15 text-info',
+		warning: 'bg-warning/15 text-warning',
+		critical: 'bg-destructive/15 text-destructive'
 	};
 
 	const labels: Record<AlertSeverity, string> = {

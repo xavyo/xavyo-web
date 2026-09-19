@@ -13,13 +13,13 @@
 
 	const severityConfig = $derived(
 		({
-			info: { class: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', icon: Info },
+			info: { class: 'bg-info/15 text-info', icon: Info },
 			warning: {
 				class: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
 				icon: AlertTriangle
 			},
 			critical: {
-				class: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+				class: 'bg-destructive/15 text-destructive',
 				icon: ShieldAlert
 			}
 		})[alert.severity] ?? {
@@ -66,7 +66,7 @@
 				<p class="mt-1 text-xs text-muted-foreground">
 					{new Date(alert.created_at).toLocaleString()}
 					{#if isAcknowledged}
-						<span class="ml-2 inline-flex items-center gap-1 text-green-600 dark:text-green-400">
+						<span class="ml-2 inline-flex items-center gap-1 text-success">
 							<CheckCircle2 class="h-3 w-3" />
 							Acknowledged {new Date(alert.acknowledged_at!).toLocaleString()}
 						</span>

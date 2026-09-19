@@ -537,7 +537,7 @@
 	</TabsList>
 
 	<!-- ========================== -->
-	<!-- Details Tab                -->
+	<!-- Details Tab -->
 	<!-- ========================== -->
 	<TabsContent value="details">
 		<Card class="max-w-lg">
@@ -721,7 +721,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Criteria Tab               -->
+	<!-- Criteria Tab -->
 	<!-- ========================== -->
 	<TabsContent value="criteria">
 		<Card>
@@ -819,7 +819,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Entitlements Tab           -->
+	<!-- Entitlements Tab -->
 	<!-- ========================== -->
 	<TabsContent value="entitlements">
 		<Card>
@@ -918,7 +918,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Constraints Tab            -->
+	<!-- Constraints Tab -->
 	<!-- ========================== -->
 	<TabsContent value="constraints">
 		<Card>
@@ -1008,7 +1008,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Inheritances Tab           -->
+	<!-- Inheritances Tab -->
 	<!-- ========================== -->
 	<TabsContent value="inheritances">
 		<Card>
@@ -1103,7 +1103,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Conflicts Tab              -->
+	<!-- Conflicts Tab -->
 	<!-- ========================== -->
 	<TabsContent value="conflicts">
 		<Card>
@@ -1170,7 +1170,7 @@
 					</div>
 				{:else if conflicts.length === 0}
 					<div class="flex items-center gap-2 text-sm text-muted-foreground">
-						<CheckCircle class="h-4 w-4 text-green-500" />
+						<CheckCircle class="h-4 w-4 text-success" />
 						No conflicts found.
 					</div>
 				{:else}
@@ -1261,7 +1261,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Simulation Tab             -->
+	<!-- Simulation Tab -->
 	<!-- ========================== -->
 	<TabsContent value="simulation">
 		<div class="space-y-6">
@@ -1332,11 +1332,11 @@
 								<p class="text-xs text-muted-foreground">Roles Affected</p>
 							</div>
 							<div class="rounded-md border p-2 text-center">
-								<p class="text-lg font-bold text-green-600">{simulationResult.summary.roles_gaining_inheritance}</p>
+								<p class="text-lg font-bold text-success">{simulationResult.summary.roles_gaining_inheritance}</p>
 								<p class="text-xs text-muted-foreground">Gaining</p>
 							</div>
 							<div class="rounded-md border p-2 text-center">
-								<p class="text-lg font-bold text-red-600">{simulationResult.summary.roles_losing_inheritance}</p>
+								<p class="text-lg font-bold text-destructive">{simulationResult.summary.roles_losing_inheritance}</p>
 								<p class="text-xs text-muted-foreground">Losing</p>
 							</div>
 							<div class="rounded-md border p-2 text-center">
@@ -1374,7 +1374,7 @@
 						<!-- Roles to add -->
 						{#if simulationResult.roles_to_add.length > 0}
 							<div class="mb-4">
-								<h3 class="mb-2 font-medium text-green-600">Roles Gaining Inheritance ({simulationResult.roles_to_add.length})</h3>
+								<h3 class="mb-2 font-medium text-success">Roles Gaining Inheritance ({simulationResult.roles_to_add.length})</h3>
 								<div class="space-y-1">
 									{#each simulationResult.roles_to_add as role}
 										<div class="rounded bg-green-50 p-2 text-sm dark:bg-green-950/20">
@@ -1394,7 +1394,7 @@
 						<!-- Roles to remove -->
 						{#if simulationResult.roles_to_remove.length > 0}
 							<div class="mb-4">
-								<h3 class="mb-2 font-medium text-red-600">Roles Losing Inheritance ({simulationResult.roles_to_remove.length})</h3>
+								<h3 class="mb-2 font-medium text-destructive">Roles Losing Inheritance ({simulationResult.roles_to_remove.length})</h3>
 								<div class="space-y-1">
 									{#each simulationResult.roles_to_remove as role}
 										<div class="rounded bg-red-50 p-2 text-sm dark:bg-red-950/20">
@@ -1416,7 +1416,7 @@
 									{#each simulationResult.potential_conflicts as pc}
 										<div class="rounded-md border border-yellow-300 p-2 text-sm dark:border-yellow-700">
 											<div class="flex items-center gap-2">
-												<AlertTriangle class="h-3 w-3 text-yellow-600" />
+												<AlertTriangle class="h-3 w-3 text-warning" />
 												<span>{pc.meta_role_a_name} vs {pc.meta_role_b_name}</span>
 												<Badge variant="outline" class="text-xs">{pc.conflict_type.replace(/_/g, ' ')}</Badge>
 											</div>
@@ -1477,11 +1477,11 @@
 									<p class="text-xs text-muted-foreground">Remaining</p>
 								</div>
 								<div class="rounded-md border p-2 text-center">
-									<p class="text-lg font-bold text-green-600">{cascadeResult.success_count}</p>
+									<p class="text-lg font-bold text-success">{cascadeResult.success_count}</p>
 									<p class="text-xs text-muted-foreground">Succeeded</p>
 								</div>
 								<div class="rounded-md border p-2 text-center">
-									<p class="text-lg font-bold text-red-600">{cascadeResult.failure_count}</p>
+									<p class="text-lg font-bold text-destructive">{cascadeResult.failure_count}</p>
 									<p class="text-xs text-muted-foreground">Failed</p>
 								</div>
 							</div>
@@ -1513,7 +1513,7 @@
 	</TabsContent>
 
 	<!-- ========================== -->
-	<!-- Events Tab                 -->
+	<!-- Events Tab -->
 	<!-- ========================== -->
 	<TabsContent value="events">
 		<Card>

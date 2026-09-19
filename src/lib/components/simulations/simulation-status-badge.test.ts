@@ -88,55 +88,55 @@ describe('SimulationStatusBadge', () => {
 	it('applies blue CSS class for executed status', () => {
 		render(SimulationStatusBadge, { props: { value: 'executed', type: 'status' } });
 		const badge = screen.getByText('executed');
-		expect(badge.className).toContain('bg-blue-100');
+		expect(badge.className).toContain('bg-info/15');
 	});
 
 	it('applies green CSS class for applied status', () => {
 		render(SimulationStatusBadge, { props: { value: 'applied', type: 'status' } });
 		const badge = screen.getByText('applied');
-		expect(badge.className).toContain('bg-green-100');
+		expect(badge.className).toContain('bg-success/15');
 	});
 
 	it('applies red CSS class for cancelled status', () => {
 		render(SimulationStatusBadge, { props: { value: 'cancelled', type: 'status' } });
 		const badge = screen.getByText('cancelled');
-		expect(badge.className).toContain('bg-red-100');
+		expect(badge.className).toContain('bg-destructive/15');
 	});
 
 	it('applies red CSS class for critical severity', () => {
 		render(SimulationStatusBadge, { props: { value: 'critical', type: 'severity' } });
 		const badge = screen.getByText('critical');
-		expect(badge.className).toContain('bg-red-100');
+		expect(badge.className).toContain('bg-destructive/15');
 	});
 
 	it('applies orange CSS class for high severity', () => {
 		render(SimulationStatusBadge, { props: { value: 'high', type: 'severity' } });
 		const badge = screen.getByText('high');
-		expect(badge.className).toContain('bg-orange-100');
+		expect(badge.className).toContain('bg-warning/15');
 	});
 
 	it('applies yellow CSS class for medium severity', () => {
 		render(SimulationStatusBadge, { props: { value: 'medium', type: 'severity' } });
 		const badge = screen.getByText('medium');
-		expect(badge.className).toContain('bg-yellow-100');
+		expect(badge.className).toContain('bg-warning/15');
 	});
 
 	it('applies green CSS class for low severity', () => {
 		render(SimulationStatusBadge, { props: { value: 'low', type: 'severity' } });
 		const badge = screen.getByText('low');
-		expect(badge.className).toContain('bg-green-100');
+		expect(badge.className).toContain('bg-success/15');
 	});
 
 	it('applies red CSS class for violation impact type', () => {
 		render(SimulationStatusBadge, { props: { value: 'violation', type: 'impact' } });
 		const badge = screen.getByText('violation');
-		expect(badge.className).toContain('bg-red-100');
+		expect(badge.className).toContain('bg-destructive/15');
 	});
 
 	it('applies green CSS class for entitlement_gain impact type', () => {
 		render(SimulationStatusBadge, { props: { value: 'entitlement_gain', type: 'impact' } });
 		const badge = screen.getByText('entitlement gain');
-		expect(badge.className).toContain('bg-green-100');
+		expect(badge.className).toContain('bg-success/15');
 	});
 
 	// --- Unknown / fallback ---

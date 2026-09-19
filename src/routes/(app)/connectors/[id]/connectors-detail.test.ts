@@ -310,10 +310,10 @@ describe('Connector Detail rendering logic', () => {
 
 		it('online status gets green dot class', () => {
 			function healthDotColor(isOnline: boolean): string {
-				return isOnline ? 'bg-green-500' : 'bg-red-500';
+				return isOnline ? 'bg-success' : 'bg-destructive';
 			}
-			expect(healthDotColor(true)).toBe('bg-green-500');
-			expect(healthDotColor(false)).toBe('bg-red-500');
+			expect(healthDotColor(true)).toBe('bg-success');
+			expect(healthDotColor(false)).toBe('bg-destructive');
 		});
 
 		it('shows consecutive failures count', () => {

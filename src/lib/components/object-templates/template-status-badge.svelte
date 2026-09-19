@@ -12,8 +12,8 @@
 	};
 
 	const colors: Record<string, string> = {
-		draft: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-		active: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+		draft: 'bg-info/15 text-info',
+		active: 'bg-success/15 text-success',
 		disabled: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
 	};
 </script>

@@ -141,9 +141,9 @@
 	};
 
 	const circuitStateColors: Record<string, string> = {
-		closed: 'text-green-600 dark:text-green-400',
-		open: 'text-red-600 dark:text-red-400',
-		half_open: 'text-yellow-600 dark:text-yellow-400'
+		closed: 'text-success',
+		open: 'text-destructive',
+		half_open: 'text-warning'
 	};
 
 	const circuitStateLabels: Record<string, string> = {
@@ -153,11 +153,11 @@
 	};
 
 	const exportStatusBadgeClass: Record<string, string> = {
-		pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-		processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-		completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-		expired: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
+		pending: 'bg-warning/15 text-warning',
+		processing: 'bg-info/15 text-info',
+		completed: 'bg-success/15 text-success',
+		failed: 'bg-destructive/15 text-destructive',
+		expired: 'bg-muted text-muted-foreground '
 	};
 </script>
 
@@ -253,13 +253,13 @@
 									<td class="px-4 py-3">
 										{#if dest.enabled}
 											<span
-												class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+												class="inline-flex rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success "
 											>
 												Enabled
 											</span>
 										{:else}
 											<span
-												class="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+												class="inline-flex rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground "
 											>
 												Disabled
 											</span>
@@ -353,7 +353,7 @@
 									</td>
 									<td class="px-4 py-3">
 										<span
-											class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {exportStatusBadgeClass[exp.status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}"
+											class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {exportStatusBadgeClass[exp.status] ?? 'bg-muted text-muted-foreground '}"
 										>
 											{exp.status}
 										</span>

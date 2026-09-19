@@ -72,14 +72,14 @@
 		<PageHeader title={data.workflow.name} description="Approval workflow details" />
 		<span
 			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {data.workflow.is_active
-				? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-				: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}"
+				? 'bg-success/15 text-success'
+				: 'bg-muted text-muted-foreground '}"
 		>
 			{data.workflow.is_active ? 'Active' : 'Inactive'}
 		</span>
 		{#if data.workflow.is_default}
 			<span
-				class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+				class="inline-flex items-center rounded-full bg-info/15 px-2.5 py-0.5 text-xs font-medium text-info "
 			>
 				Default
 			</span>
@@ -157,8 +157,8 @@
 					<span class="text-sm text-muted-foreground">Status</span>
 					<span
 						class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {data.workflow.is_active
-							? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-							: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}"
+							? 'bg-success/15 text-success'
+							: 'bg-muted text-muted-foreground '}"
 					>
 						{data.workflow.is_active ? 'Active' : 'Inactive'}
 					</span>
@@ -209,10 +209,10 @@
 										<span
 											class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium
 												{step.approver_type === 'manager'
-												? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+												? 'bg-info/15 text-info'
 												: step.approver_type === 'entitlement_owner'
 													? 'bg-primary/15 text-primary'
-													: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}"
+													: 'bg-warning/15 text-warning'}"
 										>
 											{approverTypeLabels[step.approver_type] ?? step.approver_type}
 										</span>

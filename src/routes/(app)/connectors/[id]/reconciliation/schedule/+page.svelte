@@ -203,9 +203,9 @@
 			<p class="text-sm text-muted-foreground">Status</p>
 			<p class="mt-1 text-lg font-semibold">
 				{#if schedule.enabled}
-					<span class="text-green-600 dark:text-green-400">Enabled</span>
+					<span class="text-success">Enabled</span>
 				{:else}
-					<span class="text-gray-500 dark:text-gray-400">Disabled</span>
+					<span class="text-muted-foreground ">Disabled</span>
 				{/if}
 			</p>
 		</div>

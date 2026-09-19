@@ -84,7 +84,7 @@
 					</div>
 					<div>
 						<p class="text-sm text-muted-foreground">Outlier</p>
-						<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {score.peer_comparison.is_outlier ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}">
+						<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {score.peer_comparison.is_outlier ? 'bg-destructive/15 text-destructive' : 'bg-success/15 text-success'}">
 							{score.peer_comparison.is_outlier ? 'Yes' : 'No'}
 						</span>
 					</div>

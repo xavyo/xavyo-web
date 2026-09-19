@@ -54,7 +54,7 @@
 			case 'pending':
 				return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800';
 			case 'resolved':
-				return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800';
+				return 'bg-success/15 text-success';
 			default:
 				return '';
 		}
@@ -114,7 +114,7 @@
 		/>
 	{/if}
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

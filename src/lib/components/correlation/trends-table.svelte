@@ -70,10 +70,10 @@
 							<td class="px-3 py-2 text-foreground">
 								{day.total_evaluated.toLocaleString()}
 							</td>
-							<td class="px-3 py-2 text-green-600 dark:text-green-400">
+							<td class="px-3 py-2 text-success">
 								{day.auto_confirmed.toLocaleString()}
 							</td>
-							<td class="px-3 py-2 text-yellow-600 dark:text-yellow-400">
+							<td class="px-3 py-2 text-warning">
 								{day.manual_review.toLocaleString()}
 							</td>
 							<td class="px-3 py-2 text-muted-foreground">
@@ -92,10 +92,10 @@
 			<div
 				class="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30"
 			>
-				<Info class="mt-0.5 h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+				<Info class="mt-0.5 h-4 w-4 shrink-0 text-info" />
 				<div class="space-y-1">
-					<p class="text-sm font-medium text-blue-800 dark:text-blue-300">Suggestions</p>
-					<ul class="list-inside list-disc space-y-0.5 text-sm text-blue-700 dark:text-blue-400">
+					<p class="text-sm font-medium text-info ">Suggestions</p>
+					<ul class="list-inside list-disc space-y-0.5 text-sm text-info ">
 						{#each trends.suggestions as suggestion}
 							<li>{suggestion}</li>
 						{/each}

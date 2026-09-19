@@ -154,8 +154,8 @@
 
 	<!-- SoD Violations -->
 	{#if audit.sod_violations && audit.sod_violations.length > 0}
-		<div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-			<h3 class="mb-3 text-sm font-semibold text-red-700 dark:text-red-400">SoD Violations (Overridden)</h3>
+		<div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 /20">
+			<h3 class="mb-3 text-sm font-semibold text-destructive ">SoD Violations (Overridden)</h3>
 			{#each audit.sod_violations as violation}
 				<div class="mb-2 flex items-center justify-between rounded border border-red-200 bg-white p-3 dark:border-red-800 dark:bg-background">
 					<p class="text-sm text-foreground">{violation.rule_name}</p>

@@ -362,7 +362,7 @@ export async function decideNhiCertItem(
 				notes?: string;
 				comment?: string;
 				delegate_to?: string;
-		  },
+		 },
 	token: string,
 	tenantId: string,
 	fetchFn?: typeof globalThis.fetch

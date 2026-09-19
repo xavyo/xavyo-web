@@ -56,12 +56,12 @@
 			<p class="text-sm text-muted-foreground">
 				{report.total_stale} stale entities detected
 				{#if report.critical_count > 0}
-					<Badge class="ml-2 bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
+					<Badge class="ml-2 bg-destructive/15 text-destructive">
 						{report.critical_count} critical
 					</Badge>
 				{/if}
 				{#if report.warning_count > 0}
-					<Badge class="ml-2 bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+					<Badge class="ml-2 bg-warning/15 text-warning">
 						{report.warning_count} warning
 					</Badge>
 				{/if}

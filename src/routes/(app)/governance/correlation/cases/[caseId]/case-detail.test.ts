@@ -241,32 +241,32 @@ describe('Correlation case detail rendering logic', () => {
 		function statusBadgeClass(status: string): string {
 			switch (status) {
 				case 'pending':
-					return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+					return 'bg-warning/15 text-warning';
 				case 'confirmed':
-					return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+					return 'bg-success/15 text-success';
 				case 'rejected':
-					return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+					return 'bg-destructive/15 text-destructive';
 				case 'identity_created':
-					return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+					return 'bg-info/15 text-info';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('pending status gets yellow badge', () => {
-			expect(statusBadgeClass('pending')).toContain('yellow');
+			expect(statusBadgeClass('pending')).toContain('warning');
 		});
 
 		it('confirmed status gets green badge', () => {
-			expect(statusBadgeClass('confirmed')).toContain('green');
+			expect(statusBadgeClass('confirmed')).toContain('success');
 		});
 
 		it('rejected status gets red badge', () => {
-			expect(statusBadgeClass('rejected')).toContain('red');
+			expect(statusBadgeClass('rejected')).toContain('destructive');
 		});
 
 		it('identity_created status gets blue badge', () => {
-			expect(statusBadgeClass('identity_created')).toContain('blue');
+			expect(statusBadgeClass('identity_created')).toContain('info');
 		});
 	});
 
@@ -278,9 +278,9 @@ describe('Correlation case detail rendering logic', () => {
 				case 'reconciliation':
 					return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
 				case 'manual':
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
@@ -293,7 +293,7 @@ describe('Correlation case detail rendering logic', () => {
 		});
 
 		it('manual gets gray badge', () => {
-			expect(triggerTypeBadgeClass('manual')).toContain('gray');
+			expect(triggerTypeBadgeClass('manual')).toContain('muted');
 		});
 	});
 

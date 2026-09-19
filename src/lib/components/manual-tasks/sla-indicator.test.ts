@@ -11,7 +11,7 @@ describe('SlaIndicator', () => {
 		});
 		expect(screen.getByText('SLA Breached')).toBeTruthy();
 		const label = screen.getByText('SLA Breached');
-		expect(label.className).toContain('text-red-600');
+		expect(label.className).toContain('text-destructive');
 	});
 
 	it('shows SLA At Risk with orange class when warning sent but not breached', () => {
@@ -20,7 +20,7 @@ describe('SlaIndicator', () => {
 		});
 		expect(screen.getByText('SLA At Risk')).toBeTruthy();
 		const label = screen.getByText('SLA At Risk');
-		expect(label.className).toContain('text-orange-600');
+		expect(label.className).toContain('text-warning');
 	});
 
 	it('shows On Track with green class when normal', () => {
@@ -29,7 +29,7 @@ describe('SlaIndicator', () => {
 		});
 		expect(screen.getByText('On Track')).toBeTruthy();
 		const label = screen.getByText('On Track');
-		expect(label.className).toContain('text-green-600');
+		expect(label.className).toContain('text-success');
 	});
 
 	it('prioritizes breached over warning sent', () => {

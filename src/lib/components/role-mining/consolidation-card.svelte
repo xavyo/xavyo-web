@@ -10,16 +10,16 @@
 	let { suggestion, onDismiss }: Props = $props();
 
 	const statusConfig = $derived({
-		pending: { label: 'Pending', class: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
-		merged: { label: 'Merged', class: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' },
-		dismissed: { label: 'Dismissed', class: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' }
+		pending: { label: 'Pending', class: 'bg-warning/15 text-warning' },
+		merged: { label: 'Merged', class: 'bg-success/15 text-success' },
+		dismissed: { label: 'Dismissed', class: 'bg-destructive/15 text-destructive' }
 	}[suggestion.status]);
 
 	const overlapColor = $derived(
-		suggestion.overlap_percent >= 75 ? 'bg-green-500' :
-		suggestion.overlap_percent >= 50 ? 'bg-yellow-500' :
-		suggestion.overlap_percent >= 25 ? 'bg-orange-500' :
-		'bg-red-500'
+		suggestion.overlap_percent >= 75 ? 'bg-success' :
+		suggestion.overlap_percent >= 50 ? 'bg-warning' :
+		suggestion.overlap_percent >= 25 ? 'bg-warning' :
+		'bg-destructive'
 	);
 
 	function truncateId(id: string): string {
@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+<div class="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 ">
 	<div class="mb-3 flex items-start justify-between">
 		<div class="flex items-center gap-2">
 			<GitMerge class="h-4 w-4 text-primary" />
@@ -38,14 +38,14 @@
 		</span>
 	</div>
 
-	<div class="mb-3 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+	<div class="mb-3 flex items-center gap-2 text-xs text-muted-foreground ">
 		<span class="rounded bg-gray-100 px-2 py-0.5 font-mono dark:bg-gray-800" title={suggestion.role_a_id}>{truncateId(suggestion.role_a_id)}</span>
-		<span class="text-gray-400 dark:text-gray-500">&harr;</span>
+		<span class="text-gray-400 ">&harr;</span>
 		<span class="rounded bg-gray-100 px-2 py-0.5 font-mono dark:bg-gray-800" title={suggestion.role_b_id}>{truncateId(suggestion.role_b_id)}</span>
 	</div>
 
 	<div class="mb-3">
-		<div class="mb-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+		<div class="mb-1 flex items-center justify-between text-xs text-muted-foreground ">
 			<span>Overlap</span>
 			<span class="font-mono">{suggestion.overlap_percent.toFixed(1)}%</span>
 		</div>
@@ -57,7 +57,7 @@
 		</div>
 	</div>
 
-	<div class="mb-3 space-y-1 text-xs text-gray-600 dark:text-gray-400">
+	<div class="mb-3 space-y-1 text-xs text-muted-foreground ">
 		<div class="flex items-center justify-between">
 			<span>Shared entitlements</span>
 			<span class="font-medium text-gray-900 dark:text-gray-100">{suggestion.shared_entitlements.length}</span>
@@ -77,7 +77,7 @@
 			<button
 				type="button"
 				onclick={() => onDismiss?.(suggestion.id)}
-				class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+				class="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-800"
 			>
 				Dismiss
 			</button>

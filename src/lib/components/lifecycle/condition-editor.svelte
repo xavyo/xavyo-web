@@ -137,7 +137,7 @@
 				{#if evalResult}
 					<div class="mt-2">
 						{#if evalResult.is_allowed}
-							<Badge variant="default" class="bg-green-600">Allowed</Badge>
+							<Badge variant="default" class="bg-success text-success-foreground">Allowed</Badge>
 						{:else}
 							<Badge variant="destructive">Not Allowed</Badge>
 						{/if}

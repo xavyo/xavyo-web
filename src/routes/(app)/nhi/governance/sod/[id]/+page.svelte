@@ -15,8 +15,8 @@
 
 	// Enforcement badge styles
 	const enforcementStyles: Record<NhiSodEnforcement, string> = {
-		prevent: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-		warn: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+		prevent: 'bg-destructive/15 text-destructive',
+		warn: 'bg-warning/15 text-warning'
 	};
 
 	const enforcementLabels: Record<NhiSodEnforcement, string> = {

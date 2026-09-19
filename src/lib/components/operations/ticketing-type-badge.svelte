@@ -4,9 +4,9 @@
 	let { systemType }: { systemType: string } = $props();
 
 	const variants: Record<string, string> = {
-		ServiceNow: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-		servicenow: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-		service_now: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+		ServiceNow: 'bg-info/15 text-info',
+		servicenow: 'bg-info/15 text-info',
+		service_now: 'bg-info/15 text-info',
 		Jira: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
 		jira: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
 		Webhook: 'bg-primary/15 text-primary',

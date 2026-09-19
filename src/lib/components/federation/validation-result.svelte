@@ -26,13 +26,13 @@
 		<CardHeader>
 			<div class="flex items-center gap-2">
 				{#if result.is_valid}
-					<CheckCircle class="h-5 w-5 text-green-600 dark:text-green-400" />
-					<h3 class="text-lg font-semibold text-green-800 dark:text-green-200">
+					<CheckCircle class="h-5 w-5 text-success" />
+					<h3 class="text-lg font-semibold text-success ">
 						Configuration Valid
 					</h3>
 				{:else}
-					<XCircle class="h-5 w-5 text-red-600 dark:text-red-400" />
-					<h3 class="text-lg font-semibold text-red-800 dark:text-red-200">
+					<XCircle class="h-5 w-5 text-destructive" />
+					<h3 class="text-lg font-semibold text-destructive ">
 						Validation Failed
 					</h3>
 				{/if}
@@ -40,7 +40,7 @@
 		</CardHeader>
 		<CardContent>
 			{#if !result.is_valid && result.error}
-				<p class="mb-4 text-sm text-red-700 dark:text-red-300">{result.error}</p>
+				<p class="mb-4 text-sm text-destructive ">{result.error}</p>
 			{/if}
 
 			{#if result.discovered_endpoints}

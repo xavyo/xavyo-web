@@ -41,7 +41,7 @@ describe('McpToolCard', () => {
 		render(McpToolCard, { props: { tool: makeTool({ status: 'active' }), nhiId: 'nhi-1' } });
 		const badge = screen.getByText('active');
 		expect(badge).toBeTruthy();
-		expect(badge.className).toContain('bg-green-600');
+		expect(badge.className).toContain('bg-success');
 	});
 
 	it('shows deprecated badge when deprecated flag is set', () => {

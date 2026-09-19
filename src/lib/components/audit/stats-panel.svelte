@@ -45,7 +45,7 @@
 			</Card>
 			<Card>
 				<CardContent class="flex items-center gap-3 p-4">
-					<CheckCircle2 class="h-5 w-5 text-green-600 dark:text-green-400" />
+					<CheckCircle2 class="h-5 w-5 text-success" />
 					<div>
 						<p class="text-sm text-muted-foreground">Successful</p>
 						<p class="text-2xl font-bold">{stats.successful_attempts.toLocaleString()}</p>
@@ -54,7 +54,7 @@
 			</Card>
 			<Card>
 				<CardContent class="flex items-center gap-3 p-4">
-					<XCircle class="h-5 w-5 text-red-600 dark:text-red-400" />
+					<XCircle class="h-5 w-5 text-destructive" />
 					<div>
 						<p class="text-sm text-muted-foreground">Failed</p>
 						<p class="text-2xl font-bold">{stats.failed_attempts.toLocaleString()}</p>
@@ -82,7 +82,7 @@
 			</Card>
 			<Card>
 				<CardContent class="flex items-center gap-3 p-4">
-					<Smartphone class="h-5 w-5 text-blue-600 dark:text-blue-400" />
+					<Smartphone class="h-5 w-5 text-info" />
 					<div>
 						<p class="text-sm text-muted-foreground">New Device Logins</p>
 						<p class="text-lg font-semibold">{stats.new_device_logins.toLocaleString()}</p>

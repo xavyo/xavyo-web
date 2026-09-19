@@ -34,6 +34,6 @@ describe('safeInternalPath', () => {
 		expect(safeInternalPath('', origin)).toBeNull();
 		expect(safeInternalPath(null, origin)).toBeNull();
 		expect(safeInternalPath(undefined, origin)).toBeNull();
-		expect(safeInternalPath('   ', origin)).toBeNull();
+		expect(safeInternalPath(' ', origin)).toBeNull();
 	});
 });

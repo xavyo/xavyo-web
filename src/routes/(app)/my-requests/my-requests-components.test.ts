@@ -54,25 +54,25 @@ describe('AccessRequestStatusBadge', () => {
 	it('applies yellow styling for pending', () => {
 		render(AccessRequestStatusBadge, { props: { status: 'pending' } });
 		const el = screen.getByText('Pending');
-		expect(el.className).toContain('bg-yellow-100');
+		expect(el.className).toContain('bg-warning/15');
 	});
 
 	it('applies green styling for approved', () => {
 		render(AccessRequestStatusBadge, { props: { status: 'approved' } });
 		const el = screen.getByText('Approved');
-		expect(el.className).toContain('bg-green-100');
+		expect(el.className).toContain('bg-success/15');
 	});
 
 	it('applies red styling for rejected', () => {
 		render(AccessRequestStatusBadge, { props: { status: 'rejected' } });
 		const el = screen.getByText('Rejected');
-		expect(el.className).toContain('bg-red-100');
+		expect(el.className).toContain('bg-destructive/15');
 	});
 
 	it('applies fallback styling for unknown status', () => {
 		render(AccessRequestStatusBadge, { props: { status: 'unknown' } });
 		const el = screen.getByText('unknown');
-		expect(el.className).toContain('bg-gray-100');
+		expect(el.className).toContain('bg-muted');
 	});
 });
 

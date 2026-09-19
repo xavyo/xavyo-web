@@ -86,7 +86,7 @@
 						<div class="flex gap-2">
 							<Badge
 								class={card.capabilities.streaming
-									? 'bg-green-600 text-white hover:bg-green-600/80'
+									? 'bg-success text-success-foreground hover:bg-success/80'
 									: ''}
 								variant={card.capabilities.streaming ? 'default' : 'outline'}
 							>
@@ -94,7 +94,7 @@
 							</Badge>
 							<Badge
 								class={card.capabilities.push_notifications
-									? 'bg-green-600 text-white hover:bg-green-600/80'
+									? 'bg-success text-success-foreground hover:bg-success/80'
 									: ''}
 								variant={card.capabilities.push_notifications ? 'default' : 'outline'}
 							>

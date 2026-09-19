@@ -34,7 +34,7 @@
 			</Dialog.Description>
 		</Dialog.Header>
 		<div class="py-4">
-			<label for="reject-reason" class="text-sm font-medium text-foreground">Reason <span class="text-red-500">*</span></label>
+			<label for="reject-reason" class="text-sm font-medium text-foreground">Reason <span class="text-destructive">*</span></label>
 			<textarea
 				id="reject-reason"
 				bind:value={reason}
@@ -46,7 +46,7 @@
 			<p class="mt-1 text-xs text-muted-foreground">
 				{reason.length}/1000 characters
 				{#if reason.length > 0 && reason.length < 5}
-					<span class="text-red-500"> (minimum 5 characters)</span>
+					<span class="text-destructive"> (minimum 5 characters)</span>
 				{/if}
 			</p>
 		</div>

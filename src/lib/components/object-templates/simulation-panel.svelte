@@ -11,7 +11,7 @@
 
 	let { result = null, loading = false, error = null, onsubmit }: Props = $props();
 
-	let sampleObjectInput = $state('{\n  \n}');
+	let sampleObjectInput = $state('{\n \n}');
 	let jsonError = $state('');
 
 	function handleSimulate() {
@@ -39,21 +39,21 @@
 			placeholder={'{"department": "", "title": "Engineer"}'}
 		></textarea>
 		{#if jsonError}
-			<p class="text-sm text-red-600 dark:text-red-400">{jsonError}</p>
+			<p class="text-sm text-destructive">{jsonError}</p>
 		{/if}
 	</div>
 
 	<button
 		onclick={handleSimulate}
 		disabled={loading}
-		class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-500 dark:hover:bg-blue-600"
+		class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-xs hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
 	>
 		{loading ? 'Simulating...' : 'Run Simulation'}
 	</button>
 
 	{#if error}
-		<div class="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-			<p class="text-sm text-red-800 dark:text-red-400">{error}</p>
+		<div class="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 /20">
+			<p class="text-sm text-destructive ">{error}</p>
 		</div>
 	{/if}
 
@@ -86,11 +86,11 @@
 									<tr>
 										<td class="px-3 py-2 font-medium">{rule.target_attribute}</td>
 										<td class="px-3 py-2 text-zinc-500">{rule.rule_type}</td>
-										<td class="px-3 py-2 text-red-600 dark:text-red-400">{String(rule.before_value ?? 'null')}</td>
-										<td class="px-3 py-2 text-green-600 dark:text-green-400">{String(rule.after_value ?? 'null')}</td>
+										<td class="px-3 py-2 text-destructive">{String(rule.before_value ?? 'null')}</td>
+										<td class="px-3 py-2 text-success">{String(rule.after_value ?? 'null')}</td>
 										<td class="px-3 py-2">
 											{#if rule.applied}
-												<span class="text-green-600 dark:text-green-400">Yes</span>
+												<span class="text-success">Yes</span>
 											{:else}
 												<span class="text-zinc-400">No</span>
 											{/if}
@@ -108,9 +108,9 @@
 
 			<!-- Validation Errors -->
 			{#if result.validation_errors.length > 0}
-				<div class="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-					<h4 class="mb-2 text-sm font-medium text-red-800 dark:text-red-400">Validation Errors ({result.validation_errors.length})</h4>
-					<ul class="list-inside list-disc space-y-1 text-sm text-red-700 dark:text-red-300">
+				<div class="rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-800 /20">
+					<h4 class="mb-2 text-sm font-medium text-destructive ">Validation Errors ({result.validation_errors.length})</h4>
+					<ul class="list-inside list-disc space-y-1 text-sm text-destructive ">
 						{#each result.validation_errors as ve}
 							<li><strong>{ve.target_attribute}</strong>: {ve.message} <span class="text-xs opacity-70">({ve.expression})</span></li>
 						{/each}

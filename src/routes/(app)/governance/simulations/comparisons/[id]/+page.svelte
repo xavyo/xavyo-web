@@ -88,7 +88,7 @@
 
 {#if comparison.is_stale}
 	<div class="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-950">
-		<p class="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+		<p class="text-sm font-medium text-warning-foreground ">
 			This comparison may be stale. The underlying simulation data has changed since this comparison was created.
 		</p>
 	</div>

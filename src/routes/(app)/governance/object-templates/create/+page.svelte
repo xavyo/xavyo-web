@@ -16,7 +16,7 @@
 <PageHeader title="Create Object Template" description="Define a new template for automatic lifecycle rule application." />
 
 {#if $formMessage}
-	<div class="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+	<div class="mb-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-destructive dark:border-red-800 /20 ">
 		{$formMessage}
 	</div>
 {/if}
@@ -31,7 +31,7 @@
 			bind:value={$form.name}
 			class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
 		/>
-		{#if $errors.name}<p class="mt-1 text-sm text-red-600">{$errors.name}</p>{/if}
+		{#if $errors.name}<p class="mt-1 text-sm text-destructive">{$errors.name}</p>{/if}
 	</div>
 
 	<div>
@@ -43,7 +43,7 @@
 			rows={3}
 			class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
 		></textarea>
-		{#if $errors.description}<p class="mt-1 text-sm text-red-600">{$errors.description}</p>{/if}
+		{#if $errors.description}<p class="mt-1 text-sm text-destructive">{$errors.description}</p>{/if}
 	</div>
 
 	<div>
@@ -59,7 +59,7 @@
 			<option value="entitlement">Entitlement</option>
 			<option value="application">Application</option>
 		</select>
-		{#if $errors.object_type}<p class="mt-1 text-sm text-red-600">{$errors.object_type}</p>{/if}
+		{#if $errors.object_type}<p class="mt-1 text-sm text-destructive">{$errors.object_type}</p>{/if}
 	</div>
 
 	<div>
@@ -73,13 +73,13 @@
 			max="1000"
 			class="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
 		/>
-		{#if $errors.priority}<p class="mt-1 text-sm text-red-600">{$errors.priority}</p>{/if}
+		{#if $errors.priority}<p class="mt-1 text-sm text-destructive">{$errors.priority}</p>{/if}
 	</div>
 
 	<div class="flex gap-3">
 		<button
 			type="submit"
-			class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+			class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 		>
 			Create Template
 		</button>

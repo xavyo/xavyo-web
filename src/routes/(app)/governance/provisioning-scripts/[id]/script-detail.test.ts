@@ -433,26 +433,26 @@ describe('Script Detail rendering logic', () => {
 
 	describe('log status colors', () => {
 		const logStatusColors: Record<string, string> = {
-			success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-			failure: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-			timeout: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-			skipped: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+			success: 'bg-success/15 text-success',
+			failure: 'bg-destructive/15 text-destructive',
+			timeout: 'bg-warning/15 text-warning',
+			skipped: 'bg-muted text-muted-foreground '
 		};
 
 		it('success gets green badge', () => {
-			expect(logStatusColors['success']).toContain('green');
+			expect(logStatusColors['success']).toContain('success');
 		});
 
 		it('failure gets red badge', () => {
-			expect(logStatusColors['failure']).toContain('red');
+			expect(logStatusColors['failure']).toContain('destructive');
 		});
 
 		it('timeout gets yellow badge', () => {
-			expect(logStatusColors['timeout']).toContain('yellow');
+			expect(logStatusColors['timeout']).toContain('warning');
 		});
 
 		it('skipped gets gray badge', () => {
-			expect(logStatusColors['skipped']).toContain('gray');
+			expect(logStatusColors['skipped']).toContain('muted');
 		});
 	});
 

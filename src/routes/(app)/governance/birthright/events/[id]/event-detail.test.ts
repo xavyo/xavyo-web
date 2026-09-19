@@ -258,18 +258,18 @@ describe('Event Detail rendering logic', () => {
 		function eventTypeBadgeClass(type: string): string {
 			switch (type) {
 				case 'joiner':
-					return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+					return 'bg-info/15 text-info';
 				case 'mover':
 					return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
 				case 'leaver':
-					return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+					return 'bg-destructive/15 text-destructive';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('joiner gets blue badge', () => {
-			expect(eventTypeBadgeClass('joiner')).toContain('blue');
+			expect(eventTypeBadgeClass('joiner')).toContain('info');
 		});
 
 		it('mover gets amber badge', () => {
@@ -277,7 +277,7 @@ describe('Event Detail rendering logic', () => {
 		});
 
 		it('leaver gets red badge', () => {
-			expect(eventTypeBadgeClass('leaver')).toContain('red');
+			expect(eventTypeBadgeClass('leaver')).toContain('destructive');
 		});
 	});
 
@@ -384,19 +384,19 @@ describe('Event Detail rendering logic', () => {
 
 	describe('action type badge classes', () => {
 		const actionTypeBadgeClass: Record<string, string> = {
-			provision: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-			revoke: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+			provision: 'bg-success/15 text-success',
+			revoke: 'bg-destructive/15 text-destructive',
 			schedule_revoke: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
-			cancel_revoke: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-			skip: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+			cancel_revoke: 'bg-info/15 text-info',
+			skip: 'bg-muted text-muted-foreground'
 		};
 
 		it('provision gets green badge', () => {
-			expect(actionTypeBadgeClass['provision']).toContain('green');
+			expect(actionTypeBadgeClass['provision']).toContain('success');
 		});
 
 		it('revoke gets red badge', () => {
-			expect(actionTypeBadgeClass['revoke']).toContain('red');
+			expect(actionTypeBadgeClass['revoke']).toContain('destructive');
 		});
 
 		it('schedule_revoke gets amber badge', () => {
@@ -404,11 +404,11 @@ describe('Event Detail rendering logic', () => {
 		});
 
 		it('cancel_revoke gets blue badge', () => {
-			expect(actionTypeBadgeClass['cancel_revoke']).toContain('blue');
+			expect(actionTypeBadgeClass['cancel_revoke']).toContain('info');
 		});
 
 		it('skip gets gray badge', () => {
-			expect(actionTypeBadgeClass['skip']).toContain('gray');
+			expect(actionTypeBadgeClass['skip']).toContain('muted');
 		});
 	});
 

@@ -152,15 +152,15 @@
 		<div
 			class="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-600 dark:bg-yellow-950"
 		>
-			<h3 class="font-semibold text-yellow-800 dark:text-yellow-200">
+			<h3 class="font-semibold text-warning-foreground ">
 				Token Created Successfully
 			</h3>
-			<p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+			<p class="mt-1 text-sm text-warning-foreground ">
 				This token will not be shown again. Store it securely.
 			</p>
 			<div class="mt-2 flex items-center gap-2">
 				<code
-					class="flex-1 rounded bg-yellow-100 p-2 font-mono text-sm break-all dark:bg-yellow-900"
+					class="flex-1 rounded bg-warning/20 p-2 font-mono text-sm break-all"
 				>
 					{createdTokenData.token}
 				</code>
@@ -220,7 +220,7 @@
 			description="Create a SCIM bearer token to allow identity providers to provision users."
 		/>
 	{:else}
-		<div class="rounded-md border">
+		<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 			<table class="w-full text-sm">
 				<thead>
 					<tr class="border-b bg-muted/50">
@@ -248,13 +248,13 @@
 							<td class="px-4 py-3">
 								{#if token.revoked_at}
 									<span
-										class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200"
+										class="inline-flex items-center rounded-full bg-destructive/15 px-2.5 py-0.5 text-xs font-medium text-destructive "
 									>
 										Revoked
 									</span>
 								{:else}
 									<span
-										class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200"
+										class="inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success "
 									>
 										Active
 									</span>
@@ -308,7 +308,7 @@
 				};
 			}}
 		>
-			<div class="rounded-md border">
+			<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 				<table class="w-full text-sm">
 					<thead>
 						<tr class="border-b bg-muted/50">

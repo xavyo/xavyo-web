@@ -49,9 +49,9 @@
 	function matchTypeClass(matchType: string): string {
 		switch (matchType) {
 			case 'exact':
-				return 'border-transparent bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'border-transparent bg-info/15 text-info';
 			case 'fuzzy':
-				return 'border-transparent bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+				return 'border-transparent bg-warning/15 text-warning';
 			case 'expression':
 				return 'border-transparent bg-primary/15 text-primary';
 			default:
@@ -192,11 +192,11 @@
 							<td class="px-3 py-2 text-foreground">{rule.weight}</td>
 							<td class="px-3 py-2">
 								{#if rule.is_active}
-									<Badge class="border-transparent bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+									<Badge class="border-transparent bg-success/15 text-success">
 										Active
 									</Badge>
 								{:else}
-									<Badge class="border-transparent bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">
+									<Badge class="border-transparent bg-muted text-muted-foreground ">
 										Inactive
 									</Badge>
 								{/if}

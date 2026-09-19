@@ -47,11 +47,11 @@
 					<p class="text-xs text-muted-foreground">Total Affected</p>
 				</div>
 				<div class="rounded-md border p-3 text-center">
-					<p class="text-2xl font-bold text-green-600 dark:text-green-400">{result.summary.users_gaining_access}</p>
+					<p class="text-2xl font-bold text-success">{result.summary.users_gaining_access}</p>
 					<p class="text-xs text-muted-foreground">Gaining Access</p>
 				</div>
 				<div class="rounded-md border p-3 text-center">
-					<p class="text-2xl font-bold text-red-600 dark:text-red-400">{result.summary.users_losing_access}</p>
+					<p class="text-2xl font-bold text-destructive">{result.summary.users_losing_access}</p>
 					<p class="text-xs text-muted-foreground">Losing Access</p>
 				</div>
 			</div>
@@ -59,7 +59,7 @@
 			{#if result.by_department.length > 0}
 				<div>
 					<h4 class="mb-2 text-sm font-medium">By Department</h4>
-					<div class="rounded-md border">
+					<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 						<table class="w-full text-sm">
 							<thead>
 								<tr class="border-b bg-muted/50">
@@ -85,7 +85,7 @@
 			{#if result.by_location.length > 0}
 				<div>
 					<h4 class="mb-2 text-sm font-medium">By Location</h4>
-					<div class="rounded-md border">
+					<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 						<table class="w-full text-sm">
 							<thead>
 								<tr class="border-b bg-muted/50">
@@ -111,7 +111,7 @@
 			{#if result.entitlement_impacts.length > 0}
 				<div>
 					<h4 class="mb-2 text-sm font-medium">Entitlement Impact</h4>
-					<div class="rounded-md border">
+					<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 						<table class="w-full text-sm">
 							<thead>
 								<tr class="border-b bg-muted/50">
@@ -124,7 +124,7 @@
 								{#each result.entitlement_impacts as ei}
 									<tr class="border-b last:border-0">
 										<td class="px-3 py-2">{ei.entitlement_name ?? ei.entitlement_id.slice(0, 8)}</td>
-										<td class="px-3 py-2 text-right text-green-600 dark:text-green-400">{ei.users_gaining}</td>
+										<td class="px-3 py-2 text-right text-success">{ei.users_gaining}</td>
 										<td class="px-3 py-2 text-right">{ei.users_already_have}</td>
 									</tr>
 								{/each}

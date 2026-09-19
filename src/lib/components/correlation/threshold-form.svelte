@@ -95,7 +95,7 @@
 
 	<!-- Threshold validation warning -->
 	{#if hasThresholdError}
-		<div class="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
+		<div class="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-destructive dark:border-red-800 dark:bg-red-950 ">
 			<AlertTriangle class="h-4 w-4 shrink-0" />
 			Auto-confirm threshold must be greater than or equal to manual review threshold.
 		</div>

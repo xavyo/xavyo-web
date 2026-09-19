@@ -72,9 +72,9 @@
 					<span class="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">Default</span>
 				{/if}
 				{#if rule.is_active}
-					<span class="text-xs text-green-600 dark:text-green-400">Active</span>
+					<span class="text-xs text-success">Active</span>
 				{:else}
-					<span class="text-xs text-gray-500">Inactive</span>
+					<span class="text-xs text-muted-foreground">Inactive</span>
 				{/if}
 			</div>
 		</div>
@@ -100,7 +100,7 @@
 	</div>
 
 	{#if $formMessage}
-		<div class="rounded-md border border-green-500/50 bg-green-500/10 p-3 text-sm text-green-700 dark:text-green-400">
+		<div class="rounded-md border border-green-500/50 bg-success/10 p-3 text-sm text-success ">
 			{$formMessage}
 		</div>
 	{/if}

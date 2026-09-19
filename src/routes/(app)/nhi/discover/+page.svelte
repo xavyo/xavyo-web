@@ -224,20 +224,20 @@
 		<h3 class="mb-3 text-lg font-medium">Sync Check Results</h3>
 		<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 			<div class="rounded-md border bg-green-50 p-3 dark:bg-green-950">
-				<p class="text-2xl font-bold text-green-700 dark:text-green-300">{syncResult.up_to_date}</p>
-				<p class="text-sm text-green-600 dark:text-green-400">Up to date</p>
+				<p class="text-2xl font-bold text-success ">{syncResult.up_to_date}</p>
+				<p class="text-sm text-success">Up to date</p>
 			</div>
 			<div class="rounded-md border bg-yellow-50 p-3 dark:bg-yellow-950">
-				<p class="text-2xl font-bold text-yellow-700 dark:text-yellow-300">{syncResult.changed.length}</p>
-				<p class="text-sm text-yellow-600 dark:text-yellow-400">Changed</p>
+				<p class="text-2xl font-bold text-warning-foreground ">{syncResult.changed.length}</p>
+				<p class="text-sm text-warning">Changed</p>
 			</div>
 			<div class="rounded-md border bg-blue-50 p-3 dark:bg-blue-950">
-				<p class="text-2xl font-bold text-blue-700 dark:text-blue-300">{syncResult.new_tools.length}</p>
-				<p class="text-sm text-blue-600 dark:text-blue-400">New</p>
+				<p class="text-2xl font-bold text-info ">{syncResult.new_tools.length}</p>
+				<p class="text-sm text-info">New</p>
 			</div>
 			<div class="rounded-md border bg-red-50 p-3 dark:bg-red-950">
-				<p class="text-2xl font-bold text-red-700 dark:text-red-300">{syncResult.removed.length}</p>
-				<p class="text-sm text-red-600 dark:text-red-400">Removed</p>
+				<p class="text-2xl font-bold text-destructive ">{syncResult.removed.length}</p>
+				<p class="text-sm text-destructive">Removed</p>
 			</div>
 		</div>
 		{#if syncResult.changed.length > 0}
@@ -281,11 +281,11 @@
 
 {#if discoveryErrors.length > 0}
 	<div class="mb-4 rounded-md border border-orange-300 bg-orange-50 p-3 dark:border-orange-700 dark:bg-orange-950">
-		<p class="mb-1 text-sm font-medium text-orange-800 dark:text-orange-200">
+		<p class="mb-1 text-sm font-medium text-warning-foreground ">
 			Some gateways had errors:
 		</p>
 		{#each discoveryErrors as err}
-			<p class="text-sm text-orange-700 dark:text-orange-300">
+			<p class="text-sm text-warning-foreground ">
 				<strong>{err.gateway_name}:</strong>
 				{err.error}
 			</p>

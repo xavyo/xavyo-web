@@ -78,7 +78,7 @@
 			<div class="flex gap-6 mb-4">
 				<div class="flex items-center gap-2">
 					<span
-						class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 text-sm font-semibold"
+						class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-success/15 text-success text-sm font-semibold"
 					>
 						{bulkResult.success_count}
 					</span>
@@ -86,7 +86,7 @@
 				</div>
 				<div class="flex items-center gap-2">
 					<span
-						class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 text-sm font-semibold"
+						class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-destructive/15 text-destructive text-sm font-semibold"
 					>
 						{bulkResult.failure_count}
 					</span>
@@ -95,7 +95,7 @@
 			</div>
 
 			{#if bulkResult.failures.length > 0}
-				<div class="rounded-md border">
+				<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 					<table class="w-full text-sm">
 						<thead>
 							<tr class="border-b bg-muted/50">

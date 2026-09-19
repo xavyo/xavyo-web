@@ -37,6 +37,17 @@ describe('Badge', () => {
 		expect(badge?.className).toContain('border');
 	});
 
+	it('renders semantic status variants', () => {
+		render(Badge, { props: { variant: 'success' } });
+		expect(document.querySelector('span')?.className).toContain('bg-success/15');
+		cleanup();
+		render(Badge, { props: { variant: 'warning' } });
+		expect(document.querySelector('span')?.className).toContain('bg-warning/20');
+		cleanup();
+		render(Badge, { props: { variant: 'info' } });
+		expect(document.querySelector('span')?.className).toContain('bg-info/15');
+	});
+
 	it('accepts custom class', () => {
 		render(Badge, { props: { class: 'ml-2' } });
 		const badge = document.querySelector('span');

@@ -46,29 +46,29 @@
 
 <div class="space-y-6">
 	{#if errorMsg}
-		<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
+		<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-destructive dark:border-red-800 /20 ">
 			{errorMsg}
 		</div>
 	{/if}
 
 	{#if batchResult}
-		<div class="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-800 dark:bg-green-900/20">
-			<h3 class="mb-3 text-lg font-semibold text-green-800 dark:text-green-400">Batch Merge Complete</h3>
+		<div class="rounded-lg border border-green-200 bg-green-50 p-6 dark:border-green-800 /20">
+			<h3 class="mb-3 text-lg font-semibold text-success ">Batch Merge Complete</h3>
 			<div class="grid grid-cols-4 gap-4 text-center">
 				<div>
 					<p class="text-2xl font-bold text-foreground">{batchResult.total_pairs}</p>
 					<p class="text-sm text-muted-foreground">Total</p>
 				</div>
 				<div>
-					<p class="text-2xl font-bold text-green-600">{batchResult.successful}</p>
+					<p class="text-2xl font-bold text-success">{batchResult.successful}</p>
 					<p class="text-sm text-muted-foreground">Successful</p>
 				</div>
 				<div>
-					<p class="text-2xl font-bold text-red-600">{batchResult.failed}</p>
+					<p class="text-2xl font-bold text-destructive">{batchResult.failed}</p>
 					<p class="text-sm text-muted-foreground">Failed</p>
 				</div>
 				<div>
-					<p class="text-2xl font-bold text-yellow-600">{batchResult.skipped}</p>
+					<p class="text-2xl font-bold text-warning">{batchResult.skipped}</p>
 					<p class="text-sm text-muted-foreground">Skipped</p>
 				</div>
 			</div>

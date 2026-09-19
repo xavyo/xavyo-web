@@ -44,14 +44,14 @@
 		<div
 			class="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-600 dark:bg-yellow-950"
 		>
-			<h3 class="font-semibold text-yellow-800 dark:text-yellow-200">
+			<h3 class="font-semibold text-warning-foreground ">
 				Client Secret (shown once only!)
 			</h3>
-			<p class="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+			<p class="mt-1 text-sm text-warning-foreground ">
 				Copy this secret now. It will not be shown again.
 			</p>
 			<div class="mt-2 flex items-center gap-2">
-				<code class="flex-1 rounded bg-yellow-100 p-2 text-sm break-all dark:bg-yellow-900">
+				<code class="flex-1 rounded bg-warning/20 p-2 text-sm break-all ">
 					{clientSecret}
 				</code>
 				<button
@@ -77,10 +77,10 @@
 		<div
 			class="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 dark:border-green-600 dark:bg-green-950"
 		>
-			<h3 class="font-semibold text-green-800 dark:text-green-200">
+			<h3 class="font-semibold text-success ">
 				Client Created Successfully
 			</h3>
-			<p class="mt-1 text-sm text-green-700 dark:text-green-300">
+			<p class="mt-1 text-sm text-success ">
 				Public clients do not have a client secret.
 			</p>
 			<div class="mt-3">

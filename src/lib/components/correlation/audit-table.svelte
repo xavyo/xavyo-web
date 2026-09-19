@@ -37,15 +37,15 @@
 	function eventTypeClass(eventType: string): string {
 		switch (eventType) {
 			case 'auto_confirm':
-				return 'border-transparent bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+				return 'border-transparent bg-success/15 text-success';
 			case 'manual_confirm':
-				return 'border-transparent bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'border-transparent bg-info/15 text-info';
 			case 'reject':
-				return 'border-transparent bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'border-transparent bg-destructive/15 text-destructive';
 			case 'create_identity':
 				return 'border-transparent bg-primary/15 text-primary';
 			case 'reassign':
-				return 'border-transparent bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
+				return 'border-transparent bg-warning/15 text-warning';
 			default:
 				return '';
 		}
@@ -54,9 +54,9 @@
 	function outcomeClass(outcome: string): string {
 		switch (outcome) {
 			case 'success':
-				return 'border-transparent bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+				return 'border-transparent bg-success/15 text-success';
 			case 'failure':
-				return 'border-transparent bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'border-transparent bg-destructive/15 text-destructive';
 			default:
 				return '';
 		}

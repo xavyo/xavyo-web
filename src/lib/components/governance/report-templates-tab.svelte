@@ -12,13 +12,13 @@
 	function complianceClass(standard: string | null): string {
 		switch (standard) {
 			case 'sox':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+				return 'bg-info/15 text-info';
 			case 'gdpr':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+				return 'bg-success/15 text-success';
 			case 'hipaa':
 				return 'bg-primary/15 text-primary';
 			case 'custom':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+				return 'bg-warning/15 text-warning';
 			default:
 				return 'bg-muted text-muted-foreground';
 		}

@@ -37,7 +37,7 @@
 				{#if context.is_persona_active}
 					<Badge class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400">Persona Active</Badge>
 				{:else}
-					<Badge class="bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400">Physical Identity</Badge>
+					<Badge class="bg-muted text-muted-foreground ">Physical Identity</Badge>
 				{/if}
 			</div>
 			{#if context.active_persona}

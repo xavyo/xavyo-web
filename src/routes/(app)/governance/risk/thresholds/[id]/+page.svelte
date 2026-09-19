@@ -213,8 +213,8 @@
 						<p class="text-sm text-muted-foreground">Status</p>
 						<span
 							class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {threshold.is_enabled
-								? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-								: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'}"
+								? 'bg-success/15 text-success'
+								: 'bg-muted text-muted-foreground'}"
 						>
 							{threshold.is_enabled ? 'Enabled' : 'Disabled'}
 						</span>

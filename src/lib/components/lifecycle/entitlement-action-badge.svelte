@@ -7,7 +7,7 @@
 {#if action === 'none'}
 	<Badge variant="outline">None</Badge>
 {:else if action === 'pause'}
-	<Badge variant="default" class="bg-yellow-600">Pause</Badge>
+	<Badge variant="default" class="bg-warning text-warning-foreground">Pause</Badge>
 {:else if action === 'revoke'}
 	<Badge variant="destructive">Revoke</Badge>
 {:else}

@@ -71,7 +71,7 @@
 		<PageHeader title={data.sp.name} description="Service provider details" />
 		<div class="flex gap-1.5">
 			{#if data.sp.enabled}
-				<Badge class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+				<Badge class="bg-success/15 text-success">
 					<CheckCircle class="mr-1 h-3 w-3" />Enabled
 				</Badge>
 			{:else}

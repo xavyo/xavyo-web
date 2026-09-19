@@ -31,11 +31,11 @@
 	const scopeType = $derived(String($form.scope_type ?? ''));
 
 	const campaignStatusStyles: Record<string, string> = {
-		draft: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
-		active: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-		completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-		cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-		overdue: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300'
+		draft: 'bg-muted text-muted-foreground ',
+		active: 'bg-info/15 text-info',
+		completed: 'bg-success/15 text-success',
+		cancelled: 'bg-destructive/15 text-destructive',
+		overdue: 'bg-warning/15 text-warning'
 	};
 
 	const campaignStatusLabels: Record<string, string> = {
@@ -47,10 +47,10 @@
 	};
 
 	const itemStatusStyles: Record<string, string> = {
-		pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-		approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-		revoked: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-		skipped: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+		pending: 'bg-warning/15 text-warning',
+		approved: 'bg-success/15 text-success',
+		revoked: 'bg-destructive/15 text-destructive',
+		skipped: 'bg-muted text-muted-foreground '
 	};
 
 	const itemStatusLabels: Record<string, string> = {
@@ -89,7 +89,7 @@
 				<span class="text-muted-foreground">Status</span>
 				<div class="mt-1">
 					<span
-						class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {campaignStatusStyles[data.campaign.status] ?? 'bg-gray-100 text-gray-800'}"
+						class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {campaignStatusStyles[data.campaign.status] ?? 'bg-muted text-muted-foreground'}"
 					>
 						{campaignStatusLabels[data.campaign.status] ?? data.campaign.status}
 					</span>
@@ -401,7 +401,7 @@
 								<td class="py-3 pr-4 font-mono text-xs">{item.entitlement_id}</td>
 								<td class="py-3 pr-4">
 									<span
-										class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {itemStatusStyles[item.status] ?? 'bg-gray-100 text-gray-800'}"
+										class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {itemStatusStyles[item.status] ?? 'bg-muted text-muted-foreground'}"
 									>
 										{itemStatusLabels[item.status] ?? item.status}
 									</span>

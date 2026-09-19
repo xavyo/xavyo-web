@@ -8,7 +8,7 @@
 {#if sessions.length === 0}
 	<EmptyState title="No session history" description="No context switches have been performed yet." />
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

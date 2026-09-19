@@ -167,7 +167,7 @@
 			<input
 				type="checkbox"
 				bind:checked={formAuthoritative}
-				class="h-4 w-4 rounded border-zinc-300 text-blue-600"
+				class="h-4 w-4 rounded border-zinc-300 text-info"
 			/>
 			Authoritative
 		</label>
@@ -175,7 +175,7 @@
 			<input
 				type="checkbox"
 				bind:checked={formExclusive}
-				class="h-4 w-4 rounded border-zinc-300 text-blue-600"
+				class="h-4 w-4 rounded border-zinc-300 text-info"
 			/>
 			Exclusive
 		</label>
@@ -183,7 +183,7 @@
 	<div class="flex gap-2">
 		<button
 			onclick={handleSubmit}
-			class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+			class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 		>
 			{submitLabel}
 		</button>

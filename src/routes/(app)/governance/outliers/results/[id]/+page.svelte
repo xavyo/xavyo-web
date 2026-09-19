@@ -12,16 +12,16 @@
 	let submittingDisposition: boolean = $state(false);
 
 	const classificationColors: Record<string, string> = {
-		outlier: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-		normal: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-		unclassifiable: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+		outlier: 'bg-destructive/15 text-destructive',
+		normal: 'bg-success/15 text-success',
+		unclassifiable: 'bg-muted text-muted-foreground '
 	};
 
 	function scoreColor(score: number): string {
-		if (score >= 80) return 'text-red-600 dark:text-red-400';
-		if (score >= 60) return 'text-orange-600 dark:text-orange-400';
-		if (score >= 40) return 'text-yellow-600 dark:text-yellow-400';
-		return 'text-green-600 dark:text-green-400';
+		if (score >= 80) return 'text-destructive';
+		if (score >= 60) return 'text-warning';
+		if (score >= 40) return 'text-warning';
+		return 'text-success';
 	}
 
 	async function submitDisposition() {
@@ -117,7 +117,7 @@
 			<div>
 				<p class="text-sm text-muted-foreground">Score Change</p>
 				{#if result.score_change !== null}
-					<p class="text-xl font-bold {result.score_change > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}">
+					<p class="text-xl font-bold {result.score_change > 0 ? 'text-destructive' : 'text-success'}">
 						{result.score_change > 0 ? '+' : ''}{result.score_change.toFixed(1)}
 					</p>
 				{:else}
@@ -138,7 +138,7 @@
 							<p class="font-medium">{ps.peer_group_name}</p>
 							<p class="text-sm text-muted-foreground">Z-Score: {ps.z_score.toFixed(2)} | Deviation: {ps.deviation_factor.toFixed(1)}</p>
 						</div>
-						<span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {ps.is_outlier ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}">
+						<span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {ps.is_outlier ? 'bg-destructive/15 text-destructive' : 'bg-success/15 text-success'}">
 							{ps.is_outlier ? 'Outlier' : 'Normal'}
 						</span>
 					</div>

@@ -27,17 +27,17 @@
 	<!-- Delivered -->
 	<div class="rounded-lg border p-4">
 		<p class="text-sm font-medium text-muted-foreground">Delivered</p>
-		<p class="mt-1 text-2xl font-bold text-green-600 dark:text-green-400">{formatNumber(health.total_events_delivered)}</p>
+		<p class="mt-1 text-2xl font-bold text-success">{formatNumber(health.total_events_delivered)}</p>
 	</div>
 	<!-- Failed -->
 	<div class="rounded-lg border p-4">
 		<p class="text-sm font-medium text-muted-foreground">Failed</p>
-		<p class="mt-1 text-2xl font-bold text-red-600 dark:text-red-400">{formatNumber(health.total_events_failed)}</p>
+		<p class="mt-1 text-2xl font-bold text-destructive">{formatNumber(health.total_events_failed)}</p>
 	</div>
 	<!-- Dropped -->
 	<div class="rounded-lg border p-4">
 		<p class="text-sm font-medium text-muted-foreground">Dropped</p>
-		<p class="mt-1 text-2xl font-bold text-yellow-600 dark:text-yellow-400">{formatNumber(health.total_events_dropped)}</p>
+		<p class="mt-1 text-2xl font-bold text-warning">{formatNumber(health.total_events_dropped)}</p>
 	</div>
 	<!-- Success Rate -->
 	<div class="rounded-lg border p-4">

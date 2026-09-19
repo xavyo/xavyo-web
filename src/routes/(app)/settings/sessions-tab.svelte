@@ -195,7 +195,7 @@
 									</span>
 									{#if session.is_current}
 										<Badge
-											class="border-transparent bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+											class="border-transparent bg-success/15 text-success"
 										>
 											This device
 										</Badge>

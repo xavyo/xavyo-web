@@ -23,12 +23,12 @@
 			<p class="text-2xl font-bold">{summary.different_impacts}</p>
 		</div>
 		<div class="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950">
-			<p class="text-sm text-green-600 dark:text-green-400">Additions</p>
-			<p class="text-2xl font-bold text-green-600 dark:text-green-400">{summary.total_additions}</p>
+			<p class="text-sm text-success">Additions</p>
+			<p class="text-2xl font-bold text-success">{summary.total_additions}</p>
 		</div>
 		<div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
-			<p class="text-sm text-red-600 dark:text-red-400">Removals</p>
-			<p class="text-2xl font-bold text-red-600 dark:text-red-400">{summary.total_removals}</p>
+			<p class="text-sm text-destructive">Removals</p>
+			<p class="text-2xl font-bold text-destructive">{summary.total_removals}</p>
 		</div>
 	</div>
 {/if}
@@ -37,7 +37,7 @@
 	<div class="mt-6 space-y-6">
 		{#if delta.added.length > 0}
 			<div>
-				<h3 class="mb-2 text-sm font-medium text-green-600 dark:text-green-400">Added ({delta.added.length})</h3>
+				<h3 class="mb-2 text-sm font-medium text-success">Added ({delta.added.length})</h3>
 				<div class="overflow-x-auto rounded-lg border border-border">
 					<table class="w-full text-sm">
 						<thead class="border-b border-border bg-muted/50">
@@ -63,7 +63,7 @@
 
 		{#if delta.removed.length > 0}
 			<div>
-				<h3 class="mb-2 text-sm font-medium text-red-600 dark:text-red-400">Removed ({delta.removed.length})</h3>
+				<h3 class="mb-2 text-sm font-medium text-destructive">Removed ({delta.removed.length})</h3>
 				<div class="overflow-x-auto rounded-lg border border-border">
 					<table class="w-full text-sm">
 						<thead class="border-b border-border bg-muted/50">
@@ -89,7 +89,7 @@
 
 		{#if delta.modified.length > 0}
 			<div>
-				<h3 class="mb-2 text-sm font-medium text-yellow-600 dark:text-yellow-400">Modified ({delta.modified.length})</h3>
+				<h3 class="mb-2 text-sm font-medium text-warning">Modified ({delta.modified.length})</h3>
 				<div class="overflow-x-auto rounded-lg border border-border">
 					<table class="w-full text-sm">
 						<thead class="border-b border-border bg-muted/50">

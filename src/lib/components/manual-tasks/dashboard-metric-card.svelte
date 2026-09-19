@@ -9,9 +9,9 @@
 
 	const variantClasses: Record<string, string> = {
 		default: 'text-foreground',
-		warning: 'text-orange-600 dark:text-orange-400',
-		danger: 'text-red-600 dark:text-red-400',
-		success: 'text-green-600 dark:text-green-400'
+		warning: 'text-warning',
+		danger: 'text-destructive',
+		success: 'text-success'
 	};
 
 	const valueClass = $derived(variantClasses[variant] ?? variantClasses.default);

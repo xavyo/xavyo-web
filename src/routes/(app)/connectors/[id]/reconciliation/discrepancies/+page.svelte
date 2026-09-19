@@ -135,11 +135,11 @@
 	function resolutionStatusClass(status: string): string {
 		switch (status) {
 			case 'resolved':
-				return 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300';
+				return 'bg-success/15 text-success';
 			case 'ignored':
-				return 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400';
+				return 'bg-muted text-muted-foreground ';
 			default:
-				return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
@@ -213,7 +213,7 @@
 		/>
 	{/if}
 {:else}
-	<div class="rounded-md border">
+	<div class="overflow-x-auto rounded-lg border border-border/80 bg-card shadow-xs">
 		<table class="w-full text-sm">
 			<thead>
 				<tr class="border-b bg-muted/50">

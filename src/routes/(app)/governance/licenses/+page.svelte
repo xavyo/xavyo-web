@@ -366,17 +366,17 @@
 	function statusBadgeClass(status: string): string {
 		switch (status) {
 			case 'active':
-				return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+				return 'bg-success/15 text-success';
 			case 'expired':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			case 'archived':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground ';
 			case 'reclaimed':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'released':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
@@ -409,9 +409,9 @@
 	}
 
 	function utilizationColor(pct: number): string {
-		if (pct > 90) return 'text-red-600 dark:text-red-400';
-		if (pct > 70) return 'text-yellow-600 dark:text-yellow-400';
-		return 'text-green-600 dark:text-green-400';
+		if (pct > 90) return 'text-destructive';
+		if (pct > 70) return 'text-warning';
+		return 'text-success';
 	}
 
 	function formatDate(d: string | null): string {
@@ -427,7 +427,7 @@
 
 <PageHeader
 	title="License Management"
-	description="Manage software license pools, assignments, reclamation rules, and compliance"
+	description="Pools, assignments, and reclamation."
 />
 
 <div class="-mb-px flex gap-4 overflow-x-auto border-b border-border" role="tablist" aria-label="License Management tabs">
@@ -515,7 +515,7 @@
 											</button>
 										{/if}
 										<button
-											class="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+											class="rounded px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:hover:bg-red-950"
 											onclick={() => confirmDelete(pool.id, pool.name, 'pool')}
 										>
 											Delete
@@ -578,7 +578,7 @@
 								<td class="px-4 py-3">{assignment.pool_name ?? resolvePoolName(assignment.license_pool_id)}</td>
 								<td class="px-4 py-3">{assignment.user_email ?? assignment.user_id.slice(0, 8)}</td>
 								<td class="px-4 py-3">
-									<span class="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+									<span class="inline-flex rounded-full bg-info/15 px-2 py-0.5 text-xs font-medium text-info ">
 										{displayLabel(assignment.source)}
 									</span>
 								</td>
@@ -591,7 +591,7 @@
 								<td class="px-4 py-3 text-right">
 									{#if assignment.status === 'active'}
 										<button
-											class="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+											class="rounded px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:hover:bg-red-950"
 											onclick={() => handleDeallocate(assignment.id)}
 										>
 											Deallocate
@@ -645,7 +645,7 @@
 						<p class="text-sm text-muted-foreground">Monthly Cost</p>
 						<p class="text-2xl font-bold">${Number(dashboard.summary.total_monthly_cost).toFixed(2)}</p>
 						{#if dashboard.summary.expiring_soon_count > 0}
-							<p class="text-xs text-red-600 dark:text-red-400">{dashboard.summary.expiring_soon_count} expiring soon</p>
+							<p class="text-xs text-destructive">{dashboard.summary.expiring_soon_count} expiring soon</p>
 						{/if}
 					</CardContent>
 				</Card>
@@ -736,10 +736,10 @@
 									<div>
 										<div class="flex items-center gap-2">
 											<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium
-												{rec.recommendation_type === 'underutilized' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-												 rec.recommendation_type === 'high_utilization' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-												 rec.recommendation_type === 'expiring_soon' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-												 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'}">
+												{rec.recommendation_type === 'underutilized' ? 'bg-warning/15 text-warning' :
+												 rec.recommendation_type === 'high_utilization' ? 'bg-destructive/15 text-destructive' :
+												 rec.recommendation_type === 'expiring_soon' ? 'bg-warning/15 text-warning' :
+												 'bg-info/15 text-info'}">
 												{displayLabel(rec.recommendation_type)}
 											</span>
 											<span class="font-medium">{rec.pool_name}</span>
@@ -747,7 +747,7 @@
 										<p class="mt-1 text-sm text-muted-foreground">{rec.description}</p>
 									</div>
 									{#if rec.potential_savings != null}
-										<span class="whitespace-nowrap text-sm font-medium text-green-600 dark:text-green-400">
+										<span class="whitespace-nowrap text-sm font-medium text-success">
 											Save ${Number(rec.potential_savings).toFixed(2)}{rec.currency ? ` ${rec.currency}` : ''}
 										</span>
 									{/if}
@@ -785,7 +785,7 @@
 											</td>
 											<td class="px-4 py-2 text-muted-foreground">{ep.vendor}</td>
 											<td class="px-4 py-2">{formatDate(ep.expiration_date)}</td>
-											<td class="px-4 py-2 text-right {ep.days_until_expiration <= 7 ? 'text-red-600 dark:text-red-400 font-medium' : ep.days_until_expiration <= 30 ? 'text-yellow-600 dark:text-yellow-400' : ''}">
+											<td class="px-4 py-2 text-right {ep.days_until_expiration <= 7 ? 'text-destructive font-medium' : ep.days_until_expiration <= 30 ? 'text-warning' : ''}">
 												{ep.days_until_expiration}
 											</td>
 											<td class="px-4 py-2 text-right">{ep.allocated_count}/{ep.total_capacity}</td>
@@ -848,7 +848,7 @@
 							<tr class="border-b last:border-0 hover:bg-muted/30">
 								<td class="px-4 py-3">{rule.pool_name ?? resolvePoolName(rule.license_pool_id)}</td>
 								<td class="px-4 py-3">
-									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {rule.trigger_type === 'inactivity' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-primary/15 text-primary'}">
+									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {rule.trigger_type === 'inactivity' ? 'bg-warning/15 text-warning' : 'bg-primary/15 text-primary'}">
 										{displayLabel(rule.trigger_type)}
 									</span>
 								</td>
@@ -861,14 +861,14 @@
 								</td>
 								<td class="px-4 py-3 text-right">{rule.notification_days_before} days</td>
 								<td class="px-4 py-3">
-									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {rule.enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}">
+									<span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {rule.enabled ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground '}">
 										{rule.enabled ? 'Yes' : 'No'}
 									</span>
 								</td>
 								<td class="px-4 py-3 text-muted-foreground">{formatDate(rule.created_at)}</td>
 								<td class="px-4 py-3 text-right">
 									<button
-										class="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+										class="rounded px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:hover:bg-red-950"
 										onclick={() => confirmDelete(rule.id, rule.pool_name ?? 'Rule', 'rule')}
 									>
 										Delete
@@ -935,7 +935,7 @@
 								<td class="px-4 py-3 text-muted-foreground">{formatDate(incompat.created_at)}</td>
 								<td class="px-4 py-3 text-right">
 									<button
-										class="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+										class="rounded px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:hover:bg-red-950"
 										onclick={() => confirmDelete(incompat.id, `${incompat.pool_a_name ?? 'Pool A'} / ${incompat.pool_b_name ?? 'Pool B'}`, 'incompatibility')}
 									>
 										Delete
@@ -997,7 +997,7 @@
 								<td class="px-4 py-3 text-right">{link.priority}</td>
 								<td class="px-4 py-3">
 									<button
-										class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {link.enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'}"
+										class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {link.enabled ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground '}"
 										onclick={() => handleToggleLink(link.id, !link.enabled)}
 									>
 										{link.enabled ? 'Enabled' : 'Disabled'}
@@ -1006,7 +1006,7 @@
 								<td class="px-4 py-3 text-muted-foreground">{formatDate(link.created_at)}</td>
 								<td class="px-4 py-3 text-right">
 									<button
-										class="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+										class="rounded px-2 py-1 text-xs text-destructive hover:bg-red-50 dark:hover:bg-red-950"
 										onclick={() => confirmDelete(link.id, link.pool_name ?? 'Link', 'link')}
 									>
 										Delete
@@ -1083,11 +1083,11 @@
 							<p class="text-xs text-muted-foreground">Reviewed</p>
 						</div>
 						<div class="text-center">
-							<p class="text-2xl font-bold text-green-600 dark:text-green-400">{complianceReport.summary.compliant_pools}</p>
+							<p class="text-2xl font-bold text-success">{complianceReport.summary.compliant_pools}</p>
 							<p class="text-xs text-muted-foreground">Compliant</p>
 						</div>
 						<div class="text-center">
-							<p class="text-2xl font-bold text-red-600 dark:text-red-400">{complianceReport.summary.non_compliant_pools}</p>
+							<p class="text-2xl font-bold text-destructive">{complianceReport.summary.non_compliant_pools}</p>
 							<p class="text-xs text-muted-foreground">Non-Compliant</p>
 						</div>
 						<div class="text-center">
@@ -1127,14 +1127,14 @@
 											<td class="px-4 py-2 text-right {utilizationColor(Number(entry.utilization_percent))}">{Number(entry.utilization_percent).toFixed(1)}%</td>
 											<td class="px-4 py-2">
 												{#if entry.is_compliant}
-													<span class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">Yes</span>
+													<span class="inline-flex rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success ">Yes</span>
 												{:else}
-													<span class="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200">No</span>
+													<span class="inline-flex rounded-full bg-destructive/15 px-2 py-0.5 text-xs font-medium text-destructive ">No</span>
 												{/if}
 											</td>
 											<td class="px-4 py-2">
 												{#if entry.issues.length > 0}
-													<ul class="list-disc pl-4 text-xs text-red-600 dark:text-red-400">
+													<ul class="list-disc pl-4 text-xs text-destructive">
 														{#each entry.issues as issue}
 															<li>{issue}</li>
 														{/each}
@@ -1184,7 +1184,7 @@
 										<td class="px-4 py-2">{entry.pool_name ?? entry.pool_id?.slice(0, 8) ?? '\u2014'}</td>
 										<td class="px-4 py-2">{entry.user_email ?? entry.user_id?.slice(0, 8) ?? '\u2014'}</td>
 										<td class="px-4 py-2">
-											<span class="inline-flex rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+											<span class="inline-flex rounded-full bg-info/15 px-2 py-0.5 text-xs font-medium text-info ">
 												{entry.action}
 											</span>
 										</td>

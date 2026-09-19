@@ -154,7 +154,7 @@
 				</div>
 				<div class="h-2.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
 					<div
-						class="h-full rounded-full bg-blue-600 transition-all"
+						class="h-full rounded-full bg-primary transition-all"
 						style:width="{job.progress_percent}%"
 					></div>
 				</div>
@@ -193,13 +193,13 @@
 		<CardContent>
 			<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
 				<div class="rounded-lg border p-4 text-center">
-					<p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+					<p class="text-2xl font-bold text-info">
 						{job.candidate_count}
 					</p>
 					<p class="text-sm text-muted-foreground">Role Candidates</p>
 				</div>
 				<div class="rounded-lg border p-4 text-center">
-					<p class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+					<p class="text-2xl font-bold text-warning">
 						{job.excessive_privilege_count}
 					</p>
 					<p class="text-sm text-muted-foreground">Excessive Privileges</p>

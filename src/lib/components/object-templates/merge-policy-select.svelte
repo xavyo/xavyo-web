@@ -23,7 +23,7 @@
 	};
 
 	const strategyColors: Record<string, string> = {
-		source_precedence: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+		source_precedence: 'bg-info/15 text-info',
 		timestamp_wins: 'bg-primary/15 text-primary',
 		concatenate_unique: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-400',
 		first_wins: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
@@ -49,7 +49,7 @@
 		<h3 class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Merge Policies</h3>
 		<button
 			onclick={() => showForm = !showForm}
-			class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+			class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 		>
 			{showForm ? 'Cancel' : 'Add Policy'}
 		</button>
@@ -96,7 +96,7 @@
 			</div>
 			<button
 				onclick={handleAdd}
-				class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+				class="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
 			>
 				Add Policy
 			</button>
@@ -120,7 +120,7 @@
 					{#if onDelete}
 						<button
 							onclick={() => onDelete(policy.id)}
-							class="text-sm text-red-600 hover:underline dark:text-red-400"
+							class="text-sm text-destructive hover:underline "
 						>
 							Delete
 						</button>

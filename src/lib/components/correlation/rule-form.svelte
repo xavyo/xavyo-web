@@ -300,9 +300,9 @@
 					{#if expressionResult.valid}
 						<Alert class="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
 							<AlertDescription>
-								<span class="font-medium text-green-800 dark:text-green-200">Valid.</span>
+								<span class="font-medium text-success ">Valid.</span>
 								{#if expressionResult.result}
-									<span class="ml-1 text-green-700 dark:text-green-300">Result: {expressionResult.result}</span>
+									<span class="ml-1 text-success ">Result: {expressionResult.result}</span>
 								{/if}
 							</AlertDescription>
 						</Alert>

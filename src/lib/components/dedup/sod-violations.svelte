@@ -9,22 +9,22 @@
 
 	function severityClass(severity: string): string {
 		switch (severity) {
-			case 'critical': return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
-			case 'high': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400';
-			case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
-			default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+			case 'critical': return 'bg-destructive/15 text-destructive';
+			case 'high': return 'bg-warning/15 text-warning';
+			case 'medium': return 'bg-warning/15 text-warning';
+			default: return 'bg-muted text-muted-foreground ';
 		}
 	}
 </script>
 
 <div data-testid="sod-violations">
 	{#if !sodCheck.has_violations}
-		<div class="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
-			<p class="text-sm text-green-700 dark:text-green-400">No SoD violations detected. Merge is safe to proceed.</p>
+		<div class="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 /20">
+			<p class="text-sm text-success ">No SoD violations detected. Merge is safe to proceed.</p>
 		</div>
 	{:else}
-		<div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
-			<p class="mb-3 text-sm font-medium text-red-700 dark:text-red-400">
+		<div class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 /20">
+			<p class="mb-3 text-sm font-medium text-destructive ">
 				{sodCheck.violations.length} SoD violation{sodCheck.violations.length !== 1 ? 's' : ''} detected
 				{#if sodCheck.can_override}
 					<span class="text-muted-foreground">(can be overridden)</span>

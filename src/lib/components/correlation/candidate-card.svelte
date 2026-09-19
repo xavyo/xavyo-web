@@ -15,10 +15,10 @@
 
 	let confidenceColor = $derived(
 		confidencePercent >= 80
-			? 'bg-green-500'
+			? 'bg-success'
 			: confidencePercent >= 50
-				? 'bg-yellow-500'
-				: 'bg-red-500'
+				? 'bg-warning'
+				: 'bg-destructive'
 	);
 
 	let attributeEntries = $derived(Object.entries(candidate.per_attribute_scores));
@@ -53,13 +53,13 @@
 		</div>
 		<div class="flex items-center gap-1.5">
 			{#if candidate.is_definitive_match}
-				<Badge class="border-transparent bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+				<Badge class="border-transparent bg-success/15 text-success">
 					<CheckCircle class="mr-1 h-3 w-3" />
 					Definitive Match
 				</Badge>
 			{/if}
 			{#if candidate.is_deactivated}
-				<Badge class="border-transparent bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+				<Badge class="border-transparent bg-warning/15 text-warning">
 					<AlertTriangle class="mr-1 h-3 w-3" />
 					Deactivated
 				</Badge>
@@ -88,7 +88,7 @@
 			{#each attributeEntries as [attr, score]}
 				{@const pct = Math.round(score * 100)}
 				{@const barColor =
-					pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'}
+					pct >= 80 ? 'bg-success' : pct >= 50 ? 'bg-warning' : 'bg-destructive'}
 				<div class="flex items-center gap-2">
 					<span class="w-24 shrink-0 truncate text-xs text-muted-foreground" title={attr}>
 						{attr}

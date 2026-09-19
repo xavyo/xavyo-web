@@ -28,7 +28,7 @@ describe('DestinationTypeBadge', () => {
 		const { container } = render(DestinationTypeBadge, { props: { type: 'splunk_hec' } });
 		expect(screen.getByText('Splunk HEC')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('orange');
+		expect(badge.className).toContain('warning');
 	});
 
 	it('handles unknown type gracefully', () => {
@@ -37,6 +37,6 @@ describe('DestinationTypeBadge', () => {
 		});
 		expect(screen.getByText('unknown_type')).toBeTruthy();
 		const badge = container.querySelector('span')!;
-		expect(badge.className).toContain('gray');
+		expect(badge.className).toContain('muted');
 	});
 });

@@ -223,9 +223,9 @@
 					<div class="flex items-center justify-between gap-2">
 						<div class="flex items-center gap-2">
 							{#if attempt.success}
-								<CheckCircle2 class="h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+								<CheckCircle2 class="h-4 w-4 shrink-0 text-success" />
 							{:else}
-								<XCircle class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+								<XCircle class="h-4 w-4 shrink-0 text-destructive" />
 							{/if}
 							<div class="min-w-0">
 								<div class="flex flex-wrap items-center gap-1.5">
@@ -236,7 +236,7 @@
 										{authMethodLabels[attempt.auth_method] ?? attempt.auth_method}
 									</Badge>
 									{#if attempt.is_new_device}
-										<Badge variant="secondary" class="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+										<Badge variant="secondary" class="text-xs bg-info/15 text-info">
 											<Smartphone class="mr-1 h-3 w-3" />New device
 										</Badge>
 									{/if}

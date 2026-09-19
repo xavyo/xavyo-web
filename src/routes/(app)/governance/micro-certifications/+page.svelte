@@ -228,10 +228,10 @@
 									<td class="px-4 py-3 text-xs">{formatDate(cert.to_date)}</td>
 									<td class="px-4 py-3">
 										{#if cert.escalated}
-											<span class="text-xs text-orange-600 dark:text-orange-400">Escalated</span>
+											<span class="text-xs text-warning">Escalated</span>
 										{/if}
 										{#if cert.past_deadline}
-											<span class="text-xs text-red-600 dark:text-red-400">Overdue</span>
+											<span class="text-xs text-destructive">Overdue</span>
 										{/if}
 									</td>
 									<td class="px-4 py-3">
@@ -383,9 +383,9 @@
 									<td class="px-4 py-3 text-xs">{reviewerTypeLabels[rule.reviewer_type] ?? rule.reviewer_type}</td>
 									<td class="px-4 py-3">
 										{#if rule.is_active}
-											<span class="text-xs text-green-600 dark:text-green-400">Active</span>
+											<span class="text-xs text-success">Active</span>
 										{:else}
-											<span class="text-xs text-gray-500">Inactive</span>
+											<span class="text-xs text-muted-foreground">Inactive</span>
 										{/if}
 									</td>
 									<td class="px-4 py-3">

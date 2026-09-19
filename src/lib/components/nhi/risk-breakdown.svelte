@@ -11,10 +11,10 @@
 	let { breakdown }: Props = $props();
 
 	function scoreBarColor(score: number): string {
-		if (score >= 75) return 'bg-red-500';
+		if (score >= 75) return 'bg-destructive';
 		if (score >= 50) return 'bg-orange-400';
 		if (score >= 25) return 'bg-yellow-400';
-		return 'bg-green-500';
+		return 'bg-success';
 	}
 
 	const sections = $derived([

@@ -65,15 +65,15 @@
 				<div class="flex gap-3">
 					<label class="flex items-center gap-2">
 						<input type="radio" bind:group={decision} value="approve" disabled={isSubmitting} />
-						<span class="text-sm text-green-700 dark:text-green-400">Approve</span>
+						<span class="text-sm text-success ">Approve</span>
 					</label>
 					<label class="flex items-center gap-2">
 						<input type="radio" bind:group={decision} value="revoke" disabled={isSubmitting} />
-						<span class="text-sm text-red-700 dark:text-red-400">Revoke</span>
+						<span class="text-sm text-destructive ">Revoke</span>
 					</label>
 					<label class="flex items-center gap-2">
 						<input type="radio" bind:group={decision} value="reduce" disabled={isSubmitting} />
-						<span class="text-sm text-yellow-700 dark:text-yellow-400">Flag for Review</span>
+						<span class="text-sm text-warning-foreground ">Flag for Review</span>
 					</label>
 				</div>
 			</div>

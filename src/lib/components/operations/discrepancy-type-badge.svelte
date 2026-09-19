@@ -6,16 +6,16 @@
 	let { type }: Props = $props();
 
 	const typeColors: Record<string, string> = {
-		missing: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
-		orphan: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300',
-		mismatch: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+		missing: 'bg-destructive/15 text-destructive',
+		orphan: 'bg-warning/15 text-warning',
+		mismatch: 'bg-warning/15 text-warning',
 		collision: 'bg-primary/15 text-primary',
-		unlinked: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-		deleted: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+		unlinked: 'bg-info/15 text-info',
+		deleted: 'bg-muted text-muted-foreground '
 	};
 
 	const colorClass = $derived(
-		typeColors[type] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+		typeColors[type] ?? 'bg-muted text-muted-foreground '
 	);
 
 	const displayText = $derived(

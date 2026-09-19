@@ -32,9 +32,9 @@
 	let showDeleteDialog: boolean = $state(false);
 
 	const statusColors: Record<string, string> = {
-		active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-		expired: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-		archived: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+		active: 'bg-success/15 text-success',
+		expired: 'bg-destructive/15 text-destructive',
+		archived: 'bg-muted text-muted-foreground'
 	};
 
 	const statusLabels: Record<string, string> = {
@@ -61,9 +61,9 @@
 	};
 
 	function getUtilizationColor(percent: number): string {
-		if (percent > 90) return 'text-red-600 dark:text-red-400';
-		if (percent > 70) return 'text-yellow-600 dark:text-yellow-400';
-		return 'text-green-600 dark:text-green-400';
+		if (percent > 90) return 'text-destructive';
+		if (percent > 70) return 'text-warning';
+		return 'text-success';
 	}
 
 	function startEdit() {
@@ -112,7 +112,7 @@
 	<div class="flex items-center gap-3">
 		<PageHeader title={pool.name} description="License pool details" />
 		<span
-			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusColors[pool.status] ?? 'bg-gray-100 text-gray-800'}"
+			class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusColors[pool.status] ?? 'bg-muted text-muted-foreground'}"
 		>
 			{statusLabels[pool.status] ?? pool.status}
 		</span>
@@ -332,7 +332,7 @@
 				<div class="flex justify-between items-center">
 					<span class="text-sm text-muted-foreground">Status</span>
 					<span
-						class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusColors[pool.status] ?? 'bg-gray-100 text-gray-800'}"
+						class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {statusColors[pool.status] ?? 'bg-muted text-muted-foreground'}"
 					>
 						{statusLabels[pool.status] ?? pool.status}
 					</span>

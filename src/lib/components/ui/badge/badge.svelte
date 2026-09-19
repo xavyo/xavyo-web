@@ -2,7 +2,7 @@
 	import { cn } from '$lib/utils/cn';
 	import type { Snippet } from 'svelte';
 
-	type Variant = 'default' | 'secondary' | 'destructive' | 'outline';
+	type Variant = 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info';
 
 	interface Props {
 		variant?: Variant;
@@ -18,7 +18,10 @@
 			'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
 		destructive:
 			'border-transparent bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/80',
-		outline: 'border text-foreground'
+		outline: 'border text-foreground',
+		success: 'border-transparent bg-success/15 text-success',
+		warning: 'border-transparent bg-warning/20 text-warning-foreground',
+		info: 'border-transparent bg-info/15 text-info'
 	};
 </script>
 

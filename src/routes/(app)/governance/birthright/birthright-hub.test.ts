@@ -217,30 +217,30 @@ describe('Birthright hub rendering logic', () => {
 		function policyStatusClass(status: string): string {
 			switch (status) {
 				case 'active':
-					return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+					return 'bg-success/15 text-success';
 				case 'inactive':
-					return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+					return 'bg-warning/15 text-warning';
 				case 'archived':
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+					return 'bg-muted text-muted-foreground ';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('active status gets green badge', () => {
-			expect(policyStatusClass('active')).toContain('green');
+			expect(policyStatusClass('active')).toContain('success');
 		});
 
 		it('inactive status gets yellow badge', () => {
-			expect(policyStatusClass('inactive')).toContain('yellow');
+			expect(policyStatusClass('inactive')).toContain('warning');
 		});
 
 		it('archived status gets gray badge', () => {
-			expect(policyStatusClass('archived')).toContain('gray');
+			expect(policyStatusClass('archived')).toContain('muted');
 		});
 
 		it('unknown status gets gray badge', () => {
-			expect(policyStatusClass('unknown')).toContain('gray');
+			expect(policyStatusClass('unknown')).toContain('muted');
 		});
 	});
 
@@ -248,18 +248,18 @@ describe('Birthright hub rendering logic', () => {
 		function eventTypeBadgeClass(type: string): string {
 			switch (type) {
 				case 'joiner':
-					return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+					return 'bg-info/15 text-info';
 				case 'mover':
 					return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
 				case 'leaver':
-					return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+					return 'bg-destructive/15 text-destructive';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('joiner gets blue badge', () => {
-			expect(eventTypeBadgeClass('joiner')).toContain('blue');
+			expect(eventTypeBadgeClass('joiner')).toContain('info');
 		});
 
 		it('mover gets amber badge', () => {
@@ -267,11 +267,11 @@ describe('Birthright hub rendering logic', () => {
 		});
 
 		it('leaver gets red badge', () => {
-			expect(eventTypeBadgeClass('leaver')).toContain('red');
+			expect(eventTypeBadgeClass('leaver')).toContain('destructive');
 		});
 
 		it('unknown type gets gray badge', () => {
-			expect(eventTypeBadgeClass('unknown')).toContain('gray');
+			expect(eventTypeBadgeClass('unknown')).toContain('muted');
 		});
 	});
 
@@ -282,8 +282,8 @@ describe('Birthright hub rendering logic', () => {
 
 		function eventStatusClass(event: { processed_at: string | null }): string {
 			return event.processed_at
-				? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-				: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+				? 'bg-success/15 text-success'
+				: 'bg-warning/15 text-warning';
 		}
 
 		it('shows processed for event with processed_at', () => {
@@ -295,11 +295,11 @@ describe('Birthright hub rendering logic', () => {
 		});
 
 		it('processed event gets green badge', () => {
-			expect(eventStatusClass({ processed_at: '2024-01-01T00:00:00Z' })).toContain('green');
+			expect(eventStatusClass({ processed_at: '2024-01-01T00:00:00Z' })).toContain('success');
 		});
 
 		it('pending event gets yellow badge', () => {
-			expect(eventStatusClass({ processed_at: null })).toContain('yellow');
+			expect(eventStatusClass({ processed_at: null })).toContain('warning');
 		});
 	});
 

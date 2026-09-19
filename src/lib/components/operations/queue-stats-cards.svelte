@@ -15,9 +15,9 @@
 
 	const cards: CardConfig[] = [
 		{ label: 'Pending', key: 'pending', dotColor: 'bg-gray-400' },
-		{ label: 'In Progress', key: 'in_progress', dotColor: 'bg-blue-500' },
-		{ label: 'Completed', key: 'completed', dotColor: 'bg-green-500' },
-		{ label: 'Failed', key: 'failed', dotColor: 'bg-red-500' },
+		{ label: 'In Progress', key: 'in_progress', dotColor: 'bg-info' },
+		{ label: 'Completed', key: 'completed', dotColor: 'bg-success' },
+		{ label: 'Failed', key: 'failed', dotColor: 'bg-destructive' },
 		{ label: 'Dead Letter', key: 'dead_letter', dotColor: 'bg-amber-500' },
 		{ label: 'Awaiting System', key: 'awaiting_system', dotColor: 'bg-primary' },
 		{ label: 'Avg Time', key: null, dotColor: 'bg-cyan-500' }
@@ -31,10 +31,10 @@
 
 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
 	{#each cards as card}
-		<div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+		<div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white p-4">
 			<div class="flex items-center gap-2">
 				<span class="inline-block h-2 w-2 rounded-full {card.dotColor}"></span>
-				<span class="text-sm text-gray-500 dark:text-gray-400">{card.label}</span>
+				<span class="text-sm text-muted-foreground ">{card.label}</span>
 			</div>
 			<p class="mt-2 text-2xl font-bold text-gray-900 dark:text-gray-100">
 				{#if card.key !== null}

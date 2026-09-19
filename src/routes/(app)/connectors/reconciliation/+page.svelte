@@ -95,7 +95,7 @@
 								<td class="px-4 py-3">
 									<span
 										class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {schedule.mode === 'full'
-											? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+											? 'bg-info/15 text-info'
 											: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300'}"
 									>
 										{schedule.mode}
@@ -107,13 +107,13 @@
 								<td class="px-4 py-3">
 									{#if schedule.enabled}
 										<span
-											class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900 dark:text-green-300"
+											class="inline-flex items-center rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-medium text-success "
 										>
 											Enabled
 										</span>
 									{:else}
 										<span
-											class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+											class="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground "
 										>
 											Disabled
 										</span>

@@ -124,7 +124,7 @@
 	}
 </script>
 
-<PageHeader title="NHI Governance" description="Risk scoring, inactivity detection, orphan detection, SoD rules, and certifications for non-human identities" />
+<PageHeader title="NHI Governance" description="Risk, inactivity, orphans, and certifications." />
 
 <div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="NHI Governance tabs">
 	{#each tabs as tab}

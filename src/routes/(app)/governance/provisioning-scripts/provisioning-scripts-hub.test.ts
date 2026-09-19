@@ -319,30 +319,30 @@ describe('Provisioning Scripts hub rendering logic', () => {
 		function scriptStatusColor(status: string): string {
 			switch (status) {
 				case 'draft':
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 				case 'active':
-					return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+					return 'bg-success/15 text-success';
 				case 'inactive':
-					return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+					return 'bg-warning/15 text-warning';
 				default:
-					return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+					return 'bg-muted text-muted-foreground ';
 			}
 		}
 
 		it('draft status gets gray badge', () => {
-			expect(scriptStatusColor('draft')).toContain('gray');
+			expect(scriptStatusColor('draft')).toContain('muted');
 		});
 
 		it('active status gets green badge', () => {
-			expect(scriptStatusColor('active')).toContain('green');
+			expect(scriptStatusColor('active')).toContain('success');
 		});
 
 		it('inactive status gets yellow badge', () => {
-			expect(scriptStatusColor('inactive')).toContain('yellow');
+			expect(scriptStatusColor('inactive')).toContain('warning');
 		});
 
 		it('unknown status gets gray badge', () => {
-			expect(scriptStatusColor('unknown')).toContain('gray');
+			expect(scriptStatusColor('unknown')).toContain('muted');
 		});
 	});
 

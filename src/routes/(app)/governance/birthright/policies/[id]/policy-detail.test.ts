@@ -276,21 +276,21 @@ describe('Policy Detail +page.svelte', () => {
 describe('Policy Detail rendering logic', () => {
 	describe('status badge classes', () => {
 		const statusClasses: Record<string, string> = {
-			active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-			inactive: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-			archived: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+			active: 'bg-success/15 text-success',
+			inactive: 'bg-warning/15 text-warning',
+			archived: 'bg-muted text-muted-foreground'
 		};
 
 		it('active status gets green badge', () => {
-			expect(statusClasses['active']).toContain('green');
+			expect(statusClasses['active']).toContain('success');
 		});
 
 		it('inactive status gets yellow badge', () => {
-			expect(statusClasses['inactive']).toContain('yellow');
+			expect(statusClasses['inactive']).toContain('warning');
 		});
 
 		it('archived status gets gray badge', () => {
-			expect(statusClasses['archived']).toContain('gray');
+			expect(statusClasses['archived']).toContain('muted');
 		});
 	});
 

@@ -136,7 +136,7 @@ describe('CandidateCard', () => {
 		const { container } = render(CandidateCard, {
 			props: { candidate: makeCandidate({ aggregate_confidence: 0.85 }) }
 		});
-		const bars = container.querySelectorAll('.bg-green-500');
+		const bars = container.querySelectorAll('.bg-success');
 		expect(bars.length).toBeGreaterThanOrEqual(1);
 	});
 
@@ -144,7 +144,7 @@ describe('CandidateCard', () => {
 		const { container } = render(CandidateCard, {
 			props: { candidate: makeCandidate({ aggregate_confidence: 0.65 }) }
 		});
-		const bars = container.querySelectorAll('.bg-yellow-500');
+		const bars = container.querySelectorAll('.bg-warning');
 		expect(bars.length).toBeGreaterThanOrEqual(1);
 	});
 
@@ -152,7 +152,7 @@ describe('CandidateCard', () => {
 		const { container } = render(CandidateCard, {
 			props: { candidate: makeCandidate({ aggregate_confidence: 0.35 }) }
 		});
-		const bars = container.querySelectorAll('.bg-red-500');
+		const bars = container.querySelectorAll('.bg-destructive');
 		expect(bars.length).toBeGreaterThanOrEqual(1);
 	});
 
@@ -166,8 +166,8 @@ describe('CandidateCard', () => {
 			}
 		});
 		// email (95%) should be green, name (30%) should be red
-		const greenBars = container.querySelectorAll('.bg-green-500');
-		const redBars = container.querySelectorAll('.bg-red-500');
+		const greenBars = container.querySelectorAll('.bg-success');
+		const redBars = container.querySelectorAll('.bg-destructive');
 		expect(greenBars.length).toBeGreaterThanOrEqual(1);
 		expect(redBars.length).toBeGreaterThanOrEqual(1);
 	});

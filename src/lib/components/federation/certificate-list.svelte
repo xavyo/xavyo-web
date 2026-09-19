@@ -110,7 +110,7 @@
 							<Shield class="h-4 w-4 shrink-0 text-muted-foreground" />
 							<span class="font-medium text-foreground">{cert.key_id}</span>
 							{#if cert.is_active}
-								<Badge class="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+								<Badge class="bg-success/15 text-success">
 									<CheckCircle class="mr-1 h-3 w-3" />Active
 								</Badge>
 							{:else}

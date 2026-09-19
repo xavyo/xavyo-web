@@ -360,32 +360,32 @@ describe('Error type badge color logic', () => {
 	const errorTypeBadgeColor = (errorType: string): string => {
 		switch (errorType) {
 			case 'validation':
-				return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+				return 'bg-warning/15 text-warning';
 			case 'duplicate_in_file':
 			case 'duplicate_in_tenant':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+				return 'bg-warning/15 text-warning';
 			case 'role_not_found':
 			case 'group_error':
 				return 'bg-primary/15 text-primary';
 			case 'attribute_error':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+				return 'bg-info/15 text-info';
 			case 'system':
-				return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+				return 'bg-destructive/15 text-destructive';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+				return 'bg-muted text-muted-foreground';
 		}
 	};
 
 	it('validation is orange', () => {
-		expect(errorTypeBadgeColor('validation')).toContain('orange');
+		expect(errorTypeBadgeColor('validation')).toContain('warning');
 	});
 
 	it('duplicate_in_file is yellow', () => {
-		expect(errorTypeBadgeColor('duplicate_in_file')).toContain('yellow');
+		expect(errorTypeBadgeColor('duplicate_in_file')).toContain('warning');
 	});
 
 	it('duplicate_in_tenant is yellow', () => {
-		expect(errorTypeBadgeColor('duplicate_in_tenant')).toContain('yellow');
+		expect(errorTypeBadgeColor('duplicate_in_tenant')).toContain('warning');
 	});
 
 	it('role_not_found is purple', () => {
@@ -397,15 +397,15 @@ describe('Error type badge color logic', () => {
 	});
 
 	it('attribute_error is blue', () => {
-		expect(errorTypeBadgeColor('attribute_error')).toContain('blue');
+		expect(errorTypeBadgeColor('attribute_error')).toContain('info');
 	});
 
 	it('system is red', () => {
-		expect(errorTypeBadgeColor('system')).toContain('red');
+		expect(errorTypeBadgeColor('system')).toContain('destructive');
 	});
 
 	it('unknown error type defaults to gray', () => {
-		expect(errorTypeBadgeColor('unknown')).toContain('gray');
+		expect(errorTypeBadgeColor('unknown')).toContain('muted');
 	});
 });
 

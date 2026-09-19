@@ -100,15 +100,15 @@
 	function caseStatusBadgeClass(status: string): string {
 		switch (status) {
 			case 'pending':
-				return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+				return 'bg-warning/15 text-warning';
 			case 'confirmed':
-				return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+				return 'bg-success/15 text-success';
 			case 'rejected':
-				return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'bg-destructive/15 text-destructive';
 			case 'identity_created':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'bg-info/15 text-info';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
@@ -119,9 +119,9 @@
 			case 'reconciliation':
 				return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
 			case 'manual':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'bg-muted text-muted-foreground ';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
@@ -197,24 +197,24 @@
 	function eventTypeBadgeClass(type: string): string {
 		switch (type) {
 			case 'auto_confirm':
-				return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+				return 'bg-success/15 text-success';
 			case 'manual_confirm':
-				return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+				return 'bg-info/15 text-info';
 			case 'reject':
-				return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+				return 'bg-destructive/15 text-destructive';
 			case 'create_identity':
 				return 'bg-primary/15 text-primary';
 			case 'reassign':
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'bg-muted text-muted-foreground ';
 			default:
-				return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+				return 'bg-muted text-muted-foreground ';
 		}
 	}
 
 	function outcomeBadgeClass(outcome: string): string {
 		return outcome === 'success'
-			? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-			: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+			? 'bg-success/15 text-success'
+			: 'bg-destructive/15 text-destructive';
 	}
 
 	function formatDate(dateStr: string): string {
@@ -231,7 +231,7 @@
 
 <PageHeader
 	title="Identity Correlation"
-	description="Review correlation cases, manage identity matching rules, and audit correlation decisions."
+	description="Cases, matching rules, and decisions."
 />
 
 <div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="Correlation tabs">
@@ -444,12 +444,12 @@
 									<td class="py-2 pr-4">
 										{#if rule.is_active}
 											<span
-												class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400"
+												class="inline-flex items-center rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success "
 												>Active</span
 											>
 										{:else}
 											<span
-												class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
+												class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground "
 												>Inactive</span
 											>
 										{/if}
