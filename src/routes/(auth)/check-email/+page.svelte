@@ -44,7 +44,9 @@
 	<div>
 		<FunnelSteps current={2} />
 		<h1 class="text-2xl font-semibold tracking-tight">Check your email</h1>
-		<p class="mt-1 text-sm text-muted-foreground">Verify your email address to continue</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			We created your workspace. Confirm this address to enter it as administrator.
+		</p>
 	</div>
 
 	{#if actionResult?.success}

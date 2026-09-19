@@ -2,8 +2,9 @@
 
 **Feature Branch**: `003-onboarding-app-shell`
 **Created**: 2026-02-10
-**Status**: Draft
-**Input**: User description: "After signup, user creates their organization via tenant provisioning, receives confirmation with credentials displayed once, then enters the authenticated app shell with sidebar navigation, header, and toast notifications."
+**Status**: Superseded (customer funnel)
+
+The customer path is no longer signup-in-system-tenant then `/onboarding` → `POST /tenants/provision`. Public `/signup` now collects organization + admin and calls `POST /tenants/signup`. `/onboarding` redirects to `/signup`. System-tenant sessions stay in the app. App-shell stories below are unchanged.
 
 ## User Scenarios & Testing *(mandatory)*
 

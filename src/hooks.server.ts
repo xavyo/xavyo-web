@@ -1,4 +1,4 @@
-import type { Handle } from '@sveltejs/kit';
+import { redirect, type Handle } from '@sveltejs/kit';
 import {
 	decodeAccessToken,
 	isTokenExpired,
@@ -10,6 +10,10 @@ import {
 import { refresh } from '$lib/api/auth';
 
 export const handle: Handle = async ({ event, resolve }) => {
+	if (event.url.pathname === '/onboarding' || event.url.pathname === '/onboarding/') {
+		redirect(302, '/signup');
+	}
+
 	// CSRF protection for API routes — SvelteKit protects form actions automatically,
 	// but /api/ endpoints (BFF proxies) need explicit Origin header validation.
 	if (

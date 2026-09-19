@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
 import type { LayoutServerLoad } from './$types';
-import { SYSTEM_TENANT_ID, hasAdminRole } from '$lib/server/auth';
+import { hasAdminRole } from '$lib/server/auth';
 import { fetchAlerts } from '$lib/api/alerts';
 import { getCurrentAssumption } from '$lib/api/power-of-attorney';
 import { getCurrentContext } from '$lib/api/persona-context';
@@ -16,25 +16,6 @@ export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
 	if (!locals.user) {
 		const redirectTo = encodeURIComponent(url.pathname + url.search);
 		redirect(302, `/login?redirectTo=${redirectTo}`);
-	}
-
-	// System-tenant users have not provisioned an organization yet. They must go
-	// through onboarding first, and we must NOT issue the tenant-scoped context
-	// calls for them — the admin-only governance calls (assumption/context) would
-	// 403 for a non-admin and break the onboarding page entirely.
-	const inSystemTenant = !locals.tenantId || locals.tenantId === SYSTEM_TENANT_ID;
-	if (inSystemTenant && !url.pathname.startsWith('/logout')) {
-		if (!url.pathname.startsWith('/onboarding')) {
-			redirect(302, '/onboarding');
-		}
-		return {
-			user: locals.user,
-			unacknowledgedAlertCount: 0,
-			isAdmin: hasAdminRole(locals.user.roles),
-			currentAssumption: null,
-			personaContext: null,
-			appVersion: env.APP_VERSION || 'dev'
-		};
 	}
 
 	// Security alerts are self-service (any authenticated user). Power-of-attorney

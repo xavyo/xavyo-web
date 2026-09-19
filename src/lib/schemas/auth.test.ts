@@ -24,50 +24,62 @@ describe('loginSchema', () => {
 });
 
 describe('signupSchema', () => {
-	it('accepts valid email and password', () => {
-		const result = signupSchema.safeParse({ email: 'user@example.com', password: 'password123' });
+	const valid = {
+		organizationName: 'Acme Corp',
+		email: 'user@example.com',
+		password: 'a-long-unique-pass'
+	};
+
+	it('accepts org, email, and password', () => {
+		const result = signupSchema.safeParse(valid);
 		expect(result.success).toBe(true);
 	});
 
 	it('accepts valid email, password, and displayName', () => {
 		const result = signupSchema.safeParse({
-			email: 'user@example.com',
-			password: 'password123',
+			...valid,
 			displayName: 'John Doe'
 		});
 		expect(result.success).toBe(true);
 	});
 
 	it('accepts missing displayName (optional)', () => {
-		const result = signupSchema.safeParse({ email: 'user@example.com', password: 'password123' });
+		const result = signupSchema.safeParse(valid);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.displayName).toBeUndefined();
 		}
 	});
 
-	it('rejects password too short (< 8 chars)', () => {
-		const result = signupSchema.safeParse({ email: 'user@example.com', password: 'short' });
+	it('rejects missing organization name', () => {
+		const result = signupSchema.safeParse({
+			email: 'user@example.com',
+			password: 'a-long-unique-pass'
+		});
+		expect(result.success).toBe(false);
+	});
+
+	it('rejects password too short (< 12 chars)', () => {
+		const result = signupSchema.safeParse({ ...valid, password: 'short' });
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects password too long (> 128 chars)', () => {
 		const result = signupSchema.safeParse({
-			email: 'user@example.com',
+			...valid,
 			password: 'a'.repeat(129)
 		});
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects invalid email', () => {
-		const result = signupSchema.safeParse({ email: 'bad', password: 'password123' });
+		const result = signupSchema.safeParse({ ...valid, email: 'bad' });
 		expect(result.success).toBe(false);
 	});
 
 	it('rejects displayName too long (> 255 chars)', () => {
 		const result = signupSchema.safeParse({
-			email: 'user@example.com',
-			password: 'password123',
+			...valid,
 			displayName: 'a'.repeat(256)
 		});
 		expect(result.success).toBe(false);

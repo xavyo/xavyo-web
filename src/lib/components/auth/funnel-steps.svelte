@@ -1,7 +1,7 @@
 <script lang="ts">
 	let { current = 1 }: { current?: number } = $props();
 
-	const steps = ['Account', 'Verify email', 'Organization'];
+	const steps = ['Workspace', 'Verify email'];
 </script>
 
 <ol class="mb-6 flex items-center gap-2" aria-label="Sign-up progress">

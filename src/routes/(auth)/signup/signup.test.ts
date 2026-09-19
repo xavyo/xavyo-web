@@ -1,11 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock modules
 vi.mock('$app/environment', () => ({ dev: true }));
 
 vi.mock('$lib/schemas/auth', () => ({
 	signupSchema: {
-		_type: {} as { email: string; password: string; displayName?: string }
+		_type: {} as {
+			organizationName: string;
+			email: string;
+			password: string;
+			displayName?: string;
+		}
 	}
 }));
 
@@ -15,11 +19,14 @@ vi.mock('sveltekit-superforms/adapters', () => ({
 
 vi.mock('sveltekit-superforms', () => ({
 	superValidate: vi.fn(),
-	message: vi.fn((_form: unknown, msg: string, opts: unknown) => ({ message: msg, ...opts as object }))
+	message: vi.fn((_form: unknown, msg: string, opts: unknown) => ({
+		message: msg,
+		...(opts as object)
+	}))
 }));
 
-vi.mock('$lib/api/auth', () => ({
-	signup: vi.fn()
+vi.mock('$lib/api/tenants', () => ({
+	signupTenant: vi.fn()
 }));
 
 vi.mock('$lib/api/client', () => ({
@@ -35,10 +42,10 @@ vi.mock('$lib/api/client', () => ({
 }));
 
 import { superValidate } from 'sveltekit-superforms';
-import { signup } from '$lib/api/auth';
+import { signupTenant } from '$lib/api/tenants';
 
 const mockSuperValidate = vi.mocked(superValidate);
-const mockSignup = vi.mocked(signup);
+const mockSignupTenant = vi.mocked(signupTenant);
 
 describe('signup page server', () => {
 	beforeEach(() => {
@@ -48,20 +55,30 @@ describe('signup page server', () => {
 	describe('load', () => {
 		it('redirects to dashboard if user is already logged in', async () => {
 			const { load } = await import('./+page.server');
-			await expect(
-				load({ locals: { user: { sub: '123' } } } as any)
-			).rejects.toMatchObject({ status: 302, location: '/dashboard' });
+			await expect(load({ locals: { user: { sub: '123' } } } as any)).rejects.toMatchObject({
+				status: 302,
+				location: '/dashboard'
+			});
 		});
 	});
 
 	describe('signup action', () => {
-		it('redirects to check-email page on success (not onboarding)', async () => {
+		it('redirects to check-email with tenant after POST /tenants/signup', async () => {
 			const { actions } = await import('./+page.server');
 			mockSuperValidate.mockResolvedValue({
 				valid: true,
-				data: { email: 'new@example.com', password: 'Pass1234!', displayName: '' }
+				data: {
+					organizationName: 'Acme Corp',
+					email: 'new@example.com',
+					password: 'a-long-unique-pass',
+					displayName: ''
+				}
 			} as any);
-			mockSignup.mockResolvedValue({} as any);
+			mockSignupTenant.mockResolvedValue({
+				tenant: { id: 'tenant-1', slug: 'acme-corp', name: 'Acme Corp' },
+				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				verification_email_sent: true
+			});
 
 			await expect(
 				actions.default({
@@ -71,8 +88,18 @@ describe('signup page server', () => {
 				} as any)
 			).rejects.toMatchObject({
 				status: 302,
-				location: '/check-email?email=new%40example.com'
+				location: '/check-email?email=new%40example.com&tenant=tenant-1'
 			});
+
+			expect(mockSignupTenant).toHaveBeenCalledWith(
+				{
+					organization_name: 'Acme Corp',
+					email: 'new@example.com',
+					password: 'a-long-unique-pass',
+					display_name: ''
+				},
+				expect.any(Function)
+			);
 		});
 
 		it('does NOT set access_token cookie on signup', async () => {
@@ -80,9 +107,18 @@ describe('signup page server', () => {
 			const cookieSet = vi.fn();
 			mockSuperValidate.mockResolvedValue({
 				valid: true,
-				data: { email: 'new@example.com', password: 'Pass1234!', displayName: '' }
+				data: {
+					organizationName: 'Acme',
+					email: 'new@example.com',
+					password: 'a-long-unique-pass',
+					displayName: ''
+				}
 			} as any);
-			mockSignup.mockResolvedValue({} as any);
+			mockSignupTenant.mockResolvedValue({
+				tenant: { id: 'tenant-1', slug: 'acme', name: 'Acme' },
+				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				verification_email_sent: true
+			});
 
 			try {
 				await actions.default({
@@ -94,8 +130,12 @@ describe('signup page server', () => {
 				// redirect throws
 			}
 
-			// Ensure no cookies were set (no auto-login)
-			expect(cookieSet).not.toHaveBeenCalled();
+			expect(cookieSet).toHaveBeenCalledWith(
+				'tenant_id',
+				'tenant-1',
+				expect.objectContaining({ httpOnly: true, path: '/' })
+			);
+			expect(cookieSet.mock.calls.some((c) => c[0] === 'access_token')).toBe(false);
 		});
 
 		it('shows API error on signup failure', async () => {
@@ -103,9 +143,14 @@ describe('signup page server', () => {
 			const { ApiError } = await import('$lib/api/client');
 			mockSuperValidate.mockResolvedValue({
 				valid: true,
-				data: { email: 'dup@example.com', password: 'Pass1234!', displayName: '' }
+				data: {
+					organizationName: 'Acme',
+					email: 'dup@example.com',
+					password: 'a-long-unique-pass',
+					displayName: ''
+				}
 			} as any);
-			mockSignup.mockRejectedValue(new ApiError('Email already in use', 409));
+			mockSignupTenant.mockRejectedValue(new ApiError('Email already in use', 409));
 
 			const result = await actions.default({
 				request: new Request('http://localhost/signup', { method: 'POST' }),

@@ -1,15 +1,16 @@
 import { z } from 'zod/v3';
+import { onboardingSchema } from './onboarding';
 
 export const loginSchema = z.object({
 	email: z.string().email('Invalid email address'),
 	password: z.string().min(1, 'Password is required')
 });
 
-export const signupSchema = z.object({
+export const signupSchema = onboardingSchema.extend({
 	email: z.string().email('Invalid email address'),
 	password: z
 		.string()
-		.min(8, 'Password must be at least 8 characters')
+		.min(12, 'Password must be at least 12 characters')
 		.max(128, 'Password must not exceed 128 characters'),
 	displayName: z.string().max(255, 'Display name must not exceed 255 characters').optional()
 });
