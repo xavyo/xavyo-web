@@ -1,0 +1,71 @@
+{
+  "id": "invite-verify-banner",
+  "state": "implementing",
+  "objective": "When the signed-in admin is not email-verified, /invitations shows a confirm-email state instead of a usable invite form.",
+  "non_goals": [
+    "Do not change invitation accept/join",
+    "Do not implement real SMTP or the golden-path E2E",
+    "Do not touch frozen apps/idp-web",
+    "Do not invent a second billing model"
+  ],
+  "project": {
+    "field": "brownfield",
+    "baseline_revision": "776689b4a83111f361a03568eff91cd04c448246",
+    "invariants": [
+      "Verified admins still list, filter, resend, and cancel invitations",
+      "Invite create still posts the same email+role payload when the admin is verified",
+      "Resend verification still uses POST /auth/resend-verification",
+      "Existing invitations list and create unit tests stay green for verified users"
+    ],
+    "rollback": "Revert the xavyo-web PR. Unverified admins see the invite form again; the API gate is unchanged."
+  },
+  "grill": {
+    "mode": "research",
+    "notes": [
+      "No user-only gaps: maturity-plan lot 3 and Auth0 Add Tenant Members require verify-before-invite. JWT has no email_verified claim — GET /me/profile is the source.",
+      "Mobbin followed: Air verify banner on the invite surface (a714b643), PayPal amber capability-block banner (61cc199f), PlanetScale confirm card + resend (b118fbad), Loom email chip + resend (c3760374), SchoolAI envelope + sent-to copy (fe1caa40).",
+      "Assumed /invitations/create redirects to /invitations when unverified rather than duplicating the card. Fail closed to unverified if profile cannot be loaded.",
+      "Pre-mortem: most plausible failure is a verified admin losing Invite user after a profile 500. Fail closed is safer than showing a form the API 403s. Continuity pins verified list/create tests."
+    ]
+  },
+  "risk": {
+    "tier": "critical",
+    "signals": [
+      "auth-permissions",
+      "pii",
+      "x-design"
+    ],
+    "rationale": "Invite surface is an authz boundary; the page shows the admin email and hides the form until verified."
+  },
+  "acceptance": [
+    {
+      "id": "unverified-confirm-state",
+      "criterion": "Unverified admin load of /invitations returns emailVerified false and does not list invitations; create redirects to /invitations.",
+      "verification": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/routes/(app)/invitations src/lib/server/email-verified.test.ts src/lib/api/auth.test.ts"
+    },
+    {
+      "id": "verified-continuity",
+      "criterion": "Verified admins still list invitations and can submit the create form.",
+      "verification": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/routes/(app)/invitations",
+      "continuity": true
+    }
+  ],
+  "execution": {
+    "mode": "sequential",
+    "rationale": "List and create pages share one verification helper and one visual state."
+  },
+  "tasks": [
+    {
+      "id": "gate-ui",
+      "outcome": "Confirm-email state on /invitations; create redirects when unverified."
+    },
+    {
+      "id": "verify",
+      "outcome": "Unit tests, svelte-autofixer, and live screenshots."
+    }
+  ],
+  "approvals": {
+    "contract": true,
+    "critical_actions": false
+  }
+}

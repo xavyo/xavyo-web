@@ -8,6 +8,10 @@ vi.mock('$lib/api/invitations', () => ({
 	createInvitation: vi.fn()
 }));
 
+vi.mock('$lib/server/email-verified', () => ({
+	currentUserEmailVerified: vi.fn()
+}));
+
 vi.mock('$lib/api/client', () => ({
 	ApiError: class ApiError extends Error {
 		status: number;
@@ -21,6 +25,7 @@ vi.mock('$lib/api/client', () => ({
 import { load, actions } from './+page.server';
 import { hasAdminRole } from '$lib/server/auth';
 import { createInvitation } from '$lib/api/invitations';
+import { currentUserEmailVerified } from '$lib/server/email-verified';
 import { ApiError } from '$lib/api/client';
 
 const mockLocals = (admin: boolean) => ({
@@ -44,13 +49,18 @@ function makeFormData(data: Record<string, string>): Request {
 describe('Invitations Create +page.server', () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		vi.mocked(currentUserEmailVerified).mockResolvedValue({
+			emailVerified: true,
+			email: 'admin@example.com'
+		});
 	});
 
 	describe('load', () => {
 		it('does not redirect a non-admin JWT user', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(false);
 			const result: any = await load({
-				locals: mockLocals(false)
+				locals: mockLocals(false),
+				fetch: vi.fn()
 			} as any);
 			expect(result.form).toBeDefined();
 		});
@@ -58,9 +68,27 @@ describe('Invitations Create +page.server', () => {
 		it('returns form for admin users', async () => {
 			vi.mocked(hasAdminRole).mockReturnValue(true);
 			const result: any = await load({
-				locals: mockLocals(true)
+				locals: mockLocals(true),
+				fetch: vi.fn()
 			} as any);
 			expect(result.form).toBeDefined();
+		});
+
+		it('redirects unverified admins to /invitations', async () => {
+			vi.mocked(currentUserEmailVerified).mockResolvedValue({
+				emailVerified: false,
+				email: 'admin@example.com'
+			});
+			try {
+				await load({
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown redirect');
+			} catch (e: any) {
+				expect(e.status).toBe(302);
+				expect(e.location).toBe('/invitations');
+			}
 		});
 	});
 
@@ -119,6 +147,25 @@ describe('Invitations Create +page.server', () => {
 				fetch: vi.fn()
 			} as any);
 			expect(result.status).toBe(409);
+		});
+
+		it('redirects unverified admins without creating an invitation', async () => {
+			vi.mocked(currentUserEmailVerified).mockResolvedValue({
+				emailVerified: false,
+				email: 'admin@example.com'
+			});
+			try {
+				await actions.default({
+					request: makeFormData({ email: 'user@example.com' }),
+					locals: mockLocals(true),
+					fetch: vi.fn()
+				} as any);
+				expect.fail('should have thrown redirect');
+			} catch (e: any) {
+				expect(e.status).toBe(302);
+				expect(e.location).toBe('/invitations');
+			}
+			expect(createInvitation).not.toHaveBeenCalled();
 		});
 
 		it('returns generic error for non-API errors', async () => {

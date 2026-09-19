@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import PageHeader from '$lib/components/layout/page-header.svelte';
@@ -7,8 +7,10 @@
 	import { EmptyState } from '$lib/components/ui/empty-state';
 	import { addToast } from '$lib/stores/toast.svelte';
 	import ConfirmDialog from '$lib/components/ui/confirm-dialog.svelte';
+	import { Mail } from 'lucide-svelte';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let resendingVerification = $state(false);
 
 	// svelte-ignore state_referenced_locally
 	let currentStatus = $state(data.status ?? '');
@@ -100,6 +102,73 @@
 	}
 </script>
 
+{#if !data.emailVerified}
+	<PageHeader
+		title="Invitations"
+		description="Confirm your email before inviting teammates."
+	/>
+
+	<div
+		class="mb-6 rounded-md border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning-foreground"
+		role="status"
+	>
+		To invite teammates, we need to confirm it is really you. Check your inbox for a verification
+		link
+		{#if data.profileEmail}
+			sent to <span class="font-medium">{data.profileEmail}</span>
+		{/if}.
+	</div>
+
+	<div
+		class="mx-auto flex max-w-lg flex-col items-center rounded-lg border border-border/80 bg-card px-6 py-12 text-center shadow-xs"
+	>
+		<div
+			class="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary"
+			aria-hidden="true"
+		>
+			<Mail class="h-7 w-7" />
+		</div>
+		<h2 class="text-xl font-semibold tracking-tight">Confirm your email</h2>
+		<p class="mt-2 max-w-sm text-sm text-muted-foreground">
+			Click the link we sent you. Invitation is locked until that address is verified.
+		</p>
+		{#if data.profileEmail}
+			<p class="mt-4 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground">
+				{data.profileEmail}
+			</p>
+		{/if}
+
+		{#if form?.action === 'resendVerification' && form.success}
+			<p class="mt-4 text-sm text-foreground">Verification email sent. Check your inbox.</p>
+		{/if}
+
+		<form
+			method="POST"
+			action="?/resendVerification"
+			class="mt-6 w-full max-w-xs"
+			use:enhance={() => {
+				resendingVerification = true;
+				return async ({ result, update }) => {
+					resendingVerification = false;
+					if (result.type === 'success') {
+						addToast('success', 'Verification email sent');
+					} else {
+						addToast('error', 'Could not resend verification email');
+					}
+					await update();
+				};
+			}}
+		>
+			<Button type="submit" class="w-full" disabled={resendingVerification}>
+				{resendingVerification ? 'Sending…' : 'Resend email'}
+			</Button>
+		</form>
+
+		<p class="mt-6 text-sm text-muted-foreground">
+			Can’t find the email? Check your junk folder, then resend.
+		</p>
+	</div>
+{:else}
 <PageHeader title="Invitations" description="Invite people and track acceptance.">
 	<a
 		href="/invitations/create"
@@ -294,3 +363,4 @@
 		}
 	}}
 />
+{/if}
