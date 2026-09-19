@@ -25,7 +25,9 @@
 	);
 
 	const canSubmit = $derived(
-		($form.email ?? '').toString().length > 0 && password.length >= 8
+		($form.organizationName ?? '').toString().trim().length > 0 &&
+			($form.email ?? '').toString().length > 0 &&
+			password.length >= 12
 	);
 
 	const tenantParam = $derived(
@@ -38,8 +40,10 @@
 <div class="space-y-6">
 	<div>
 		<FunnelSteps current={1} />
-		<h1 class="text-2xl font-semibold tracking-tight">Create your account</h1>
-		<p class="mt-1 text-sm text-muted-foreground">Enter your details to get started</p>
+		<h1 class="text-2xl font-semibold tracking-tight">Create your workspace</h1>
+		<p class="mt-1 text-sm text-muted-foreground">
+			Name the organization. You will be its administrator.
+		</p>
 	</div>
 
 	{#if $message}
@@ -50,7 +54,26 @@
 
 	<form method="POST" use:enhance class="space-y-4">
 		<div class="space-y-2">
-			<Label for="email">Email</Label>
+			<Label for="organizationName">Organization</Label>
+			<Input
+				id="organizationName"
+				name="organizationName"
+				type="text"
+				autocomplete="organization"
+				placeholder="Acme Corp"
+				aria-invalid={$errors.organizationName ? 'true' : undefined}
+				value={String($form.organizationName ?? '')}
+				oninput={(e) => {
+					$form.organizationName = e.currentTarget.value;
+				}}
+			/>
+			{#if $errors.organizationName}
+				<p class="text-sm text-destructive">{$errors.organizationName}</p>
+			{/if}
+		</div>
+
+		<div class="space-y-2">
+			<Label for="email">Work email</Label>
 			<Input
 				id="email"
 				name="email"
@@ -148,7 +171,7 @@
 		</div>
 
 		<Button type="submit" class="w-full" disabled={!canSubmit || $submitting}>
-			{$submitting ? 'Creating account…' : 'Create account'}
+			{$submitting ? 'Creating workspace…' : 'Create workspace'}
 		</Button>
 	</form>
 

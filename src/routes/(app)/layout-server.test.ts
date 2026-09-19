@@ -136,6 +136,21 @@ describe('App layout +layout.server', () => {
 		expect(result.unacknowledgedAlertCount).toBe(2);
 	});
 
+	it('does not bounce system-tenant super_admin to /onboarding', async () => {
+		const result = (await load({
+			locals: {
+				user: { id: 'u1', roles: ['super_admin'] },
+				accessToken: 'tok',
+				tenantId: '00000000-0000-0000-0000-000000000001'
+			},
+			url: new URL('http://localhost/dashboard'),
+			fetch: vi.fn()
+		} as any)) as any;
+
+		expect(result.isAdmin).toBe(true);
+		expect(fetchAlerts).toHaveBeenCalled();
+	});
+
 	it('propagates ApiError status from alerts', async () => {
 		vi.mocked(fetchAlerts).mockRejectedValue(new ApiError('Forbidden', 403));
 

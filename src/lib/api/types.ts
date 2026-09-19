@@ -70,6 +70,23 @@ export interface VerifyEmailResponse {
 
 // Tenant Types
 
+export interface SignupTenantRequest {
+	organization_name: string;
+	email: string;
+	password: string;
+	display_name?: string;
+}
+
+export interface SignupTenantResponse {
+	tenant: TenantInfo;
+	admin: {
+		id: string;
+		email: string;
+		email_verified: boolean;
+	};
+	verification_email_sent: boolean;
+}
+
 export interface ProvisionTenantRequest {
 	organization_name: string;
 }

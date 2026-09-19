@@ -13,6 +13,11 @@ describe('session tenant', () => {
 		expect(src).not.toContain("claims.tid ?? event.cookies.get('tenant_id')");
 	});
 
+	it('sends leftover /onboarding URLs to /signup', () => {
+		expect(src).toContain("pathname === '/onboarding'");
+		expect(src).toContain("redirect(302, '/signup')");
+	});
+
 	it('copies advertised JWT name onto locals.user', () => {
 		expect(src).toContain('sessionUserFromClaims(claims)');
 		expect(src).not.toContain('email: claims.email ?? \'\'');

@@ -37,8 +37,7 @@ export const actions: Actions = {
 		}
 
 		// A fresh verification returns a session: sign the user in automatically and
-		// take them straight into the app (the app layout routes system-tenant users
-		// to onboarding) instead of bouncing them back to the login screen.
+		// take them straight into the app (JWT tid is the new tenant).
 		// redirect() throws, so it must live outside the try/catch above.
 		if (result.access_token && result.refresh_token) {
 			setCookies(cookies, {
