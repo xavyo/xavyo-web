@@ -38,11 +38,12 @@
 </script>
 
 <div class="space-y-6">
+	<FunnelSteps current={1} />
+
 	<div>
-		<FunnelSteps current={1} />
-		<h1 class="text-2xl font-semibold tracking-tight">Create your workspace</h1>
-		<p class="mt-1 text-sm text-muted-foreground">
-			Name the organization. You will be its administrator.
+		<h1 class="text-2xl font-semibold tracking-tight">Create your organization</h1>
+		<p class="mt-1.5 text-sm text-muted-foreground">
+			Your organization is your company’s workspace. You will be its administrator.
 		</p>
 	</div>
 
@@ -52,9 +53,9 @@
 		</Alert>
 	{/if}
 
-	<form method="POST" use:enhance class="space-y-4">
+	<form method="POST" use:enhance class="space-y-5">
 		<div class="space-y-2">
-			<Label for="organizationName">Organization</Label>
+			<Label for="organizationName">Organization name</Label>
 			<Input
 				id="organizationName"
 				name="organizationName"
@@ -67,6 +68,7 @@
 					$form.organizationName = e.currentTarget.value;
 				}}
 			/>
+			<p class="text-xs text-muted-foreground">Shown on invites and the workspace header.</p>
 			{#if $errors.organizationName}
 				<p class="text-sm text-destructive">{$errors.organizationName}</p>
 			{/if}
@@ -79,7 +81,7 @@
 				name="email"
 				type="email"
 				autocomplete="email"
-				placeholder="you@example.com"
+				placeholder="you@company.com"
 				aria-invalid={$errors.email ? 'true' : undefined}
 				value={String($form.email ?? '')}
 				oninput={(e) => {
@@ -99,7 +101,7 @@
 					name="password"
 					type={showPassword ? 'text' : 'password'}
 					autocomplete="new-password"
-					placeholder="Create a strong password"
+					placeholder="At least 12 characters"
 					class="pr-10"
 					aria-invalid={$errors.password ? 'true' : undefined}
 					value={password}
@@ -132,14 +134,20 @@
 						</div>
 						<span class="w-16 text-right text-xs text-muted-foreground">{strength.label}</span>
 					</div>
-					<ul class="grid grid-cols-1 gap-1 sm:grid-cols-2">
+					<ul class="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
 						{#each strength.checks as check (check.label)}
 							<li
 								class="flex items-center gap-1.5 text-xs {check.met
-									? 'text-green-600'
+									? 'text-foreground'
 									: 'text-muted-foreground'}"
 							>
-								<Check class="h-3 w-3 {check.met ? 'opacity-100' : 'opacity-30'}" />
+								<span
+									class="flex h-4 w-4 items-center justify-center rounded-full {check.met
+										? 'bg-primary/15 text-primary'
+										: 'bg-muted text-muted-foreground'}"
+								>
+									<Check class="h-2.5 w-2.5 {check.met ? 'opacity-100' : 'opacity-40'}" />
+								</span>
 								{check.label}
 							</li>
 						{/each}
@@ -153,7 +161,7 @@
 		</div>
 
 		<div class="space-y-2">
-			<Label for="displayName">Display name <span class="text-muted-foreground">(optional)</span></Label>
+			<Label for="displayName">Your name <span class="text-muted-foreground">(optional)</span></Label>
 			<Input
 				id="displayName"
 				name="displayName"
@@ -171,9 +179,24 @@
 		</div>
 
 		<Button type="submit" class="w-full" disabled={!canSubmit || $submitting}>
-			{$submitting ? 'Creating workspace…' : 'Create workspace'}
+			{$submitting ? 'Creating organization…' : 'Get started'}
 		</Button>
 	</form>
+
+	<ul class="space-y-2 text-xs text-muted-foreground">
+		<li class="flex items-start gap-2">
+			<Check class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+			You become the only administrator of this workspace
+		</li>
+		<li class="flex items-start gap-2">
+			<Check class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+			Confirm your email before inviting anyone else
+		</li>
+		<li class="flex items-start gap-2">
+			<Check class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+			No credit card required
+		</li>
+	</ul>
 
 	<p class="text-sm text-muted-foreground">
 		Already have an account?
