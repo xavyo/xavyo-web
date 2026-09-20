@@ -190,6 +190,10 @@
 		</li>
 		<li class="flex items-start gap-2">
 			<Check class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+			One work email creates one organization (retry resends verification)
+		</li>
+		<li class="flex items-start gap-2">
+			<Check class="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
 			Confirm your email before inviting anyone else
 		</li>
 		<li class="flex items-start gap-2">

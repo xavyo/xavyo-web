@@ -105,15 +105,14 @@
 {#if !data.emailVerified}
 	<PageHeader
 		title="Invitations"
-		description="Confirm your email before inviting teammates."
+		description="Email verification is required to invite members."
 	/>
 
 	<div
 		class="mb-6 rounded-md border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning-foreground"
 		role="status"
 	>
-		To invite teammates, we need to confirm it is really you. Check your inbox for a verification
-		link
+		To invite teammates, email verification is required. Check your inbox for a verification link
 		{#if data.profileEmail}
 			sent to <span class="font-medium">{data.profileEmail}</span>
 		{/if}.
@@ -130,7 +129,7 @@
 		</div>
 		<h2 class="text-xl font-semibold tracking-tight">Confirm your email</h2>
 		<p class="mt-2 max-w-sm text-sm text-muted-foreground">
-			Click the link we sent you. Invitation is locked until that address is verified.
+			Click the link we sent you. Inviting members stays locked until that address is verified.
 		</p>
 		{#if data.profileEmail}
 			<p class="mt-4 rounded-full bg-muted px-3 py-1 text-sm font-medium text-foreground">

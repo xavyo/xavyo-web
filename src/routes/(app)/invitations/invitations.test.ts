@@ -365,6 +365,7 @@ describe('Invitations +page.svelte', () => {
 		const src = readFileSync('src/routes/(app)/invitations/+page.svelte', 'utf8');
 		expect(src).toContain('Confirm your email');
 		expect(src).toContain('?/resendVerification');
+		expect(src).toContain('Email verification is required');
 		expect(src).toContain('!data.emailVerified');
 		expect(src).toContain('Invite user');
 	});

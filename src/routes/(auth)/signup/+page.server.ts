@@ -26,6 +26,8 @@ export const actions: Actions = {
 
 		let tenantId: string;
 		let verificationEmailSent: boolean;
+		// API omits oauth_client on one-email=one-org retry (secret was already shown once).
+		let isRetry: boolean;
 		try {
 			const result = await signupTenant(
 				{
@@ -38,6 +40,7 @@ export const actions: Actions = {
 			);
 			tenantId = result.tenant.id;
 			verificationEmailSent = result.verification_email_sent;
+			isRetry = result.oauth_client == null;
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
@@ -54,9 +57,10 @@ export const actions: Actions = {
 		});
 
 		const sent = verificationEmailSent ? '1' : '0';
+		const retry = isRetry ? '&retry=1' : '';
 		redirect(
 			302,
-			`/check-email?email=${encodeURIComponent(form.data.email)}&tenant=${encodeURIComponent(tenantId)}&sent=${sent}`
+			`/check-email?email=${encodeURIComponent(form.data.email)}&tenant=${encodeURIComponent(tenantId)}&sent=${sent}${retry}`
 		);
 	}
 };

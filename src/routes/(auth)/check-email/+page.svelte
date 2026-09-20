@@ -52,9 +52,16 @@
 		>
 			<Mail class="h-7 w-7" />
 		</div>
-		<h1 class="text-2xl font-semibold tracking-tight">Check your inbox</h1>
+		<h1 class="text-2xl font-semibold tracking-tight">
+			{#if data.isRetry}Welcome back{:else}Check your inbox{/if}
+		</h1>
 		<p class="mt-2 max-w-sm text-sm text-muted-foreground">
-			We created your workspace. Confirm this address to enter it as administrator.
+			{#if data.isRetry}
+				You already have a workspace for this email. We resent the verification link — confirm
+				to enter as administrator.
+			{:else}
+				We created your workspace. Confirm this address to enter it as administrator.
+			{/if}
 		</p>
 		{#if email}
 			<p

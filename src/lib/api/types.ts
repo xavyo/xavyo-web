@@ -84,6 +84,11 @@ export interface SignupTenantResponse {
 		email: string;
 		email_verified: boolean;
 	};
+	/**
+	 * Present only on first create (secret once). Absent on one-email=one-org retry
+	 * — use absence to show “already have a workspace / we resent” copy.
+	 */
+	oauth_client?: OAuthClientInfo;
 	verification_email_sent: boolean;
 }
 
