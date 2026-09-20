@@ -14,6 +14,10 @@ vi.mock('$lib/api/alerts', () => ({
 	fetchAlerts: vi.fn()
 }));
 
+vi.mock('$lib/api/auth', () => ({
+	resendVerification: vi.fn()
+}));
+
 vi.mock('$lib/api/client', () => ({
 	ApiError: class ApiError extends Error {
 		status: number;
@@ -24,10 +28,11 @@ vi.mock('$lib/api/client', () => ({
 	}
 }));
 
-import { load } from './+page.server';
+import { load, actions } from './+page.server';
 import { getProfile, getSecurityOverview } from '$lib/api/me';
 import { getMfaStatus } from '$lib/api/mfa';
 import { fetchAlerts } from '$lib/api/alerts';
+import { resendVerification } from '$lib/api/auth';
 import { ApiError } from '$lib/api/client';
 
 const mockLocals = () => ({
@@ -116,5 +121,44 @@ describe('Settings +page.server', () => {
 		} catch (e: any) {
 			expect(e.status).toBe(403);
 		}
+	});
+
+	describe('resendVerification action', () => {
+		it('calls auth resend with the session email and tenant', async () => {
+			vi.mocked(resendVerification).mockResolvedValue(undefined);
+
+			const result = await actions.resendVerification({
+				locals: mockLocals(),
+				fetch: vi.fn()
+			} as any);
+
+			expect(resendVerification).toHaveBeenCalledWith('a@b.com', 'tid', expect.any(Function));
+			expect(result).toEqual({ success: true, action: 'resendVerification' });
+		});
+
+		it('returns success even when the API call fails (no enumeration)', async () => {
+			vi.mocked(resendVerification).mockRejectedValue(new Error('smtp down'));
+
+			const result = await actions.resendVerification({
+				locals: mockLocals(),
+				fetch: vi.fn()
+			} as any);
+
+			expect(result).toEqual({ success: true, action: 'resendVerification' });
+		});
+
+		it('fails when session has no email', async () => {
+			const result = await actions.resendVerification({
+				locals: { ...mockLocals(), user: { id: 'u1', roles: ['user'] } },
+				fetch: vi.fn()
+			} as any);
+
+			expect(result).toEqual({
+				success: false,
+				error: 'Missing email',
+				action: 'resendVerification'
+			});
+			expect(resendVerification).not.toHaveBeenCalled();
+		});
 	});
 });

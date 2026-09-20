@@ -41,6 +41,7 @@
 					id="email"
 					name="email"
 					type="email"
+					autocomplete="email"
 					placeholder="user@example.com"
 					value={String($form.email ?? '')}
 				/>

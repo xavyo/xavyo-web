@@ -218,6 +218,8 @@
 		<EmptyState
 			title="No invitations yet"
 			description="Invite users to join your organization."
+			actionLabel="Invite user"
+			actionHref="/invitations/create"
 		/>
 	{/if}
 {:else}

@@ -368,5 +368,7 @@ describe('Invitations +page.svelte', () => {
 		expect(src).toContain('Email verification is required');
 		expect(src).toContain('!data.emailVerified');
 		expect(src).toContain('Invite user');
+		expect(src).toContain('actionLabel="Invite user"');
+		expect(src).toContain('actionHref="/invitations/create"');
 	});
 });

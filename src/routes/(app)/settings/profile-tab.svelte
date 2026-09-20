@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
+	import { enhance as formEnhance } from '$app/forms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { updateProfileSchema } from '$lib/schemas/settings';
 	import { addToast } from '$lib/stores/toast.svelte';
@@ -32,6 +33,7 @@
 	});
 
 	let showEmailChange = $state(false);
+	let resendingVerification = $state(false);
 
 	let avatarPreviewUrl = $derived(String($form.avatar_url ?? ''));
 	let avatarError = $state(false);
@@ -49,9 +51,9 @@
 	<!-- Email (read-only) -->
 	<div class="rounded-lg border bg-card p-6">
 		<h3 class="mb-4 text-lg font-medium">Email Address</h3>
-		<div class="flex items-center justify-between">
+		<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 			<div class="flex items-center gap-3">
-				<Mail class="h-5 w-5 text-muted-foreground" />
+				<Mail class="h-5 w-5 shrink-0 text-muted-foreground" />
 				<div>
 					<p class="text-sm font-medium">{profile?.email ?? 'Unknown'}</p>
 					<p class="text-xs text-muted-foreground">
@@ -59,8 +61,40 @@
 					</p>
 				</div>
 			</div>
-			<Button variant="outline" size="sm" onclick={() => (showEmailChange = true)}>Change email</Button>
+			<div class="flex flex-wrap items-center gap-2">
+				{#if profile && !profile.email_verified}
+					<form
+						method="POST"
+						action="?/resendVerification"
+						use:formEnhance={() => {
+							resendingVerification = true;
+							return async ({ result, update }) => {
+								resendingVerification = false;
+								if (result.type === 'success') {
+									addToast('success', 'Verification email sent');
+								} else {
+									addToast('error', 'Could not resend verification email');
+								}
+								await update();
+							};
+						}}
+					>
+						<Button type="submit" variant="outline" size="sm" disabled={resendingVerification}>
+							{resendingVerification ? 'Sending…' : 'Resend verification'}
+						</Button>
+					</form>
+				{/if}
+				<Button variant="outline" size="sm" onclick={() => (showEmailChange = true)}
+					>Change email</Button
+				>
+			</div>
 		</div>
+		{#if profile && !profile.email_verified}
+			<p class="mt-3 text-sm text-muted-foreground">
+				Confirm this address to unlock inviting teammates. Check your inbox, then use Resend if
+				needed.
+			</p>
+		{/if}
 	</div>
 
 	<!-- Profile Form -->

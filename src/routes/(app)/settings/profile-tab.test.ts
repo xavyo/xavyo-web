@@ -96,6 +96,20 @@ describe('ProfileTab', () => {
 		expect(screen.getByText('Not verified')).toBeTruthy();
 	});
 
+	it('shows Resend verification when email is not verified', async () => {
+		const form = await createMockForm();
+		const unverifiedProfile = { ...baseProfile, email_verified: false };
+		render(ProfileTab, { props: { profile: unverifiedProfile, form } });
+		expect(screen.getByText('Resend verification')).toBeTruthy();
+		expect(screen.getByText(/Confirm this address to unlock inviting teammates/)).toBeTruthy();
+	});
+
+	it('hides Resend verification when email is verified', async () => {
+		const form = await createMockForm();
+		render(ProfileTab, { props: { profile: baseProfile, form } });
+		expect(screen.queryByText('Resend verification')).toBeNull();
+	});
+
 	it('renders the Email Address section heading', async () => {
 		const form = await createMockForm();
 		render(ProfileTab, { props: { profile: baseProfile, form } });
