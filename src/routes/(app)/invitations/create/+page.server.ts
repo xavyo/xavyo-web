@@ -5,14 +5,21 @@ import { fail, redirect } from '@sveltejs/kit';
 import { createInvitationSchema } from '$lib/schemas/invitations';
 import { createInvitation } from '$lib/api/invitations';
 import { ApiError } from '$lib/api/client';
+import { currentUserEmailVerified } from '$lib/server/email-verified';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals, fetch }) => {
+	const { emailVerified } = await currentUserEmailVerified(locals, fetch);
+	if (!emailVerified) redirect(302, '/invitations');
+
 	const form = await superValidate(zod(createInvitationSchema));
 	return { form };
 };
 
 export const actions: Actions = {
 	default: async ({ request, locals, fetch }) => {
+		const { emailVerified } = await currentUserEmailVerified(locals, fetch);
+		if (!emailVerified) redirect(302, '/invitations');
+
 		const form = await superValidate(request, zod(createInvitationSchema));
 		if (!form.valid) return fail(400, { form });
 
