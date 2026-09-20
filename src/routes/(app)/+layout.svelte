@@ -81,7 +81,7 @@
 					label: 'Governance',
 					collapsible: true,
 					items: [
-						{ label: 'Applications', href: '/governance/applications', icon: Grid3X3 },
+						{ label: 'App catalog', href: '/governance/applications', icon: Grid3X3 },
 						{ label: 'Overview', href: '/governance', icon: Shield },
 						{ label: 'Roles', href: '/governance/roles', icon: KeyRound },
 						{ label: 'Meta-Roles', href: '/governance/meta-roles', icon: Layers },

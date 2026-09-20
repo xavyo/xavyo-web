@@ -20,7 +20,7 @@
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.type !== 'error') {
-				addToast('success', 'OAuth client updated successfully');
+				addToast('success', 'Application updated successfully');
 				isEditing = false;
 				invalidateAll();
 			}
@@ -73,7 +73,7 @@
 
 <div class="flex items-center justify-between">
 	<div class="flex items-center gap-3">
-		<PageHeader title={data.client.name} description="OAuth client details" />
+		<PageHeader title={data.client.name} description="Application details" />
 		{#if data.client.is_active}
 			<Badge variant="default">Active</Badge>
 		{:else}
@@ -84,7 +84,7 @@
 		href="/settings/oauth-clients"
 		class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
-		Back to Clients
+		Back to Applications
 	</a>
 </div>
 
