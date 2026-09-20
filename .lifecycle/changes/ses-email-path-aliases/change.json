@@ -1,6 +1,6 @@
 {
   "id": "ses-email-path-aliases",
-  "state": "implementing",
+  "state": "verifying",
   "objective": "Accept SES-default email links at /auth/verify-email and /auth/reset-password by redirecting to the real SvelteKit routes (/verify-email, /reset-password) while preserving the query string (token).",
   "non_goals": [
     "Do not change API SesEmailConfig defaults (separate API fix)",
@@ -64,5 +64,28 @@
   "approvals": {
     "contract": true,
     "critical_actions": false
+  },
+  "evidence": [
+    {
+      "acceptance_id": "alias-verify-and-reset",
+      "command": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/hooks.server.test.ts",
+      "exit_code": 0,
+      "revision": "99c8d8bdbde583d3da884ebb220b307987ddd02e",
+      "observed_at": "2026-09-20T06:10:56Z"
+    },
+    {
+      "acceptance_id": "hooks-continuity",
+      "command": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/hooks.server.test.ts",
+      "exit_code": 0,
+      "revision": "99c8d8bdbde583d3da884ebb220b307987ddd02e",
+      "observed_at": "2026-09-20T06:10:56Z"
+    }
+  ],
+  "review": {
+    "independent": false,
+    "result": "pending",
+    "findings": [
+      "Critical change needs independent review on draft PR before done/merge."
+    ]
   }
 }
