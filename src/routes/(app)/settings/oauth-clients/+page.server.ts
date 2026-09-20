@@ -10,7 +10,10 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		const apiBase = (env.API_BASE_URL ?? '').replace(/\/$/, '');
 		const issuerUrl = apiBase || null;
 		const discoveryUrl = apiBase ? `${apiBase}/.well-known/openid-configuration` : null;
-		return { clients: result.clients, total: result.total, issuerUrl, discoveryUrl };
+		// Shared issuers need ?tenant= (or X-Tenant-ID) on /oauth/authorize — surface the
+		// workspace id next to issuer/discovery so free-plan OIDC smoke can copy it.
+		const tenantId = locals.tenantId ?? null;
+		return { clients: result.clients, total: result.total, issuerUrl, discoveryUrl, tenantId };
 	} catch (e) {
 		if (e instanceof ApiError) {
 			error(e.status, e.message);

@@ -71,33 +71,60 @@
 	</a>
 </PageHeader>
 
-{#if data.issuerUrl}
+{#if data.issuerUrl || data.tenantId}
 	<div class="mb-6 rounded-lg border border-border bg-muted/30 p-4">
 		<h3 class="text-sm font-semibold">OIDC endpoints</h3>
 		<p class="mt-1 text-sm text-muted-foreground">
 			Point your app at this issuer. Register exact redirect URIs on each application (signup
-			creates a default client you can edit).
+			creates a default client you can edit). Authorization requests on a shared issuer need
+			<code class="rounded bg-background px-1 py-0.5 text-xs">?tenant=</code>
+			(or an
+			<code class="rounded bg-background px-1 py-0.5 text-xs">X-Tenant-ID</code>
+			header).
 		</p>
 		<div class="mt-3 space-y-3">
-			<div class="space-y-1">
-				<span class="text-xs font-medium text-muted-foreground">Issuer</span>
-				<div class="flex items-center gap-2">
-					<code class="flex-1 overflow-x-auto rounded bg-background px-3 py-2 text-sm">
-						{data.issuerUrl}
-					</code>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onclick={() => {
-							navigator.clipboard.writeText(data.issuerUrl!);
-							addToast('success', 'Issuer URL copied');
-						}}
-					>
-						Copy
-					</Button>
+			{#if data.tenantId}
+				<div class="space-y-1">
+					<span class="text-xs font-medium text-muted-foreground">Tenant ID</span>
+					<div class="flex items-center gap-2">
+						<code class="flex-1 overflow-x-auto rounded bg-background px-3 py-2 text-sm">
+							{data.tenantId}
+						</code>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							onclick={() => {
+								navigator.clipboard.writeText(data.tenantId!);
+								addToast('success', 'Tenant ID copied');
+							}}
+						>
+							Copy
+						</Button>
+					</div>
 				</div>
-			</div>
+			{/if}
+			{#if data.issuerUrl}
+				<div class="space-y-1">
+					<span class="text-xs font-medium text-muted-foreground">Issuer</span>
+					<div class="flex items-center gap-2">
+						<code class="flex-1 overflow-x-auto rounded bg-background px-3 py-2 text-sm">
+							{data.issuerUrl}
+						</code>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							onclick={() => {
+								navigator.clipboard.writeText(data.issuerUrl!);
+								addToast('success', 'Issuer URL copied');
+							}}
+						>
+							Copy
+						</Button>
+					</div>
+				</div>
+			{/if}
 			{#if data.discoveryUrl}
 				<div class="space-y-1">
 					<span class="text-xs font-medium text-muted-foreground">OpenID configuration URL</span>
