@@ -68,14 +68,13 @@
 						action="?/resendVerification"
 						use:formEnhance={() => {
 							resendingVerification = true;
-							return async ({ result, update }) => {
+							return async ({ result }) => {
 								resendingVerification = false;
 								if (result.type === 'success') {
 									addToast('success', 'Verification email sent');
 								} else {
 									addToast('error', 'Could not resend verification email');
 								}
-								await update();
 							};
 						}}
 					>
