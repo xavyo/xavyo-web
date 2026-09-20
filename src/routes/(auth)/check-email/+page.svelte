@@ -119,7 +119,7 @@
 
 	<p class="text-center text-sm">
 		<a
-			href={resolve(`/login${tenantParam}`)}
+			href={`${resolve('/login')}${tenantParam}`}
 			class="font-medium text-primary underline-offset-4 hover:underline"
 			>Back to login</a
 		>
