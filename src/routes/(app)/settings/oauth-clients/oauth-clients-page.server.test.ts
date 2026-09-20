@@ -60,7 +60,7 @@ describe('OAuth Clients Admin +page.server', () => {
 			load = mod.load;
 		});
 
-		it('returns clients with issuer and discovery URLs (trailing slash stripped)', async () => {
+		it('returns clients with issuer, discovery, and tenant ID (trailing slash stripped)', async () => {
 			vi.mocked(listOAuthClients).mockResolvedValue({
 				clients: [makeClient()],
 				total: 1
@@ -78,9 +78,10 @@ describe('OAuth Clients Admin +page.server', () => {
 				'http://localhost:8080/.well-known/openid-configuration'
 			);
 			expect(result.discoveryUrl).toMatch(/\/\.well-known\/openid-configuration$/);
+			expect(result.tenantId).toBe('tid');
 		});
 
-		it('returns null issuer and discovery when API_BASE_URL is empty', async () => {
+		it('returns null issuer and discovery when API_BASE_URL is empty but keeps tenant ID', async () => {
 			mockEnv.API_BASE_URL = '';
 			vi.mocked(listOAuthClients).mockResolvedValue({
 				clients: [],
@@ -94,6 +95,7 @@ describe('OAuth Clients Admin +page.server', () => {
 
 			expect(result.issuerUrl).toBeNull();
 			expect(result.discoveryUrl).toBeNull();
+			expect(result.tenantId).toBe('tid');
 		});
 
 		it('fails closed when API throws', async () => {
@@ -123,5 +125,20 @@ describe('OAuth Clients Admin +page.server', () => {
 				expect(e.status).toBe(403);
 			}
 		});
+	});
+});
+
+describe('Applications OIDC endpoints panel (source)', () => {
+	it('surfaces Tenant ID and shared-issuer ?tenant= guidance', async () => {
+		const { readFileSync } = await import('node:fs');
+		const src = readFileSync(
+			'src/routes/(app)/settings/oauth-clients/+page.svelte',
+			'utf8'
+		);
+		expect(src).toContain('OIDC endpoints');
+		expect(src).toContain('Tenant ID');
+		expect(src).toContain('?tenant=');
+		expect(src).toContain('X-Tenant-ID');
+		expect(src).toContain('data.tenantId');
 	});
 });
