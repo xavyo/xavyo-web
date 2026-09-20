@@ -12,6 +12,7 @@
 
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message: formMessage } = superForm(data.form, {
+		dataType: 'json',
 		validators: zodClient(createTemplateSchema),
 		onResult: ({ result }) => {
 			if (result.type === 'redirect') {
@@ -23,6 +24,43 @@
 	function typeLabel(t: string): string {
 		return t.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 	}
+
+	// The definition is a nested object. With dataType:'json' superForm submits
+	// $form.definition (not raw fields), so the JSON textarea must be kept in sync
+	// with $form.definition. Edit it as text and parse into the store.
+	let definitionText = $state(
+		JSON.stringify(
+			{
+				data_sources: ['entitlements'],
+				filters: [],
+				columns: [{ field: 'name', label: 'Name', sortable: true }],
+				grouping: [],
+				default_sort: null
+			},
+			null,
+			2
+		)
+	);
+	let definitionError = $state('');
+
+	$effect(() => {
+		try {
+			$form.definition = JSON.parse(definitionText);
+			definitionError = '';
+		} catch {
+			definitionError = 'Definition must be valid JSON';
+		}
+	});
+
+	// $errors.definition is a nested object; flatten it to a readable line.
+	let definitionFieldError = $derived(
+		definitionError ||
+			($errors.definition
+				? typeof $errors.definition === 'string'
+					? $errors.definition
+					: 'Please provide at least one data source and one column.'
+				: '')
+	);
 
 	$effect(() => {
 		if ($formMessage) addToast('error', $formMessage);
@@ -100,22 +138,13 @@
 			<label for="definition" class="block text-sm font-medium">Template Definition (JSON)</label>
 			<textarea
 				id="definition"
-				name="definition"
 				rows={10}
+				bind:value={definitionText}
 				class="mt-1 block w-full rounded-md border border-border bg-background px-3 py-2 font-mono text-sm"
-				placeholder={JSON.stringify(
-					{
-						data_sources: ['entitlements'],
-						filters: [{ field: 'status', type: 'select', required: false, options: null, default: null }],
-						columns: [{ field: 'name', label: 'Name', sortable: true }],
-						grouping: [],
-						default_sort: null
-					},
-					null,
-					2
-				)}
 			></textarea>
-			{#if $errors.definition}<p class="mt-1 text-xs text-destructive">{$errors.definition}</p>{/if}
+			{#if definitionFieldError}<p class="mt-1 text-xs text-destructive">
+					{definitionFieldError}
+				</p>{/if}
 		</div>
 
 		<div class="flex gap-3">
