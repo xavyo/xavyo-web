@@ -9,9 +9,24 @@ import {
 } from '$lib/server/auth';
 import { refresh } from '$lib/api/auth';
 
+/** SES EmailConfig still defaults to /auth/* paths; SvelteKit routes omit that prefix. */
+const EMAIL_LINK_ALIASES: Record<string, string> = {
+	'/auth/verify-email': '/verify-email',
+	'/auth/reset-password': '/reset-password'
+};
+
 export const handle: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname === '/onboarding' || event.url.pathname === '/onboarding/') {
 		redirect(302, '/signup');
+	}
+
+	const path =
+		event.url.pathname.length > 1 && event.url.pathname.endsWith('/')
+			? event.url.pathname.slice(0, -1)
+			: event.url.pathname;
+	const emailAlias = EMAIL_LINK_ALIASES[path];
+	if (emailAlias) {
+		redirect(302, `${emailAlias}${event.url.search}`);
 	}
 
 	// CSRF protection for API routes — SvelteKit protects form actions automatically,

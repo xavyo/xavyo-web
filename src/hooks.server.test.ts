@@ -18,6 +18,15 @@ describe('session tenant', () => {
 		expect(src).toContain("redirect(302, '/signup')");
 	});
 
+	it('aliases SES-default email link paths onto real auth routes', () => {
+		expect(src).toContain("'/auth/verify-email': '/verify-email'");
+		expect(src).toContain("'/auth/reset-password': '/reset-password'");
+		expect(src).toContain('EMAIL_LINK_ALIASES');
+		expect(src).toContain('`${emailAlias}${event.url.search}`');
+		// OAuth social/federation callback must stay at /auth/callback.
+		expect(src).not.toContain("'/auth/callback'");
+	});
+
 	it('copies advertised JWT name onto locals.user', () => {
 		expect(src).toContain('sessionUserFromClaims(claims)');
 		expect(src).not.toContain('email: claims.email ?? \'\'');

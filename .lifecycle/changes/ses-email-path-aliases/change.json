@@ -1,0 +1,91 @@
+{
+  "id": "ses-email-path-aliases",
+  "state": "verifying",
+  "objective": "Accept SES-default email links at /auth/verify-email and /auth/reset-password by redirecting to the real SvelteKit routes (/verify-email, /reset-password) while preserving the query string (token).",
+  "non_goals": [
+    "Do not change API SesEmailConfig defaults (separate API fix)",
+    "Do not prove outside-inbox / SES delivery",
+    "Do not alter verify-email or reset-password form logic",
+    "Do not alias /auth/callback (real OAuth callback route)",
+    "Do not reopen keep/revert on web #23"
+  ],
+  "project": {
+    "field": "brownfield",
+    "baseline_revision": "bf42b51c91684469285721230a92db87b558794d",
+    "invariants": [
+      "Existing /verify-email and /reset-password routes keep working unchanged",
+      "/onboarding still redirects to /signup",
+      "/auth/callback is not redirected",
+      "hooks.server session/JWT tenant resolution unchanged"
+    ],
+    "rollback": "Revert the xavyo-web PR. SES links with default /auth/* paths 404 again unless EMAIL_VERIFY_PATH / PASSWORD_RESET_PATH are set."
+  },
+  "grill": {
+    "mode": "research",
+    "notes": [
+      "Source: crates/xavyo-api-auth/src/services/ses_email_service.rs defaults EMAIL_VERIFY_PATH=/auth/verify-email and PASSWORD_RESET_PATH=/auth/reset-password; SMTP EmailConfig was fixed in 43fc1dfc to /verify-email and /reset-password but SES was not.",
+      "Source: xavyo-web routes live at (auth)/verify-email → /verify-email and (auth)/reset-password → /reset-password; no /auth/verify-email route exists. Ops runbooks document the SES default as expected.",
+      "No user-only gaps. Assumed 302 + preserve search is enough; do not rewrite /auth/callback. Pre-mortem: broad /auth/* rewrite breaks OAuth callback — allowlist only verify-email and reset-password.",
+      "Continuity: existing hooks onboarding redirect and session-tenant tests stay green."
+    ]
+  },
+  "risk": {
+    "tier": "critical",
+    "signals": [
+      "auth-permissions",
+      "input-validation",
+      "cross-component"
+    ],
+    "rationale": "Verification and password-reset email entry points; wrong path blocks stranger signup completion when SES is used without path overrides."
+  },
+  "acceptance": [
+    {
+      "id": "alias-verify-and-reset",
+      "criterion": "hooks.server redirects /auth/verify-email and /auth/reset-password (with or without trailing slash) to /verify-email and /reset-password, preserving the query string; /auth/callback is not redirected.",
+      "verification": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/hooks.server.test.ts"
+    },
+    {
+      "id": "hooks-continuity",
+      "criterion": "Existing onboarding→signup redirect and JWT tenant session rules remain unchanged.",
+      "verification": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/hooks.server.test.ts",
+      "continuity": true
+    }
+  ],
+  "execution": {
+    "mode": "sequential",
+    "rationale": "Single hooks.server.ts write plus unit tests."
+  },
+  "tasks": [
+    {
+      "id": "alias-redirects",
+      "outcome": "Allowlist redirects in hooks.server.ts; extend hooks.server.test.ts; leave /auth/callback alone."
+    }
+  ],
+  "approvals": {
+    "contract": true,
+    "critical_actions": false
+  },
+  "evidence": [
+    {
+      "acceptance_id": "alias-verify-and-reset",
+      "command": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/hooks.server.test.ts",
+      "exit_code": 0,
+      "revision": "99c8d8bdbde583d3da884ebb220b307987ddd02e",
+      "observed_at": "2026-09-20T06:10:56Z"
+    },
+    {
+      "acceptance_id": "hooks-continuity",
+      "command": "cd /home/ubuntu/xavyo-web && npm run test:unit -- src/hooks.server.test.ts",
+      "exit_code": 0,
+      "revision": "99c8d8bdbde583d3da884ebb220b307987ddd02e",
+      "observed_at": "2026-09-20T06:10:56Z"
+    }
+  ],
+  "review": {
+    "independent": false,
+    "result": "pending",
+    "findings": [
+      "Critical change needs independent review on draft PR before done/merge."
+    ]
+  }
+}
