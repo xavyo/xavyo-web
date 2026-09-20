@@ -127,6 +127,8 @@
 	<EmptyState
 		title="No applications yet"
 		description="Register an OAuth/OIDC application so your app can sign users in with this workspace."
+		actionLabel="Create application"
+		actionHref="/settings/oauth-clients/create"
 	/>
 {/snippet}
 

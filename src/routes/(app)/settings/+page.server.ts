@@ -8,6 +8,7 @@ import { getProfile, updateProfile } from '$lib/api/me';
 import { getMfaStatus } from '$lib/api/mfa';
 import { getSecurityOverview } from '$lib/api/me';
 import { fetchAlerts } from '$lib/api/alerts';
+import { resendVerification } from '$lib/api/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
@@ -77,5 +78,20 @@ export const actions: Actions = {
 		}
 
 		return message(form, 'Profile updated successfully');
+	},
+
+	resendVerification: async ({ locals, fetch }) => {
+		const email = locals.user?.email;
+		if (!email) {
+			return { success: false, error: 'Missing email', action: 'resendVerification' };
+		}
+
+		try {
+			await resendVerification(email, locals.tenantId ?? undefined, fetch);
+			return { success: true, action: 'resendVerification' };
+		} catch {
+			// Same as /check-email and /invitations: do not leak send outcome.
+			return { success: true, action: 'resendVerification' };
+		}
 	}
 };

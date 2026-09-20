@@ -98,7 +98,7 @@
 {#if !createdClient}
 	<Card class="max-w-lg">
 		<CardHeader>
-			<h2 class="text-xl font-semibold">Client details</h2>
+			<h2 class="text-xl font-semibold">Application details</h2>
 		</CardHeader>
 		<CardContent>
 			{#if $message}
