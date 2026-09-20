@@ -64,6 +64,15 @@
 		{/if}
 	</div>
 
+	{#if !data.verificationEmailSent}
+		<Alert variant="destructive">
+			<AlertDescription>
+				We could not send the verification email. Use Resend below, or check SMTP / ops
+				configuration.
+			</AlertDescription>
+		</Alert>
+	{/if}
+
 	{#if actionResult?.success}
 		<Alert>
 			<AlertDescription>Verification email sent. Please check your inbox.</AlertDescription>
@@ -83,6 +92,9 @@
 		}}
 	>
 		<input type="hidden" name="email" value={email} />
+		{#if data.tenant}
+			<input type="hidden" name="tenant" value={data.tenant} />
+		{/if}
 		<Button type="submit" variant="outline" class="w-full rounded-full" disabled={!canResend}>
 			{#if resending}
 				Sending…

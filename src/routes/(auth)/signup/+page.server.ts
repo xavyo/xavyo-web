@@ -25,6 +25,7 @@ export const actions: Actions = {
 		}
 
 		let tenantId: string;
+		let verificationEmailSent: boolean;
 		try {
 			const result = await signupTenant(
 				{
@@ -36,6 +37,7 @@ export const actions: Actions = {
 				fetch
 			);
 			tenantId = result.tenant.id;
+			verificationEmailSent = result.verification_email_sent;
 		} catch (e) {
 			if (e instanceof ApiError) {
 				return message(form, e.message, { status: e.status as ErrorStatus });
@@ -51,9 +53,10 @@ export const actions: Actions = {
 			maxAge: 60 * 60 * 24 * 30
 		});
 
+		const sent = verificationEmailSent ? '1' : '0';
 		redirect(
 			302,
-			`/check-email?email=${encodeURIComponent(form.data.email)}&tenant=${encodeURIComponent(tenantId)}`
+			`/check-email?email=${encodeURIComponent(form.data.email)}&tenant=${encodeURIComponent(tenantId)}&sent=${sent}`
 		);
 	}
 };
