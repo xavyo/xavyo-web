@@ -70,14 +70,14 @@
       "acceptance_id": "check-email-send-failure",
       "command": "npm run test:unit -- src/routes/(auth)/signup src/routes/(auth)/check-email",
       "exit_code": 0,
-      "revision": "PLACEHOLDER",
+      "revision": "698ac14fbe7de4faf95d83f655f5fdcfa154c03a",
       "observed_at": "2026-09-20T03:21:49Z"
     },
     {
       "acceptance_id": "signup-redirect-continuity",
       "command": "npm run test:unit -- src/routes/(auth)/signup",
       "exit_code": 0,
-      "revision": "PLACEHOLDER",
+      "revision": "698ac14fbe7de4faf95d83f655f5fdcfa154c03a",
       "observed_at": "2026-09-20T03:21:49Z"
     }
   ],
