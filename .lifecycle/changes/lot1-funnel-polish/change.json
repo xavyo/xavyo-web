@@ -49,13 +49,8 @@
   "tasks": [
     {
       "id": "web-check-email-honesty",
-      "outcome": "Wire sent flag and honest UI; harden resend tenant.",
+      "outcome": "Wire sent flag and honest UI; harden resend tenant; run signup and check-email unit tests.",
       "write_scope": ["src/routes/(auth)/signup/", "src/routes/(auth)/check-email/"]
-    },
-    {
-      "id": "verify",
-      "outcome": "Run signup and check-email unit tests.",
-      "depends_on": ["web-check-email-honesty"]
     }
   ],
   "approvals": {
