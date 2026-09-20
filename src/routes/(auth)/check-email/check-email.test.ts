@@ -101,6 +101,28 @@ describe('check-email page', () => {
 			expect(result.tenant).toBe('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
 			expect(cookieSet).toHaveBeenCalledWith('tenant_id', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
 		});
+
+		it('flags isRetry when retry=1', async () => {
+			const { load } = await import('./+page.server');
+			const url = new URL(
+				'http://localhost/check-email?email=a@b.com&tenant=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&sent=1&retry=1'
+			);
+			const result = (await load({
+				url,
+				cookies: { get: () => undefined, set: vi.fn() }
+			} as any)) as { isRetry: boolean };
+			expect(result.isRetry).toBe(true);
+		});
+
+		it('defaults isRetry false', async () => {
+			const { load } = await import('./+page.server');
+			const url = new URL('http://localhost/check-email?email=a@b.com');
+			const result = (await load({
+				url,
+				cookies: { get: () => undefined, set: vi.fn() }
+			} as any)) as { isRetry: boolean };
+			expect(result.isRetry).toBe(false);
+		});
 	});
 
 	describe('resend action', () => {

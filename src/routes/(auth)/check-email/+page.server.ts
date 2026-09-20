@@ -19,10 +19,14 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 	const tenant =
 		tenantIdFromQuery(url.searchParams.get('tenant')) || cookies.get('tenant_id') || '';
 
+	const retryParam = url.searchParams.get('retry');
+	const isRetry = retryParam === '1' || retryParam?.toLowerCase() === 'true';
+
 	return {
 		email: url.searchParams.get('email') ?? '',
 		tenant,
-		verificationEmailSent
+		verificationEmailSent,
+		isRetry
 	};
 };
 

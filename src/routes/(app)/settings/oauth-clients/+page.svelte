@@ -59,20 +59,20 @@
 	}
 </script>
 
-<PageHeader title="OAuth Clients"
-		description="Manage registered OAuth/OIDC client applications">
+<PageHeader title="Applications"
+		description="OAuth/OIDC apps for this workspace — free plan includes developer OIDC clients.">
 	<a
 		href="/settings/oauth-clients/create"
 		class="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
 	>
-		Create Client
+		Create application
 	</a>
 </PageHeader>
 
 {#snippet emptyState()}
 	<EmptyState
-		title="No OAuth clients"
-		description="Create your first OAuth client application to get started."
+		title="No applications yet"
+		description="Register an OAuth/OIDC client so your app can sign users in with this workspace."
 	/>
 {/snippet}
 

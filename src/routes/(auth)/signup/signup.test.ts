@@ -77,6 +77,7 @@ describe('signup page server', () => {
 			mockSignupTenant.mockResolvedValue({
 				tenant: { id: 'tenant-1', slug: 'acme-corp', name: 'Acme Corp' },
 				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				oauth_client: { client_id: 'cid', client_secret: 'sec' },
 				verification_email_sent: true
 			});
 
@@ -117,6 +118,7 @@ describe('signup page server', () => {
 			mockSignupTenant.mockResolvedValue({
 				tenant: { id: 'tenant-1', slug: 'acme', name: 'Acme' },
 				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				oauth_client: { client_id: 'cid', client_secret: 'sec' },
 				verification_email_sent: true
 			});
 
@@ -152,6 +154,7 @@ describe('signup page server', () => {
 			mockSignupTenant.mockResolvedValue({
 				tenant: { id: 'tenant-1', slug: 'acme', name: 'Acme' },
 				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				oauth_client: { client_id: 'cid', client_secret: 'sec' },
 				verification_email_sent: false
 			});
 
@@ -164,6 +167,35 @@ describe('signup page server', () => {
 			).rejects.toMatchObject({
 				status: 302,
 				location: '/check-email?email=new%40example.com&tenant=tenant-1&sent=0'
+			});
+		});
+
+		it('marks one-org retry when oauth_client is omitted', async () => {
+			const { actions } = await import('./+page.server');
+			mockSuperValidate.mockResolvedValue({
+				valid: true,
+				data: {
+					organizationName: 'Acme',
+					email: 'new@example.com',
+					password: 'a-long-unique-pass',
+					displayName: ''
+				}
+			} as any);
+			mockSignupTenant.mockResolvedValue({
+				tenant: { id: 'tenant-1', slug: 'acme', name: 'Acme' },
+				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				verification_email_sent: true
+			});
+
+			await expect(
+				actions.default({
+					request: new Request('http://localhost/signup', { method: 'POST' }),
+					fetch: vi.fn(),
+					cookies: { set: vi.fn(), get: vi.fn() }
+				} as any)
+			).rejects.toMatchObject({
+				status: 302,
+				location: '/check-email?email=new%40example.com&tenant=tenant-1&sent=1&retry=1'
 			});
 		});
 
