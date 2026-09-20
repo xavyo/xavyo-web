@@ -47,11 +47,19 @@
 		if (data.isAdmin) {
 			// The dashboard is an admin overview (tenant-wide metrics); only admins
 			// can load it, so it leads the nav for them and is hidden for others.
-			sections.unshift({
-				label: 'Dashboard',
-				collapsible: false,
-				items: [{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }]
-			});
+			// Applications (OIDC clients) sits next as a top-level Auth0-style entry.
+			sections.unshift(
+				{
+					label: 'Dashboard',
+					collapsible: false,
+					items: [{ label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard }]
+				},
+				{
+					label: 'Applications',
+					collapsible: false,
+					items: [{ label: 'Applications', href: '/settings/oauth-clients', icon: KeyRound }]
+				}
+			);
 			sections.push(
 				{
 					label: 'Identity',
@@ -122,7 +130,6 @@
 						{ label: 'Provisioning Ops', href: '/connectors/operations', icon: Activity },
 						{ label: 'Reconciliation', href: '/connectors/reconciliation', icon: RefreshCw },
 						{ label: 'Federation', href: '/federation', icon: Network },
-						{ label: 'Applications', href: '/settings/oauth-clients', icon: KeyRound },
 						{ label: 'SIEM', href: '/governance/siem', icon: Radio },
 						{ label: 'Provisioning Scripts', href: '/governance/provisioning-scripts', icon: ScrollText },
 						{ label: 'Operations', href: '/governance/operations', icon: Clock },

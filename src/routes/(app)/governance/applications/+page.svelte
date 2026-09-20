@@ -101,7 +101,7 @@
 	});
 </script>
 
-<PageHeader title="Applications"
+<PageHeader title="App catalog"
 		description="Manage governance applications">
 	<a
 		href="/governance/applications/create"
