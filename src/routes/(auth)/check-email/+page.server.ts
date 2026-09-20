@@ -1,10 +1,28 @@
 import type { Actions, PageServerLoad } from './$types';
 import { apiClient } from '$lib/api/client';
-import { requestTenantId } from '$lib/server/auth';
+import {
+	requestTenantId,
+	stampTenantCookieFromQuery,
+	tenantIdFromQuery
+} from '$lib/server/auth';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, cookies }) => {
+	stampTenantCookieFromQuery(cookies, url);
+
+	const sentParam = url.searchParams.get('sent');
+	// Absent `sent` (e.g. login → check-email): do not alarm; only signup sets sent=0.
+	const verificationEmailSent =
+		sentParam === null || sentParam === ''
+			? true
+			: sentParam !== '0' && sentParam.toLowerCase() !== 'false';
+
+	const tenant =
+		tenantIdFromQuery(url.searchParams.get('tenant')) || cookies.get('tenant_id') || '';
+
 	return {
-		email: url.searchParams.get('email') ?? ''
+		email: url.searchParams.get('email') ?? '',
+		tenant,
+		verificationEmailSent
 	};
 };
 
@@ -18,7 +36,8 @@ export const actions: Actions = {
 		}
 
 		try {
-			const tenantId = requestTenantId(url, cookies);
+			const formTenant = tenantIdFromQuery(String(formData.get('tenant') ?? ''));
+			const tenantId = formTenant || requestTenantId(url, cookies);
 			await apiClient('/auth/resend-verification', {
 				method: 'POST',
 				body: { email },

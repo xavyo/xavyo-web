@@ -1,0 +1,91 @@
+{
+  "id": "lot1-funnel-polish",
+  "state": "verifying",
+  "objective": "Surface verification_email_sent=false on check-email after public signup; keep resend on the same email and tenant. Ops FRONTEND_BASE_URL naming lives in the API repo contract of the same id.",
+  "non_goals": [
+    "Do not prove real SES / outside-inbox delivery",
+    "Do not merge",
+    "Do not touch paid plans, one-email-one-org, or verify-before-invite beyond existing main",
+    "Do not change API EmailConfig"
+  ],
+  "project": {
+    "field": "brownfield",
+    "baseline_revision": "0a1ba56f1bccf5991ab3d5e528e7a2d10a7a5a49",
+    "invariants": [
+      "Web signup still posts org+admin to POST /tenants/signup",
+      "check-email still posts ?/resend to POST /auth/resend-verification",
+      "No JSX in frozen apps/idp-web or packages/ui"
+    ],
+    "rollback": "Revert this xavyo-web PR."
+  },
+  "grill": {
+    "mode": "autonomous",
+    "notes": [
+      "Paired with API lot1-funnel-polish. Assumed sent=0|1 query flag. Pre-mortem: silent success when mail failed."
+    ]
+  },
+  "risk": {
+    "tier": "critical",
+    "signals": [
+      "auth-permissions",
+      "pii",
+      "input-validation",
+      "cross-component"
+    ],
+    "rationale": "Public signup funnel honesty for unverified admin email delivery."
+  },
+  "acceptance": [
+    {
+      "id": "check-email-send-failure",
+      "criterion": "Signup with verification_email_sent=false redirects with sent=0; check-email load sets verificationEmailSent false; resend keeps email+tenant.",
+      "verification": "npm run test:unit -- src/routes/(auth)/signup src/routes/(auth)/check-email"
+    },
+    {
+      "id": "signup-redirect-continuity",
+      "criterion": "Successful signup still redirects to check-email with email and tenant.",
+      "verification": "npm run test:unit -- src/routes/(auth)/signup",
+      "continuity": true
+    }
+  ],
+  "execution": {
+    "mode": "sequential",
+    "rationale": "Single web funnel write path."
+  },
+  "tasks": [
+    {
+      "id": "web-check-email-honesty",
+      "outcome": "Wire sent flag and honest UI; harden resend tenant; run signup and check-email unit tests.",
+      "write_scope": [
+        "src/routes/(auth)/signup/",
+        "src/routes/(auth)/check-email/"
+      ]
+    }
+  ],
+  "approvals": {
+    "contract": true,
+    "critical_actions": false
+  },
+  "evidence": [
+    {
+      "acceptance_id": "check-email-send-failure",
+      "command": "npm run test:unit -- src/routes/(auth)/signup src/routes/(auth)/check-email",
+      "exit_code": 0,
+      "revision": "698ac14fbe7de4faf95d83f655f5fdcfa154c03a",
+      "observed_at": "2026-09-20T03:21:49Z"
+    },
+    {
+      "acceptance_id": "signup-redirect-continuity",
+      "command": "npm run test:unit -- src/routes/(auth)/signup",
+      "exit_code": 0,
+      "revision": "698ac14fbe7de4faf95d83f655f5fdcfa154c03a",
+      "observed_at": "2026-09-20T03:21:49Z"
+    }
+  ],
+  "review": {
+    "independent": false,
+    "result": "pending",
+    "findings": [
+      "Critical change needs independent review on draft PR before done/merge."
+    ]
+  }
+}

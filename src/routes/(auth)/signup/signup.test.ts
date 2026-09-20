@@ -88,7 +88,7 @@ describe('signup page server', () => {
 				} as any)
 			).rejects.toMatchObject({
 				status: 302,
-				location: '/check-email?email=new%40example.com&tenant=tenant-1'
+				location: '/check-email?email=new%40example.com&tenant=tenant-1&sent=1'
 			});
 
 			expect(mockSignupTenant).toHaveBeenCalledWith(
@@ -136,6 +136,35 @@ describe('signup page server', () => {
 				expect.objectContaining({ httpOnly: true, path: '/' })
 			);
 			expect(cookieSet.mock.calls.some((c) => c[0] === 'access_token')).toBe(false);
+		});
+
+		it('redirects with sent=0 when verification email was not sent', async () => {
+			const { actions } = await import('./+page.server');
+			mockSuperValidate.mockResolvedValue({
+				valid: true,
+				data: {
+					organizationName: 'Acme',
+					email: 'new@example.com',
+					password: 'a-long-unique-pass',
+					displayName: ''
+				}
+			} as any);
+			mockSignupTenant.mockResolvedValue({
+				tenant: { id: 'tenant-1', slug: 'acme', name: 'Acme' },
+				admin: { id: 'user-1', email: 'new@example.com', email_verified: false },
+				verification_email_sent: false
+			});
+
+			await expect(
+				actions.default({
+					request: new Request('http://localhost/signup', { method: 'POST' }),
+					fetch: vi.fn(),
+					cookies: { set: vi.fn(), get: vi.fn() }
+				} as any)
+			).rejects.toMatchObject({
+				status: 302,
+				location: '/check-email?email=new%40example.com&tenant=tenant-1&sent=0'
+			});
 		});
 
 		it('shows API error on signup failure', async () => {

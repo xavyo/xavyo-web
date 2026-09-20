@@ -4,6 +4,26 @@ vi.mock('$lib/server/auth', () => ({
 	requestTenantId: vi.fn(
 		(url: URL, cookies: { get: (name: string) => string | undefined }) =>
 			url.searchParams.get('tenant') || cookies.get('tenant_id')
+	),
+	tenantIdFromQuery: vi.fn((value: string | null | undefined) => {
+		if (!value) return undefined;
+		const trimmed = value.trim();
+		return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmed)
+			? trimmed
+			: undefined;
+	}),
+	stampTenantCookieFromQuery: vi.fn(
+		(cookies: { set: (n: string, v: string) => void }, url: URL) => {
+			const tid = url.searchParams.get('tenant');
+			if (
+				tid &&
+				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tid)
+			) {
+				cookies.set('tenant_id', tid);
+				return tid;
+			}
+			return undefined;
+		}
 	)
 }));
 
@@ -33,22 +53,53 @@ describe('check-email page', () => {
 		it('returns email from URL search params', async () => {
 			const { load } = await import('./+page.server');
 			const url = new URL('http://localhost/check-email?email=test@example.com');
-			const result = await load({ url } as any) as { email: string };
+			const result = (await load({
+				url,
+				cookies: { get: () => undefined, set: vi.fn() }
+			} as any)) as {
+				email: string;
+				verificationEmailSent: boolean;
+			};
 			expect(result.email).toBe('test@example.com');
+			expect(result.verificationEmailSent).toBe(true);
 		});
 
 		it('returns empty string when no email param', async () => {
 			const { load } = await import('./+page.server');
 			const url = new URL('http://localhost/check-email');
-			const result = await load({ url } as any) as { email: string };
+			const result = (await load({
+				url,
+				cookies: { get: () => undefined, set: vi.fn() }
+			} as any)) as { email: string };
 			expect(result.email).toBe('');
 		});
 
 		it('handles encoded email correctly', async () => {
 			const { load } = await import('./+page.server');
 			const url = new URL('http://localhost/check-email?email=user%2Btag%40example.com');
-			const result = await load({ url } as any) as { email: string };
+			const result = (await load({
+				url,
+				cookies: { get: () => undefined, set: vi.fn() }
+			} as any)) as { email: string };
 			expect(result.email).toBe('user+tag@example.com');
+		});
+
+		it('flags verificationEmailSent false when sent=0', async () => {
+			const { load } = await import('./+page.server');
+			const url = new URL(
+				'http://localhost/check-email?email=a@b.com&tenant=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&sent=0'
+			);
+			const cookieSet = vi.fn();
+			const result = (await load({
+				url,
+				cookies: { get: () => undefined, set: cookieSet }
+			} as any)) as {
+				verificationEmailSent: boolean;
+				tenant: string;
+			};
+			expect(result.verificationEmailSent).toBe(false);
+			expect(result.tenant).toBe('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+			expect(cookieSet).toHaveBeenCalledWith('tenant_id', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
 		});
 	});
 
@@ -78,6 +129,33 @@ describe('check-email page', () => {
 				fetch: expect.any(Function)
 			});
 			expect(result).toEqual({ success: true });
+		});
+
+		it('prefers form tenant over cookie when both present', async () => {
+			const { actions } = await import('./+page.server');
+			mockApiClient.mockResolvedValue({ message: 'ok' });
+
+			const formData = new FormData();
+			formData.set('email', 'same@example.com');
+			formData.set('tenant', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee');
+			const request = new Request('http://localhost/check-email?/resend', {
+				method: 'POST',
+				body: formData
+			});
+
+			await actions.resend({
+				request,
+				url: new URL('http://localhost/check-email'),
+				cookies: { get: () => '11111111-2222-3333-4444-555555555555' },
+				fetch: vi.fn() as unknown as typeof globalThis.fetch
+			} as any);
+
+			expect(mockApiClient).toHaveBeenCalledWith('/auth/resend-verification', {
+				method: 'POST',
+				body: { email: 'same@example.com' },
+				tenantId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+				fetch: expect.any(Function)
+			});
 		});
 
 		it('does not send the system tenant when no tenant cookie is set', async () => {

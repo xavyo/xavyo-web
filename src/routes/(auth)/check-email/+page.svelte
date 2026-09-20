@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
@@ -64,6 +65,15 @@
 		{/if}
 	</div>
 
+	{#if !data.verificationEmailSent}
+		<Alert variant="destructive">
+			<AlertDescription>
+				We could not send the verification email. Use Resend below, or check SMTP / ops
+				configuration.
+			</AlertDescription>
+		</Alert>
+	{/if}
+
 	{#if actionResult?.success}
 		<Alert>
 			<AlertDescription>Verification email sent. Please check your inbox.</AlertDescription>
@@ -83,6 +93,9 @@
 		}}
 	>
 		<input type="hidden" name="email" value={email} />
+		{#if data.tenant}
+			<input type="hidden" name="tenant" value={data.tenant} />
+		{/if}
 		<Button type="submit" variant="outline" class="w-full rounded-full" disabled={!canResend}>
 			{#if resending}
 				Sending…
@@ -95,12 +108,19 @@
 	</form>
 
 	<div class="rounded-xl border bg-muted/40 px-4 py-3 text-left text-sm text-muted-foreground">
-		<p class="font-medium text-foreground">Can’t find your email?</p>
-		<p class="mt-1">Check your junk folder, or resend the verification link above.</p>
+		{#if data.verificationEmailSent}
+			<p class="font-medium text-foreground">Can’t find your email?</p>
+			<p class="mt-1">Check your junk folder, or resend the verification link above.</p>
+		{:else}
+			<p class="font-medium text-foreground">Email not sent</p>
+			<p class="mt-1">Use Resend above to try again.</p>
+		{/if}
 	</div>
 
 	<p class="text-center text-sm">
-		<a href="/login{tenantParam}" class="font-medium text-primary underline-offset-4 hover:underline"
+		<a
+			href={`${resolve('/login')}${tenantParam}`}
+			class="font-medium text-primary underline-offset-4 hover:underline"
 			>Back to login</a
 		>
 	</p>
