@@ -16,7 +16,7 @@
 	const { form, errors, enhance, message } = superForm(data.form, {
 		onResult({ result }) {
 			if (result.type === 'success' && result.data?.created) {
-				addToast('success', 'OAuth client created successfully');
+				addToast('success', 'Application created successfully');
 			}
 		}
 	});
@@ -29,13 +29,13 @@
 	);
 </script>
 
-<PageHeader title="Create OAuth Client"
-		description="Register a new OAuth/OIDC client application">
+<PageHeader title="Create application"
+		description="Register an OAuth/OIDC application for this workspace">
 	<a
 		href="/settings/oauth-clients"
 		class="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
 	>
-		Back to Clients
+		Back to Applications
 	</a>
 </PageHeader>
 
@@ -69,7 +69,7 @@
 					href="/settings/oauth-clients"
 					class="text-sm font-medium text-primary hover:underline"
 				>
-					Go to OAuth Clients list
+					Go to Applications
 				</a>
 			</div>
 		</div>
@@ -88,7 +88,7 @@
 					href="/settings/oauth-clients"
 					class="text-sm font-medium text-primary hover:underline"
 				>
-					Go to OAuth Clients list
+					Go to Applications
 				</a>
 			</div>
 		</div>
@@ -276,7 +276,7 @@
 				</div>
 
 				<div class="flex gap-2 pt-2">
-					<Button type="submit">Create Client</Button>
+					<Button type="submit">Create application</Button>
 					<a
 						href="/settings/oauth-clients"
 						class="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground"
