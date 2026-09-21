@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { signupTenant } from './tenants';
+import { signupTenant, getTenantSettings } from './tenants';
 
 vi.mock('./client', () => ({
 	apiClient: vi.fn()
@@ -40,5 +40,23 @@ describe('tenants API', () => {
 		expect(JSON.stringify(mockApiClient.mock.calls[0][1])).not.toContain(
 			'00000000-0000-0000-0000-000000000001'
 		);
+	});
+});
+
+
+describe('getTenantSettings', () => {
+	it('calls GET /tenants/:id/settings with token and tenant header', async () => {
+		mockApiClient.mockResolvedValueOnce({
+			tenant_id: 't1',
+			settings: { plan: 'free' }
+		});
+		const result = await getTenantSettings('t1', 'tok', fetch);
+		expect(mockApiClient).toHaveBeenCalledWith('/tenants/t1/settings', {
+			method: 'GET',
+			token: 'tok',
+			tenantId: 't1',
+			fetch
+		});
+		expect(result.settings.plan).toBe('free');
 	});
 });

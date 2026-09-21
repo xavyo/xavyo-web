@@ -14,6 +14,10 @@ vi.mock('$lib/api/scim', () => ({
 	updateScimMappings: vi.fn()
 }));
 
+vi.mock('$lib/api/tenants', () => ({
+	getTenantSettings: vi.fn()
+}));
+
 vi.mock('$lib/api/client', () => ({
 	ApiError: class ApiError extends Error {
 		status: number;
@@ -33,6 +37,7 @@ import {
 	updateScimMappings
 } from '$lib/api/scim';
 import { ApiError } from '$lib/api/client';
+import { getTenantSettings } from '$lib/api/tenants';
 
 const mockLocals = (admin: boolean) => ({
 	accessToken: 'tok',
@@ -70,6 +75,10 @@ const makeMapping = (overrides: Record<string, unknown> = {}) => ({
 describe('SCIM Admin +page.server', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		vi.mocked(getTenantSettings).mockResolvedValue({
+			tenant_id: 'tid',
+			settings: { plan: 'professional' }
+		} as any);
 	});
 
 	describe('load', () => {
@@ -109,6 +118,22 @@ describe('SCIM Admin +page.server', () => {
 			expect(result.mappings[0].scim_path).toBe('userName');
 			// Base URL for the IdP's SCIM connector must be surfaced to the admin.
 			expect(result.scimBaseUrl).toMatch(/\/scim\/v2$/);
+		});
+
+		it('locks SCIM UI on free plan without calling token APIs', async () => {
+			vi.mocked(getTenantSettings).mockResolvedValue({
+				tenant_id: 'tid',
+				settings: { plan: 'free' }
+			} as any);
+
+			const result = await load({
+				locals: mockLocals(true),
+				fetch: vi.fn()
+			} as any);
+
+			expect(result.planLocked).toBe(true);
+			expect(result.tokens).toEqual([]);
+			expect(listScimTokens).not.toHaveBeenCalled();
 		});
 
 		it('fails closed when API throws', async () => {

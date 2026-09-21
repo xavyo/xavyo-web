@@ -17,6 +17,7 @@
 	import { addToast } from '$lib/stores/toast.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import { planAllows, minTierFor, planDisplayName, type PlanTier } from '$lib/plans';
 	import type {
 		IdentityProvider,
 		IdentityProviderListResponse,
@@ -29,10 +30,19 @@
 	} from '$lib/api/types';
 
 	let activeTab = $derived($page.url.searchParams.get('tab') ?? 'overview');
+	const plan = $derived(($page.data.plan ?? 'free') as PlanTier);
+	const allowSaml = $derived(planAllows(plan, 'saml_idp'));
 
 	function handleTabChange(value: string) {
+		if (value === 'saml' && !allowSaml) return;
 		goto(`/federation?tab=${value}`, { replaceState: true });
 	}
+
+	$effect(() => {
+		if (activeTab === 'saml' && !allowSaml) {
+			goto('/federation?tab=overview', { replaceState: true });
+		}
+	});
 
 	// --- OIDC tab state ---
 	let oidcProviders = $state<IdentityProvider[]>([]);
@@ -279,7 +289,13 @@
 	<TabsList>
 		<TabsTrigger value="overview"><Network class="mr-2 h-4 w-4" />Overview</TabsTrigger>
 		<TabsTrigger value="oidc"><Globe class="mr-2 h-4 w-4" />OIDC</TabsTrigger>
-		<TabsTrigger value="saml"><Shield class="mr-2 h-4 w-4" />SAML</TabsTrigger>
+		{#if allowSaml}
+			<TabsTrigger value="saml"><Shield class="mr-2 h-4 w-4" />SAML</TabsTrigger>
+		{:else}
+			<span class="inline-flex items-center px-3 py-1.5 text-xs text-muted-foreground" title="Requires {planDisplayName(minTierFor('saml_idp'))} plan">
+				SAML (upgrade)
+			</span>
+		{/if}
 		<TabsTrigger value="social"><Share2 class="mr-2 h-4 w-4" />Social</TabsTrigger>
 	</TabsList>
 

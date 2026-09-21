@@ -20,6 +20,7 @@
 	import ContextIndicator from '$lib/components/persona/context-indicator.svelte';
 	import AppFooter from '$lib/components/layout/app-footer.svelte';
 	import type { LayoutData } from './$types';
+	import { planAllows, planDisplayName, type PlanTier } from '$lib/plans';
 
 	interface Props {
 		data: LayoutData;
@@ -29,6 +30,7 @@
 	let { data, children }: Props = $props();
 
 	let sidebarOpen = $state(false);
+	const plan = $derived((data.plan ?? 'free') as PlanTier);
 
 	const navSections: NavSection[] = $derived.by(() => {
 		const sections: NavSection[] = [
@@ -142,6 +144,36 @@
 			);
 		}
 
+		// Hide paid-only admin entries that the API already 403s on free/starter.
+		const allowScim = planAllows(plan, 'scim_inbound');
+		const allowSaml = planAllows(plan, 'saml_idp');
+		const allowIga = planAllows(plan, 'iga');
+		for (const section of sections) {
+			section.items = section.items.filter((item) => {
+				if (item.href === '/settings/scim' || item.href.startsWith('/settings/scim/')) {
+					return allowScim;
+				}
+				if (item.href === '/federation/saml' || item.href.startsWith('/federation/saml/')) {
+					return allowSaml;
+				}
+				if (
+					item.href === '/governance/certifications' ||
+					item.href.startsWith('/governance/certifications/') ||
+					item.href === '/governance/micro-certifications' ||
+					item.href.startsWith('/governance/micro-certifications/')
+				) {
+					return allowIga;
+				}
+				return true;
+			});
+		}
+		// Drop empty collapsible sections after filtering.
+		for (let i = sections.length - 1; i >= 0; i--) {
+			if (sections[i].collapsible && sections[i].items.length === 0) {
+				sections.splice(i, 1);
+			}
+		}
+
 		sections.push({
 			label: 'Settings',
 			collapsible: false,
@@ -195,6 +227,9 @@
 	<!-- Main content -->
 	<div class="flex min-w-0 flex-1 flex-col overflow-hidden">
 		<Header email={data.user?.email ?? ''} onToggleSidebar={toggleSidebar} />
+		<p class="border-b border-border px-4 py-1.5 text-xs text-muted-foreground" data-testid="tenant-plan">
+			Plan: {planDisplayName(plan)}
+		</p>
 		{#if data.currentAssumption?.is_assuming && data.currentAssumption.donor_id}
 			<div class="px-4 pt-2 sm:px-6">
 				<AssumedIdentityIndicator

@@ -8,6 +8,8 @@ import { ApiError } from '$lib/api/client';
 import { JsonObjectError, isJsonParseError, parseJsonRecord } from '$lib/utils/json-record';
 import { parsePortNumber } from '$lib/server/list-pagination';
 import type { ConnectorType, CreateConnectorRequest } from '$lib/api/types';
+import { getTenantSettings } from '$lib/api/tenants';
+import { parsePlanTier, planAllows, minTierFor, planDisplayName } from '$lib/plans';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const form = await superValidate(zod(createConnectorSchema));
@@ -75,7 +77,20 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
+
 		const connectorType = form.data.connector_type as ConnectorType;
+
+		if (connectorType === 'ldap') {
+			const settings = await getTenantSettings(locals.tenantId!, locals.accessToken!, fetch).catch(() => null);
+			const plan = parsePlanTier(settings?.settings?.plan);
+			if (!planAllows(plan, 'ldap_connector')) {
+				return message(
+					form,
+					`LDAP/AD connectors require the ${planDisplayName(minTierFor('ldap_connector'))} plan or higher (current: ${planDisplayName(plan)}).`,
+					{ status: 403 as ErrorStatus }
+				);
+			}
+		}
 
 		let config: Record<string, unknown>;
 		let credentials: Record<string, unknown>;

@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('$lib/api/tenants', () => ({
+	getTenantSettings: vi.fn()
+}));
+
 vi.mock('$lib/api/connectors', () => ({
 	createConnector: vi.fn()
 }));
@@ -20,6 +24,7 @@ vi.mock('$lib/server/auth', () => ({
 
 import { load, actions } from './+page.server';
 import { createConnector } from '$lib/api/connectors';
+import { getTenantSettings } from '$lib/api/tenants';
 import { ApiError } from '$lib/api/client';
 import { hasAdminRole } from '$lib/server/auth';
 
@@ -44,6 +49,11 @@ function makeFormData(data: Record<string, string>): Request {
 describe('Connectors Create +page.server', () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
+		// LDAP create is plan-gated; existing LDAP action tests assume starter+.
+		vi.mocked(getTenantSettings).mockResolvedValue({
+			tenant_id: 'tid',
+			settings: { plan: 'starter' }
+		} as any);
 	});
 
 	describe('load', () => {
@@ -341,6 +351,27 @@ describe('Connectors Create +page.server', () => {
 			} as any);
 			expect(result.status).toBe(409);
 		});
+
+		it('blocks LDAP create on free plan', async () => {
+		vi.mocked(getTenantSettings).mockResolvedValue({
+			tenant_id: 'tid',
+			settings: { plan: 'free' }
+		} as any);
+		const result: any = await actions.default({
+			request: makeFormData({
+				name: 'Corp LDAP',
+				connector_type: 'ldap',
+				host: 'ldap.example.com',
+				bind_dn: 'cn=admin',
+				bind_password: 'secret',
+				base_dn: 'dc=example,dc=com'
+			}),
+			locals: mockLocals(true),
+			fetch: vi.fn()
+		} as any);
+		expect(result.status).toBe(403);
+		expect(createConnector).not.toHaveBeenCalled();
+	});
 
 		it('rethrows non-API errors', async () => {
 			vi.mocked(createConnector).mockRejectedValue(new Error('network error'));

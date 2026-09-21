@@ -5,7 +5,9 @@ import { hasAdminRole } from '$lib/server/auth';
 import { fetchAlerts } from '$lib/api/alerts';
 import { getCurrentAssumption } from '$lib/api/power-of-attorney';
 import { getCurrentContext } from '$lib/api/persona-context';
+import { getTenantSettings } from '$lib/api/tenants';
 import { ApiError } from '$lib/api/client';
+import { parsePlanTier, type PlanTier } from '$lib/plans';
 
 function loadError(e: unknown, fallback: string): never {
 	if (e instanceof ApiError) error(e.status, e.message);
@@ -25,7 +27,7 @@ export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
 	// admin endpoints and the entire app shell would fail to load.
 	const isAdmin = hasAdminRole(locals.user.roles);
 	try {
-		const [alertsResult, currentAssumption, personaContext] = await Promise.all([
+		const [alertsResult, currentAssumption, personaContext, tenantSettings] = await Promise.all([
 			fetchAlerts(
 				{ limit: 1, acknowledged: false },
 				locals.accessToken!,
@@ -35,8 +37,11 @@ export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
 			isAdmin
 				? getCurrentAssumption(locals.accessToken!, locals.tenantId!, fetch)
 				: Promise.resolve(null),
-			isAdmin ? getCurrentContext(locals.accessToken!, locals.tenantId!, fetch) : Promise.resolve(null)
+			isAdmin ? getCurrentContext(locals.accessToken!, locals.tenantId!, fetch) : Promise.resolve(null),
+			getTenantSettings(locals.tenantId!, locals.accessToken!, fetch).catch(() => null)
 		]);
+
+		const plan: PlanTier = parsePlanTier(tenantSettings?.settings?.plan);
 
 		return {
 			user: locals.user,
@@ -44,6 +49,7 @@ export const load: LayoutServerLoad = async ({ locals, url, fetch }) => {
 			isAdmin,
 			currentAssumption,
 			personaContext,
+			plan,
 			appVersion: env.APP_VERSION || 'dev'
 		};
 	} catch (e) {
