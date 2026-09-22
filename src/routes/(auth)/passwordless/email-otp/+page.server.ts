@@ -9,7 +9,8 @@ import {
 	decodeAccessToken,
 	setMfaPartialToken,
 	requestTenantId,
-	stampTenantCookieFromQuery
+	stampTenantCookieFromQuery,
+	SYSTEM_TENANT_ID
 } from '$lib/server/auth';
 import { dev } from '$app/environment';
 import { ApiError } from '$lib/api/client';
@@ -30,7 +31,7 @@ export const actions: Actions = {
 			return fail(400, { requestForm });
 		}
 
-		const tenantId = requestTenantId(url, cookies);
+		const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
 
 		try {
 			await requestEmailOtp(requestForm.data.email, tenantId, fetch);
@@ -54,7 +55,7 @@ export const actions: Actions = {
 			return fail(400, { verifyForm, codeSent: true, email: verifyForm.data.email });
 		}
 
-		const tenantId = requestTenantId(url, cookies);
+		const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
 
 		try {
 			const result = await verifyEmailOtp(

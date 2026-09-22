@@ -53,7 +53,8 @@ describe('magic-link request action', () => {
 		expect(requestMagicLink).toHaveBeenCalledWith('user@example.com', TENANT, expect.any(Function));
 	});
 
-	it('redirects without tenant when none is provided', async () => {
+	it('defaults to system tenant when none is provided', async () => {
+		const SYSTEM = '00000000-0000-0000-0000-000000000001';
 		vi.mocked(requestMagicLink).mockResolvedValue({} as never);
 		try {
 			await actions.default({
@@ -66,7 +67,12 @@ describe('magic-link request action', () => {
 		} catch (e) {
 			const err = e as { status: number; location: string };
 			expect(err.status).toBe(302);
-			expect(err.location).toBe('/passwordless/magic-link/sent');
+			expect(err.location).toBe(`/passwordless/magic-link/sent?tenant=${SYSTEM}`);
 		}
+		expect(requestMagicLink).toHaveBeenCalledWith(
+			'user@example.com',
+			SYSTEM,
+			expect.any(Function)
+		);
 	});
 });
