@@ -90,12 +90,15 @@ describe('login page server', () => {
 			);
 			mockSuperValidate.mockResolvedValue({ valid: true, data: {} } as any);
 			const { load } = await import('./+page.server');
-			const result = await load({
+			const result = (await load({
 				locals: { user: null },
 				url: new URL('http://localhost/login'),
 				cookies: makeCookies(),
 				fetch: vi.fn()
-			} as any);
+			} as any)) as {
+				availableMethods: { magic_link: boolean; email_otp: boolean };
+				form: unknown;
+			};
 			expect(result.availableMethods).toEqual({ magic_link: false, email_otp: false });
 			expect(result.form).toBeDefined();
 		});
