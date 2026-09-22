@@ -16,7 +16,7 @@
 	let { data }: { data: PageData } = $props();
 
 	let selectedType = $state('');
-	const plan = $derived(($page.data.plan ?? 'free') as PlanTier);
+	const plan = $derived(($page.data?.plan ?? 'free') as PlanTier);
 	const allowLdap = $derived(planAllows(plan, 'ldap_connector'));
 	const availableTypes = $derived(
 		allowLdap ? CONNECTOR_TYPES : CONNECTOR_TYPES.filter((t) => t !== 'ldap')

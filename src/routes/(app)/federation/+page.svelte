@@ -30,7 +30,7 @@
 	} from '$lib/api/types';
 
 	let activeTab = $derived($page.url.searchParams.get('tab') ?? 'overview');
-	const plan = $derived(($page.data.plan ?? 'free') as PlanTier);
+	const plan = $derived(($page.data?.plan ?? 'free') as PlanTier);
 	const allowSaml = $derived(planAllows(plan, 'saml_idp'));
 
 	function handleTabChange(value: string) {
