@@ -15,9 +15,27 @@ import {
 import { ApiError } from '$lib/api/client';
 import { env } from '$env/dynamic/private';
 import type { MappingRequest } from '$lib/api/types';
+import { getTenantSettings } from '$lib/api/tenants';
+import { parsePlanTier, planAllows, minTierFor, planDisplayName, type PlanTier } from '$lib/plans';
 
 export const load: PageServerLoad = async ({ locals, fetch }) => {
 	const form = await superValidate(zod(createScimTokenSchema));
+	const settings = await getTenantSettings(locals.tenantId!, locals.accessToken!, fetch).catch(
+		() => null
+	);
+	const plan: PlanTier = parsePlanTier(settings?.settings?.plan);
+	if (!planAllows(plan, 'scim_inbound')) {
+		return {
+			form,
+			tokens: [] as Awaited<ReturnType<typeof listScimTokens>>,
+			mappings: [] as Awaited<ReturnType<typeof listScimMappings>>,
+			scimBaseUrl: '',
+			planLocked: true as const,
+			plan,
+			requiredPlan: minTierFor('scim_inbound'),
+			planMessage: `SCIM inbound requires the ${planDisplayName(minTierFor('scim_inbound'))} plan or higher (current: ${planDisplayName(plan)}).`
+		};
+	}
 
 	try {
 		const [tokens, mappings] = await Promise.all([
@@ -27,7 +45,7 @@ export const load: PageServerLoad = async ({ locals, fetch }) => {
 		// Base URL an external IdP (Okta/Azure AD/OneLogin) points its SCIM
 		// connector at. Derived from the backend API base; strip any trailing slash.
 		const scimBaseUrl = `${(env.API_BASE_URL ?? '').replace(/\/$/, '')}/scim/v2`;
-		return { form, tokens, mappings, scimBaseUrl };
+		return { form, tokens, mappings, scimBaseUrl, planLocked: false as const, plan };
 	} catch (e) {
 		if (e instanceof ApiError) error(e.status, e.message);
 		error(500, 'Failed to load SCIM settings');
@@ -39,6 +57,18 @@ export const actions: Actions = {
 		const form = await superValidate(request, zod(createScimTokenSchema));
 		if (!form.valid) {
 			return fail(400, { form });
+		}
+
+		const settings = await getTenantSettings(locals.tenantId!, locals.accessToken!, fetch).catch(
+			() => null
+		);
+		const plan = parsePlanTier(settings?.settings?.plan);
+		if (!planAllows(plan, 'scim_inbound')) {
+			return message(
+				form,
+				`SCIM inbound requires the ${planDisplayName(minTierFor('scim_inbound'))} plan or higher (current: ${planDisplayName(plan)}).`,
+				{ status: 403 as ErrorStatus }
+			);
 		}
 
 		try {

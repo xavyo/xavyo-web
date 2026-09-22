@@ -21,6 +21,8 @@
 	let { data }: { data: PageData } = $props();
 
 	const tokens = $derived(data.tokens as ScimTokenInfo[]);
+	const planLocked = $derived(Boolean((data as { planLocked?: boolean }).planLocked));
+	const planMessage = $derived((data as { planMessage?: string }).planMessage ?? '');
 	const mappings = $derived(data.mappings as ScimAttributeMapping[]);
 
 	// Tab state
@@ -87,6 +89,13 @@
 </script>
 
 <PageHeader title="SCIM Administration" description="Manage SCIM provisioning tokens and attribute mappings" />
+
+{#if planLocked}
+	<Alert class="mb-6" data-testid="scim-plan-locked">
+		<AlertDescription>{planMessage}</AlertDescription>
+	</Alert>
+{/if}
+
 
 <div class="-mb-px flex gap-4 border-b border-border" role="tablist" aria-label="SCIM Administration tabs">
 	{#each tabs as tab}

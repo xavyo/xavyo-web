@@ -10,10 +10,17 @@
 	import { addToast } from '$lib/stores/toast.svelte';
 	import { CONNECTOR_TYPES, DATABASE_DRIVERS, AUTH_TYPES } from '$lib/schemas/connectors';
 	import type { PageData } from './$types';
+	import { planAllows, minTierFor, planDisplayName, type PlanTier } from '$lib/plans';
+	import { page } from '$app/stores';
 
 	let { data }: { data: PageData } = $props();
 
 	let selectedType = $state('');
+	const plan = $derived(($page.data?.plan ?? 'free') as PlanTier);
+	const allowLdap = $derived(planAllows(plan, 'ldap_connector'));
+	const availableTypes = $derived(
+		allowLdap ? CONNECTOR_TYPES : CONNECTOR_TYPES.filter((t) => t !== 'ldap')
+	);
 
 	// svelte-ignore state_referenced_locally
 	const { form, errors, enhance, message } = superForm(data.form, {
@@ -94,7 +101,7 @@
 					}}
 				>
 					<option value="" disabled>Select connector type</option>
-					{#each CONNECTOR_TYPES as type}
+					{#each availableTypes as type}
 						<option value={type}>{connectorTypeLabels[type] ?? type}</option>
 					{/each}
 				</select>
@@ -103,6 +110,12 @@
 				{/if}
 			</div>
 
+			{#if !allowLdap}
+				<p class="text-sm text-muted-foreground">
+					LDAP/AD connectors require the {planDisplayName(minTierFor('ldap_connector'))} plan or higher
+					(current: {planDisplayName(plan)}).
+				</p>
+			{/if}
 			{#if selectedType}
 				<Separator class="my-4" />
 				<h3 class="text-sm font-medium text-muted-foreground">

@@ -21,6 +21,10 @@ vi.mock('$lib/api/persona-context', () => ({
 	getCurrentContext: vi.fn()
 }));
 
+vi.mock('$lib/api/tenants', () => ({
+	getTenantSettings: vi.fn()
+}));
+
 vi.mock('$lib/api/client', () => ({
 	ApiError: class ApiError extends Error {
 		status: number;
@@ -35,6 +39,7 @@ import { load } from './+layout.server';
 import { fetchAlerts } from '$lib/api/alerts';
 import { getCurrentAssumption } from '$lib/api/power-of-attorney';
 import { getCurrentContext } from '$lib/api/persona-context';
+import { getTenantSettings } from '$lib/api/tenants';
 import { ApiError } from '$lib/api/client';
 
 const tenantId = '11111111-1111-1111-1111-111111111111';
@@ -45,6 +50,10 @@ describe('App layout +layout.server', () => {
 		vi.mocked(fetchAlerts).mockResolvedValue({ unacknowledged_count: 2 } as any);
 		vi.mocked(getCurrentAssumption).mockResolvedValue({ is_assuming: false } as any);
 		vi.mocked(getCurrentContext).mockResolvedValue({ is_persona_active: false } as any);
+		vi.mocked(getTenantSettings).mockResolvedValue({
+			tenant_id: tenantId,
+			settings: { plan: 'free', limits: { max_mau: 1000 } }
+		} as any);
 	});
 
 	it('redirects unauthenticated users to login', async () => {
@@ -76,6 +85,17 @@ describe('App layout +layout.server', () => {
 		expect(result.currentAssumption.is_assuming).toBe(false);
 		expect(result.personaContext.is_persona_active).toBe(false);
 		expect(result.isAdmin).toBe(true);
+		expect(result.plan).toBe('free');
+	});
+
+	it('defaults plan to free when settings fetch fails', async () => {
+		vi.mocked(getTenantSettings).mockRejectedValue(new Error('down'));
+		const result = (await load({
+			locals: { user: { id: 'u1', roles: ['admin'] }, accessToken: 'tok', tenantId },
+			url: new URL('http://localhost/dashboard'),
+			fetch: vi.fn()
+		} as any)) as any;
+		expect(result.plan).toBe('free');
 	});
 
 	it('fails closed when assumption API throws (admin)', async () => {

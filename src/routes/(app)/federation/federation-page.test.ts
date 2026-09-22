@@ -5,7 +5,11 @@ import { render, screen, cleanup } from '@testing-library/svelte';
 vi.mock('$app/stores', () => ({
 	page: {
 		subscribe: vi.fn((fn: Function) => {
-			fn({ url: new URL('http://localhost/federation?tab=overview'), params: {} });
+			fn({
+				url: new URL('http://localhost/federation?tab=overview'),
+				params: {},
+				data: { plan: 'enterprise' }
+			});
 			return () => {};
 		})
 	}
