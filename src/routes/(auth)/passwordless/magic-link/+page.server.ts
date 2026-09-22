@@ -4,7 +4,7 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { fail, redirect } from '@sveltejs/kit';
 import { magicLinkRequestSchema } from '$lib/schemas/auth';
 import { requestMagicLink } from '$lib/api/auth';
-import { requestTenantId, stampTenantCookieFromQuery } from '$lib/server/auth';
+import { requestTenantId, stampTenantCookieFromQuery, SYSTEM_TENANT_ID } from '$lib/server/auth';
 import { ApiError } from '$lib/api/client';
 
 export const load: PageServerLoad = async ({ cookies, url }) => {
@@ -22,7 +22,7 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		const tenantId = requestTenantId(url, cookies);
+		const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
 
 		try {
 			await requestMagicLink(form.data.email, tenantId, fetch);
@@ -33,7 +33,6 @@ export const actions: Actions = {
 			return message(form, 'An unexpected error occurred', { status: 500 });
 		}
 
-		const tenantParam = tenantId ? `?tenant=${tenantId}` : '';
-		redirect(302, `/passwordless/magic-link/sent${tenantParam}`);
+		redirect(302, `/passwordless/magic-link/sent?tenant=${tenantId}`);
 	}
 };

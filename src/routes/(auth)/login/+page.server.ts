@@ -1,7 +1,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import { superValidate, message, type ErrorStatus } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { error, fail, redirect } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { loginSchema } from '$lib/schemas/auth';
 import { login, getAvailableMethods } from '$lib/api/auth';
 import { getAvailableSocialProviders } from '$lib/api/social';
@@ -38,15 +38,15 @@ export const load: PageServerLoad = async ({ locals, url, cookies, fetch }) => {
 
 	stampTenantCookieFromQuery(cookies, url);
 	const tenantId = requestTenantId(url, cookies) || SYSTEM_TENANT_ID;
+	// Methods and social are best-effort: a 429/5xx on these probes must not brick password login.
+	// (Registration rate limit shares one BFF egress IP; fail-closed here made /login unusable.)
 	let availableMethods = { magic_link: false, email_otp: false };
 	try {
 		availableMethods = await getAvailableMethods(tenantId, fetch);
-	} catch (e) {
-		if (e instanceof ApiError) error(e.status, e.message);
-		error(500, 'Failed to load available login methods');
+	} catch {
+		availableMethods = { magic_link: false, email_otp: false };
 	}
 
-	// Social providers are best-effort: a failure here must not break password login.
 	let socialProviders: { provider: string; name: string }[] = [];
 	try {
 		const res = await getAvailableSocialProviders(tenantId, fetch);

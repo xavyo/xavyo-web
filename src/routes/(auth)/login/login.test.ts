@@ -23,6 +23,10 @@ vi.mock('$lib/api/auth', () => ({
 	getAvailableMethods: vi.fn().mockResolvedValue({ magic_link: false, email_otp: false })
 }));
 
+vi.mock('$lib/api/social', () => ({
+	getAvailableSocialProviders: vi.fn().mockResolvedValue({ providers: [] })
+}));
+
 vi.mock('$lib/server/auth', () => ({
 	setCookies: vi.fn(),
 	SYSTEM_TENANT_ID: '00000000-0000-0000-0000-000000000001',
@@ -78,19 +82,22 @@ describe('login page server', () => {
 			).rejects.toMatchObject({ status: 302, location: '/dashboard' });
 		});
 
-		it('fails closed when available methods API throws', async () => {
+		it('degrades when available methods API throws so password login still renders', async () => {
 			const { getAvailableMethods } = await import('$lib/api/auth');
-			vi.mocked(getAvailableMethods).mockRejectedValueOnce(new Error('network'));
+			const { ApiError } = await import('$lib/api/client');
+			vi.mocked(getAvailableMethods).mockRejectedValueOnce(
+				new ApiError('too_many_requests', 429, 'too_many_requests')
+			);
 			mockSuperValidate.mockResolvedValue({ valid: true, data: {} } as any);
 			const { load } = await import('./+page.server');
-			await expect(
-				load({
-					locals: { user: null },
-					url: new URL('http://localhost/login'),
-					cookies: makeCookies(),
-					fetch: vi.fn()
-				} as any)
-			).rejects.toMatchObject({ status: 500 });
+			const result = await load({
+				locals: { user: null },
+				url: new URL('http://localhost/login'),
+				cookies: makeCookies(),
+				fetch: vi.fn()
+			} as any);
+			expect(result.availableMethods).toEqual({ magic_link: false, email_otp: false });
+			expect(result.form).toBeDefined();
 		});
 
 		it('defaults to system tenant for getAvailableMethods when no tenant param', async () => {
